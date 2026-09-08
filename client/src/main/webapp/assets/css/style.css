@@ -1,0 +1,52 @@
+:root {
+    --nen: #f6f7f9;
+    --chu: #1c1e21;
+    --mo: #65676b;
+    --vien: #dcdfe3;
+    --ok: #1a7f37;
+    --loi: #c9252d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--nen);
+    color: var(--chu);
+    font: 15px/1.6 "Segoe UI", system-ui, sans-serif;
+}
+
+.container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 17px; margin: 32px 0 8px; }
+
+.sub { color: var(--mo); margin: 0 0 28px; }
+
+.box {
+    border: 1px solid var(--vien);
+    border-left-width: 4px;
+    border-radius: 6px;
+    background: #fff;
+    padding: 14px 16px;
+}
+
+.box p { margin: 6px 0 0; }
+.box-ok  { border-left-color: var(--ok); }
+.box-loi { border-left-color: var(--loi); }
+
+.hint { color: var(--mo); font-size: 13px; }
+
+code {
+    background: #eceef1;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+ul { padding-left: 20px; }
+li { margin: 4px 0; }

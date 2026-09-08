@@ -1,0 +1,27 @@
+# ===========================================================================
+# COPY FILE NAY THANH application-local.properties ROI SUA THEO MAY CUA BAN.
+# File application-local.properties da nam trong .gitignore -> KHONG bi commit.
+# Tuyet doi khong ghi mat khau that vao file .example nay.
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Ket noi SQL Server
+# ---------------------------------------------------------------------------
+# encrypt=true la mac dinh tu mssql-jdbc 10.x tro di. Neu khong them
+# trustServerCertificate=true thi chay local se loi SSL handshake ngay.
+# Chi dung trustServerCertificate=true khi dev, khong dung tren server that.
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=swp391_kpi;encrypt=true;trustServerCertificate=true
+spring.datasource.username=sa
+spring.datasource.password=DOI_MAT_KHAU_CUA_BAN
+
+# Neu dung SQL Server Express thi thuong phai chi ro instance:
+#spring.datasource.url=jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=swp391_kpi;encrypt=true;trustServerCertificate=true
+
+# ---------------------------------------------------------------------------
+# Truoc khi chay lan dau, kiem tra 3 thu trong SQL Server Configuration Manager:
+#   1. SQL Server Network Configuration -> Protocols -> TCP/IP = Enabled
+#   2. TCP/IP -> Properties -> IP Addresses -> IPAll -> TCP Port = 1433
+#   3. SSMS -> chuot phai server -> Properties -> Security
+#      -> chon "SQL Server and Windows Authentication mode" (Mixed Mode)
+#      Doi xong phai restart dich vu SQL Server thi moi an.
+# ---------------------------------------------------------------------------

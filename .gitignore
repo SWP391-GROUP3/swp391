@@ -1,0 +1,39 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Cau hinh cuc bo - CHUA MAT KHAU, KHONG COMMIT
+application-local.properties
+*-local.properties
+.env
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse / STS
+.settings/
+.project
+.classpath
+.factorypath
+bin/
+
+# VS Code
+.vscode/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+nbdist/
+
+# Windows / macOS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Log
+*.log
+logs/
