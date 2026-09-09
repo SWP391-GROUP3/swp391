@@ -79,28 +79,6 @@ Không cần database, chạy xong trong dưới một giây.
 
 ---
 
-## Bảng endpoint
-
-Cả nhóm thống nhất bảng này **trước** khi code. Ai thêm endpoint thì sửa bảng
-này trong cùng PR — người làm client dựa vào đây để làm giao diện song song,
-không phải chờ server xong.
-
-| Method | Đường dẫn | Mô tả | Vai trò | Người làm |
-|---|---|---|---|---|
-| GET | `/api/ping` | Kiểm tra server sống | công khai | ✅ xong |
-| POST | `/api/auth/login` | Đăng nhập, trả JWT | công khai | |
-| GET | `/api/tac-pham` | Danh sách bài, có lọc & phân trang | mọi vai trò | |
-| POST | `/api/tac-pham` | Nộp bài mới | phóng viên | |
-| PUT | `/api/tac-pham/{id}/trang-thai` | Chuyển trạng thái duyệt | BTV, TKTS | |
-| POST | `/api/tac-pham/{id}/cham-diem` | Gửi phiếu chấm điểm | BTV, TKTS | |
-| GET | `/api/ky-tinh` | Danh sách kỳ | TKTS, kế toán | |
-| POST | `/api/ky-tinh/{id}/tinh-thu` | Tính thử, chưa ghi DB | TKTS | |
-| POST | `/api/ky-tinh/{id}/chot` | Chốt kỳ, sinh bảng kê | tổng biên tập | |
-| GET | `/api/bang-ke?kyId=&nguoiDungId=` | Xem bảng kê | kế toán, cá nhân | |
-| GET | `/api/bao-cao/kpi?kyId=` | Báo cáo KPI theo kỳ | TKTS, TBT | |
-
----
-
 ## Quy tắc làm việc
 
 **Nhánh.** Không push thẳng `main`. Tạo nhánh `feature/<việc>`, mở PR, một người
