@@ -74,8 +74,9 @@ export default function Login({ onDangNhap }) {
             <li><code>an.nv@toasoan.vn</code> — Phóng viên</li>
             <li><code>cuong.lh@toasoan.vn</code> — Biên tập viên</li>
             <li><code>dung.pt@toasoan.vn</code> — Thư ký toà soạn</li>
-            <li><code>duc.vm@toasoan.vn</code> — Tổng biên tập</li>
-            <li><code>chi.hl@toasoan.vn</code> — Kế toán + Quản trị</li>
+            <li><code>duc.vm@toasoan.vn</code> — Trưởng ban</li>
+            <li><code>chi.hl@toasoan.vn</code> — Kế toán</li>
+            <li><code>admin@toasoan.vn</code> — Quản trị hệ thống</li>
           </ul>
         </details>
       </div>

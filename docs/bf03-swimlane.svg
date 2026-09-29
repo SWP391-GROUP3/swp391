@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1660" viewBox="0 0 1080 1660" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C00000"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="1660" fill="#FFFFFF"/>
+
+  <text x="540" y="32" text-anchor="middle" font-size="21" font-weight="700" fill="#1F3864">BF-03 — TÍNH KPI &amp; NHUẬN BÚT THEO KỲ</text>
+  <text x="540" y="54" text-anchor="middle" font-size="12.5" font-style="italic" fill="#666">Trigger: đến giờ chạy theo lịch, hoặc kế toán bấm chạy tay  ·  Kết thúc: mọi bài đã đăng trong kỳ đều có dòng tiền, hoặc có dòng lỗi chờ xử lý</text>
+
+  <rect x="30" y="114" width="350" height="1456" fill="#FAFBFD" stroke="#B8CCE4" stroke-width="1.5"/>
+  <rect x="390" y="114" width="640" height="1456" fill="#FFFFFF" stroke="#B8CCE4" stroke-width="1.5"/>
+  <rect x="30" y="70" width="350" height="44" fill="#D9E2F3" stroke="#B8CCE4" stroke-width="1.5"/>
+  <rect x="390" y="70" width="640" height="44" fill="#D9E2F3" stroke="#B8CCE4" stroke-width="1.5"/>
+  <text x="205" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#1F3864">KẾ TOÁN</text>
+  <text x="710" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#1F3864">HỆ THỐNG  (job chạy theo lịch)</text>
+
+  <rect x="430" y="500" width="600" height="800" fill="none" stroke="#9AA6B2" stroke-width="1.5" stroke-dasharray="7 5" rx="8"/>
+  <text x="442" y="522" font-size="12" font-style="italic" fill="#6B7A8C">lặp: với mỗi bài đã đăng trong kỳ</text>
+
+  <rect x="75" y="150" width="260" height="44" rx="22" fill="#D9E2F3" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="205" y="177" text-anchor="middle" font-size="13" fill="#1F3864">Bấm chạy tay (ngoài lịch)</text>
+
+  <rect x="460" y="150" width="320" height="44" rx="22" fill="#D9E2F3" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="177" text-anchor="middle" font-size="13" fill="#1F3864">Đến giờ chạy theo lịch</text>
+
+  <path d="M335,172 H452" stroke="#444" stroke-width="1.6" fill="none" marker-end="url(#ar)"/>
+
+  <path d="M620,194 V222" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+  <polygon points="620,230 750,272 620,314 490,272" fill="#FFFFFF" stroke="#7F7F7F" stroke-width="1.6"/>
+  <text x="620" y="268" text-anchor="middle" font-size="12.5" fill="#333">Có job cùng kỳ</text>
+  <text x="620" y="285" text-anchor="middle" font-size="12.5" fill="#333">đang chạy?</text>
+
+  <path d="M750,272 H782" stroke="#C00000" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="766" y="264" text-anchor="middle" font-size="11.5" fill="#C00000">Có</text>
+  <rect x="790" y="250" width="220" height="44" rx="6" fill="#FBE4E4" stroke="#C00000" stroke-width="1.5"/>
+  <text x="900" y="277" text-anchor="middle" font-size="12.5" fill="#8B0000">Dừng, không tạo bản ghi</text>
+
+  <text x="634" y="334" font-size="11.5" fill="#555">Không</text>
+  <path d="M620,314 V342" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="350" width="320" height="44" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="377" text-anchor="middle" font-size="13" fill="#222">Tạo bản ghi lần chạy — ĐANG CHẠY</text>
+
+  <path d="M620,394 V422" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="430" width="320" height="44" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="457" text-anchor="middle" font-size="13" fill="#222">Quét bài đã đăng trong kỳ</text>
+
+  <rect x="75" y="430" width="260" height="50" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="205" y="450" text-anchor="middle" font-size="12.5" fill="#222">Xem tiến trình job:</text>
+  <text x="205" y="468" text-anchor="middle" font-size="12.5" fill="#222">bài quét · dòng ghi · lỗi</text>
+  <path d="M456,455 H343" stroke="#888" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#arg)"/>
+
+  <path d="M620,474 V532" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="540" width="320" height="44" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="567" text-anchor="middle" font-size="13" fill="#222">Tra định mức theo NGÀY ĐĂNG của bài</text>
+
+  <path d="M620,584 V611" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+  <polygon points="620,619 740,657 620,695 500,657" fill="#FFFFFF" stroke="#7F7F7F" stroke-width="1.6"/>
+  <text x="620" y="662" text-anchor="middle" font-size="12.5" fill="#333">Tra được định mức?</text>
+
+  <path d="M740,657 H782" stroke="#C00000" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="761" y="649" text-anchor="middle" font-size="11.5" fill="#C00000">Không</text>
+  <rect x="790" y="631" width="220" height="52" rx="6" fill="#FBE4E4" stroke="#C00000" stroke-width="1.5"/>
+  <text x="900" y="652" text-anchor="middle" font-size="12" fill="#8B0000">Ghi lỗi NO_RATE_VERSION,</text>
+  <text x="900" y="670" text-anchor="middle" font-size="12" fill="#8B0000">bỏ qua bài, sang bài kế</text>
+
+  <text x="634" y="715" font-size="11.5" fill="#555">Có</text>
+  <path d="M620,695 V722" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <polygon points="620,730 750,768 620,806 490,768" fill="#FFFFFF" stroke="#7F7F7F" stroke-width="1.6"/>
+  <text x="620" y="765" text-anchor="middle" font-size="12.5" fill="#333">Bài đã có hạng</text>
+  <text x="620" y="782" text-anchor="middle" font-size="12.5" fill="#333">chất lượng?</text>
+
+  <path d="M750,768 H782" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+  <text x="766" y="760" text-anchor="middle" font-size="11.5" fill="#555">Chưa</text>
+  <rect x="790" y="742" width="220" height="52" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="900" y="763" text-anchor="middle" font-size="12" fill="#222">Lấy hệ số đáy khung,</text>
+  <text x="900" y="781" text-anchor="middle" font-size="12" fill="#222">đánh dấu TẠM TÍNH</text>
+  <path d="M900,794 V832 H788" stroke="#444" stroke-width="1.4" fill="none" marker-end="url(#ar)"/>
+
+  <text x="634" y="826" font-size="11.5" fill="#555">Rồi</text>
+  <path d="M620,806 V832" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="840" width="320" height="56" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="862" text-anchor="middle" font-size="12.5" fill="#222">Tính tiền tác phẩm =</text>
+  <text x="620" y="881" text-anchor="middle" font-size="12.5" fill="#222">hệ số × đơn giá × hệ số video × % đăng lại</text>
+
+  <path d="M620,896 V922" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="930" width="320" height="56" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="952" text-anchor="middle" font-size="12.5" fill="#222">Bài điện tử: cộng tiền view =</text>
+  <text x="620" y="971" text-anchor="middle" font-size="12.5" fill="#222">min(view hợp lệ × đơn giá, trần view)  ·  bài in = 0</text>
+
+  <path d="M620,986 V1012" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <polygon points="620,1020 760,1058 620,1096 480,1058" fill="#FFFFFF" stroke="#7F7F7F" stroke-width="1.6"/>
+  <text x="620" y="1055" text-anchor="middle" font-size="12.5" fill="#333">Có cảnh báo gian lận</text>
+  <text x="620" y="1072" text-anchor="middle" font-size="12.5" fill="#333">chưa xử lý?</text>
+
+  <path d="M760,1058 H782" stroke="#C00000" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="772" y="1050" text-anchor="middle" font-size="11.5" fill="#C00000">Có</text>
+  <rect x="790" y="1036" width="220" height="44" rx="6" fill="#FBE4E4" stroke="#C00000" stroke-width="1.5"/>
+  <text x="900" y="1063" text-anchor="middle" font-size="12.5" fill="#8B0000">Dòng tiền → TẠM GIỮ</text>
+
+  <text x="634" y="1116" font-size="11.5" fill="#555">Không</text>
+  <path d="M620,1096 V1122" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="1130" width="320" height="56" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="2.2"/>
+  <text x="620" y="1152" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7F6000">★ Chia tiền cho người hưởng</text>
+  <text x="620" y="1171" text-anchor="middle" font-size="12" fill="#7F6000">phân bổ phần dư lớn nhất — tổng khớp tuyệt đối</text>
+
+  <path d="M620,1186 V1212" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="1220" width="320" height="50" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="1240" text-anchor="middle" font-size="12.5" fill="#222">Ghi snapshot tham số đã dùng ·</text>
+  <text x="620" y="1258" text-anchor="middle" font-size="12.5" fill="#222">áp thưởng / phạt tự động</text>
+
+  <path d="M620,1270 V1332" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="1340" width="320" height="56" rx="6" fill="#FFF2CC" stroke="#BF8F00" stroke-width="2.2"/>
+  <text x="620" y="1362" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7F6000">★ Tính kết quả KPI từng người</text>
+  <text x="620" y="1381" text-anchor="middle" font-size="12" fill="#7F6000">% hoàn thành → tra bậc thưởng → hệ số thưởng</text>
+
+  <path d="M620,1396 V1422" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="460" y="1430" width="320" height="44" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="620" y="1457" text-anchor="middle" font-size="13" fill="#222">Đóng job — THÀNH CÔNG</text>
+
+  <path d="M620,1474 V1492" stroke="#444" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="440" y="1500" width="360" height="48" rx="24" fill="#D9E2F3" stroke="#4472C4" stroke-width="2"/>
+  <text x="620" y="1520" text-anchor="middle" font-size="12.5" fill="#1F3864">Mọi bài đã đăng trong kỳ đều có dòng tiền,</text>
+  <text x="620" y="1538" text-anchor="middle" font-size="12.5" fill="#1F3864">hoặc có dòng lỗi chờ xử lý</text>
+
+  <rect x="75" y="1340" width="260" height="50" rx="6" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="205" y="1360" text-anchor="middle" font-size="12.5" fill="#222">Xử lý bài lỗi,</text>
+  <text x="205" y="1378" text-anchor="middle" font-size="12.5" fill="#222">rồi cho chạy lại</text>
+
+  <path d="M1010,657 H1050 V1365 H343" stroke="#C00000" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#arr)"/>
+  <text x="1044" y="1010" font-size="11.5" fill="#C00000" transform="rotate(-90 1044 1010)">danh sách bài lỗi</text>
+
+  <path d="M205,1340 V1332 H60 V372 H452" stroke="#444" stroke-width="1.6" fill="none" marker-end="url(#ar)"/>
+  <text x="68" y="860" font-size="11.5" fill="#555" transform="rotate(-90 68 860)">chạy lại</text>
+
+  <rect x="30" y="1592" width="22" height="16" rx="3" fill="#FFFFFF" stroke="#4472C4" stroke-width="1.5"/>
+  <text x="60" y="1605" font-size="12" fill="#444">bước xử lý</text>
+
+  <rect x="160" y="1592" width="22" height="16" rx="3" fill="#FFF2CC" stroke="#BF8F00" stroke-width="2"/>
+  <text x="190" y="1605" font-size="12" fill="#444">★ thuật toán — lõi đồ án</text>
+
+  <rect x="375" y="1592" width="22" height="16" rx="3" fill="#FBE4E4" stroke="#C00000" stroke-width="1.5"/>
+  <text x="405" y="1605" font-size="12" fill="#444">nhánh ngoại lệ</text>
+
+  <polygon points="530,1590 552,1600 530,1610 508,1600" fill="#FFFFFF" stroke="#7F7F7F" stroke-width="1.5"/>
+  <text x="560" y="1605" font-size="12" fill="#444">điểm rẽ nhánh</text>
+
+  <path d="M690,1600 H726" stroke="#888" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arg)"/>
+  <text x="734" y="1605" font-size="12" fill="#444">luồng dữ liệu (không phải điều khiển)</text>
+</svg>

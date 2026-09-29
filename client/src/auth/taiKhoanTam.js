@@ -17,8 +17,9 @@
  *        if (!res.ok) throw new Error('Email hoac mat khau khong dung')
  *        const nguoiDung = await res.json()
  *
- * Danh sach duoi day lay dung 7 nguoi trong database/data.sql (ma NV, ho ten,
+ * Danh sach duoi day lay dung 8 nguoi trong database/data.sql (username, ho ten,
  * email, vai tro) de khi noi vao DB that thi du lieu khop san.
+ * Moi nguoi dung 1 vai tro (users.role_id), van de dang mang cho tenVaiTro().
  */
 
 const MAT_KHAU_CHUNG = '123456'
@@ -26,20 +27,21 @@ const MAT_KHAU_CHUNG = '123456'
 const TEN_VAI_TRO = {
   PHONG_VIEN:      'Phóng viên',
   BIEN_TAP_VIEN:   'Biên tập viên',
+  TRUONG_BAN:      'Trưởng ban',
   THU_KY_TOA_SOAN: 'Thư ký toà soạn',
-  TONG_BIEN_TAP:   'Tổng biên tập',
   KE_TOAN:         'Kế toán',
   QUAN_TRI:        'Quản trị hệ thống',
 }
 
 const DANH_SACH = [
-  { maNV: 'NV001', hoTen: 'Nguyễn Văn An',  email: 'an.nv@toasoan.vn',    vaiTro: ['PHONG_VIEN'] },
-  { maNV: 'NV002', hoTen: 'Trần Thị Bình',  email: 'binh.tt@toasoan.vn',  vaiTro: ['PHONG_VIEN'] },
-  { maNV: 'NV003', hoTen: 'Lê Hoàng Cường', email: 'cuong.lh@toasoan.vn', vaiTro: ['BIEN_TAP_VIEN'] },
-  { maNV: 'NV004', hoTen: 'Phạm Thu Dung',  email: 'dung.pt@toasoan.vn',  vaiTro: ['THU_KY_TOA_SOAN'] },
-  { maNV: 'NV005', hoTen: 'Vũ Minh Đức',    email: 'duc.vm@toasoan.vn',   vaiTro: ['TONG_BIEN_TAP'] },
-  { maNV: 'NV006', hoTen: 'Hoàng Lan Chi',  email: 'chi.hl@toasoan.vn',   vaiTro: ['KE_TOAN', 'QUAN_TRI'] },
-  { maNV: 'CTV01', hoTen: 'Đỗ Quốc Hưng',   email: 'hung.dq@gmail.com',   vaiTro: ['PHONG_VIEN'] },
+  { username: 'an.nv',    hoTen: 'Nguyễn Văn An',  email: 'an.nv@toasoan.vn',    vaiTro: ['PHONG_VIEN'] },
+  { username: 'binh.tt',  hoTen: 'Trần Thị Bình',  email: 'binh.tt@toasoan.vn',  vaiTro: ['PHONG_VIEN'] },
+  { username: 'cuong.lh', hoTen: 'Lê Hoàng Cường', email: 'cuong.lh@toasoan.vn', vaiTro: ['BIEN_TAP_VIEN'] },
+  { username: 'dung.pt',  hoTen: 'Phạm Thu Dung',  email: 'dung.pt@toasoan.vn',  vaiTro: ['THU_KY_TOA_SOAN'] },
+  { username: 'duc.vm',   hoTen: 'Vũ Minh Đức',    email: 'duc.vm@toasoan.vn',   vaiTro: ['TRUONG_BAN'] },
+  { username: 'chi.hl',   hoTen: 'Hoàng Lan Chi',  email: 'chi.hl@toasoan.vn',   vaiTro: ['KE_TOAN'] },
+  { username: 'hung.dq',  hoTen: 'Đỗ Quốc Hưng',   email: 'hung.dq@toasoan.vn',  vaiTro: ['PHONG_VIEN'] },
+  { username: 'admin',    hoTen: 'Quản trị viên',  email: 'admin@toasoan.vn',    vaiTro: ['QUAN_TRI'] },
 ]
 
 /** Ten vai tro tieng Viet, ghep bang dau phay - de hien ra man hinh. */

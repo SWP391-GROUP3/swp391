@@ -1,0 +1,976 @@
+// =============================================================
+// BÀI TOÁN 3 — KPI & NHUẬN BÚT
+// DBML v3 · 20/09/2026 · sửa từ v2
+//
+// Đề bài: "thiên về tính toán và xử lý logic số liệu ... thuật toán
+// và báo cáo ... mô phỏng khâu hậu kỳ của toà soạn."
+// v3 kéo schema về đúng trọng tâm đó: bỏ phần SEO/mặt tiền, lấy lại
+// bốn thuật toán đã có ở bản 22 bảng.
+//
+// BỐN THUẬT TOÁN LÀ LÕI CỦA ĐỒ ÁN:
+//   1. Chia tiền một bài cho nhiều tác giả  -> PhanBoTien (largest remainder)
+//   2. Áp trần quỹ: co đều toàn kỳ cho khớp -> PhanBoTien, trọng số = tiền
+//   3. Bậc thưởng KPI theo % hoàn thành     -> rate_kpi_bonus_tiers
+//   4. Phát hiện view bất thường            -> fraud_alerts, độ lệch chuẩn
+//
+// BA QUY TẮC XUYÊN SUỐT (giữ nguyên từ v2, đã đúng):
+//   1. Định mức không sửa đè, chỉ tạo phiên bản mới (rate_versions),
+//      tra theo articles.published_at.
+//   2. Thuế tra theo NGÀY CHI, không phải ngày đăng (tax_rules).
+//   3. Kỳ đã LOCKED thì không sửa, chỉ tạo royalty_adjustments ở kỳ sau.
+//
+// Tiền lưu bằng số nguyên đồng: decimal(14,0), không dùng float.
+// Mọi phép chia tiền đi qua PhanBoTien — lấy lại ở commit 46e9403^,
+// đừng viết lại, bản cũ đã có test.
+//
+// -------------------------------------------------------------
+// THỨ TỰ TÍNH — cố định, không được đảo:
+//
+//   [1] Tiền của BÀI  (article_royalties)
+//       work_amount = factor × unit_value × video_mult × repost%
+//       view_amount = min(valid_views × view_rate, view_cap)   // PRINT = 0
+//       article_amount = work_amount + view_amount
+//
+//   [2] Chia cho người  (royalty_shares)
+//       phụ trợ (BIEN_TAP/HOA_SI/PHONG_VIEN_ANH):
+//           amount = work_amount × percent   // KHÔNG ăn tiền view
+//       tác giả (TAC_GIA_CHINH/DONG_TAC_GIA):
+//           chia (work_amount − Σ phụ trợ) + view_amount
+//           theo share_percent, bằng PhanBoTien
+//
+//   [3] Gộp theo người trong kỳ  (payment_vouchers)
+//       royalty_amount    = Σ royalty_shares đã APPROVED
+//       adjustment_amount = Σ royalty_adjustments của kỳ
+//       × kpi_bonus_factor            (kpi_results)
+//       → amount_before_fund_factor
+//       × fund_factor                 (nếu tổng kỳ vượt total_fund)
+//       = gross_amount
+//       − advance_amount − tax_amount = net_amount
+//
+// Làm tròn: chỉ làm tròn ở bước cuối của mỗi phép chia, bằng
+// PhanBoTien. Không làm tròn ở bước trung gian.
+// -------------------------------------------------------------
+//
+// PHẠM VI: 36 bảng — bằng đúng v2, nhưng đổi trọng tâm. Bỏ 7 bảng
+// SEO/mặt tiền, thêm 7 bảng thuật toán. Vẫn nên dựng làm hai đợt:
+// đợt 1 bỏ qua mục 6 (số liệu đọc) là hệ tiền đã chạy trọn vẹn.
+// =============================================================
+
+
+// ---------- 1. ENUM ----------
+
+Enum user_status {
+  ACTIVE
+  INACTIVE
+  LOCKED
+}
+
+Enum contract_type {
+  STAFF      // cơ hữu: HĐLĐ từ 3 tháng -> nhuận bút cộng vào lương, phiếu chi không trừ thuế
+  FREELANCE  // cộng tác viên: không HĐLĐ hoặc dưới 3 tháng -> khấu trừ 10% theo ngưỡng
+}
+
+Enum publication_type {
+  PRINT   // báo chí in — không có view, không có tiền view
+  ONLINE  // báo chí điện tử
+}
+
+Enum article_status {
+  DRAFT        // phóng viên đang viết
+  SUBMITTED    // đã nộp, chờ biên tập viên
+  RETURNED     // BTV trả lại -> bài quay về DRAFT, article_reviews ghi 1 lần trả
+  REJECTED     // BTV từ chối hẳn, không sửa lại được
+  EDITED       // biên tập xong, chờ thư ký toà soạn xếp lịch
+  SCHEDULED    // thư ký đã xếp lịch, job sẽ tự đăng khi tới scheduled_at
+  PUBLISHED    // đã đăng — từ đây mới vào dây chuyền tiền
+  UNPUBLISHED  // đã gỡ
+}
+
+Enum quality_grade {
+  A  // đỉnh khung hệ số của thể loại
+  B  // giữa khung
+  C  // đáy khung
+  D  // dưới ngưỡng — KHÔNG tính nhuận bút. Khác hẳn NULL = chưa chấm.
+}
+
+Enum assessment_status {
+  ASSIGNED   // trưởng ban phân công người chấm
+  SUBMITTED  // người chấm đã nộp điểm
+  APPROVED   // trưởng ban duyệt -> hạng được chốt vào articles
+  REJECTED   // trưởng ban trả lại, chấm lại
+}
+
+Enum contributor_role {
+  TAC_GIA_CHINH    // chia work_amount theo share_percent
+  DONG_TAC_GIA     // chia work_amount theo share_percent
+  BIEN_TAP         // hưởng % cố định theo rate_contributor_shares
+  HOA_SI           // nt
+  PHONG_VIEN_ANH   // nt
+}
+
+Enum period_status {
+  OPEN       // đang gom bài, job chạy lại được
+  SUBMITTED  // kế toán đã gửi duyệt, khoá chạy job
+  APPROVED   // tổng biên tập đã duyệt bảng kê
+  LOCKED     // kế toán đã khoá sổ, cấm sửa
+  PAID       // đã chi hết phiếu
+}
+
+Enum royalty_status {
+  DRAFT     // tạm tính
+  ON_HOLD   // tạm giữ vì nghi gian lận view
+  APPROVED  // đã duyệt, vào phiếu chi
+  REJECTED  // không trả (hạng D, hoặc bài bị gỡ khi kỳ chưa khoá)
+}
+
+Enum adjustment_direction {
+  BONUS
+  PENALTY
+}
+
+Enum adjustment_calc {
+  FIXED    // số tiền cố định
+  PERCENT  // phần trăm nhuận bút của bài
+}
+
+Enum adjustment_source {
+  AUTO    // job tự áp theo cờ trên bài
+  MANUAL  // tổng biên tập áp tay
+}
+
+Enum voucher_line_source {
+  ROYALTY     // một dòng royalty_shares
+  ADJUSTMENT  // một dòng royalty_adjustments
+  ADVANCE     // cấn trừ tạm ứng — amount luôn ÂM
+}
+
+Enum voucher_status {
+  PENDING    // chờ duyệt
+  APPROVED   // đã duyệt
+  PAID       // đã nhận
+  CANCELLED
+}
+
+Enum advance_status {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PAID
+  PARTIALLY_SETTLED  // đã cấn trừ một phần, còn nợ
+  SETTLED            // đã cấn trừ hết
+}
+
+Enum complaint_status {
+  NEW
+  IN_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+Enum job_trigger {
+  CRON
+  MANUAL
+}
+
+Enum job_status {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+Enum fraud_status {
+  NEW        // job vừa sinh cảnh báo -> dòng nhuận bút chuyển ON_HOLD
+  REVIEWED   // DATA_ANALYST đã xem và đề xuất
+  CLEARED    // tổng biên tập gỡ cờ, tính bình thường
+  CONFIRMED  // tổng biên tập xác nhận gian lận -> bỏ view của ngày đó, tính lại
+}
+
+Enum traffic_source {
+  DIRECT
+  SOCIAL
+  SEARCH
+  OTHER
+}
+
+
+// ---------- 2. NỀN TẢNG ----------
+
+Table roles {
+  id integer [primary key, increment]
+  code varchar(50) [unique, not null]
+  name varchar(100) [not null]
+  Note: '''
+  ADMIN         — user, role, rate_versions, tax_rules
+  ACCOUNTANT    — gửi duyệt kỳ, khoá sổ, sinh phiếu, chi
+  EDITOR        — biên tập bài
+  HEAD_EDITOR   — trưởng ban: gán BTV, phân công chấm, duyệt kết quả chấm
+  SECRETARY     — thư ký toà soạn: xếp lịch đăng
+  CHIEF_EDITOR  — tổng biên tập: duyệt bảng kê, áp thưởng/phạt tay, chốt fraud
+  REPORTER      — phóng viên: viết bài
+  DATA_ANALYST  — chỉ đọc số liệu, đề xuất xử lý fraud_alerts
+  '''
+}
+
+Table user_roles {
+  user_id integer [not null, ref: > users.id]
+  role_id integer [not null, ref: > roles.id]
+
+  indexes {
+    (user_id, role_id) [pk]
+    role_id
+  }
+  Note: 'Một người nhiều vai trò. Trưởng ban vẫn viết bài được, BTV cũng vậy — chuyện bình thường ở toà soạn, v2 gán 1 role/người nên không làm được.'
+}
+
+Table departments {
+  id integer [primary key, increment]
+  code varchar(20) [unique, not null]
+  name varchar(100) [not null]
+  head_id integer [ref: > users.id]      // trưởng ban biên tập
+  is_active boolean [not null, default: true]
+  Note: 'FK vòng với users.department_id. Trong schema.sql phải tạo cả hai bảng trước rồi mới ALTER TABLE ADD CONSTRAINT, và seed data chèn hai bước: departments (head_id NULL) -> users -> UPDATE head_id.'
+}
+
+Table users {
+  id integer [primary key, increment]
+  username varchar(50) [unique, not null]
+  email varchar(255) [unique, not null]
+  password_hash varchar(255) [not null]
+  full_name varchar(100) [not null]
+  department_id integer [ref: > departments.id]
+  contract_type contract_type [not null, default: 'FREELANCE']
+  status user_status [not null, default: 'ACTIVE']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  indexes {
+    department_id
+  }
+  Note: 'Vai trò nằm ở user_roles, không còn role_id. contract_type là giá trị HIỆN TẠI — phiếu chi phải tự snapshot, xem payment_vouchers.contract_type_snap.'
+}
+
+Table bank_accounts {
+  id integer [primary key, increment]
+  user_id integer [not null, ref: > users.id]
+  bank_name varchar(100) [not null]
+  account_no varchar(30) [not null]
+  account_holder varchar(100) [not null]
+  is_active boolean [not null, default: true]
+  replaced_by integer [ref: > bank_accounts.id]
+  verified_by integer [ref: > users.id]
+  verified_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  deactivated_at timestamp
+
+  indexes {
+    user_id
+  }
+  Note: '''
+  BẢNG CHỈ GHI THÊM, KHÔNG SỬA. Đổi số tài khoản = tạo dòng mới, dòng
+  cũ đặt is_active = false + replaced_by. Đây là đường gian lận thật
+  (đổi STK ngay trước khi chi), phải có vết.
+
+  Ràng buộc viết trong schema.sql:
+    filtered unique index (user_id) WHERE is_active = 1
+  Màn hình chỉ hiện 4 số cuối. Đổi số khi đang có phiếu APPROVED chưa
+  chi thì phiếu quay về PENDING, kế toán phải xác nhận lại.
+  '''
+}
+
+
+// ---------- 3. NỘI DUNG ----------
+
+Table genres {
+  id integer [primary key, increment]
+  code varchar(20) [unique, not null]    // TIN, PHAN_ANH, PHONG_VAN, BINH_LUAN, PHONG_SU, ANH, MEDIA
+  name varchar(100) [not null]
+  is_news boolean [not null, default: false]   // phân biệt "tin" và "bài" khi đối chiếu định mức KPI
+  is_active boolean [not null, default: true]
+  Note: 'Khung hệ số nằm ở rate_genre_factors, theo từng phiên bản định mức.'
+}
+
+Table articles {
+  id integer [primary key, increment]
+  code varchar(20) [unique, not null]
+  title varchar(255) [not null]
+  body text
+  genre_id integer [not null, ref: > genres.id]
+  publication_type publication_type [not null]
+  author_id integer [not null, ref: > users.id]            // tác giả chính, denormalize để query nhanh
+  department_id integer [not null, ref: > departments.id]  // ban của tác giả lúc đăng, chốt lại không tra ngược
+  original_article_id integer [ref: > articles.id]         // bài đăng lại trỏ về bài gốc
+  has_video boolean [not null, default: false]
+  is_exclusive boolean [not null, default: false]          // tin độc quyền -> job tự áp thưởng
+  status article_status [not null, default: 'DRAFT']
+  quality_grade quality_grade                              // NULL = chưa chấm. D = chấm rớt. Hai chuyện khác nhau.
+  final_score decimal(4,2)
+  editor_id integer [ref: > users.id]                      // BTV biên tập bài này
+  editor_assigned_by integer [ref: > users.id]             // trưởng ban gán BTV
+  scheduled_by integer [ref: > users.id]                   // thư ký toà soạn xếp lịch
+  scheduled_at timestamp
+  published_at timestamp                                   // job tự điền khi tới scheduled_at
+  unpublished_at timestamp
+  deadline_at timestamp                                    // để đếm "trễ hạn" trong kpi_results
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (status, published_at)
+    (author_id, published_at)
+    genre_id
+    department_id
+    original_article_id
+  }
+  Note: '''
+  published_at quyết định kỳ nhuận bút VÀ phiên bản định mức được áp dụng.
+
+  Ràng buộc viết trong schema.sql / tầng service:
+    - article_contributors phải có đúng 1 dòng TAC_GIA_CHINH,
+      và user_id của dòng đó = author_id
+    - bài trỏ original_article_id thì bài được trỏ phải có
+      original_article_id IS NULL (chặn repost của repost)
+    - PRINT thì không sinh article_daily_stats, view_amount luôn 0
+    - RETURNED đưa bài về DRAFT; mỗi lần trả ghi 1 dòng article_reviews
+    - gỡ bài: kỳ chưa LOCKED -> royalty_shares về REJECTED.
+      Kỳ đã LOCKED -> royalty_adjustments PENALTY mã THU_HOI_GO_BAI.
+  '''
+}
+
+Table article_contributors {
+  id integer [primary key, increment]
+  article_id integer [not null, ref: > articles.id]
+  user_id integer [not null, ref: > users.id]
+  contributor_role contributor_role [not null]
+  share_percent decimal(7,4)     // chỉ cho TAC_GIA_CHINH + DONG_TAC_GIA, tổng phải = 100
+
+  indexes {
+    (article_id, user_id, contributor_role) [unique]
+    user_id
+  }
+  Note: '''
+  Bảng này là thứ v2 đánh rơi — không có nó thì bài đồng tác giả không
+  chia được tiền, và BTV/hoạ sĩ/PV ảnh không có nhuận bút.
+
+  Ràng buộc viết trong schema.sql / tầng service:
+    - share_percent NOT NULL khi role là TAC_GIA_CHINH/DONG_TAC_GIA,
+      NULL với ba vai trò còn lại
+    - tổng share_percent của nhóm tác giả trong 1 bài = 100 (SQL Server
+      không viết được bằng CHECK, phải chặn ở service trước khi cho
+      bài rời trạng thái DRAFT)
+    - % của ba vai trò phụ trợ lấy từ rate_contributor_shares theo
+      phiên bản định mức, không lưu ở đây
+  '''
+}
+
+Table article_reviews {
+  id integer [primary key, increment]
+  article_id integer [not null, ref: > articles.id]
+  reviewer_id integer [not null, ref: > users.id]
+  from_status article_status [not null]
+  to_status article_status [not null]
+  comment text
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    article_id
+    (article_id, to_status)
+  }
+  Note: 'Log mọi lần chuyển trạng thái. Đếm to_status = RETURNED để nuôi kpi_results.returned_count.'
+}
+
+
+// ---------- 4. CHẤM ĐIỂM & XẾP LOẠI ----------
+
+Table criteria {
+  id integer [primary key, increment]
+  code varchar(10) [unique, not null]
+  name varchar(150) [not null]
+  weight_percent integer [not null]
+  is_active boolean [not null, default: true]
+  Note: 'Tổng weight_percent của các tiêu chí đang bật phải bằng 100. Trọng số đổi giữa chừng thì phiếu cũ vẫn tái lập được nhờ assessment_scores.weight_percent_snap.'
+}
+
+Table assessments {
+  id integer [primary key, increment]
+  article_id integer [not null, ref: > articles.id]
+  assessor_id integer [not null, ref: > users.id]   // người chấm
+  assigned_by integer [not null, ref: > users.id]   // trưởng ban phân công
+  status assessment_status [not null, default: 'ASSIGNED']
+  total_score decimal(4,2)
+  grade quality_grade
+  approved_by integer [ref: > users.id]
+  approved_at timestamp
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (article_id, status)
+    assessor_id
+  }
+  Note: '''
+  Ràng buộc viết ở tầng service:
+    - assessor_id <> articles.author_id   <-- quan trọng nhất, v2 quên
+    - assessor_id <> articles.editor_id
+    - assessor_id không nằm trong article_contributors của bài đó
+    - mỗi bài chỉ 1 phiếu APPROVED
+
+  Ban quá nhỏ không tìm được người chấm hợp lệ thì trưởng ban tự chấm,
+  và phải mời trưởng ban khác duyệt.
+
+  Khi APPROVED: ghi grade + total_score ngược về articles.
+  Dưới ngưỡng C -> grade = D -> royalty_shares REJECTED, không trả tiền.
+  '''
+}
+
+Table assessment_scores {
+  assessment_id integer [not null, ref: > assessments.id]
+  criterion_id integer [not null, ref: > criteria.id]
+  score integer [not null]                  // 1..10
+  weight_percent_snap integer [not null]    // chụp lại trọng số lúc chấm
+  comment varchar(255)
+
+  indexes {
+    (assessment_id, criterion_id) [pk]
+  }
+  Note: 'weight_percent_snap để tính lại total_score sau này vẫn ra đúng con số cũ, kể cả khi criteria đã đổi trọng số.'
+}
+
+Table grade_thresholds {
+  rate_version_id integer [not null, ref: > rate_versions.id]
+  grade quality_grade [not null]
+  min_score decimal(4,2) [not null]   // vd A >= 8.50, B >= 6.50, C >= 5.00, D >= 0
+
+  indexes {
+    (rate_version_id, grade) [pk]
+  }
+  Note: 'v2 để ngưỡng có effective_from/to riêng -> hai trục thời gian độc lập, rất dễ lệch. v3 gom về một trục duy nhất là rate_versions.'
+}
+
+
+// ---------- 5. ĐỊNH MỨC (SV1) ----------
+
+Table rate_versions {
+  id integer [primary key, increment]
+  code varchar(20) [unique, not null]              // DM-2026-09
+  effective_from date [not null]
+  effective_to date                                // null = đang áp dụng
+  unit_value decimal(14,0) [not null]              // giá trị 1 hệ số, vd 100000
+  view_rate decimal(10,2) [not null]               // đơn giá 1 view, vd 50
+  view_cap decimal(14,0) [not null]                // trần tiền view mỗi bài
+  view_window_days integer [not null, default: 7]  // cửa sổ tính view kể từ ngày đăng
+  video_multiplier decimal(5,2) [not null, default: 1.5]
+  repost_percent integer [not null, default: 20]   // bài đăng lại hưởng bao nhiêu % tiền tác phẩm
+  max_penalty_percent integer [not null, default: 30]  // tổng phạt tối đa trên 1 bài
+  note varchar(255)
+  created_by integer [not null, ref: > users.id]
+  created_at timestamp [not null, default: `now()`]
+  Note: 'Sửa định mức = thêm bản ghi mới, không sửa đè. Không cho effective_from rơi vào kỳ đã LOCKED. v2 có quality_multiplier_enabled (điểm sao độc giả ăn thẳng vào tiền) — v3 bỏ, vì đó là đường cày sao để rút tiền.'
+}
+
+Table rate_genre_factors {
+  rate_version_id integer [not null, ref: > rate_versions.id]
+  genre_id integer [not null, ref: > genres.id]
+  factor_c decimal(5,2) [not null]   // hạng C — đáy khung
+  factor_b decimal(5,2) [not null]   // hạng B — giữa khung
+  factor_a decimal(5,2) [not null]   // hạng A — đỉnh khung
+
+  indexes {
+    (rate_version_id, genre_id) [pk]
+  }
+  Note: 'Không có factor_d: hạng D không tính nhuận bút. Bài chưa chấm tạm lấy factor_c, is_provisional = true.'
+}
+
+Table rate_contributor_shares {
+  rate_version_id integer [not null, ref: > rate_versions.id]
+  contributor_role contributor_role [not null]   // BIEN_TAP, HOA_SI, PHONG_VIEN_ANH
+  percent decimal(5,2) [not null]                // vd 10.00 = 10% work_amount
+
+  indexes {
+    (rate_version_id, contributor_role) [pk]
+  }
+  Note: 'Phụ trợ ăn % trên work_amount, KHÔNG ăn tiền view — tiền view gắn với sức hút của bài, thuộc về tác giả. Tổng % của ba vai trò phải < 100.'
+}
+
+Table rate_kpi_bonus_tiers {
+  id integer [primary key, increment]
+  rate_version_id integer [not null, ref: > rate_versions.id]
+  from_percent decimal(7,4) [not null]    // vd 120.0000
+  to_percent decimal(7,4)                 // null = không giới hạn trên
+  period_grade varchar(2) [not null]      // A/B/C/D — xếp loại kỳ
+  bonus_factor decimal(5,2) [not null]    // vd 1.20
+
+  indexes {
+    (rate_version_id, from_percent)
+  }
+  Note: 'Bậc thưởng theo % hoàn thành định mức. Các khoảng không được chồng nhau. Đây là thuật toán 3 — v2 đánh rơi cả bảng này lẫn kpi_results.'
+}
+
+Table adjustment_types {
+  id integer [primary key, increment]
+  code varchar(30) [unique, not null]   // THUONG_DOC_QUYEN, PHAT_CHINH_TA, THU_HOI_GO_BAI, BU_TIEN_VIEW
+  name varchar(150) [not null]
+  direction adjustment_direction [not null]
+  calc_type adjustment_calc [not null, default: 'FIXED']
+  amount decimal(14,0)                  // nếu FIXED
+  percent decimal(5,2)                  // nếu PERCENT, tính trên nhuận bút bài
+  max_amount decimal(14,0)
+  auto_flag varchar(30)                 // 'IS_EXCLUSIVE' -> job tự áp; null -> tổng biên tập áp tay
+  is_active boolean [not null, default: true]
+}
+
+Table tax_rules {
+  id integer [primary key, increment]
+  contract_type contract_type [not null]
+  threshold_amount decimal(14,0) [not null]   // 2.000.000 trước 01/7/2026; 5.000.000 từ 01/7/2026
+  tax_percent decimal(5,2) [not null]         // 10
+  effective_from date [not null]
+  effective_to date
+  note varchar(255)
+  Note: 'Tra theo NGÀY CHI của phiếu, khác với định mức nhuận bút tra theo ngày đăng. STAFF không khấu trừ ở phiếu (cộng vào lương) nhưng vẫn phải có dòng để snapshot lại cho rõ.'
+}
+
+Table department_budgets {
+  department_id integer [not null, ref: > departments.id]
+  period_id integer [not null, ref: > royalty_periods.id]
+  budget_amount decimal(14,0) [not null]
+  note varchar(255)
+
+  indexes {
+    (department_id, period_id) [pk]
+  }
+  Note: 'CẢNH BÁO MỀM theo ban: vượt 90% thì cảnh báo, vượt 100% vẫn duyệt được nhưng bắt buộc ghi lý do. Trần CỨNG toàn kỳ nằm ở royalty_periods.total_fund — hai cơ chế khác nhau, đừng lẫn.'
+}
+
+Table kpi_quotas {
+  id integer [primary key, increment]
+  period_id integer [not null, ref: > royalty_periods.id]
+  user_id integer [ref: > users.id]              // đặt cho 1 người...
+  department_id integer [ref: > departments.id]  // ...hoặc cho cả ban
+  min_news integer [not null, default: 0]        // số tin
+  min_articles integer [not null, default: 0]    // số bài
+  min_grade_a integer [not null, default: 0]
+  created_by integer [not null, ref: > users.id]
+
+  indexes {
+    (period_id, user_id)
+    (period_id, department_id)
+  }
+  Note: 'Ràng buộc schema.sql: CHECK đúng một trong hai cột user_id / department_id được điền. Dòng theo người thắng dòng theo ban.'
+}
+
+Table income_goals {
+  user_id integer [not null, ref: > users.id]
+  period_id integer [not null, ref: > royalty_periods.id]
+  target_amount decimal(14,0) [not null]
+
+  indexes {
+    (user_id, period_id) [pk]
+  }
+  Note: 'Phóng viên tự đặt, dùng cho màn cố vấn thu nhập.'
+}
+
+
+// ---------- 6. SỐ LIỆU ĐỌC ----------
+
+Table article_daily_stats {
+  article_id integer [not null, ref: > articles.id]
+  stat_date date [not null]
+  raw_views integer [not null, default: 0]
+  valid_views integer [not null, default: 0]      // đã lọc: đọc >= 10 giây, 1 lần/phiên/30 phút, bỏ bot và tác giả
+  is_excluded boolean [not null, default: false]  // fraud CONFIRMED -> loại ngày này khỏi tính tiền
+  avg_read_seconds integer [not null, default: 0]
+  sessions integer [not null, default: 0]
+  bounced_sessions integer [not null, default: 0]
+  views_direct integer [not null, default: 0]
+  views_social integer [not null, default: 0]
+  views_search integer [not null, default: 0]
+  views_other integer [not null, default: 0]
+  shares integer [not null, default: 0]
+
+  indexes {
+    (article_id, stat_date) [pk]
+    stat_date
+  }
+  Note: 'Chỉ sinh cho bài ONLINE. valid_views là con số duy nhất được quy ra tiền, và chỉ khi is_excluded = false.'
+}
+
+Table page_events {
+  id bigint [primary key, increment]
+  session_key varchar(64) [not null]
+  article_id integer [ref: > articles.id]
+  event_type varchar(20) [not null]    // VIEW, LEAVE, CLICK, SHARE
+  source traffic_source [not null, default: 'DIRECT']
+  referrer varchar(255)
+  dwell_seconds integer
+  occurred_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (article_id, occurred_at)
+    session_key
+  }
+  Note: '''
+  [GIỮ CÓ ĐIỀU KIỆN] Bảng này chỉ đáng tồn tại nếu nhóm thực sự cài bộ
+  lọc view hợp lệ (đọc >= 10s, 1 lần/phiên/30 phút, loại bot và tác giả)
+  — đó là một thuật toán thật, đúng tinh thần đề bài.
+  Không cài thì bỏ bảng này và sinh thẳng article_daily_stats bằng
+  generator. Đừng giữ một bảng thô không ai đọc.
+  '''
+}
+
+Table fraud_alerts {
+  id integer [primary key, increment]
+  article_id integer [not null, ref: > articles.id]
+  stat_date date [not null]
+  valid_views integer [not null]
+  expected_views integer [not null]     // trung bình bài cùng thể loại ở cùng ngày tuổi
+  deviation decimal(6,2)                // vượt bao nhiêu lần độ lệch chuẩn
+  status fraud_status [not null, default: 'NEW']
+  reviewed_by integer [ref: > users.id]   // DATA_ANALYST đề xuất
+  reviewed_at timestamp
+  confirmed_by integer [ref: > users.id]  // CHIEF_EDITOR chốt
+  confirmed_at timestamp
+  note varchar(255)
+
+  indexes {
+    (article_id, stat_date) [unique]
+    status
+  }
+  Note: '''
+  Thuật toán 4. NEW -> royalty_shares của bài chuyển ON_HOLD.
+  CONFIRMED -> article_daily_stats.is_excluded = true cho ngày đó,
+  job tính lại, article_royalties.views_excluded ghi số view đã loại.
+
+  Hai người: DATA_ANALYST đề xuất, CHIEF_EDITOR chốt. Quyết định này
+  làm mất tiền của người khác nên không để một người quyết.
+  '''
+}
+
+
+// ---------- 7. TÍNH NHUẬN BÚT (SV2) ----------
+
+Table royalty_periods {
+  id integer [primary key, increment]
+  code varchar(20) [unique, not null]   // 2026-09
+  start_date date [not null]
+  end_date date [not null]
+  status period_status [not null, default: 'OPEN']
+
+  // --- trần quỹ: thuật toán 2 ---
+  total_fund decimal(14,0)              // quỹ nhuận bút của kỳ, null = không đặt
+  cap_enabled boolean [not null, default: true]
+  fund_factor decimal(12,8)             // điền khi chốt: total_fund / tổng tiền trước điều chỉnh
+
+  submitted_by integer [ref: > users.id]
+  submitted_at timestamp
+  approved_by integer [ref: > users.id]
+  approved_at timestamp
+  locked_by integer [ref: > users.id]
+  locked_at timestamp
+  paid_at timestamp
+  row_version integer [not null, default: 1]
+  Note: '''
+  fund_factor là thuật toán 2, thứ v2 hạ xuống thành một câu if:
+  tổng tiền toàn kỳ vượt total_fund thì CO ĐỀU mọi người theo tỷ lệ,
+  phân bổ bằng PhanBoTien với trọng số = tiền trước điều chỉnh của
+  từng người, để tổng sau khi co đúng bằng total_fund, không lệch 1đ.
+  cap_enabled = false thì fund_factor = 1.
+
+  row_version để chặn hai người cùng bấm duyệt/khoá.
+  '''
+}
+
+Table calc_jobs {
+  id integer [primary key, increment]
+  period_id integer [not null, ref: > royalty_periods.id]
+  trigger_type job_trigger [not null, default: 'CRON']
+  triggered_by integer [ref: > users.id]
+  is_final boolean [not null, default: false]   // false = chạy tạm hằng đêm, true = bản chốt kỳ
+  status job_status [not null, default: 'RUNNING']
+  articles_scanned integer [not null, default: 0]
+  lines_written integer [not null, default: 0]
+  error_count integer [not null, default: 0]
+  started_at timestamp [not null, default: `now()`]
+  finished_at timestamp
+
+  indexes {
+    (period_id, started_at)
+  }
+  Note: 'Ràng buộc schema.sql: filtered unique index (period_id) WHERE status = RUNNING — v2 chỉ ghi luật này trong ghi chú nên không có gì chặn thật.'
+}
+
+Table calc_errors {
+  id integer [primary key, increment]
+  job_id integer [not null, ref: > calc_jobs.id]
+  article_id integer [ref: > articles.id]
+  error_code varchar(40) [not null]   // NO_RATE_VERSION, NO_GRADE, NO_GENRE_FACTOR, NO_CONTRIBUTOR, SHARE_SUM_NOT_100
+  message varchar(255)
+  resolved_at timestamp
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    job_id
+    article_id
+  }
+  Note: 'Bài lỗi thì không sinh dòng nhuận bút. Kỳ còn lỗi chưa xử lý thì không gửi duyệt được.'
+}
+
+Table article_royalties {
+  id integer [primary key, increment]
+  article_id integer [not null, unique, ref: > articles.id]
+  period_id integer [not null, ref: > royalty_periods.id]
+
+  // --- snapshot lúc tính, sửa định mức sau không ảnh hưởng dòng đã chốt ---
+  rate_version_id integer [not null, ref: > rate_versions.id]
+  genre_id integer [not null, ref: > genres.id]
+  grade_snapshot quality_grade
+  factor_applied decimal(5,2) [not null]
+  unit_value_snap decimal(14,0) [not null]
+  video_multiplier_snap decimal(5,2) [not null, default: 1]
+  repost_percent_snap integer [not null, default: 100]   // 20 nếu là bài đăng lại
+  work_amount decimal(14,0) [not null]                   // tiền tác phẩm
+
+  valid_views_used integer [not null, default: 0]
+  views_excluded integer [not null, default: 0]          // bị loại do fraud CONFIRMED
+  view_counted_through date                              // ngày cuối đã tính view
+  view_rate_snap decimal(10,2) [not null, default: 0]
+  view_cap_snap decimal(14,0) [not null, default: 0]
+  view_amount decimal(14,0) [not null, default: 0]       // bài PRINT luôn bằng 0
+
+  article_amount decimal(14,0) [not null]                // work_amount + view_amount
+  is_provisional boolean [not null, default: true]       // true khi bài chưa có hạng, đang tạm lấy hệ số đáy khung
+  calc_job_id integer [ref: > calc_jobs.id]
+  calculated_at timestamp [not null, default: `now()`]
+  row_version integer [not null, default: 1]
+
+  indexes {
+    period_id
+    rate_version_id
+  }
+  Note: '''
+  Đây là tiền của BÀI. Tiền của NGƯỜI nằm ở royalty_shares.
+
+  view_counted_through vá lỗ hổng của v2: cửa sổ view 7 ngày vắt qua
+  ranh giới kỳ. Bài đăng 28/09 có view tới 05/10 nhưng kỳ 09 khoá sổ
+  đầu tháng 10 -> mất 5 ngày view vĩnh viễn. Kỳ sau, job thấy
+  view_counted_through < published_at + view_window_days thì sinh
+  royalty_adjustments BONUS mã BU_TIEN_VIEW cho phần thiếu.
+  '''
+}
+
+Table royalty_shares {
+  id integer [primary key, increment]
+  royalty_id integer [not null, ref: > article_royalties.id]
+  user_id integer [not null, ref: > users.id]
+  contributor_role contributor_role [not null]
+  share_percent_snap decimal(7,4)        // tác giả: % chia. phụ trợ: % lấy từ rate_contributor_shares
+  amount decimal(14,0) [not null]
+  status royalty_status [not null, default: 'DRAFT']
+  approved_by integer [ref: > users.id]  // chỉ dùng khi gỡ dòng khỏi ON_HOLD
+  approved_at timestamp
+  hold_reason varchar(255)
+
+  indexes {
+    (royalty_id, user_id, contributor_role) [unique]
+    (user_id, status)
+    royalty_id
+  }
+  Note: '''
+  Tiền của NGƯỜI. Bảng này là kết quả của thuật toán 1.
+
+  Σ amount của một royalty_id phải đúng bằng
+  article_royalties.article_amount — không thừa không thiếu một đồng.
+  Đó là lý do phải dùng PhanBoTien chứ không dùng phép chia thường.
+
+  grade = D hoặc bài bị gỡ khi kỳ chưa khoá -> toàn bộ dòng REJECTED.
+  Dòng ON_HOLD nằm ở kỳ đã LOCKED thì không vực lại được: cho REJECTED
+  rồi trả bằng royalty_adjustments ở kỳ sau.
+  '''
+}
+
+Table royalty_adjustments {
+  id integer [primary key, increment]
+  period_id integer [not null, ref: > royalty_periods.id]   // kỳ được cộng/trừ, có thể là kỳ sau kỳ phát sinh
+  user_id integer [not null, ref: > users.id]
+  department_id integer [not null, ref: > departments.id]   // để đối chiếu department_budgets
+  article_id integer [ref: > articles.id]
+  adjustment_type_id integer [ref: > adjustment_types.id]
+  direction adjustment_direction [not null]
+  quantity integer [not null, default: 1]     // vd số lỗi chính tả
+  amount decimal(14,0) [not null]             // số tiền cuối, đã nhân quantity và đã chặn trần
+  reason varchar(255) [not null]
+  source adjustment_source [not null, default: 'MANUAL']
+  origin_share_id integer [ref: > royalty_shares.id]        // dòng gốc, khi đây là điều chỉnh của kỳ đã khoá
+  created_by integer [not null, ref: > users.id]
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (period_id, user_id)
+    article_id
+    origin_share_id
+  }
+  Note: 'Tổng phạt của 1 bài không quá rate_versions.max_penalty_percent và không làm bài âm tiền. v2 để con số 30% nằm trong ghi chú, v3 đưa vào định mức để nó versioned theo.'
+}
+
+
+// ---------- 8. KPI (vế còn lại của tên đề bài) ----------
+
+Table kpi_results {
+  id integer [primary key, increment]
+  period_id integer [not null, ref: > royalty_periods.id]
+  user_id integer [not null, ref: > users.id]
+  department_id integer [not null, ref: > departments.id]
+  quota_news integer [not null, default: 0]        // chụp lại từ kpi_quotas
+  quota_articles integer [not null, default: 0]
+  actual_news integer [not null, default: 0]
+  actual_articles integer [not null, default: 0]
+  completion_percent decimal(7,4) [not null, default: 0]
+  grade_a_count integer [not null, default: 0]
+  grade_a_percent decimal(7,4) [not null, default: 0]
+  returned_count integer [not null, default: 0]    // đếm article_reviews to_status = RETURNED
+  late_count integer [not null, default: 0]        // published_at > deadline_at
+  period_grade varchar(2)                          // A/B/C/D
+  bonus_factor decimal(5,2) [not null, default: 1] // tra từ rate_kpi_bonus_tiers
+  calc_job_id integer [ref: > calc_jobs.id]
+  calculated_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (period_id, user_id) [unique]
+    (period_id, department_id)
+  }
+  Note: '''
+  Bảng này là vế "Đánh giá Chất lượng (KPI)" trong tên đề bài. v2 chỉ
+  có kpi_quotas (đặt chỉ tiêu) mà không có chỗ nào lưu KẾT QUẢ, nên
+  màn hình KPI phải tính lại từ đầu mỗi lần mở, và khi kỳ LOCKED thì
+  không snapshot được gì.
+
+  bonus_factor chảy vào payment_vouchers.kpi_bonus_factor_snap —
+  đó là đường duy nhất để KPI ảnh hưởng tới tiền.
+  '''
+}
+
+
+// ---------- 9. DUYỆT & CHI TRẢ (SV3 + SV1) ----------
+
+Table payment_vouchers {
+  id integer [primary key, increment]
+  code varchar(30) [unique, not null]   // PC-2026-09-017
+  period_id integer [not null, ref: > royalty_periods.id]
+  user_id integer [not null, ref: > users.id]
+  bank_account_id integer [ref: > bank_accounts.id]
+
+  royalty_amount decimal(14,0) [not null]                  // Σ royalty_shares APPROVED
+  adjustment_amount decimal(14,0) [not null, default: 0]   // thưởng trừ phạt
+  kpi_bonus_factor_snap decimal(5,2) [not null, default: 1]
+  amount_before_fund_factor decimal(14,0) [not null]
+  fund_factor_snap decimal(12,8) [not null, default: 1]
+  gross_amount decimal(14,0) [not null]                    // thu nhập kỳ sau khi co theo quỹ
+
+  contract_type_snap contract_type [not null]
+  tax_rule_id integer [ref: > tax_rules.id]
+  tax_percent_snap decimal(5,2) [not null, default: 0]
+  tax_threshold_snap decimal(14,0) [not null, default: 0]
+  tax_amount decimal(14,0) [not null, default: 0]
+
+  advance_amount decimal(14,0) [not null, default: 0]      // tạm ứng đã cấn trừ
+  net_amount decimal(14,0) [not null]                      // thực nhận
+
+  status voucher_status [not null, default: 'PENDING']
+  approved_by integer [ref: > users.id]
+  approved_at timestamp
+  paid_by integer [ref: > users.id]
+  paid_at timestamp
+  note varchar(255)
+  row_version integer [not null, default: 1]
+
+  indexes {
+    (period_id, user_id) [unique]
+    status
+  }
+  Note: '''
+  Mỗi người 1 phiếu mỗi kỳ. Chưa có bank_account_id hợp lệ thì phiếu
+  dừng ở PENDING.
+
+  Bốn cột snapshot thuế: v2 chỉ giữ tax_rule_id, nên khi luật đổi và
+  dòng tax_rules bị sửa thì phiếu cũ mất dấu cách tính. Mọi chỗ khác
+  trong schema snapshot rất kỹ, riêng thuế thì không — v3 vá lại.
+  '''
+}
+
+Table voucher_lines {
+  id integer [primary key, increment]
+  voucher_id integer [not null, ref: > payment_vouchers.id]
+  source voucher_line_source [not null]
+  royalty_share_id integer [ref: > royalty_shares.id]
+  adjustment_id integer [ref: > royalty_adjustments.id]
+  advance_id integer [ref: > advances.id]
+  amount decimal(14,0) [not null]      // ADVANCE luôn âm
+  description varchar(255)
+
+  indexes {
+    voucher_id
+    royalty_share_id [unique]
+    adjustment_id [unique]
+  }
+  Note: '''
+  Bảng này vá ba lỗ cùng lúc:
+
+  1. In được bảng kê chi tiết "phiếu này gồm bài nào, mỗi bài bao
+     nhiêu" — v2 chỉ có con số tổng nên không báo cáo được. Đề bài
+     có chữ "báo cáo".
+  2. complaints trỏ tới một dòng tiền thì tra ngược ra được phiếu.
+  3. Chặn cộng hai lần: unique trên royalty_share_id và adjustment_id
+     nghĩa là một khoản không thể lọt vào hai phiếu. v2 không có gì
+     ngăn một khoản thưởng vào phiếu kỳ 09 rồi vào tiếp kỳ 10.
+
+  Ràng buộc schema.sql: CHECK đúng một trong ba cột id được điền, khớp
+  với source. Σ amount phải = payment_vouchers.net_amount.
+  '''
+}
+
+Table advances {
+  id integer [primary key, increment]
+  user_id integer [not null, ref: > users.id]
+  period_id integer [not null, ref: > royalty_periods.id]
+  amount decimal(14,0) [not null]
+  settled_amount decimal(14,0) [not null, default: 0]   // đã cấn trừ được bao nhiêu
+  reason varchar(255)
+  status advance_status [not null, default: 'REQUESTED']
+  requested_at timestamp [not null, default: `now()`]
+  approved_by integer [ref: > users.id]
+  approved_at timestamp
+  paid_at timestamp
+
+  indexes {
+    (user_id, period_id)
+    status
+  }
+  Note: '''
+  Tối đa 50% số tạm tính của kỳ đang mở.
+
+  v2 dùng settled_voucher_id (FK đơn) trong khi ghi chú lại viết
+  "thiếu thì trừ tiếp ở kỳ sau" — tức nghiệp vụ là 1-N mà mô hình là
+  1-1, không ghi nổi. v3 cấn trừ qua voucher_lines source = ADVANCE,
+  settled_amount = Σ các dòng đó (lấy trị tuyệt đối).
+  settled_amount < amount -> PARTIALLY_SETTLED, kỳ sau trừ tiếp.
+  '''
+}
+
+Table complaints {
+  id integer [primary key, increment]
+  user_id integer [not null, ref: > users.id]
+  voucher_id integer [ref: > payment_vouchers.id]
+  royalty_share_id integer [ref: > royalty_shares.id]
+  content text [not null]
+  status complaint_status [not null, default: 'NEW']
+  deadline_at timestamp                 // hạn trả lời 7 ngày
+  handled_by integer [ref: > users.id]
+  handled_at timestamp
+  resolution varchar(255)
+  adjustment_id integer [ref: > royalty_adjustments.id]   // nếu chấp nhận thì trỏ tới khoản điều chỉnh
+  created_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, status)
+    voucher_id
+  }
+  Note: 'Gửi trong 30 ngày kể từ khi phiếu được duyệt. Trỏ royalty_share_id (tiền của người) chứ không phải article_royalties (tiền của bài) — khiếu nại luôn là về phần của mình.'
+}
