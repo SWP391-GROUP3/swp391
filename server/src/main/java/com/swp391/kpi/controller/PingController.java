@@ -35,6 +35,3 @@ public class PingController {
                 "thoiGian", LocalDateTime.now().toString());
     }
 }
-                "thoiGian", LocalDateTime.now().toString());
-    }
-}
