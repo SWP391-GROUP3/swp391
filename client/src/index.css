@@ -1,0 +1,163 @@
+/* ===========================================================================
+   SWP391 - KPI & Nhuan but
+   Style chung. Hien tai moi co trang login va khung trang main.
+   =========================================================================== */
+
+:root {
+  --muc:       #1b2430;   /* chu chinh */
+  --muc-nhat:  #64748b;   /* chu phu */
+  --vien:      #dfe3e8;
+  --nen:       #f4f6f8;
+  --nen-the:   #ffffff;
+  --chinh:     #14532d;   /* xanh la dam - mau nhan dien */
+  --chinh-dam: #0f3d21;
+  --do:        #b42318;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muc);
+  background: var(--nen);
+}
+
+/* ------------------------------------------------------------------ LOGIN */
+
+.trang-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.the-login {
+  width: 100%;
+  max-width: 380px;
+  padding: 32px;
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .06);
+}
+
+.the-login__tieu-de { margin: 0; font-size: 19px; font-weight: 600; }
+.the-login__phu-de  { margin: 4px 0 24px; color: var(--muc-nhat); font-size: 14px; }
+
+.nhan {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.o-nhap {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 9px 11px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--muc);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
+  border-radius: 6px;
+}
+
+.o-nhap:focus {
+  outline: 2px solid var(--chinh);
+  outline-offset: 1px;
+  border-color: var(--chinh);
+}
+
+.nut-chinh {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: var(--chinh);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nut-chinh:hover:not(:disabled)  { background: var(--chinh-dam); }
+.nut-chinh:active:not(:disabled) { transform: translateY(1px); }
+.nut-chinh:disabled              { opacity: .6; cursor: not-allowed; }
+
+.thong-bao-loi {
+  margin: 0 0 16px;
+  padding: 9px 11px;
+  font-size: 13px;
+  color: var(--do);
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 6px;
+}
+
+/* Khoi goi y tai khoan - xoa cung luc voi src/auth/taiKhoanTam.js */
+.goi-y {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--vien);
+  font-size: 12.5px;
+  color: var(--muc-nhat);
+}
+
+.goi-y summary { cursor: pointer; font-weight: 600; }
+.goi-y ul      { margin: 8px 0 0; padding-left: 18px; }
+.goi-y li      { margin-bottom: 3px; }
+.goi-y code    { font-size: 12px; background: var(--nen); padding: 1px 4px; border-radius: 3px; }
+
+/* ------------------------------------------------------------------- MAIN */
+
+.thanh-tren {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 56px;
+  padding: 0 22px;
+  background: var(--nen-the);
+  border-bottom: 1px solid var(--vien);
+}
+
+.thanh-tren__ten { font-weight: 600; }
+
+.thanh-tren__nguoi-dung {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+.ho-ten { font-weight: 600; }
+
+.vai-tro {
+  padding: 2px 9px;
+  font-size: 12px;
+  color: var(--chinh);
+  background: #e7f3ec;
+  border-radius: 999px;
+}
+
+.nut-thoat {
+  padding: 6px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--muc);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nut-thoat:hover { background: var(--nen); }
+
+/* Vung noi dung - dang de trong, cho cac chuc nang duoc chen vao */
+.vung-noi-dung { padding: 24px; }

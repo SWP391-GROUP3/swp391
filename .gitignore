@@ -2,6 +2,10 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
+# Node / Vite (client React)
+node_modules/
+dist/
+
 # Cau hinh cuc bo - CHUA MAT KHAU, KHONG COMMIT
 application-local.properties
 *-local.properties

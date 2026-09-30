@@ -7,10 +7,11 @@ chấm chất lượng → tính nhuận bút theo kỳ → chốt sổ và lên
 swp391/
 ├── database/     schema.sql + data.sql  (chạy trong SSMS)
 ├── server/       Spring Boot 3.5 + JPA + SQL Server   → cổng 8080
-└── client/       Servlet/JSP + Tomcat 10.1            → cổng 8081
-```
+└── client/       React 19 + Vite 8                    → cổng 5173
 
 Client **không** kết nối database. Mọi truy cập dữ liệu đi qua REST API của server.
+Khi chạy dev, Vite chuyển mọi request `/api/...` sang server cổng 8080, nên server
+không cần cấu hình CORS.
 
 ---
 
@@ -22,11 +23,11 @@ Client **không** kết nối database. Mọi truy cập dữ liệu đi qua RES
 | Maven | 3.9+ | hoặc dùng Maven tích hợp trong IntelliJ |
 | SQL Server | 2019+ | bản Developer hoặc Express đều được |
 | SSMS | mới nhất | để chạy file `.sql` |
-| Tomcat | **10.1** | bắt buộc 10.1, **không dùng Tomcat 9** |
-| IntelliJ IDEA Ultimate | | bản Community không chạy được JSP/Tomcat |
-
-> Tomcat 10.1 dùng namespace `jakarta.servlet.*`. Tomcat 9 dùng `javax.servlet.*`
-> và sẽ **không** chạy được code trong repo này.
+| Maven | 3.9+ | hoặc dùng Maven tích hợp trong IntelliJ |
+| Node.js | 20.19+ hoặc 22.12+ | Vite 8 bắt buộc. `node -v` để kiểm tra |
+| SQL Server | 2019+ | bản Developer hoặc Express đều được |
+| SSMS | mới nhất | để chạy file `.sql` |
+| IntelliJ IDEA | | Community hoặc Ultimate đều được, client không còn dùng JSP/Tomcat |
 
 ## 2. Dựng database
 
@@ -60,12 +61,34 @@ Kiểm tra: mở `http://localhost:8080/api/ping`, phải thấy JSON có `"tran
 
 ## 4. Chạy client
 
-Trong IntelliJ: `Run → Edit Configurations → + → Tomcat Server → Local`.
-Chọn Tomcat 10.1, tab **Deployment** thêm artifact `kpi-client:war exploded`,
-tab **Server** đặt HTTP port = **8081**.
+Lần đầu, hoặc mỗi khi `client/package.json` thay đổi, cài thư viện:
 
-Mở `http://localhost:8081/`. Nếu server đang chạy, trang chủ hiện khung xanh
-"Đã kết nối server".
+```bash
+cd client
+npm install
+```
+
+Chạy dev server (trong thư mục `client/`):
+
+```bash
+npm run dev
+```
+
+Mở `http://localhost:5173/`. Chưa đăng nhập thì trang tự chuyển về `/login`.
+
+Trong code React chỉ gọi `fetch('/api/...')`, **không** viết `http://localhost:8080`.
+Vite tự chuyển request sang server (cấu hình ở `client/vite.config.js`), nên muốn
+gọi API thật thì server phải đang chạy.
+
+Đăng nhập hiện là **giả** (`client/src/auth/taiKhoanTam.js`), tài khoản dùng thử
+nằm ngay dưới form. Phải thay bằng API đăng nhập thật trước khi nộp bài.
+
+Trước khi mở PR, chạy lint và build:
+
+```bash
+npm run lint
+npm run build
+```
 
 ## 5. Chạy test
 
@@ -100,7 +123,6 @@ không phải chờ server xong.
 | GET | `/api/bao-cao/kpi?kyId=` | Báo cáo KPI theo kỳ | TKTS, TBT | |
 
 ---
-
 ## Quy tắc làm việc
 
 **Nhánh.** Không push thẳng `main`. Tạo nhánh `feature/<việc>`, mở PR, một người
@@ -137,7 +159,7 @@ vào qua tham số, không inject repository. Nhắc nhau khi review.
 | 2 | Package `royalty`: engine tính nhuận bút + bộ test bất biến |
 | 3 | Entity cụm 1–2, đăng nhập JWT, phân quyền |
 | 4 | Entity cụm 3–5, REST controller theo bảng endpoint |
-| 5 | Toàn bộ client Servlet/JSP |
+| 5 | Toàn bộ client React |
 
 ---
 
@@ -164,6 +186,10 @@ thay vì để sai âm thầm.
 **JSTL viết đúng cú pháp nhưng in ra nguyên chuỗi `<c:forEach ...>`**
 Sai URI taglib. Bản jakarta dùng `jakarta.tags.core`, không phải
 `http://java.sun.com/jsp/jstl/core`.
+
+**`npm run dev` báo `Port 5173 is already in use`**
+Một tiến trình `npm run dev` cũ vẫn đang chạy. Tắt nó đi (Ctrl+C ở terminal cũ),
+dừng đổi cổng: cả nhóm cố định 5173 (`strictPort` trong `vite.config.js`).
 
 **Git báo PR sửa cả trăm dòng trong khi bạn chỉ sửa vài dòng**
 Lệch kiểu xuống dòng. File `.gitattributes` đã xử lý việc này; nếu vẫn gặp thì
