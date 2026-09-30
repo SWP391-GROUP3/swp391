@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1020" height="860" viewBox="0 0 1020 860" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#000" stroke-width="1.2"/>
+    </marker>
+  </defs>
+  <style>
+    .uc   { fill:#9DD9F3; stroke:#1F6FB2; stroke-width:1.2; }
+    .ucA  { fill:#FFE08A; stroke:#B8860B; stroke-width:1.8; }
+    .t    { font-size:11px; fill:#000; text-anchor:middle; }
+    .id   { font-size:9px; fill:#1F6FB2; text-anchor:middle; }
+    .idA  { font-size:9px; fill:#8A6400; text-anchor:middle; }
+    .fig  { stroke:#000; stroke-width:1.4; fill:none; }
+    .an   { font-size:11.5px; fill:#000; text-anchor:middle; }
+    .st   { font-size:9.5px; fill:#555; text-anchor:middle; font-style:italic; }
+    .as   { stroke:#000; stroke-width:1; fill:none; }
+    .rel  { stroke:#000; stroke-width:1; fill:none; stroke-dasharray:6 4; marker-end:url(#open); }
+    .rl   { font-size:9.5px; fill:#000; }
+  </style>
+
+  <rect width="1020" height="860" fill="#FFFFFF"/>
+
+  <rect x="310" y="58" width="400" height="712" fill="none" stroke="#3A3A3A" stroke-width="1.3"/>
+  <text x="510" y="82" font-size="12.5" font-weight="700" fill="#000" text-anchor="middle">Royalty &amp; KPI Calculation  (SV3)</text>
+
+  <ellipse class="ucA" cx="510" cy="127" rx="90" ry="27"/>
+  <text class="idA" x="510" y="118">UC-38</text>
+  <text class="t" x="510" y="131">Calculate Royalty &amp; KPI</text>
+  <text class="t" x="510" y="144">(Nightly)</text>
+
+  <ellipse class="uc" cx="510" cy="207" rx="90" ry="27"/>
+  <text class="id" x="510" y="201">UC-20</text>
+  <text class="t" x="510" y="215">Run Calculation Manually</text>
+
+  <ellipse class="uc" cx="510" cy="281" rx="90" ry="27"/>
+  <text class="id" x="510" y="275">UC-21</text>
+  <text class="t" x="510" y="289">Resolve Calculation Errors</text>
+
+  <ellipse class="uc" cx="510" cy="355" rx="90" ry="27"/>
+  <text class="id" x="510" y="349">UC-22</text>
+  <text class="t" x="510" y="363">Submit Period for Approval</text>
+
+  <ellipse class="uc" cx="510" cy="429" rx="90" ry="27"/>
+  <text class="id" x="510" y="420">UC-23</text>
+  <text class="t" x="510" y="433">Lock Period &amp;</text>
+  <text class="t" x="510" y="446">Generate Vouchers</text>
+
+  <ellipse class="uc" cx="510" cy="503" rx="90" ry="27"/>
+  <text class="id" x="510" y="497">UC-26</text>
+  <text class="t" x="510" y="511">Approve Period Statement</text>
+
+  <ellipse class="uc" cx="510" cy="577" rx="90" ry="27"/>
+  <text class="id" x="510" y="571">UC-27</text>
+  <text class="t" x="510" y="585">Apply Manual Adjustment</text>
+
+  <ellipse class="uc" cx="510" cy="651" rx="90" ry="27"/>
+  <text class="id" x="510" y="645">UC-08</text>
+  <text class="t" x="510" y="659">View My KPI</text>
+
+  <ellipse class="uc" cx="510" cy="725" rx="90" ry="27"/>
+  <text class="id" x="510" y="719">UC-16</text>
+  <text class="t" x="510" y="733">View Department KPI</text>
+
+  <path class="rel" d="M560,184 V152"/>
+  <text class="rl" x="572" y="172">&#171;include&#187;</text>
+
+  <path class="rel" d="M560,554 V528"/>
+  <text class="rl" x="572" y="544">&#171;extend&#187;</text>
+
+  <circle class="fig" cx="140" cy="296" r="10"/>
+  <path class="fig" d="M140,306 V332 M124,316 H156 M140,332 L127,350 M140,332 L153,350"/>
+  <text class="an" x="140" y="366">Accountant</text>
+
+  <circle class="fig" cx="140" cy="518" r="10"/>
+  <path class="fig" d="M140,528 V554 M124,538 H156 M140,554 L127,572 M140,554 L153,572"/>
+  <text class="an" x="140" y="588">Chief Editor</text>
+
+  <circle class="fig" cx="880" cy="105" r="10"/>
+  <path class="fig" d="M880,115 V141 M864,125 H896 M880,141 L867,159 M880,141 L893,159"/>
+  <text class="an" x="880" y="175">Scheduler</text>
+  <text class="st" x="880" y="189">&#171;system&#187;</text>
+
+  <circle class="fig" cx="880" cy="610" r="10"/>
+  <path class="fig" d="M880,620 V646 M864,630 H896 M880,646 L867,664 M880,646 L893,664"/>
+  <text class="an" x="880" y="680">Reporter</text>
+
+  <circle class="fig" cx="880" cy="725" r="10"/>
+  <path class="fig" d="M880,735 V761 M864,745 H896 M880,761 L867,779 M880,761 L893,779"/>
+  <text class="an" x="880" y="795">Head Editor</text>
+
+  <path class="as" d="M140,318 L420,207"/>
+  <path class="as" d="M140,318 L420,281"/>
+  <path class="as" d="M140,318 L420,355"/>
+  <path class="as" d="M140,318 L420,429"/>
+
+  <path class="as" d="M140,540 L420,503"/>
+  <path class="as" d="M140,540 L420,577"/>
+
+  <path class="as" d="M880,127 L600,127"/>
+  <path class="as" d="M880,632 L600,651"/>
+  <path class="as" d="M880,747 L600,725"/>
+
+  <path d="M320,796 H700 V852 H320 Z" fill="#FAFAFA" stroke="#999" stroke-width="1"/>
+  <text x="332" y="815" font-size="10.5" fill="#333">UC-23 is the SV3 / SV4 boundary: SV3 owns period locking and the fund cap;</text>
+  <text x="332" y="830" font-size="10.5" fill="#333">SV4 owns voucher generation, tax and payment from that point on.</text>
+  <text x="332" y="845" font-size="10.5" fill="#333">Amber = core algorithm of the project.</text>
+</svg>

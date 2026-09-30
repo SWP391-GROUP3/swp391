@@ -2,122 +2,149 @@
    SWP391 - Dữ liệu mẫu
    Chạy SAU schema.sql. Chỉ dùng để dev và demo.
 
-   LƯU Ý mật khẩu: cột matKhau phải chứa BCrypt hash, không phải plain text.
+   LƯU Ý mật khẩu: cột password_hash phải chứa BCrypt hash, không phải plain text.
    Chuỗi bên dưới là PLACEHOLDER. Người phụ trách auth thay bằng hash thật
    (BCryptPasswordEncoder.encode("123456")) khi làm chức năng đăng nhập.
+
+   schema.sql vừa tạo lại bảng nên IDENTITY bắt đầu từ 1: các id tham chiếu
+   bên dưới (role_id = 1, author_id = 1, ...) dựa vào thứ tự INSERT.
    ========================================================================== */
+
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
 
 USE swp391_kpi;
 GO
 
-/* ---------- Cụm 1: nhân sự & tổ chức ---------- */
+/* ---------- Nền tảng ---------- */
 
-INSERT INTO Ban (ma, ten) VALUES
-    ('THOISU',  N'Ban Thời sự'),
-    ('KINHTE',  N'Ban Kinh tế'),
-    ('VANHOA',  N'Ban Văn hoá - Xã hội'),
-    ('THETHAO', N'Ban Thể thao');
+INSERT INTO roles (code, name) VALUES
+    ('PHONG_VIEN',      N'Phóng viên'),          -- 1
+    ('BIEN_TAP_VIEN',   N'Biên tập viên'),       -- 2
+    ('TRUONG_BAN',      N'Trưởng ban'),          -- 3
+    ('THU_KY_TOA_SOAN', N'Thư ký toà soạn'),     -- 4
+    ('KE_TOAN',         N'Kế toán'),             -- 5
+    ('QUAN_TRI',        N'Quản trị hệ thống');   -- 6
 
-INSERT INTO ChuyenMuc (ma, ten) VALUES
-    ('THOISU',   N'Thời sự'),
-    ('KINHTE',   N'Kinh tế'),
-    ('XAHOI',    N'Xã hội'),
-    ('THETHAO',  N'Thể thao'),
-    ('GIAITRI',  N'Giải trí');
+INSERT INTO sections (code, name) VALUES
+    ('THOISU',  N'Ban Thời sự'),             -- 1
+    ('KINHTE',  N'Ban Kinh tế'),             -- 2
+    ('VANHOA',  N'Ban Văn hoá - Xã hội'),    -- 3
+    ('THETHAO', N'Ban Thể thao');            -- 4
 
-INSERT INTO VaiTro (ma, ten) VALUES
-    ('PHONG_VIEN',        N'Phóng viên'),
-    ('BIEN_TAP_VIEN',     N'Biên tập viên'),
-    ('THU_KY_TOA_SOAN',   N'Thư ký toà soạn'),
-    ('TONG_BIEN_TAP',     N'Tổng biên tập'),
-    ('KE_TOAN',           N'Kế toán'),
-    ('QUAN_TRI',          N'Quản trị hệ thống');
+/* PV / BTV / Trưởng ban có ban. TKTS, Kế toán, Admin: section_id = NULL. */
+INSERT INTO users (username, email, password_hash, full_name, role_id, section_id) VALUES
+    ('an.nv',    'an.nv@toasoan.vn',    'REPLACE_WITH_BCRYPT_HASH', N'Nguyễn Văn An',  1, 1),     -- 1 PV Thời sự
+    ('binh.tt',  'binh.tt@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', N'Trần Thị Bình',  1, 1),     -- 2 PV Thời sự
+    ('cuong.lh', 'cuong.lh@toasoan.vn', 'REPLACE_WITH_BCRYPT_HASH', N'Lê Hoàng Cường', 2, 1),     -- 3 BTV Thời sự
+    ('dung.pt',  'dung.pt@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', N'Phạm Thu Dung',  4, NULL),  -- 4 TKTS
+    ('duc.vm',   'duc.vm@toasoan.vn',   'REPLACE_WITH_BCRYPT_HASH', N'Vũ Minh Đức',    3, 1),     -- 5 Trưởng ban Thời sự
+    ('chi.hl',   'chi.hl@toasoan.vn',   'REPLACE_WITH_BCRYPT_HASH', N'Hoàng Lan Chi',  5, NULL),  -- 6 Kế toán
+    ('hung.dq',  'hung.dq@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', N'Đỗ Quốc Hưng',   1, 2),     -- 7 PV Kinh tế
+    ('admin',    'admin@toasoan.vn',    'REPLACE_WITH_BCRYPT_HASH', N'Quản trị viên',  6, NULL);  -- 8 Admin
 
-INSERT INTO NguoiDung (maNV, hoTen, email, matKhau, banId, laCongTacVien) VALUES
-    ('NV001', N'Nguyễn Văn An',   'an.nv@toasoan.vn',   'REPLACE_WITH_BCRYPT_HASH', 1, 0),
-    ('NV002', N'Trần Thị Bình',   'binh.tt@toasoan.vn', 'REPLACE_WITH_BCRYPT_HASH', 1, 0),
-    ('NV003', N'Lê Hoàng Cường',  'cuong.lh@toasoan.vn','REPLACE_WITH_BCRYPT_HASH', 2, 0),
-    ('NV004', N'Phạm Thu Dung',   'dung.pt@toasoan.vn', 'REPLACE_WITH_BCRYPT_HASH', 3, 0),
-    ('NV005', N'Vũ Minh Đức',     'duc.vm@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', 1, 0),
-    ('NV006', N'Hoàng Lan Chi',   'chi.hl@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', 2, 0),
-    ('CTV01', N'Đỗ Quốc Hưng',    'hung.dq@gmail.com',  'REPLACE_WITH_BCRYPT_HASH', NULL, 1);
+INSERT INTO genres (code, name, min_factor, max_factor) VALUES
+    ('TIN_VAN',   N'Tin vắn',           1.00,  2.00),   -- 1
+    ('TIN_SAU',   N'Tin sâu',           2.00,  4.00),   -- 2
+    ('PHAN_ANH',  N'Bài phản ánh',      4.00,  7.00),   -- 3
+    ('PHONG_VAN', N'Bài phỏng vấn',     5.00,  8.00),   -- 4
+    ('BINH_LUAN', N'Bình luận',         3.00,  6.00),   -- 5
+    ('PHONG_SU',  N'Phóng sự điều tra', 8.00, 15.00);   -- 6
 
-/* NV001-002: phóng viên | NV003: BTV | NV004: thư ký toà soạn
-   NV005: tổng biên tập  | NV006: kế toán + quản trị | CTV01: cộng tác viên */
-INSERT INTO NguoiDung_VaiTro (nguoiDungId, vaiTroId) VALUES
-    (1,1), (2,1), (3,2), (4,3), (5,4), (6,5), (6,6), (7,1);
+INSERT INTO media_factors (media_type, min_factor, max_factor) VALUES
+    ('IMAGE', 0.50, 2.00),
+    ('VIDEO', 1.00, 5.00);
 
-/* ---------- Cụm 2: thể loại ---------- */
+/* ---------- Chất lượng: tổng trọng số = 100 ---------- */
 
-INSERT INTO TheLoai (ma, ten, laTin) VALUES
-    ('TIN_VAN',      N'Tin vắn',              1),
-    ('TIN_SAU',      N'Tin sâu',              1),
-    ('PHAN_ANH',     N'Bài phản ánh',         0),
-    ('PHONG_VAN',    N'Bài phỏng vấn',        0),
-    ('PHONG_SU',     N'Phóng sự điều tra',    0),
-    ('ANH_BAO_CHI',  N'Ảnh báo chí',          0),
-    ('INFOGRAPHIC',  N'Infographic',          0);
+INSERT INTO quality_criteria (name, weight_percent) VALUES
+    (N'Tính phát hiện, độc quyền',  30.00),   -- 1
+    (N'Độ khó khi tác nghiệp',      20.00),   -- 2
+    (N'Chất lượng viết, trình bày', 30.00),   -- 3
+    (N'Tính thời sự',               20.00);   -- 4
 
-/* ---------- Cụm 3: tiêu chí chấm điểm (tổng trọng số = 1) ---------- */
+/* ---------- Nhuận bút: đơn giá và kỳ ---------- */
 
-INSERT INTO TieuChiChamDiem (ten, trongSo) VALUES
-    (N'Tính phát hiện, độc quyền',  0.3000),
-    (N'Độ khó khi tác nghiệp',      0.2000),
-    (N'Chất lượng viết, trình bày', 0.3000),
-    (N'Tính thời sự',               0.2000);
+INSERT INTO unit_prices (amount, effective_from, created_by) VALUES
+    (150000, '2026-01-01', 6);
 
-/* ---------- Cụm 4: barem áp dụng từ 01/2026 ---------- */
+INSERT INTO royalty_periods (period_year, period_month, status) VALUES
+    (2026, 9, 'OPEN');   -- 1
 
-INSERT INTO BaremNhuanBut (ten, hieuLucTu, hieuLucDen, giaTriDonViHeSo, trangThai)
-VALUES (N'Barem nhuận bút 2026', '2026-01-01', NULL, 150000, 'DA_BAN_HANH');
+/* ---------- Bài mẫu: đủ 3 trạng thái để dev màn hình ---------- */
 
-INSERT INTO HeSoTheLoai (baremId, theLoaiId, heSo) VALUES
-    (1, 1,  1.0000),   -- Tin vắn
-    (1, 2,  2.0000),   -- Tin sâu
-    (1, 3,  5.0000),   -- Bài phản ánh
-    (1, 4,  6.0000),   -- Bài phỏng vấn
-    (1, 5, 10.0000),   -- Phóng sự điều tra
-    (1, 6,  3.0000),   -- Ảnh báo chí
-    (1, 7,  4.0000);   -- Infographic
+/* Bài 1: đã PUBLISHED, có đồng tác giả, đã chấm chất lượng và chấm nhuận bút.
+   Bài 2: DRAFT, chưa nộp.
+   Bài 3: SUBMITTED, chờ Trưởng ban phân công BTV. */
+INSERT INTO articles (author_id, section_id, genre_id, editor_id, approved_by, title, content,
+                      status, created_at, updated_at, submitted_at, published_at) VALUES
+    (1, 1, 3, 3, 5, N'Người dân khu Bắc Hà khốn khổ vì ngập sau mưa lớn',
+        N'Nội dung bản đã biên tập...', 'PUBLISHED',
+        '2026-09-10 08:00', '2026-09-15 09:00', '2026-09-10 10:00', '2026-09-15 09:00'),
+    (2, 1, 1, NULL, NULL, N'Khai mạc hội chợ hàng Việt 2026',
+        N'Bản nháp...', 'DRAFT',
+        '2026-09-25 14:00', '2026-09-25 14:00', NULL, NULL),
+    (1, 1, 2, NULL, NULL, N'Giá xăng giảm lần thứ ba liên tiếp',
+        N'Nội dung bản nộp...', 'SUBMITTED',
+        '2026-09-27 07:30', '2026-09-27 08:00', '2026-09-27 08:00', NULL);
 
-INSERT INTO HeSoChatLuong (baremId, xepLoai, heSo) VALUES
-    (1, 'A', 1.3000),
-    (1, 'B', 1.0000),
-    (1, 'C', 0.7000),
-    (1, 'D', 0.4000);
+INSERT INTO article_authors (article_id, user_id, share_percent) VALUES
+    (1, 1, 70.00),
+    (1, 2, 30.00),
+    (2, 2, 100.00),
+    (3, 1, 100.00);
 
-INSERT INTO HeSoViTri (baremId, viTriDang, heSo) VALUES
-    (1, 'TRANG_NHAT',  1.2000),
-    (1, 'TRANG_TRONG', 1.0000),
-    (1, 'TRANG_CUOI',  0.9000);
+INSERT INTO article_versions (article_id, version_no, kind, title, content, created_by, created_at) VALUES
+    (1, 1, 'SUBMISSION', N'Người dân khu Bắc Hà khốn khổ vì ngập sau mưa lớn',
+        N'Nội dung bản PV nộp...', 1, '2026-09-10 10:00'),                 -- 1
+    (1, 2, 'EDITED',     N'Người dân khu Bắc Hà khốn khổ vì ngập sau mưa lớn',
+        N'Nội dung bản đã biên tập...', 3, '2026-09-12 16:00'),            -- 2
+    (3, 1, 'SUBMISSION', N'Giá xăng giảm lần thứ ba liên tiếp',
+        N'Nội dung bản nộp...', 1, '2026-09-27 08:00');                    -- 3
 
-INSERT INTO TyLeThuLao (baremId, vaiTroThamGia, tyLePhanTram) VALUES
-    (1, 'BIEN_TAP',       10.0000),
-    (1, 'HOA_SI',          5.0000),
-    (1, 'PHONG_VIEN_ANH',  8.0000);
+INSERT INTO article_attachments (article_id, version_id, author_id, media_type, url, caption) VALUES
+    (1, 1, 2, 'IMAGE', N'/uploads/2026/09/bac-ha-ngap-1.jpg', N'Nước ngập ngang gối tại ngõ 12');
 
-INSERT INTO MucThuongKPI (baremId, tyLeHoanThanhTu, tyLeHoanThanhDen, xepLoaiKy, heSoThuong) VALUES
-    (1, 120.0000, NULL,     'A', 1.2000),
-    (1, 100.0000, 120.0000, 'B', 1.0000),
-    (1,  80.0000, 100.0000, 'C', 0.9000),
-    (1,   0.0000,  80.0000, 'D', 0.8000);
+INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at) VALUES
+    (1, 1, 'CREATE',        NULL,               'DRAFT',            NULL, '2026-09-10 08:00'),
+    (1, 1, 'SUBMIT',        'DRAFT',            'SUBMITTED',        NULL, '2026-09-10 10:00'),
+    (1, 5, 'ASSIGN',        'SUBMITTED',        'ASSIGNED',         N'Giao BTV Cường', '2026-09-10 14:00'),
+    (1, 3, 'START_EDIT',    'ASSIGNED',         'EDITING',          NULL, '2026-09-11 08:30'),
+    (1, 3, 'SEND_APPROVAL', 'EDITING',          'PENDING_APPROVAL', NULL, '2026-09-12 16:00'),
+    (1, 5, 'PUBLISH',       'PENDING_APPROVAL', 'PUBLISHED',        NULL, '2026-09-15 09:00'),
+    (2, 2, 'CREATE',        NULL,               'DRAFT',            NULL, '2026-09-25 14:00'),
+    (3, 1, 'CREATE',        NULL,               'DRAFT',            NULL, '2026-09-27 07:30'),
+    (3, 1, 'SUBMIT',        'DRAFT',            'SUBMITTED',        NULL, '2026-09-27 08:00');
 
-/* ---------- Cụm 5: định mức & kỳ tính ---------- */
+/* Phiếu chấm bài 1 trên bản nộp (version 1):
+   8*30% + 7*20% + 9*30% + 6*20% = 2.4 + 1.4 + 2.7 + 1.2 = 7.70 */
+INSERT INTO quality_reviews (article_id, version_id, editor_id, total_score, comment, created_at) VALUES
+    (1, 1, 3, 7.70, N'Đề tài tốt, cần thêm ý kiến cơ quan chức năng.', '2026-09-11 09:00');
 
-INSERT INTO DinhMuc (banId, nguoiDungId, soLuongTin, soLuongBai, hieuLucTu) VALUES
-    (1, NULL, 20, 8, '2026-01-01'),   -- Ban Thời sự
-    (2, NULL, 15, 6, '2026-01-01'),   -- Ban Kinh tế
-    (3, NULL, 12, 6, '2026-01-01'),   -- Ban Văn hoá
-    (4, NULL, 18, 5, '2026-01-01');   -- Ban Thể thao
+INSERT INTO quality_review_items (review_id, criterion_id, weight_percent, score) VALUES
+    (1, 1, 30.00, 8.00),
+    (1, 2, 20.00, 7.00),
+    (1, 3, 30.00, 9.00),
+    (1, 4, 20.00, 6.00);
 
-/* Ghi đè cá nhân: NV002 đi học nửa kỳ, giảm định mức */
-INSERT INTO DinhMuc (banId, nguoiDungId, soLuongTin, soLuongBai, hieuLucTu) VALUES
-    (NULL, 2, 10, 4, '2026-01-01');
+/* Kỳ 09/2026 còn OPEN nên unit_price và amount chưa điền. */
+INSERT INTO royalty_gradings (article_id, period_id, graded_by, suggested_factor, factor, graded_at) VALUES
+    (1, 1, 4, 5.50, 6.00, '2026-09-16 10:00');
 
-INSERT INTO KyTinh (thang, nam, quyNhuanBut, batTranQuy, baremId, trangThai) VALUES
-    (1, 2026, 480000000, 1, 1, 'DA_CHOT'),
-    (2, 2026, 480000000, 1, 1, 'MO');
+INSERT INTO royalty_media_items (grading_id, attachment_id, factor) VALUES
+    (1, 1, 1.00);
 
+/* ---------- KPI tháng 09/2026 do Trưởng ban Thời sự đặt ---------- */
+
+INSERT INTO kpi_targets (reporter_id, target_year, target_month, min_published, min_avg_score, set_by) VALUES
+    (1, 2026, 9, 8, 7.00, 5),
+    (2, 2026, 9, 6, 6.50, 5);
+
+INSERT INTO notifications (user_id, article_id, message, is_read, created_at) VALUES
+    (1, 1, N'Bài "Người dân khu Bắc Hà khốn khổ vì ngập sau mưa lớn" đã được xuất bản.', 1, '2026-09-15 09:00'),
+    (2, 1, N'Bạn là đồng tác giả của bài vừa được xuất bản.',                         0, '2026-09-15 09:00'),
+    (5, 3, N'Có bài mới chờ phân công biên tập viên.',                                 0, '2026-09-27 08:00');
 GO
 
 PRINT N'Nạp dữ liệu mẫu thành công.';
