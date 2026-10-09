@@ -44,7 +44,7 @@ Tôi đang làm project môn học SWP391: Spring Boot 3.5 + JPA + SQL Server (b
 React 19 + Vite (frontend). Yêu cầu:
 - Code ở mức sinh viên, dễ đọc, KHÔNG cần tối ưu, KHÔNG dùng design pattern phức tạp,
   KHÔNG dùng MapStruct/ModelMapper, KHÔNG dùng generic base class.
-- Theo cấu trúc: controller / service / repository / entity / dto trong package của luồng.
+- Theo cấu trúc chia theo tầng: controller / service / repository / entity / dto dùng chung, tên class có tiền tố của luồng (vd RoyaltyPeriodService).
 - Controller chỉ gọi service, trả về ApiResponse. Logic nghiệp vụ nằm trong service.
 - Tiền dùng BigDecimal. Enum lưu dạng STRING.
 - Comment ngắn bằng tiếng Việt ở những chỗ có logic nghiệp vụ.
@@ -77,6 +77,8 @@ swp391/
 ```
 
 ### 1.2 Backend — cấu trúc package
+
+> **ĐÃ ĐỔI:** nhóm chuyển sang **chia theo tầng** (`controller/`, `service/`, `entity/`... dùng chung, phân biệt luồng bằng tiền tố tên class). Mục này và ví dụ `royalty/...` bên dưới **không còn áp dụng**, theo `AGENTS.md` mục 2 và 3.1.
 
 Chia **theo luồng** (mỗi người sở hữu một package), bên trong mỗi luồng mới chia tầng. Làm vậy để mỗi người chủ yếu sửa trong thư mục của mình, ít bị conflict khi merge.
 

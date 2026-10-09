@@ -17,31 +17,23 @@ Mục có nhãn **[ĐỀ XUẤT]** là chưa chốt: AI làm theo đề xuất, 
 | File | Đọc để biết |
 |---|---|
 | `database/schema.sql` | Bảng, cột, CHECK/UNIQUE, và **comment phía trên mỗi bảng** (luật nghiệp vụ). Ít nhất đọc hết các bảng mà task đụng tới + bảng có FK tới chúng |
-| `docs/SRS_Constraints.docx` | Ràng buộc kỹ thuật: stack, tiền, làm tròn, đăng nhập, phạm vi |
-| `docs/SRS_3.2_Entity_Descriptions.docx` | Ý nghĩa từng entity/bảng |
-| `docs/SDS_Architecture_DB_SourceCode.docx` | Kiến trúc, thiết kế DB, cấu trúc source code |
+| `docs/SRS_Overview.md` | Mục **Vấn đề đã biết** (chỗ SRS lệch schema), 5 luồng nghiệp vụ, entity, actor, luật chung GBR-xx, ràng buộc kỹ thuật (stack, tiền, làm tròn, đăng nhập) |
 | `docs/CODING_PLAN.md` | Quy ước code chi tiết (bản nháp cũ — chỗ nào khác file này thì theo file này) |
 
 **Tài liệu riêng của luồng — đọc thêm khi làm luồng đó:**
 
 | Luồng | File |
 |---|---|
-| `royalty` (BF-04) | `docs/SRS_UC_FullDressed_BF04.docx` (UC, Normal/Alternative flow, BR-RY-xx) |
-| `article`, `assessment`, `publishing`, `kpi`, `admin` | Chưa có. Khi nhóm thêm file UC/SRS của luồng vào `docs/` → thêm 1 dòng vào bảng này **và** vào `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js` |
+| `article` (BF-01) | `docs/SRS_BF01_Article.md` (UC-01…13, BR-IN-xx) |
+| `assessment` (BF-02, BF-03) | `docs/SRS_BF02_Scoring.md` (UC-14…34, BR-SC-xx), `docs/SRS_BF03_Appeal.md` (UC-35…45, BR-QC-xx) |
+| `publishing` | `docs/SRS_BF02_Scoring.md` (UC-33 duyệt đăng), `docs/SRS_BF03_Appeal.md` — xem Vấn đề #5 trong `SRS_Overview.md` |
+| `royalty` (BF-04) | `docs/SRS_BF04_Royalty.md` (UC-46…57, BR-RY-xx) |
+| `kpi` (BF-05) | `docs/SRS_BF05_KPI.md` (UC-58…68, BR-KPI-xx) |
+| `admin` | Chỉ cần tài liệu chung |
 
-**Nên xem (không bắt buộc):** `docs/SWP391_PackageDiagram.png`, `docs/SWP391_SoftwareArchitecture.png`.
+Thêm/đổi file tài liệu của luồng → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
 
-**Cách đọc file `.docx`** (máy nhóm không có Python/pandoc; Claude Code không mở được `.docx` bằng Read):
-
-```bash
-# Git Bash
-unzip -p docs/SRS_Constraints.docx word/document.xml | sed -e 's/<\/w:tc>/ | /g; s/<\/w:p>/\n/g; s/<[^>]*>//g' | grep -v '^\s*$'
-```
-
-```powershell
-# PowerShell
-Add-Type -AssemblyName System.IO.Compression.FileSystem; $z = [IO.Compression.ZipFile]::OpenRead((Resolve-Path 'docs\SRS_Constraints.docx')); $r = New-Object IO.StreamReader($z.GetEntry('word/document.xml').Open()); $x = $r.ReadToEnd(); $r.Close(); $z.Dispose(); ($x -replace '</w:tc>', ' | ' -replace '</w:p>', "`n" -replace '<[^>]+>', '') -split "`n" | Where-Object { $_.Trim() }
-```
+**Chỉ đọc file `.md`.** Bộ SRS đã được chuyển từ `SRS.pdf` sang Markdown. Không đọc file `.docx` / `.pdf`. Sơ đồ (ERD, swimlane, use case) và mockup nằm trong `docs/srs-images/`, mở bằng Read khi cần xem hình. Tài liệu gốc thay đổi → cập nhật lại file `.md` tương ứng qua PR.
 
 **Khi tài liệu mâu thuẫn nhau**, ưu tiên theo thứ tự:
 1. `database/schema.sql` — cấu trúc bảng, kiểu, tên cột, giá trị enum
@@ -87,21 +79,23 @@ Người nộp code phải **tự giải thích được từng dòng** khi th�
 
 ## 2. Ai sở hữu gì
 
-Mỗi luồng là một package, người phụ trách luồng nào chủ yếu sửa trong package đó.
+Backend **chia theo tầng** (mục 3.1): mọi luồng dùng chung các thư mục `controller/`, `service/`, `entity/`... File thuộc luồng nào thì nhận ra bằng **tiền tố tên class**. Người phụ trách luồng nào chủ yếu sửa các file có tiền tố của luồng đó.
 
 Package gốc: `com.swp391.kpi`
 
-| Package | Luồng | Bảng sở hữu |
+| Luồng | Tiền tố tên class | Bảng sở hữu |
 |---|---|---|
-| `common` | Dùng chung — **sửa phải báo cả nhóm** | `notifications` |
-| `admin` | Nền tảng / Admin **[ĐỀ XUẤT: chia người phụ trách]** | `roles`, `sections`, `users`, `genres`, `media_factors` |
-| `article` | BF-01 Viết & nộp bài | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs` |
-| `assessment` | BF-02 Phân công & đánh giá chất lượng | `quality_criteria`, `quality_reviews`, `quality_review_items` |
-| `publishing` | BF-03 Duyệt đăng **[ĐỀ XUẤT tên]** | không có bảng riêng, dùng bảng của `article` qua `ArticleService` |
-| `royalty` | BF-04 Chấm & chi nhuận bút | `unit_prices`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_lines`, `royalty_payments` |
-| `kpi` | BF-05 KPI & báo cáo | `kpi_targets` |
+| Dùng chung — **sửa phải báo cả nhóm** | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications` |
+| `admin` — Nền tảng / Admin **[ĐỀ XUẤT: chia người phụ trách]** | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors` |
+| `article` — BF-01 Viết & nộp bài | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs` |
+| `assessment` — BF-02 Phân công & đánh giá chất lượng | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval` | `quality_criteria`, `quality_reviews`, `quality_review_items` |
+| `publishing` — BF-03 Duyệt đăng **[ĐỀ XUẤT tên]** | `Publishing` (bảng khiếu nại `Appeal`, `CrossReview`, `ReviewerDeviation`: chưa chốt luồng nào, xem Vấn đề #5) | không có bảng riêng, dùng bảng của `article` qua `ArticleService` |
+| `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty`, `Event` | `unit_prices`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_lines`, `royalty_payments` |
+| `kpi` — BF-05 KPI & báo cáo | `Kpi`, `CsvImport`, `ReaderInteraction` | `kpi_targets` |
 
-Các thư mục tầng ở gốc (`com.swp391.kpi.controller`, `.entity`, `.service`...) là khung cũ: **không thêm code mới vào đó**.
+Cột **Tiền tố** lấy theo tên bảng thật trong `schema.sql`. Cột **Bảng sở hữu** còn tên bảng cũ (Vấn đề #7 trong `SRS_Overview.md`), nhóm cần chốt lại. Thêm tiền tố mới → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
+
+**Không** tạo package theo luồng (`com.swp391.kpi.royalty`...) và **không** tạo thư mục con theo luồng bên trong tầng (`entity/royalty/`...).
 
 **Dùng dữ liệu của luồng khác:**
 - Cần dữ liệu luồng khác → gọi **Service** của luồng đó, không gọi Repository của họ, không tự viết query vào bảng của họ.
@@ -110,18 +104,24 @@ Các thư mục tầng ở gốc (`com.swp391.kpi.controller`, `.entity`, `.serv
 
 ## 3. Backend
 
-### 3.1 Cấu trúc trong mỗi luồng
+### 3.1 Cấu trúc thư mục (chia theo tầng)
 
 ```
-royalty/
-├── controller/   RoyaltyPeriodController.java
-├── service/      RoyaltyPeriodService.java
-├── repository/   RoyaltyPeriodRepository.java
-├── entity/       RoyaltyPeriod.java, RoyaltyPeriodStatus.java
-└── dto/          RoyaltyPeriodResponse.java, RoyaltyPeriodCreateRequest.java
+server/src/main/java/com/swp391/kpi/
+├── KpiApplication.java
+├── config/       Cấu hình (Security, ...)                 — dùng chung
+├── controller/   ArticleController, RoyaltyPeriodController, PingController...
+├── dto/          ApiResponse (dùng chung), RoyaltyPeriodResponse, RoyaltyPeriodCreateRequest...
+├── entity/       Article, RoyaltyPeriod, RoyaltyPeriodStatus (enum)...
+├── exception/    GlobalExceptionHandler, NotFoundException, BusinessException — dùng chung
+├── repository/   ArticleRepository, RoyaltyPeriodRepository...
+└── service/      ArticleService, RoyaltyPeriodService...
 ```
 
-Code mẫu chuẩn để bắt chước: package `com.swp391.kpi.royalty` (kỳ nhuận bút).
+- Tên file trên là **ví dụ đặt tên**, hiện repo chưa có code mẫu của luồng nào.
+- Enum để chung thư mục `entity/` với entity dùng nó.
+- **Không có thư mục `mapper/`**: đổi entity → DTO bằng hàm `from()` trong DTO (mục 3.4).
+- Logic tính toán thuần (chia tiền, tính điểm...) để trong `service/`, là class thường không có `@Service` (mục 3.9).
 
 ### 3.2 Việc của từng tầng
 
@@ -181,7 +181,7 @@ DB **có** CHECK/UNIQUE constraint (xem `schema.sql`), nhưng chúng chỉ là l
 
 ### 3.6 Response & lỗi
 
-Mọi API trả `com.swp391.kpi.common.response.ApiResponse`:
+Mọi API trả `com.swp391.kpi.dto.ApiResponse`:
 
 ```json
 { "success": true,  "message": "Tạo kỳ nhuận bút thành công", "data": { } }
@@ -197,7 +197,7 @@ Mọi API trả `com.swp391.kpi.common.response.ApiResponse`:
 | 404 | `NotFoundException` |
 | 409 | `BusinessException` (sai trạng thái nghiệp vụ, trùng dữ liệu) |
 
-- Chỉ có **một** `GlobalExceptionHandler` (`@RestControllerAdvice`) trong `common/exception`, cùng chỗ với `NotFoundException`, `BusinessException`. Nếu chưa có thì báo người dùng tạo trong `common` — **không tự tạo bản riêng trong package luồng**.
+- Chỉ có **một** `GlobalExceptionHandler` (`@RestControllerAdvice`) trong thư mục `exception/`, cùng chỗ với `NotFoundException`, `BusinessException`. Nếu chưa có thì báo người dùng tạo trong `exception/` (file dùng chung) — **không tự tạo bản riêng cho luồng của mình**.
 - Message trả cho người dùng: **tiếng Việt có dấu** (frontend hiển thị thẳng).
 
 ### 3.7 URL
@@ -214,7 +214,7 @@ Mọi API trả `com.swp391.kpi.common.response.ApiResponse`:
 
 ### 3.9 Test
 
-- Logic tính toán thuần (tiền, phân bổ, điểm — vd `royalty/PhanBoTien`) **bắt buộc** có unit test JUnit 5 trong `server/src/test`, không cần Spring/DB.
+- Logic tính toán thuần (tiền, phân bổ, điểm — vd hàm chia tiền nhuận bút cho đồng tác giả) **bắt buộc** có unit test JUnit 5 trong `server/src/test`, không cần Spring/DB.
 - API: chạy thật và gọi thử bằng Postman/trình duyệt trước khi tạo PR.
 
 ## 4. Frontend
@@ -265,9 +265,29 @@ client/src/
 
 ## 8. Quy tắc riêng cho AI
 
-1. Chưa rõ người dùng phụ trách luồng nào → hỏi trước khi viết code.
+### 8.1 Hỏi rõ trước khi code (mỗi phiên code)
+
+Đầu **mỗi phiên code** (mỗi lần mở AI mới / mỗi task mới), trước khi tạo hay sửa file code, AI phải hỏi và nhận câu trả lời rõ ràng từ người dùng về:
+- Người dùng phụ trách **luồng** nào (xem tiền tố tên class ở mục 2).
+- Cần làm **chính xác việc gì**: chức năng nào, UC nào, API/màn hình nào.
+- **Phạm vi**: chỉ backend, chỉ frontend hay cả hai; những gì **không** làm trong phiên này.
+- Kết quả mong muốn: làm xong thế nào thì coi là đạt.
+
+Yêu cầu còn mơ hồ hoặc có nhiều cách hiểu → hỏi tiếp, **không tự đoán rồi code**. Hỏi xong thì nhắc lại ngắn gọn yêu cầu đã hiểu để người dùng xác nhận.
+
+### 8.2 Code từng bước nhỏ, không làm một mạch
+
+- **Không** code một mạch cả chức năng từ đầu đến cuối (entity + repository + service + controller + DTO + frontend trong một lượt).
+- Trước khi code, liệt kê **kế hoạch các bước nhỏ** (mỗi bước khoảng 1 hàm hoặc 1 file nhỏ) để người dùng xem.
+- Mỗi lượt chỉ làm **1 bước**: viết 1 hàm (hoặc 1 class nhỏ), compile/chạy thử, giải thích ngắn hàm đó làm gì, rồi **dừng lại chờ người dùng đồng ý** mới sang bước tiếp.
+- Đi theo thứ tự tầng: entity → repository → service (từng hàm) → controller → frontend. Không nhảy sang tầng sau khi tầng trước chưa chạy được.
+- Không tự làm thêm việc ngoài bước đang làm (không "tiện tay" sửa chỗ khác, không viết trước hàm cho bước sau).
+
+### 8.3 Các quy tắc khác
+
+1. Chưa rõ người dùng phụ trách luồng nào → hỏi trước khi viết code (xem 8.1).
 2. Làm đủ **Bước 0** (đọc tài liệu) trước khi code. Viết entity/query → đọc lại đúng bảng đó trong `database/schema.sql` (cả comment phía trên bảng: nhiều luật nghiệp vụ nằm ở đó).
-3. Chỉ sửa trong package luồng của người dùng. Cần sửa `common/`, luồng khác, `schema.sql`, `pom.xml`, `package.json` → **dừng lại**, nói rõ cần sửa gì để người dùng báo nhóm.
+3. Chỉ sửa file có tiền tố của luồng người dùng (mục 2). Cần sửa file dùng chung (`ApiResponse`, `exception/`, `config/`), file của luồng khác, `schema.sql`, `pom.xml`, `package.json` → **dừng lại**, nói rõ cần sửa gì để người dùng báo nhóm.
 4. Không đổi `ddl-auto`, không thêm thư viện, không tạo pattern/abstraction ngoài mục 1.
 5. Viết xong backend → chạy `mvn -f server/pom.xml compile` (có DB thì chạy `spring-boot:run` và gọi thử API). Frontend → `npm run build` trong `client/`.
 6. Không commit/push khi người dùng chưa yêu cầu.
@@ -278,8 +298,8 @@ client/src/
 | # | Câu hỏi | Đề xuất hiện tại |
 |---|---|---|
 | 1 | Tách Service thành interface + Impl? | Không (trừ khi thầy yêu cầu) |
-| 2 | Tên package BF-03 | `publishing` |
+| 2 | Tên luồng BF-03 | `publishing` |
 | 3 | Đăng nhập | Spring Security + JWT; tạm thời header `X-User-Id` |
 | 4 | Thư viện frontend | `axios` + Ant Design |
-| 5 | Ai làm package `admin` + đăng nhập? | Chưa có |
+| 5 | Ai làm luồng `admin` + đăng nhập? | Chưa có |
 | 6 | Ai là chủ DB? | Chưa có |

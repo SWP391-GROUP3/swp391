@@ -41,3 +41,6 @@ desktop.ini
 # Log
 *.log
 logs/
+
+# File nhap do AI xuat ra, khong commit
+Claude outputs/

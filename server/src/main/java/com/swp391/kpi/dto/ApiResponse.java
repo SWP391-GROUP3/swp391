@@ -1,4 +1,4 @@
-package com.swp391.kpi.common.response;
+package com.swp391.kpi.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

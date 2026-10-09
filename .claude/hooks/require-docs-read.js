@@ -7,17 +7,56 @@ const fs = require('fs');
 const COMMON_DOCS = [
   'CODING_PLAN.md',
   'schema.sql',
-  'SRS_Constraints.docx',
-  'SRS_3.2_Entity_Descriptions.docx',
-  'SDS_Architecture_DB_SourceCode.docx',
+  'SRS_Overview.md',
 ];
 
-// Tai lieu rieng cua tung luong: sua code trong package/thu muc nay thi phai doc them
-const FLOW_DOCS = {
-  royalty: ['SRS_UC_FullDressed_BF04.docx'],
-};
+// Tai lieu rieng cua tung luong.
+// Backend chia theo tang (controller/, service/, entity/...) nen nhan ra luong
+// bang TIEN TO TEN FILE (vd RoyaltyPeriodService.java -> royalty).
+// Frontend van chia theo luong nen nhan ra bang thu muc (vd pages/royalty/).
+// prefixes: tien to ten class, viet thuong (lay theo ten bang trong schema.sql)
+const FLOW_DOCS = [
+  {
+    flow: 'article',
+    prefixes: ['article', 'duplication'],
+    docs: ['SRS_BF01_Article.md'],
+  },
+  {
+    flow: 'assessment',
+    prefixes: ['assessment', 'assignment', 'categorychange', 'criteri', 'scoringattempt', 'scoreapproval'],
+    docs: ['SRS_BF02_Scoring.md', 'SRS_BF03_Appeal.md'],
+  },
+  {
+    flow: 'publishing',
+    prefixes: ['publishing', 'appeal', 'crossreview', 'reviewerdeviation'],
+    docs: ['SRS_BF02_Scoring.md', 'SRS_BF03_Appeal.md'],
+  },
+  {
+    flow: 'royalty',
+    prefixes: ['royalty', 'event'],
+    docs: ['SRS_BF04_Royalty.md'],
+  },
+  {
+    flow: 'kpi',
+    prefixes: ['kpi', 'csvimport', 'readerinteraction'],
+    docs: ['SRS_BF05_KPI.md'],
+  },
+];
 
 const CODE_DIRS = ['/server/src/', '/client/src/'];
+
+// File nay thuoc luong nao? Khong dung '/kpi/' cua backend vi package goc
+// com/swp391/kpi chua MOI file Java.
+function belongsToFlow(filePath, item) {
+  const fileName = filePath.substring(filePath.lastIndexOf('/') + 1).toLowerCase();
+  for (const prefix of item.prefixes) {
+    if (fileName.startsWith(prefix)) {
+      return true;
+    }
+  }
+  const isClient = filePath.includes('/client/src/');
+  return isClient && filePath.includes('/' + item.flow + '/');
+}
 
 function readStdin() {
   try {
@@ -70,9 +109,9 @@ function main() {
   }
 
   const required = [...COMMON_DOCS];
-  for (const flow of Object.keys(FLOW_DOCS)) {
-    if (filePath.includes('/' + flow + '/')) {
-      required.push(...FLOW_DOCS[flow]);
+  for (const item of FLOW_DOCS) {
+    if (belongsToFlow(filePath, item)) {
+      required.push(...item.docs);
     }
   }
 

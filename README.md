@@ -101,9 +101,8 @@ npm run build
 mvn -f server/pom.xml test
 ```
 
-Bộ test của `PhanBoTien` chạy trên **hơn 10.000 bộ dữ liệu ngẫu nhiên** để kiểm
-tra các bất biến (tổng tiền chia luôn khớp, không ai nhận số âm, kết quả tất định).
-Không cần database, chạy xong trong dưới một giây.
+Test logic tính toán thuần (chia tiền, tính điểm...) không cần database, chạy
+nhanh. Hiện chưa có test nào: luồng `royalty` đang được làm lại từ đầu.
 
 ## 6. Dùng AI để code (Claude Code, Codex, Antigravity)
 
@@ -133,7 +132,7 @@ danh từ tiếng Anh số nhiều, `kebab-case`; hành động nghiệp vụ l�
 | Method | Đường dẫn | Mô tả | Vai trò | Trạng thái |
 |---|---|---|---|---|
 | GET | `/api/ping` | Kiểm tra server sống | công khai | ✅ xong |
-| GET | `/api/royalty-periods` | Danh sách kỳ nhuận bút | TKTS, kế toán | ✅ xong |
+| GET | `/api/royalty-periods` | Danh sách kỳ nhuận bút | TKTS, kế toán | |
 | POST | `/api/auth/login` | Đăng nhập, trả JWT | công khai | |
 | GET | `/api/articles` | Danh sách bài, có lọc & phân trang | mọi vai trò | |
 | POST | `/api/articles` | Nộp bài mới | phóng viên | |
@@ -179,8 +178,8 @@ thật đang chứa gì.
 `double` sẽ ra `1193399.9999999998` và bảng kê lệch vài đồng mà không tìm ra
 nguyên nhân.
 
-**Logic tính toán thuần không import Spring.** Các lớp như `royalty/PhanBoTien`
-giữ thuần Java để test chạy nhanh và chạy được hàng nghìn trường hợp. Cần dữ liệu
+**Logic tính toán thuần không import Spring.** Các lớp tính toán (vd chia tiền
+nhuận bút cho đồng tác giả) giữ thuần Java để test chạy nhanh và chạy được hàng nghìn trường hợp. Cần dữ liệu
 gì thì truyền vào qua tham số, không inject repository. Phần controller/service/
 repository của luồng vẫn dùng Spring bình thường.
 
@@ -188,19 +187,22 @@ repository của luồng vẫn dùng Spring bình thường.
 
 ## Chia việc
 
-Mỗi luồng là một package trong `com.swp391.kpi`, người phụ trách luồng nào chủ yếu
-sửa trong package đó (chi tiết bảng sở hữu ở `AGENTS.md` mục 2).
+Backend **chia theo tầng**: mọi luồng dùng chung các thư mục `controller/`,
+`service/`, `repository/`, `entity/`, `dto/`, `exception/`, `config/` trong
+`com.swp391.kpi`. File thuộc luồng nào thì nhận ra bằng **tiền tố tên class**
+(vd `RoyaltyPeriodService` thuộc `royalty`). Người phụ trách luồng nào chủ yếu sửa
+file có tiền tố của luồng đó (bảng tiền tố đầy đủ ở `AGENTS.md` mục 2).
 
-| Package | Luồng | Người phụ trách |
+| Luồng | Tiền tố tên class (ví dụ) | Người phụ trách |
 |---|---|---|
-| `common` | Dùng chung — sửa phải báo cả nhóm | cả nhóm |
-| `admin` | Nền tảng / Admin, đăng nhập | *chưa chốt* |
-| `article` | BF-01 Viết & nộp bài | |
-| `assessment` | BF-02 Phân công & đánh giá chất lượng | |
-| `publishing` | BF-03 Duyệt đăng | |
-| `royalty` | BF-04 Chấm & chi nhuận bút | |
-| `kpi` | BF-05 KPI & báo cáo | |
-| `client/` | Giao diện React | |
+| Dùng chung — sửa phải báo cả nhóm | `ApiResponse`, `exception/`, `config/` | cả nhóm |
+| `admin` — Nền tảng / Admin, đăng nhập | `User`, `Role`, `Genre`... | *chưa chốt* |
+| `article` — BF-01 Viết & nộp bài | `Article...` | |
+| `assessment` — BF-02 Phân công & đánh giá chất lượng | `Assignment...`, `ScoringAttempt...` | |
+| `publishing` — BF-03 Duyệt đăng | `Publishing...` | |
+| `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty...` | |
+| `kpi` — BF-05 KPI & báo cáo | `Kpi...` | |
+| `client/` — Giao diện React (vẫn chia theo luồng trong `pages/`) | | |
 
 ---
 
