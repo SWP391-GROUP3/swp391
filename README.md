@@ -152,13 +152,13 @@ khi làm và sửa bảng trong cùng PR.
 
 Tóm tắt các quy tắc hay quên. Đầy đủ xem [`AGENTS.md`](AGENTS.md).
 
-**Nhánh.** Không push thẳng `main` hay `develop`. Tách nhánh `feature/<luồng>-<việc>`
-từ `develop`, mở PR vào `develop`, một người khác duyệt rồi mới merge. `main` chỉ
-nhận merge từ `develop` để demo.
+**Nhánh.** Nhóm chỉ dùng `main` + nhánh feature, **không có `develop`**. Không push
+thẳng `main`. Tách nhánh `feature/<luồng>-<việc>` từ `main`, mở PR vào `main`, một
+người khác duyệt rồi mới merge. `main` phải luôn chạy được vì dùng để demo.
 
 ```bash
-git checkout develop
-git pull origin develop
+git checkout main
+git pull origin main
 git checkout -b feature/bf04-tao-ky-nhuan-but
 ```
 

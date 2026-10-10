@@ -299,14 +299,15 @@ client/src/
 
 **Nhánh**
 
+> **ĐÃ ĐỔI:** nhóm bỏ nhánh `develop`, chỉ dùng `main` + nhánh feature (xem `AGENTS.md` mục 7).
+
 ```
-main        ← bản ổn định, dùng để demo review iteration. Chỉ merge từ develop.
-develop     ← nhánh tích hợp, luôn phải chạy được
-feature/bf04-cham-nhuan-but   ← mỗi việc một nhánh, tách từ develop
+main                          ← nhánh chung, luôn chạy được, dùng để demo review iteration
+feature/bf04-cham-nhuan-but   ← mỗi việc một nhánh, tách từ main, PR vào main
 ```
 
-- Không ai push thẳng lên `main` / `develop`, mọi thay đổi đi qua Pull Request.
-- Trước khi tạo PR: `git pull origin develop` về nhánh mình, sửa conflict, chạy lại app.
+- Không ai push thẳng lên `main`, mọi thay đổi đi qua Pull Request.
+- Trước khi tạo PR: `git pull origin main` về nhánh mình, sửa conflict, chạy lại app.
 
 **Commit message:** `[BF-04] Thêm API gợi ý hệ số nhuận bút`
 (Việc dùng chung thì ghi `[COMMON]`, sửa DB thì ghi `[DB]`.)

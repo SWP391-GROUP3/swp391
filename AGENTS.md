@@ -257,9 +257,10 @@ client/src/
 
 ## 7. Git
 
-- Nhánh: `main` (ổn định, demo) ← `develop` (tích hợp, luôn chạy được) ← `feature/bf04-ten-viec`.
-- Không push thẳng lên `main`/`develop`, mọi thay đổi qua Pull Request.
-- Trước khi tạo PR: `git pull origin develop`, sửa conflict, chạy lại app.
+- Nhánh: `main` (nhánh chung, luôn chạy được, dùng để demo) ← `feature/bf04-ten-viec`. **Không dùng nhánh `develop`.**
+- Mỗi việc tách một nhánh `feature/<luồng>-<việc>` từ `main`, xong mở Pull Request vào `main`, một người khác duyệt rồi mới merge.
+- Không push thẳng lên `main`, mọi thay đổi qua Pull Request.
+- Trước khi tạo PR: `git pull origin main`, sửa conflict, chạy lại app.
 - Commit: `[BF-04] Thêm API tạo kỳ nhuận bút`. Việc chung: `[COMMON]`, sửa DB: `[DB]`.
 - **Không bao giờ commit** `application-local.properties`, mật khẩu, `target/`, `node_modules/`.
 
