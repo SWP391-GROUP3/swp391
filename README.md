@@ -62,7 +62,9 @@ Mở `application-local.properties`, sửa `spring.datasource.password` thành m
 mvn -f server/pom.xml spring-boot:run
 ```
 
-Kiểm tra: mở `http://localhost:8080/api/ping`, phải thấy JSON có `"trangThai":"OK"`.
+Kiểm tra: log có dòng `Started KpiApplication` là server đã chạy và kết nối được
+database. Chưa bật SQL Server hoặc sai cấu hình DB thì app dừng ngay lúc khởi động,
+log báo `Application run failed` kèm lỗi kết nối (xem mục *Lỗi hay gặp* cuối file).
 
 ## 4. Chạy client
 
@@ -131,7 +133,6 @@ danh từ tiếng Anh số nhiều, `kebab-case`; hành động nghiệp vụ l�
 
 | Method | Đường dẫn | Mô tả | Vai trò | Trạng thái |
 |---|---|---|---|---|
-| GET | `/api/ping` | Kiểm tra server sống | công khai | ✅ xong |
 | GET | `/api/royalty-periods` | Danh sách kỳ nhuận bút | TKTS, kế toán | |
 | POST | `/api/auth/login` | Đăng nhập, trả JWT | công khai | |
 | GET | `/api/articles` | Danh sách bài, có lọc & phân trang | mọi vai trò | |
