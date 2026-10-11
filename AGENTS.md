@@ -30,6 +30,7 @@ Mục có nhãn **[ĐỀ XUẤT]** là chưa chốt: AI làm theo đề xuất, 
 | `royalty` (BF-04) | `docs/SRS_BF04_Royalty.md` (UC-46…57, BR-RY-xx) |
 | `kpi` (BF-05) | `docs/SRS_BF05_KPI.md` (UC-58…68, BR-KPI-xx) |
 | `admin` | Chỉ cần tài liệu chung |
+| Mọi việc **frontend** (`client/`) | Ảnh thiết kế trong `docs/ui-images/` (export từ file `.fig`, xem mục 4) |
 
 Thêm/đổi file tài liệu của luồng → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
 
@@ -228,6 +229,12 @@ client/src/
 ├── routes/         khai báo route + chặn route theo role
 └── utils/          formatMoney, formatDate
 ```
+
+**Giao diện phải làm theo thiết kế Figma có sẵn:** `docs/Web Dashboard UI - Task & Project Management (Community).fig`
+- Bố cục, màu, font, khoảng cách, kiểu bảng/form/nút/menu lấy theo file này. Không tự nghĩ ra phong cách giao diện khác.
+- File `.fig` là định dạng nhị phân của Figma, **AI không đọc được**. Muốn AI làm theo: mở file trong Figma, export màn hình cần làm ra PNG vào `docs/ui-images/` (tên theo màn hình, vd `dashboard.png`), AI mở ảnh bằng Read trước khi code.
+- Chưa có ảnh của màn hình đang làm → AI **dừng lại hỏi**, không tự đoán giao diện.
+- Màn hình thiết kế không có (vd form nhập nhuận bút) → ghép từ component, màu, kiểu có sẵn trong thiết kế.
 
 - Function component + hooks. Không Redux; thông tin đăng nhập để trong một Context.
 - **Chỉ gọi API qua file trong `src/api/`**, URL bắt đầu bằng `/api/...`. Không bao giờ viết `http://localhost:8080` trong code React.
