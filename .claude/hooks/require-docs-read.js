@@ -1,13 +1,13 @@
-// Hook PreToolUse cua Claude Code: chan Edit/Write vao code (server/src, client/src)
-// neu trong phien hien tai agent CHUA doc cac tai lieu bat buoc (xem AGENTS.md, Buoc 0).
-// Chi dung module co san cua Node, khong can cai thu vien.
+// Hook PreToolUse cua Claude Code: chan Edit/Write vao server/src, client/src, database
+// neu trong phien hien tai agent CHUA mo (bang tool Read) cac tai lieu bat buoc
+// (xem AGENTS.md, Buoc 0). Chi dung module co san cua Node, khong can cai thu vien.
 const fs = require('fs');
 
-// Tai lieu bat buoc cho moi lan code (so khop theo ten file)
+// Tai lieu bat buoc cho moi lan code (duong dan tinh tu thu muc goc repo)
 const COMMON_DOCS = [
-  'CODING_PLAN.md',
-  'schema.sql',
-  'SRS_Overview.md',
+  'database/schema.sql',
+  'docs/SRS_Overview.md',
+  'docs/CODING_PLAN.md',
 ];
 
 // Tai lieu rieng cua tung luong.
@@ -19,31 +19,37 @@ const FLOW_DOCS = [
   {
     flow: 'article',
     prefixes: ['article', 'duplication'],
-    docs: ['SRS_BF01_Article.md'],
+    docs: ['docs/SRS_BF01_Article.md'],
   },
   {
     flow: 'assessment',
     prefixes: ['assessment', 'assignment', 'categorychange', 'criteri', 'scoringattempt', 'scoreapproval', 'publishing'],
-    docs: ['SRS_BF02_Scoring.md', 'SRS_BF03_Appeal.md'],
+    docs: ['docs/SRS_BF02_Scoring.md', 'docs/SRS_BF03_Appeal.md'],
   },
   {
     flow: 'appeal',
     prefixes: ['appeal', 'crossreview', 'reviewerdeviation'],
-    docs: ['SRS_BF03_Appeal.md', 'SRS_BF02_Scoring.md'],
+    docs: ['docs/SRS_BF03_Appeal.md', 'docs/SRS_BF02_Scoring.md'],
   },
   {
     flow: 'royalty',
     prefixes: ['royalty', 'event'],
-    docs: ['SRS_BF04_Royalty.md'],
+    docs: ['docs/SRS_BF04_Royalty.md'],
   },
   {
     flow: 'kpi',
     prefixes: ['kpi', 'csvimport', 'readerinteraction'],
-    docs: ['SRS_BF05_KPI.md'],
+    docs: ['docs/SRS_BF05_KPI.md'],
   },
 ];
 
-const CODE_DIRS = ['/server/src/', '/client/src/'];
+// Sua file trong cac thu muc nay thi phai doc tai lieu truoc (AGENTS.md, Buoc 0)
+const CODE_DIRS = ['/server/src/', '/client/src/', '/database/'];
+
+// Doi dau \ cua Windows thanh / de so sanh duong dan cho de
+function normalizePath(path) {
+  return String(path || '').replace(/\\/g, '/');
+}
 
 // File nay thuoc luong nao? Khong dung '/kpi/' cua backend vi package goc
 // com/swp391/kpi chua MOI file Java.
@@ -66,15 +72,19 @@ function readStdin() {
   }
 }
 
-// Gom input cua moi tool_use ma assistant da goi (bo qua system reminder, mo ta tool...)
-function collectToolInputs(transcriptPath) {
-  const inputs = [];
+// Lay duong dan cac file agent da mo THANH CONG bang tool Read trong phien.
+// Trong transcript: moi lan goi tool la 1 "tool_use" (co id, name, input),
+// ket qua tra ve la 1 "tool_result" (co tool_use_id, is_error = true neu loi).
+// Chi nhac ten file trong lenh khac (Grep, Bash...) hoac Read bi loi thi KHONG tinh.
+function collectReadPaths(transcriptPath) {
   if (!transcriptPath || !fs.existsSync(transcriptPath)) {
-    return '';
+    return [];
   }
+  const readPathById = {};   // id cua lenh Read -> duong dan file da mo
+  const failedIds = [];      // id cua cac lenh bi loi
   const lines = fs.readFileSync(transcriptPath, 'utf8').split('\n');
   for (const line of lines) {
-    if (!line.includes('"tool_use"')) {
+    if (!line.includes('"tool_use"') && !line.includes('"tool_result"')) {
       continue;
     }
     let entry;
@@ -84,16 +94,36 @@ function collectToolInputs(transcriptPath) {
       continue;
     }
     const content = entry.message && entry.message.content;
-    if (entry.type !== 'assistant' || !Array.isArray(content)) {
+    if (!Array.isArray(content)) {
       continue;
     }
     for (const item of content) {
-      if (item.type === 'tool_use') {
-        inputs.push(JSON.stringify(item.input || {}));
+      if (entry.type === 'assistant' && item.type === 'tool_use' && item.name === 'Read' && item.input) {
+        readPathById[item.id] = normalizePath(item.input.file_path);
+      }
+      if (entry.type === 'user' && item.type === 'tool_result' && item.is_error) {
+        failedIds.push(item.tool_use_id);
       }
     }
   }
-  return inputs.join('\n');
+
+  const readPaths = [];
+  for (const id of Object.keys(readPathById)) {
+    if (!failedIds.includes(id)) {
+      readPaths.push(readPathById[id]);
+    }
+  }
+  return readPaths;
+}
+
+// Tai lieu da duoc doc chua: co file nao da Read ma duong dan ket thuc bang ten tai lieu
+function hasRead(readPaths, doc) {
+  for (const path of readPaths) {
+    if (path.endsWith('/' + doc)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function main() {
@@ -102,7 +132,7 @@ function main() {
     process.exit(0);
   }
 
-  const filePath = String(data.tool_input.file_path || '').replace(/\\/g, '/');
+  const filePath = normalizePath(data.tool_input.file_path);
   const isCode = CODE_DIRS.some((dir) => filePath.includes(dir));
   if (!isCode) {
     process.exit(0);
@@ -115,17 +145,17 @@ function main() {
     }
   }
 
-  const history = collectToolInputs(data.transcript_path);
-  const missing = required.filter((name) => !history.includes(name));
+  const readPaths = collectReadPaths(data.transcript_path);
+  const missing = required.filter((doc) => !hasRead(readPaths, doc));
   if (missing.length === 0) {
     process.exit(0);
   }
 
   console.error(
-    'CHAN: chua doc tai lieu bat buoc truoc khi code (AGENTS.md - Buoc 0).\n' +
-      'Hay doc cac file sau roi thu lai:\n- ' +
+    'CHAN: chua doc tai lieu bat buoc truoc khi sua code (AGENTS.md - Buoc 0).\n' +
+      'Hay mo cac file sau bang tool Read (mo thanh cong moi tinh) roi thu lai:\n- ' +
       missing.join('\n- ') +
-      '\nFile .docx: doc bang lenh trong AGENTS.md muc "Cach doc file .docx".'
+      '\nChi doc file .md va schema.sql, khong doc .docx/.pdf.'
   );
   process.exit(2);
 }

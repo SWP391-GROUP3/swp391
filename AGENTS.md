@@ -48,7 +48,7 @@ Mâu thuẫn về **nghiệp vụ** (vd SRS nói một kiểu, schema làm một
 - `Đã đọc:` danh sách file ở trên
 - Các bảng, luật nghiệp vụ (BR-xx), UC liên quan tới task sẽ áp dụng
 
-**Cưỡng chế:** với Claude Code, hook `.claude/hooks/require-docs-read.js` (khai báo trong `.claude/settings.json`) **chặn** Edit/Write vào `server/src/` và `client/src/` nếu trong phiên chưa đọc đủ các file trên. Codex / Antigravity không có hook → bắt buộc tự tuân thủ mục này.
+**Cưỡng chế:** với Claude Code, hook `.claude/hooks/require-docs-read.js` (khai báo trong `.claude/settings.json`) **chặn** Edit/Write vào `server/src/`, `client/src/` và `database/` nếu trong phiên chưa **mở thành công bằng tool Read** đủ các file trên (chỉ nhắc tên file trong Grep/Bash không được tính). Codex / Antigravity không có hook → bắt buộc tự tuân thủ mục này.
 
 ---
 
@@ -86,15 +86,15 @@ Package gốc: `com.swp391.kpi`
 
 | Luồng | Tiền tố tên class | Bảng sở hữu |
 |---|---|---|
-| Dùng chung — **sửa phải báo cả nhóm** | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications` |
-| `admin` — Nền tảng / Admin **[ĐỀ XUẤT: chia người phụ trách]** | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors` |
-| `article` — BF-01 Viết & nộp bài | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs` |
-| `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng (UC-33) | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval`, `Publishing` | `quality_criteria`, `quality_reviews`, `quality_review_items` |
+| Dùng chung — **sửa phải báo cả nhóm** | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications`, `audit_logs` |
+| `admin` — Nền tảng / Admin **[ĐỀ XUẤT: chia người phụ trách]** | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors`, `system_parameters` |
+| `article` — BF-01 Viết & nộp bài | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs`, `duplication_checks`, `duplication_matches` |
+| `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng (UC-33) | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval`, `Publishing` | `assignments`, `category_change_logs`, `criteria_set_versions`, `criteria`, `scoring_attempts`, `scoring_attempt_details`, `score_approvals` |
 | `appeal` — BF-03 Khiếu nại & kiểm soát chất lượng chấm | `Appeal`, `CrossReview`, `ReviewerDeviation` | `appeals`, `appeal_criteria`, `appeal_resolutions`, `appeal_rule_configs`, `cross_review_batches`, `cross_review_tasks`, `reviewer_deviation_indices` |
-| `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty`, `Event` | `unit_prices`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_lines`, `royalty_payments` |
-| `kpi` — BF-05 KPI & báo cáo | `Kpi`, `CsvImport`, `ReaderInteraction` | `kpi_targets` |
+| `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty`, `Event` | `royalty_rates`, `events`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_payments`, `royalty_lines` |
+| `kpi` — BF-05 KPI & báo cáo | `Kpi`, `CsvImport`, `ReaderInteraction` | `kpi_targets`, `kpi_snapshots`, `csv_import_logs`, `reader_interactions` |
 
-Cột **Tiền tố** lấy theo tên bảng thật trong `schema.sql`. Cột **Bảng sở hữu** còn tên bảng cũ (Vấn đề #7 trong `SRS_Overview.md`), nhóm cần chốt lại. Thêm tiền tố mới → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
+Cột **Tiền tố** và **Bảng sở hữu** lấy theo danh sách bảng ở đầu `schema.sql`. Thêm bảng hoặc tiền tố mới → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
 
 **Không** tạo package theo luồng (`com.swp391.kpi.royalty`...) và **không** tạo thư mục con theo luồng bên trong tầng (`entity/royalty/`...).
 
