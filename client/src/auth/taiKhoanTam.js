@@ -25,23 +25,23 @@
 const MAT_KHAU_CHUNG = '123456'
 
 const TEN_VAI_TRO = {
-  PHONG_VIEN:      'Phóng viên',
-  BIEN_TAP_VIEN:   'Biên tập viên',
-  TRUONG_BAN:      'Trưởng ban',
-  THU_KY_TOA_SOAN: 'Thư ký toà soạn',
-  KE_TOAN:         'Kế toán',
-  QUAN_TRI:        'Quản trị hệ thống',
+  REPORTER:            'Phóng viên',
+  EDITOR:              'Biên tập viên',
+  HEAD_OF_DEPARTMENT:  'Trưởng ban',
+  EDITORIAL_SECRETARY: 'Thư ký toà soạn',
+  ACCOUNTANT:          'Kế toán',
+  ADMIN:               'Quản trị hệ thống',
 }
 
 const DANH_SACH = [
-  { username: 'an.nv',    hoTen: 'Nguyễn Văn An',  email: 'an.nv@toasoan.vn',    vaiTro: ['PHONG_VIEN'] },
-  { username: 'binh.tt',  hoTen: 'Trần Thị Bình',  email: 'binh.tt@toasoan.vn',  vaiTro: ['PHONG_VIEN'] },
-  { username: 'cuong.lh', hoTen: 'Lê Hoàng Cường', email: 'cuong.lh@toasoan.vn', vaiTro: ['BIEN_TAP_VIEN'] },
-  { username: 'dung.pt',  hoTen: 'Phạm Thu Dung',  email: 'dung.pt@toasoan.vn',  vaiTro: ['THU_KY_TOA_SOAN'] },
-  { username: 'duc.vm',   hoTen: 'Vũ Minh Đức',    email: 'duc.vm@toasoan.vn',   vaiTro: ['TRUONG_BAN'] },
-  { username: 'chi.hl',   hoTen: 'Hoàng Lan Chi',  email: 'chi.hl@toasoan.vn',   vaiTro: ['KE_TOAN'] },
-  { username: 'hung.dq',  hoTen: 'Đỗ Quốc Hưng',   email: 'hung.dq@toasoan.vn',  vaiTro: ['PHONG_VIEN'] },
-  { username: 'admin',    hoTen: 'Quản trị viên',  email: 'admin@toasoan.vn',    vaiTro: ['QUAN_TRI'] },
+  { username: 'an.nv',    hoTen: 'Nguyễn Văn An',  email: 'an.nv@toasoan.vn',    vaiTro: ['REPORTER'] },
+  { username: 'binh.tt',  hoTen: 'Trần Thị Bình',  email: 'binh.tt@toasoan.vn',  vaiTro: ['REPORTER'] },
+  { username: 'cuong.lh', hoTen: 'Lê Hoàng Cường', email: 'cuong.lh@toasoan.vn', vaiTro: ['EDITOR'] },
+  { username: 'dung.pt',  hoTen: 'Phạm Thu Dung',  email: 'dung.pt@toasoan.vn',  vaiTro: ['EDITORIAL_SECRETARY'] },
+  { username: 'duc.vm',   hoTen: 'Vũ Minh Đức',    email: 'duc.vm@toasoan.vn',   vaiTro: ['HEAD_OF_DEPARTMENT'] },
+  { username: 'chi.hl',   hoTen: 'Hoàng Lan Chi',  email: 'chi.hl@toasoan.vn',   vaiTro: ['ACCOUNTANT'] },
+  { username: 'hung.dq',  hoTen: 'Đỗ Quốc Hưng',   email: 'hung.dq@toasoan.vn',  vaiTro: ['REPORTER'] },
+  { username: 'admin',    hoTen: 'Quản trị viên',  email: 'admin@toasoan.vn',    vaiTro: ['ADMIN'] },
 ]
 
 /** Ten vai tro tieng Viet, ghep bang dau phay - de hien ra man hinh. */

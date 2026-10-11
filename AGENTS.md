@@ -25,8 +25,8 @@ Mục có nhãn **[ĐỀ XUẤT]** là chưa chốt: AI làm theo đề xuất, 
 | Luồng | File |
 |---|---|
 | `article` (BF-01) | `docs/SRS_BF01_Article.md` (UC-01…13, BR-IN-xx) |
-| `assessment` (BF-02, BF-03) | `docs/SRS_BF02_Scoring.md` (UC-14…34, BR-SC-xx), `docs/SRS_BF03_Appeal.md` (UC-35…45, BR-QC-xx) |
-| `publishing` | `docs/SRS_BF02_Scoring.md` (UC-33 duyệt đăng), `docs/SRS_BF03_Appeal.md` — xem Vấn đề #5 trong `SRS_Overview.md` |
+| `assessment` (BF-02, gồm duyệt đăng UC-33) | `docs/SRS_BF02_Scoring.md` (UC-14…34, BR-SC-xx), `docs/SRS_BF03_Appeal.md` (UC-35…45, BR-QC-xx) |
+| `appeal` (BF-03) | `docs/SRS_BF03_Appeal.md` (UC-35…45, BR-QC-xx), `docs/SRS_BF02_Scoring.md` (lần chấm lại do khiếu nại ghi vào `scoring_attempts`) |
 | `royalty` (BF-04) | `docs/SRS_BF04_Royalty.md` (UC-46…57, BR-RY-xx) |
 | `kpi` (BF-05) | `docs/SRS_BF05_KPI.md` (UC-58…68, BR-KPI-xx) |
 | `admin` | Chỉ cần tài liệu chung |
@@ -89,8 +89,8 @@ Package gốc: `com.swp391.kpi`
 | Dùng chung — **sửa phải báo cả nhóm** | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications` |
 | `admin` — Nền tảng / Admin **[ĐỀ XUẤT: chia người phụ trách]** | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors` |
 | `article` — BF-01 Viết & nộp bài | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs` |
-| `assessment` — BF-02 Phân công & đánh giá chất lượng | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval` | `quality_criteria`, `quality_reviews`, `quality_review_items` |
-| `publishing` — BF-03 Duyệt đăng **[ĐỀ XUẤT tên]** | `Publishing` (bảng khiếu nại `Appeal`, `CrossReview`, `ReviewerDeviation`: chưa chốt luồng nào, xem Vấn đề #5) | không có bảng riêng, dùng bảng của `article` qua `ArticleService` |
+| `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng (UC-33) | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval`, `Publishing` | `quality_criteria`, `quality_reviews`, `quality_review_items` |
+| `appeal` — BF-03 Khiếu nại & kiểm soát chất lượng chấm | `Appeal`, `CrossReview`, `ReviewerDeviation` | `appeals`, `appeal_criteria`, `appeal_resolutions`, `appeal_rule_configs`, `cross_review_batches`, `cross_review_tasks`, `reviewer_deviation_indices` |
 | `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty`, `Event` | `unit_prices`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_lines`, `royalty_payments` |
 | `kpi` — BF-05 KPI & báo cáo | `Kpi`, `CsvImport`, `ReaderInteraction` | `kpi_targets` |
 
@@ -223,7 +223,7 @@ Mọi API trả `com.swp391.kpi.dto.ApiResponse`:
 ```
 client/src/
 ├── api/            axiosClient.js (baseURL '/api', xử lý lỗi chung), mỗi luồng 1 file: royaltyApi.js...
-├── pages/          chia theo luồng: article/, assessment/, publishing/, royalty/, kpi/, admin/
+├── pages/          chia theo luồng: article/, assessment/, appeal/, royalty/, kpi/, admin/
 ├── components/common/   Button, Table, Modal... dùng chung
 ├── layouts/        layout theo role
 ├── routes/         khai báo route + chặn route theo role
@@ -306,7 +306,7 @@ Yêu cầu còn mơ hồ hoặc có nhiều cách hiểu → hỏi tiếp, **kh�
 | # | Câu hỏi | Đề xuất hiện tại |
 |---|---|---|
 | 1 | Tách Service thành interface + Impl? | Không (trừ khi thầy yêu cầu) |
-| 2 | Tên luồng BF-03 | `publishing` |
+| 2 | Tên luồng BF-03 | **Đã chốt:** `appeal` (khiếu nại, chấm mù theo SRS). Duyệt đăng UC-33 thuộc `assessment` |
 | 3 | Đăng nhập | Spring Security + JWT; tạm thời header `X-User-Id` |
 | 4 | Thư viện frontend | `axios` + Ant Design |
 | 5 | Ai làm luồng `admin` + đăng nhập? | Chưa có |
