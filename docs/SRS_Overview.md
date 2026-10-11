@@ -29,7 +29,7 @@
 | 4 | Thiếu bảng luật BR-SC | Các UC của BF-02 tham chiếu `BR-SC-01…11` nhưng PDF không có bảng định nghĩa. Nội dung luật phải suy ra từ UC (xem `SRS_BF02_Scoring.md`). |
 | 5 | Tên/phạm vi BF-03 | **Đã chốt (2026-10-11):** BF-03 = `appeal` (*Kiểm soát chất lượng chấm*: khiếu nại, chấm mù) theo SRS. Duyệt đăng (UC-33) thuộc `assessment` (BF-02). `AGENTS.md` mục 2 và hook đã sửa theo. |
 | 6 | Bảng KPI | UC-58 lưu vào `kpi_benchmarks` (không có trong `schema.sql`). UC-59 có `target_views` (không có cột này trong `kpi_targets`). |
-| 7 | Bảng sở hữu trong AGENTS.md | `AGENTS.md` mục 2 còn ghi tên bảng cũ (`quality_criteria`, `quality_reviews`, `unit_prices`…). `schema.sql` hiện dùng `criteria_set_versions`, `criteria`, `scoring_attempts`, `royalty_rates`, `appeals`… |
+| 7 | Bảng sở hữu trong AGENTS.md | **Đã chốt (2026-10-11):** cột "Bảng sở hữu" trong `AGENTS.md` mục 2 đã sửa theo danh sách 40 bảng ở đầu `schema.sql` (bỏ tên cũ `quality_criteria`, `quality_reviews`, `unit_prices`…). |
 | 8 | End condition BF-02 | Mục 2.2 ghi "Bài được chốt hạng A, B, C hoặc D", còn UC/swimlane BF-02 kết thúc ở PUBLISHED / REJECTED và không có xếp hạng chữ. BR-KPI-05 cấm xếp hạng A/B/C/D cho KPI. |
 | 9 | Mockup khác SRS | Mockup chấm điểm dùng 5 tiêu chí thang 10, tổng /50 và hệ số 1.30/1.15… Mockup phiếu chi có thuế TNCN 10% và số tài khoản. SRS và schema dùng thang 0–100 có trọng số và không có thuế/tài khoản. **Mockup chỉ minh hoạ bố cục, không phải yêu cầu.** |
 | 10 | Phần template chưa điền | Một số mục vẫn là dữ liệu mẫu của template (hệ thống tuyển dụng: Candidate, Job posting, HR Manager, VnPay/SePay, JOB-01/02, MSG01…). Xem cuối file, mục **Phần template chưa thay**. **Không code theo phần này.** |

@@ -114,9 +114,9 @@ nhanh. Hiện chưa có test nào: luồng `royalty` đang được làm lại t
   theo danh sách ở mục *Bước 0* của `AGENTS.md`. Làm luồng nào thì đọc thêm tài
   liệu UC của luồng đó.
 - Với **Claude Code**, việc này được hook `.claude/hooks/require-docs-read.js`
-  cưỡng chế: chưa đọc đủ thì không sửa được file trong `server/src/` hay
-  `client/src/`. Lần đầu mở project, Claude Code có thể hỏi có tin hook của
-  project không — chọn đồng ý.
+  cưỡng chế: chưa mở đủ tài liệu bằng tool Read thì không sửa được file trong
+  `server/src/`, `client/src/` hay `database/`. Lần đầu mở project, Claude Code
+  có thể hỏi có tin hook của project không — chọn đồng ý.
 - **Codex / Antigravity** không có hook: khi giao việc, nhắc AI làm *Bước 0*
   trước và kiểm tra câu trả lời có dòng `Đã đọc: ...`.
 - Thêm tài liệu UC/SRS cho luồng mới vào `docs/` → cập nhật bảng *Bước 0* trong
