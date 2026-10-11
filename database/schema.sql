@@ -265,15 +265,19 @@ CREATE TABLE article_versions (
     CONSTRAINT ck_article_versions_change  CHECK (change_type IN ('INITIAL','MINOR','MAJOR'))
 );
 
-/* Ảnh/video. author_id là người nhận nhuận bút phần này, có thể khác tác giả
-   bài. version_id NULL = đang soạn, chưa gắn vào bản nộp nào.
+/* Ảnh/video. author_id là người nhận nhuận bút phần này, PHẢI là một trong
+   các tác giả của bài (có dòng trong article_authors, BR-IN-05): kiểm ở service.
+   version_id NULL = đang soạn, chưa gắn vào bản nộp nào.
    File lưu trên ổ đĩa server, DB chỉ giữ đường dẫn (url) và mã băm.
    Kiểm trùng ảnh: file_hash (SHA-256) trùng y hệt, dhash (64 bit, dạng hex)
-   gần giống khi distance_bits nhỏ hơn ngưỡng.
+   gần giống khi distance_bits <= DHASH_MAX_BITS (5 bit, system_parameters).
    hash_result: NULL = chưa kiểm | NEW = không trùng | DUPLICATE = trùng
    file_hash | SIMILAR = dhash gần giống. DUPLICATE/SIMILAR thì
-   matched_attachment_id trỏ ảnh bị trùng và KHÔNG tính nhuận bút (BR-RY-04).
-   external_source khác NULL = ảnh lấy từ nguồn ngoài, cũng không tính tiền. */
+   matched_attachment_id trỏ ảnh bị trùng. Trùng CHƯA chắc mất tiền: chỉ khi
+   ảnh bị trùng đã từng được trả nhuận bút mới là tái sử dụng, không tính
+   tiền (BR-IN-05, BR-RY-04). Luồng royalty kiểm việc này lúc chấm ảnh (UC-48).
+   [ĐỀ XUẤT] "đã từng được trả" = ảnh bị trùng đã có dòng trong royalty_media_items.
+   external_source khác NULL = ảnh lấy từ nguồn ngoài, không tính tiền. */
 CREATE TABLE article_attachments (
     id                     INT IDENTITY(1,1) PRIMARY KEY,
     article_id             INT            NOT NULL,
@@ -760,9 +764,9 @@ CREATE TABLE royalty_gradings (
 );
 CREATE INDEX ix_royalty_gradings_period ON royalty_gradings(period_id);
 
-/* Hệ số từng ảnh/video của 1 phiếu chấm (BR-RY-04). Ảnh trùng hoặc nguồn
-   ngoài thì không tạo dòng ở đây. Attachment phải thuộc đúng bài của
-   grading: kiểm ở service. */
+/* Hệ số từng ảnh/video của 1 phiếu chấm (BR-RY-04). Ảnh tái sử dụng (trùng
+   với ảnh đã từng được trả nhuận bút, BR-IN-05) hoặc nguồn ngoài thì không
+   tạo dòng ở đây. Attachment phải thuộc đúng bài của grading: kiểm ở service. */
 CREATE TABLE royalty_media_items (
     id             INT IDENTITY(1,1) PRIMARY KEY,
     grading_id     INT            NOT NULL,
