@@ -199,8 +199,8 @@ file có tiền tố của luồng đó (bảng tiền tố đầy đủ ở `AG
 | Dùng chung — sửa phải báo cả nhóm | `ApiResponse`, `exception/`, `config/` | cả nhóm |
 | `admin` — Nền tảng / Admin, đăng nhập | `User`, `Role`, `Genre`... | *chưa chốt* |
 | `article` — BF-01 Viết & nộp bài | `Article...` | |
-| `assessment` — BF-02 Phân công & đánh giá chất lượng | `Assignment...`, `ScoringAttempt...` | |
-| `publishing` — BF-03 Duyệt đăng | `Publishing...` | |
+| `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng | `Assignment...`, `ScoringAttempt...`, `Publishing...` | |
+| `appeal` — BF-03 Khiếu nại & kiểm soát chất lượng chấm | `Appeal...`, `CrossReview...` | |
 | `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty...` | |
 | `kpi` — BF-05 KPI & báo cáo | `Kpi...` | |
 | `client/` — Giao diện React (vẫn chia theo luồng trong `pages/`) | | |
