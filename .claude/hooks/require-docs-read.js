@@ -23,13 +23,13 @@ const FLOW_DOCS = [
   },
   {
     flow: 'assessment',
-    prefixes: ['assessment', 'assignment', 'categorychange', 'criteri', 'scoringattempt', 'scoreapproval'],
+    prefixes: ['assessment', 'assignment', 'categorychange', 'criteri', 'scoringattempt', 'scoreapproval', 'publishing'],
     docs: ['SRS_BF02_Scoring.md', 'SRS_BF03_Appeal.md'],
   },
   {
-    flow: 'publishing',
-    prefixes: ['publishing', 'appeal', 'crossreview', 'reviewerdeviation'],
-    docs: ['SRS_BF02_Scoring.md', 'SRS_BF03_Appeal.md'],
+    flow: 'appeal',
+    prefixes: ['appeal', 'crossreview', 'reviewerdeviation'],
+    docs: ['SRS_BF03_Appeal.md', 'SRS_BF02_Scoring.md'],
   },
   {
     flow: 'royalty',

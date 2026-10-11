@@ -2,7 +2,7 @@
 
 > Chuyển từ `SRS.pdf`. Đọc kèm `docs/SRS_Overview.md` và `database/schema.sql` (bảng `appeals`, `appeal_criteria`, `appeal_resolutions`, `appeal_rule_configs`, `cross_review_batches`, `cross_review_tasks`, `reviewer_deviation_indices`, `audit_logs`).
 >
-> **Ghi chú (Vấn đề #5):** `AGENTS.md` mục 2 đang ghi BF-03 là *Duyệt đăng* (package `publishing`). SRS định nghĩa BF-03 là luồng khiếu nại / chấm mù dưới đây. Nhóm cần chốt package nào sở hữu luồng này.
+> **Ghi chú (Vấn đề #5 — đã chốt):** BF-03 là luồng `appeal` (khiếu nại / chấm mù dưới đây), tiền tố class `Appeal`, `CrossReview`, `ReviewerDeviation`. Duyệt đăng (UC-33) thuộc `assessment` (BF-02). Xem `AGENTS.md` mục 2.
 
 - **Trigger (mục 2.3):** Phóng viên gửi khiếu nại.
 - **End condition (mục 2.3):** Nhận khiếu nại và chấm lại, sau đó cập nhật chỉ số.

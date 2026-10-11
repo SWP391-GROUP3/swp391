@@ -20,12 +20,12 @@ GO
 /* ---------- ADMIN ---------- */
 
 INSERT INTO roles (code, name) VALUES
-    ('PHONG_VIEN',      N'Phóng viên'),          -- 1
-    ('BIEN_TAP_VIEN',   N'Biên tập viên'),       -- 2
-    ('TRUONG_BAN',      N'Trưởng ban'),          -- 3
-    ('THU_KY_TOA_SOAN', N'Thư ký toà soạn'),     -- 4
-    ('KE_TOAN',         N'Kế toán'),             -- 5
-    ('QUAN_TRI',        N'Quản trị hệ thống');   -- 6
+    ('REPORTER',            N'Phóng viên'),          -- 1
+    ('EDITOR',              N'Biên tập viên'),       -- 2
+    ('HEAD_OF_DEPARTMENT',  N'Trưởng ban'),          -- 3
+    ('EDITORIAL_SECRETARY', N'Thư ký toà soạn'),     -- 4
+    ('ACCOUNTANT',          N'Kế toán'),             -- 5
+    ('ADMIN',               N'Quản trị hệ thống');   -- 6
 
 INSERT INTO sections (code, name) VALUES
     ('THOISU',  N'Ban Thời sự'),             -- 1
@@ -59,11 +59,12 @@ INSERT INTO media_factors (media_kind, factor, max_factor) VALUES
     ('VIDEO',   3.00, 5.00);
 
 INSERT INTO system_parameters (param_key, param_value, unit, flow, updated_by) VALUES
-    ('MAX_AUTHORS',                 N'5',    N'người', 'BF-01', 8),
+    ('MAX_AUTHORS_PER_ARTICLE',     N'5',    N'người', 'BF-01', 8),
     ('CO_AUTHOR_CONFIRM_DAYS',      N'3',    N'ngày',  'BF-01', 8),
-    ('DHASH_SIMILAR_BITS',          N'10',   N'bit',   'BF-01', 8),
-    ('DUPLICATION_WARNING_PERCENT', N'30',   N'%',     'BF-01', 8),
-    ('DUPLICATION_FAIL_PERCENT',    N'60',   N'%',     'BF-01', 8),
+    ('SHINGLE_SIZE',                N'5',    N'âm tiết', 'BF-01', 8),
+    ('DHASH_MAX_BITS',              N'5',    N'bit',   'BF-01', 8),
+    ('DUP_WARN_PERCENT',            N'20',   N'%',     'BF-01', 8),
+    ('DUP_BLOCK_PERCENT',           N'50',   N'%',     'BF-01', 8),
     ('SCORE_TIER_HIGH',             N'90',   N'điểm',  'BF-04', 8),
     ('SCORE_TIER_MID',              N'70',   N'điểm',  'BF-04', 8),
     ('TIER_RATE_HIGH',              N'100',  N'%',     'BF-04', 8),
@@ -110,7 +111,7 @@ INSERT INTO articles (author_id, section_id, declared_category_id, category_id, 
 /* Tác giả chính ACCEPTED ngay; đồng tác giả đã xác nhận trong hạn 3 ngày. */
 INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, confirm_deadline, responded_at) VALUES
     (1, 1,  70.00, 'ACCEPTED', NULL,               '2026-09-10 10:00'),
-    (1, 2,  30.00, 'ACCEPTED', '2026-09-13 10:00', '2026-09-10 15:00'),
+    (1, 2,  30.00, 'ACCEPTED', '2026-09-13 10:00', '2026-09-10 11:00'),
     (2, 2, 100.00, 'ACCEPTED', NULL,               '2026-09-25 14:00'),
     (3, 1, 100.00, 'ACCEPTED', NULL,               '2026-09-27 08:00');
 
@@ -130,8 +131,8 @@ INSERT INTO article_attachments (article_id, version_id, author_id, media_type, 
         'c3a1e0f07b1d2c4e', 'NEW', N'Nước ngập ngang gối tại ngõ 12');   -- 1
 
 INSERT INTO duplication_checks (article_id, version_id, max_overlap_percent, result, explanation, checked_at) VALUES
-    (1, 1, 0.00, 'PASS', N'Không có đoạn trùng với bài đã đăng.',              '2026-09-10 10:01'),   -- 1
-    (3, 3, 8.00, 'PASS', N'Trùng một câu trích dẫn số liệu, dưới ngưỡng 30%.', '2026-09-27 08:01');   -- 2
+    (1, 1, 0.00, 'NORMAL', N'Không có đoạn trùng với bài đã đăng.',              '2026-09-10 10:01'),   -- 1
+    (3, 3, 8.00, 'NORMAL', N'Trùng một câu trích dẫn số liệu, dưới ngưỡng 20%.', '2026-09-27 08:01');   -- 2
 
 INSERT INTO duplication_matches (check_id, matched_article_id, overlap_percent, passages) VALUES
     (2, 1, 8.00, N'"...theo số liệu của Sở Công Thương..."');
@@ -249,18 +250,20 @@ INSERT INTO audit_logs (actor_id, action_type, entity_type, entity_id, old_value
     (8, 'UPDATE', 'system_parameters', 1, N'{"param_value":"4"}', N'{"param_value":"5"}', '2026-09-01 08:00'),
     (4, 'CREATE', 'royalty_gradings',  1, NULL, N'{"final_factor":5.00,"amount":1170000}', '2026-09-16 10:00');
 
-/* Lịch sử bài: theo vòng đời DRAFT -> SUBMITTED -> ASSIGNED -> PENDING_APPROVAL
-   -> SCORE_PUBLISHED -> PUBLISHED. */
+/* Lịch sử bài: theo vòng đời DRAFT -> (PENDING_CONFIRMATION nếu có đồng tác giả)
+   -> SUBMITTED -> ASSIGNED -> PENDING_APPROVAL -> SCORE_PUBLISHED -> PUBLISHED.
+   Bài 1 có đồng tác giả: PV Bình xác nhận lúc 11:00 thì bài mới sang SUBMITTED. */
 INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at) VALUES
-    (1, 1, 'CREATE',        NULL,               'DRAFT',            NULL,              '2026-09-10 08:00'),
-    (1, 1, 'SUBMIT',        'DRAFT',            'SUBMITTED',        NULL,              '2026-09-10 10:00'),
-    (1, 5, 'ASSIGN',        'SUBMITTED',        'ASSIGNED',         N'Giao BTV Cường', '2026-09-10 14:00'),
-    (1, 3, 'SUBMIT_SCORE',  'ASSIGNED',         'PENDING_APPROVAL', NULL,              '2026-09-11 09:00'),
-    (1, 5, 'APPROVE_SCORE', 'PENDING_APPROVAL', 'SCORE_PUBLISHED',  NULL,              '2026-09-12 08:05'),
-    (1, 5, 'PUBLISH',       'SCORE_PUBLISHED',  'PUBLISHED',        NULL,              '2026-09-15 09:00'),
-    (2, 2, 'CREATE',        NULL,               'DRAFT',            NULL,              '2026-09-25 14:00'),
-    (3, 1, 'CREATE',        NULL,               'DRAFT',            NULL,              '2026-09-27 07:30'),
-    (3, 1, 'SUBMIT',        'DRAFT',            'SUBMITTED',        NULL,              '2026-09-27 08:00');
+    (1, 1, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-10 08:00'),
+    (1, 1, 'SUBMIT',        'DRAFT',                'PENDING_CONFIRMATION', NULL,              '2026-09-10 10:00'),
+    (1, 2, 'CONFIRM',       'PENDING_CONFIRMATION', 'SUBMITTED',            NULL,              '2026-09-10 11:00'),
+    (1, 5, 'ASSIGN',        'SUBMITTED',            'ASSIGNED',             N'Giao BTV Cường', '2026-09-10 14:00'),
+    (1, 3, 'SUBMIT_SCORE',  'ASSIGNED',             'PENDING_APPROVAL',     NULL,              '2026-09-11 09:00'),
+    (1, 5, 'APPROVE_SCORE', 'PENDING_APPROVAL',     'SCORE_PUBLISHED',      NULL,              '2026-09-12 08:05'),
+    (1, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-09-15 09:00'),
+    (2, 2, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-25 14:00'),
+    (3, 1, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-27 07:30'),
+    (3, 1, 'SUBMIT',        'DRAFT',                'SUBMITTED',            NULL,              '2026-09-27 08:00');
 GO
 
 PRINT N'Nạp dữ liệu mẫu thành công.';

@@ -1,6 +1,6 @@
 # SRS — BF-02 Chấm điểm & xếp loại chất lượng (Quality Scoring)
 
-> Chuyển từ `SRS.pdf`. Package code: `assessment` (chấm điểm). Duyệt đăng UC-33 cũng thuộc luồng này trong SRS (xem Vấn đề #5 trong `SRS_Overview.md`). Đọc kèm `docs/SRS_Overview.md` và `database/schema.sql`.
+> Chuyển từ `SRS.pdf`. Package code: `assessment` (chấm điểm). Duyệt đăng UC-33 cũng thuộc luồng này (đã chốt, Vấn đề #5 trong `SRS_Overview.md`). Đọc kèm `docs/SRS_Overview.md` và `database/schema.sql`.
 
 - **Trigger (mục 2.2):** Bài chuyển sang PUBLISHED, trưởng ban phân công người chấm.
 - **End condition (mục 2.2):** Bài được chốt hạng A, B, C hoặc D.

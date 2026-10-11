@@ -6,7 +6,7 @@
 - **End condition (mục 2.1):** Bài đạt PUBLISHED hoặc REJECTED.
 - **Theo swimlane:** *Trigger: the Main Author creates a new work. End condition: the work is SUBMITTED and enters the Flow 02 assignment queue, or is withdrawn back to Draft, or is rejected in Flow 02.*
 
-> **Ghi chú (Vấn đề #1):** UC-05 và UC-12 dùng trạng thái `PENDING_CONFIRMATION`, nhưng `ck_articles_status` trong `schema.sql` không có giá trị này. Phải hỏi nhóm trước khi code phần xác nhận đồng tác giả.
+> **Ghi chú (Vấn đề #1 — đã chốt):** `PENDING_CONFIRMATION` (UC-05, UC-10, UC-12) đã được thêm vào `ck_articles_status` trong `schema.sql`. Ngưỡng kiểm trùng trong `data.sql` đã sửa theo BR-IN-04/05: `DUP_WARN_PERCENT` = 20, `DUP_BLOCK_PERCENT` = 50, `DHASH_MAX_BITS` = 5, `SHINGLE_SIZE` = 5; kết quả kiểm trùng là `NORMAL` / `NEED_EXPLAIN` / `BLOCKED`.
 
 ## Swimlane
 

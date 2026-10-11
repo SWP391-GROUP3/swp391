@@ -23,11 +23,11 @@
 
 | # | Vấn đề | Chi tiết |
 |---|---|---|
-| 1 | Trạng thái `PENDING_CONFIRMATION` | SRS BF-01 (UC-05, UC-12) dùng `PENDING_CONFIRMATION` khi bài có đồng tác giả. `schema.sql` (`ck_articles_status`) **không có** giá trị này: chỉ có DRAFT, SUBMITTED, ASSIGNED, REVISION_REQUESTED, REJECTED, PENDING_APPROVAL, SCORE_PUBLISHED, PUBLISHED. |
+| 1 | Trạng thái `PENDING_CONFIRMATION` | **Đã chốt (2026-10-11):** thêm `PENDING_CONFIRMATION` vào `ck_articles_status` theo SRS BF-01 (UC-05, UC-12). Cùng đợt: ngưỡng kiểm trùng sửa theo BR-IN-04/05 (20% / 50% / dHash 5 bit), kết quả kiểm trùng đổi thành `NORMAL` / `NEED_EXPLAIN` / `BLOCKED`, mã role đổi sang tiếng Anh (`REPORTER`, `EDITOR`, ...). |
 | 2 | Quyết định trả bài | UC-27 ghi decision `RETURN`. `schema.sql` (`ck_scoring_attempts_decision`) dùng `ACCEPT` / `REVISION` / `REJECT`. |
 | 3 | Mã luật BF-01 | Các UC của BF-01 tham chiếu `BR-IN-01…07`. Phụ lục của PDF lại in bảng này với mã `BR-RY-01…08` (trùng mã với luật nhuận bút). Bản MD đổi sang `BR-IN-xx` theo cách UC tham chiếu. |
 | 4 | Thiếu bảng luật BR-SC | Các UC của BF-02 tham chiếu `BR-SC-01…11` nhưng PDF không có bảng định nghĩa. Nội dung luật phải suy ra từ UC (xem `SRS_BF02_Scoring.md`). |
-| 5 | Tên/phạm vi BF-03 | SRS: BF-03 = *Kiểm soát chất lượng chấm* (khiếu nại, chấm mù). `AGENTS.md` mục 2 đang ghi BF-03 = *Duyệt đăng*, package `publishing`. Trong SRS, duyệt đăng (UC-33) thuộc BF-02. |
+| 5 | Tên/phạm vi BF-03 | **Đã chốt (2026-10-11):** BF-03 = `appeal` (*Kiểm soát chất lượng chấm*: khiếu nại, chấm mù) theo SRS. Duyệt đăng (UC-33) thuộc `assessment` (BF-02). `AGENTS.md` mục 2 và hook đã sửa theo. |
 | 6 | Bảng KPI | UC-58 lưu vào `kpi_benchmarks` (không có trong `schema.sql`). UC-59 có `target_views` (không có cột này trong `kpi_targets`). |
 | 7 | Bảng sở hữu trong AGENTS.md | `AGENTS.md` mục 2 còn ghi tên bảng cũ (`quality_criteria`, `quality_reviews`, `unit_prices`…). `schema.sql` hiện dùng `criteria_set_versions`, `criteria`, `scoring_attempts`, `royalty_rates`, `appeals`… |
 | 8 | End condition BF-02 | Mục 2.2 ghi "Bài được chốt hạng A, B, C hoặc D", còn UC/swimlane BF-02 kết thúc ở PUBLISHED / REJECTED và không có xếp hạng chữ. BR-KPI-05 cấm xếp hạng A/B/C/D cho KPI. |

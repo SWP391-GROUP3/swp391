@@ -75,7 +75,7 @@ GO
 /* Vai trò cố định, mỗi user đúng 1 vai trò. */
 CREATE TABLE roles (
     id      INT IDENTITY(1,1) PRIMARY KEY,
-    code    VARCHAR(20)  NOT NULL UNIQUE,   -- PHONG_VIEN, BIEN_TAP_VIEN, TRUONG_BAN, ...
+    code    VARCHAR(20)  NOT NULL UNIQUE,   -- REPORTER, EDITOR, HEAD_OF_DEPARTMENT, ...
     name    NVARCHAR(50) NOT NULL
 );
 
@@ -176,6 +176,9 @@ CREATE TABLE events (
    declared_category_id = thể loại PV khai; category_id = thể loại áp dụng
    (lúc tạo bằng declared, BTV đổi thì ghi category_change_logs).
    Rút bài: SUBMITTED -> DRAFT, ghi withdrawn_at.
+   Bài có đồng tác giả: nộp -> PENDING_CONFIRMATION, mọi đồng tác giả
+   ACCEPTED -> SUBMITTED; 1 người từ chối hoặc quá hạn 3 ngày -> DRAFT
+   (BR-IN-06). Bài chỉ 1 tác giả: nộp -> SUBMITTED luôn.
    saturation_rank / saturation_rate: thứ hạng và tỷ lệ bão hoà khi bài
    thuộc sự kiện (event_id), NULL nếu không thuộc sự kiện nào. */
 CREATE TABLE articles (
@@ -204,9 +207,9 @@ CREATE TABLE articles (
     CONSTRAINT fk_articles_event             FOREIGN KEY (event_id)             REFERENCES events(id),
     CONSTRAINT fk_articles_approver          FOREIGN KEY (approved_by)          REFERENCES users(id),
     CONSTRAINT ck_articles_nature  CHECK (declared_nature IN ('ORIGINAL','TRANSLATION','COMPILATION','REPOST')),
-    CONSTRAINT ck_articles_status  CHECK (status IN ('DRAFT','SUBMITTED','ASSIGNED','REVISION_REQUESTED',
-                                                     'REJECTED','PENDING_APPROVAL','SCORE_PUBLISHED',
-                                                     'PUBLISHED')),
+    CONSTRAINT ck_articles_status  CHECK (status IN ('DRAFT','PENDING_CONFIRMATION','SUBMITTED','ASSIGNED',
+                                                     'REVISION_REQUESTED','REJECTED','PENDING_APPROVAL',
+                                                     'SCORE_PUBLISHED','PUBLISHED')),
     CONSTRAINT ck_articles_saturation CHECK (
         (saturation_rank IS NULL AND saturation_rate IS NULL) OR
         (saturation_rank >= 1 AND saturation_rate > 0 AND saturation_rate <= 100)),
@@ -302,19 +305,23 @@ CREATE INDEX ix_article_attachments_article ON article_attachments(article_id);
 CREATE INDEX ix_article_attachments_hash    ON article_attachments(file_hash);
 
 /* Kiểm trùng nội dung bài với các bài đã có, chạy trên 1 bản nộp.
-   result [ĐỀ XUẤT]: PASS | WARNING | FAIL theo max_overlap_percent. */
+   result theo max_overlap_percent (BR-IN-04, ngưỡng lấy từ system_parameters):
+     NORMAL        dưới DUP_WARN_PERCENT (20%)
+     NEED_EXPLAIN  từ 20% đến DUP_BLOCK_PERCENT (50%), hoặc trên 50% nhưng
+                   tính chất khác ORIGINAL: PV phải nhập explanation
+     BLOCKED       trên 50% và tính chất ORIGINAL: chặn nộp bài */
 CREATE TABLE duplication_checks (
     id                   INT IDENTITY(1,1) PRIMARY KEY,
     article_id           INT             NOT NULL,
     version_id           INT             NOT NULL,
     max_overlap_percent  DECIMAL(5,2)    NOT NULL,
-    result               VARCHAR(10)     NOT NULL,
+    result               VARCHAR(15)     NOT NULL,
     explanation          NVARCHAR(1000)  NULL,
     checked_at           DATETIME2       NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT fk_duplication_checks_article FOREIGN KEY (article_id) REFERENCES articles(id),
     CONSTRAINT fk_duplication_checks_version FOREIGN KEY (version_id) REFERENCES article_versions(id),
     CONSTRAINT ck_duplication_checks_percent CHECK (max_overlap_percent BETWEEN 0 AND 100),
-    CONSTRAINT ck_duplication_checks_result  CHECK (result IN ('PASS','WARNING','FAIL'))
+    CONSTRAINT ck_duplication_checks_result  CHECK (result IN ('NORMAL','NEED_EXPLAIN','BLOCKED'))
 );
 CREATE INDEX ix_duplication_checks_article ON duplication_checks(article_id);
 
