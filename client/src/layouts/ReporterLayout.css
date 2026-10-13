@@ -1,0 +1,242 @@
+/* ===========================================================================
+   layouts/ReporterLayout.jsx - khung trang Phong vien theo Figma:
+   sidebar trang ben trai, thanh tren (tim kiem / chuong / vi / avatar),
+   vung noi dung ben phai. Moi class bat dau bang "khung-pv".
+   =========================================================================== */
+
+.khung-pv {
+  display: flex;
+  min-height: 100vh;
+  font-family: var(--fm-font);
+  color: var(--fm-chu);
+  background: var(--fm-the);
+}
+
+/* Dien thoai: bo do tre ~300ms khi cham vao link/nut */
+.khung-pv a,
+.khung-pv button { touch-action: manipulation; }
+
+/* Link "Bo qua toi noi dung chinh": an ngoai man hinh, Tab toi thi hien */
+.khung-pv__bo-qua {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  color: var(--fm-chu);
+  background: var(--fm-the);
+  border: 2px solid var(--fm-xanh-duong);
+  border-radius: 6px;
+  transform: translateY(-200%);
+}
+
+.khung-pv__bo-qua:focus { transform: none; }
+
+/* ---- Sidebar ---- */
+.khung-pv__sidebar {
+  position: sticky;           /* cuon noi dung thi sidebar dung yen */
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: 248px;               /* du rong cho "Xac nhan dong tac gia" tren 1 dong */
+  height: 100vh;
+  padding: 28px 0 24px;
+  background: var(--fm-the);
+  border-right: 1px solid var(--fm-vien);
+}
+
+.khung-pv__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 28px 32px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.khung-pv__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;                    /* day nut Dang xuat xuong day */
+}
+
+/* 1 muc menu (NavLink) va nut Dang xuat */
+.khung-pv__muc {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 28px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--fm-chu-nhat);
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+
+.khung-pv__muc:hover { color: var(--fm-chu); background: var(--fm-nen); }
+
+/* NavLink tu gan class "active" cho trang dang mo */
+.khung-pv__muc.active {
+  color: var(--fm-chu);
+  font-weight: 500;
+  background: var(--fm-chon);
+}
+
+.khung-pv__muc:focus-visible,
+.khung-pv__nut-icon:focus-visible,
+.khung-pv__vi:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: -2px;
+}
+
+/* ---- Phan ben phai: thanh tren + noi dung ---- */
+.khung-pv__phai {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;               /* cho phep bang/the ben trong co lai, khong tran ngang */
+}
+
+.khung-pv__thanh-tren {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 72px;
+  padding: 0 32px;
+  background: var(--fm-the);
+}
+
+.khung-pv__tim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 360px;
+  color: var(--fm-chu-nhat);
+}
+
+.khung-pv__tim input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--fm-chu);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+}
+
+.khung-pv__tim input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--fm-xanh-duong);
+}
+
+.khung-pv__nguoi-dung {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.khung-pv__nut-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--fm-chu);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.khung-pv__nut-icon:hover { background: var(--fm-nen); }
+
+/* Chip vi tien canh ten */
+.khung-pv__vi {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--fm-chu);
+  text-decoration: none;
+  background: var(--fm-chon);
+  border-radius: 999px;
+  transition: background-color .15s;
+}
+
+.khung-pv__vi:hover   { background: #dcebfb; }
+.khung-pv__vi .icon   { color: var(--fm-xanh-duong); }
+.khung-pv__vi-so      { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.khung-pv__ten {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.khung-pv__ho-ten { font-weight: 600; font-size: 13.5px; }
+
+.khung-pv__vai-tro {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+.khung-pv__avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--fm-cam);
+  border-radius: 50%;
+}
+
+.khung-pv__noi-dung {
+  flex: 1;
+  padding: 8px 32px 32px;
+}
+
+.khung-pv__noi-dung:focus { outline: none; }   /* focus do link "Bo qua" dua toi, khong can vien */
+
+/* Man hinh hep (laptop nho, tablet): sidebar chi con icon */
+@media (max-width: 960px) {
+  .khung-pv__sidebar { width: 72px; }
+  .khung-pv__logo,
+  .khung-pv__muc { justify-content: center; padding-left: 0; padding-right: 0; }
+  /* An chu bang cach cua .an-di (khong dung display:none) de trinh doc
+     man hinh van doc duoc ten muc menu */
+  .khung-pv__logo span,
+  .khung-pv__muc span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .khung-pv__ten { display: none; }
+}
+
+/* Dien thoai: an o tim kiem, thu hep le */
+@media (max-width: 600px) {
+  .khung-pv__thanh-tren,
+  .khung-pv__noi-dung { padding-left: 16px; padding-right: 16px; }
+  .khung-pv__tim { display: none; }
+  .khung-pv__thanh-tren { justify-content: flex-end; }
+  .khung-pv__nguoi-dung { gap: 10px; }
+  .khung-pv__vi { padding: 6px 10px; }
+}

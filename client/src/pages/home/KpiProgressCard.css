@@ -1,0 +1,79 @@
+/* ===========================================================================
+   pages/home/KpiProgressCard.jsx - khoi "KPI thang nay". Moi class bat dau
+   "kpi-pv" (khac cac class .kpi-* cua man KPI Truong ban/Admin).
+   Khung the ngoai cung dung .trang-chu-pv__khoi (ReporterHome.css).
+   =========================================================================== */
+
+/* Nhan "Du kien dat / chua dat" canh tieu de */
+.kpi-pv__nhan {
+  margin-left: auto;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9a5b00;
+  background: #fff4e0;
+  border-radius: 999px;
+}
+
+.kpi-pv__nhan--dat { color: #1f6f1a; background: #e8f6e6; }
+
+.kpi-pv__dong { margin-top: 14px; }
+
+.kpi-pv__dong-dau {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+.kpi-pv__dong-so {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kpi-pv__thanh {
+  height: 8px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: var(--fm-nen);
+  border-radius: 999px;
+}
+
+.kpi-pv__thanh-day {
+  width: 100%;
+  height: 100%;
+  background: var(--fm-cam);
+  transform-origin: left;     /* scaleX co dan tu mep trai sang */
+  transition: transform .4s ease-out;
+}
+
+.kpi-pv__thanh-day--dat { background: var(--fm-xanh-la); }
+
+.kpi-pv__goi-y {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+.kpi-pv__goi-y--dat { color: #1f6f1a; }
+
+.kpi-pv__xem {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0b6fb0;   /* xanh duong dam, du tuong phan cho chu nho */
+  text-decoration: none;
+}
+
+.kpi-pv__xem:hover { text-decoration: underline; }
+
+.kpi-pv__xem:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-pv__thanh-day { transition: none; }
+}

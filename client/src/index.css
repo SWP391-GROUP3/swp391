@@ -1,9 +1,30 @@
 /* ===========================================================================
    SWP391 - KPI & Nhuan but
-   Style chung. Hien tai moi co trang login va khung trang main.
+   Style chung: bien mau Figma (--fm-*), reset, class dung chung (cuoi file).
+   Style rieng cua man nao de file .css canh component do (AGENTS.md muc 4).
+   TODO: cac phan LOGIN / MAIN / KPI ben duoi co tu truoc quy uoc nay ->
+   nguoi phu trach tung man chuyen sang Login.css, KpiBenchmarksConfig.css...
    =========================================================================== */
 
 :root {
+  /* --- Mau lay tu file Figma (docs/Web Dashboard UI ... .fig) ---
+     Dung cho khung trang moi (sidebar + thanh tren). Bien cu ben duoi
+     giu nguyen de man login/KPI khong bi vo. */
+  /* Poppins nap trong index.html; mat mang thi tu dung font du phong */
+  --fm-font:       "Poppins", "Segoe UI", system-ui, Arial, sans-serif;
+  --fm-nen:        #eef2f5;   /* nen vung noi dung, nen cot */
+  --fm-the:        #ffffff;   /* the, sidebar, thanh tren */
+  --fm-chon:       #ecf4fd;   /* nen muc menu dang chon */
+  --fm-chu:        #1a1a1a;   /* chu chinh */
+  --fm-chu-nhat:   #707070;   /* chu menu, chu phu */
+  --fm-vien:       #e9e9e9;   /* duong ke */
+  --fm-xanh-la:    #40a737;   /* cham mau nhan the */
+  --fm-hong:       #ff2473;
+  --fm-xanh-duong: #18b0ff;
+  --fm-cam:        #f8a534;
+  --fm-tim:        #8a6cf0;   /* them: Figma chi co 4 mau cham, can them cho du 7 nhom */
+  --fm-xam:        #b8bec6;
+
   --muc:       #1b2430;   /* chu chinh */
   --muc-nhat:  #64748b;   /* chu phu */
   --vien:      #dfe3e8;
@@ -496,3 +517,59 @@ body {
   margin-top: 20px;
 }
 
+/* ============================================================== DUNG CHUNG
+   Class dung o nhieu man. Style rieng cua 1 man thi de file .css canh
+   component do (AGENTS.md muc 4), KHONG them vao day.
+   ========================================================================== */
+
+/* Chu chi danh cho trinh doc man hinh, an tren giao dien */
+.an-di {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Cham mau nhan trang thai, giong "• DEVELOPMENT" tren the Figma.
+   Dung: <span className="cham cham--hong" aria-hidden="true" /> */
+.cham {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.cham--xam        { background: var(--fm-xam); }
+.cham--cam        { background: var(--fm-cam); }
+.cham--xanh-duong { background: var(--fm-xanh-duong); }
+.cham--tim        { background: var(--fm-tim); }
+.cham--hong       { background: var(--fm-hong); }
+.cham--xanh-la    { background: var(--fm-xanh-la); }
+.cham--xam-dam    { background: var(--fm-chu-nhat); }
+
+/* Nut phu nen xanh nhat (Figma): "Sua bai", "Ve trang chu"... Dung cho ca <a> va <button> */
+.nut-nhe {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fm-chu);
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--fm-chon);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color .15s;
+}
+
+.nut-nhe:hover { background: #dcebfb; }
+
+.nut-nhe:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 2px;
+}
