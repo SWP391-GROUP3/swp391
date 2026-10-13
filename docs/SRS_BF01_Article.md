@@ -1,9 +1,9 @@
 # SRS — BF-01 Viết và nộp bài (Work Intake and Declaration Verification)
 
-> Chuyển từ `SRS.pdf`. Package code: `article`. Đọc kèm `docs/SRS_Overview.md` (mục **Vấn đề đã biết**, GBR, Constraints) và `database/schema.sql`.
+> Chuyển từ `SRS.pdf`, đồng bộ lại theo bản SRS trên Google Docs ngày 2026-10-12. Luồng `article` (tiền tố class `Article`, `Duplication`). Đọc kèm `docs/SRS_Overview.md` (mục **Vấn đề đã biết**, GBR, Constraints) và `database/schema.sql`.
 
 - **Trigger (mục 2.1):** Phóng viên tạo bài mới.
-- **End condition (mục 2.1):** Bài đạt PUBLISHED hoặc REJECTED.
+- **End condition (mục 2.1):** Bài ở trạng thái SUBMITTED và vào hàng chờ phân công của Flow 02; hoặc tác giả chính rút bài về DRAFT; hoặc bài bị từ chối ở Flow 02.
 - **Theo swimlane:** *Trigger: the Main Author creates a new work. End condition: the work is SUBMITTED and enters the Flow 02 assignment queue, or is withdrawn back to Draft, or is rejected in Flow 02.*
 
 > **Ghi chú (Vấn đề #1 — đã chốt):** `PENDING_CONFIRMATION` (UC-05, UC-10, UC-12) đã được thêm vào `ck_articles_status` trong `schema.sql`. Ngưỡng kiểm trùng trong `data.sql` đã sửa theo BR-IN-04/05: `DUP_WARN_PERCENT` = 20, `DUP_BLOCK_PERCENT` = 50, `DHASH_MAX_BITS` = 5, `SHINGLE_SIZE` = 5; kết quả kiểm trùng là `NORMAL` / `NEED_EXPLAIN` / `BLOCKED`.
@@ -43,7 +43,7 @@ Mô tả sơ đồ (3 làn: Reporter – Main Author | Reporter – Co-author | 
 - Head of Department liên quan UC-05 (nhận bài đã nộp).
 - Admin: UC-13 Configure Intake Parameters.
 
-## Use Cases (4.2.1)
+## Use Cases (4.2.1 Work Intake and Declaration Verification)
 
 Primary Actor: Reporter, Admin · 13 use cases · ID 01–13
 
@@ -134,13 +134,15 @@ Primary Actor: Reporter, Admin · 13 use cases · ID 01–13
 - E1 Overlap above 50% and nature Original: resubmission is blocked.
 - E2 The work is REJECTED: it cannot be revised.
 
+> **Ghi chú (đã chốt 2026-10-12, người phụ trách BF-01):** A1 — khi tất cả đồng tác giả xác nhận lại xong, bài **về `ASSIGNED` cho đúng Biên tập viên cũ** (theo BR-IN-07), không về `SUBMITTED` để Trưởng ban phân công lại. Nhận biết bài nộp lại: bài đã có dòng trong `assignments`.
+
 ### UC-12: Confirm Co-authorship
 
 | Field | Value |
 |---|---|
 | Actor | Reporter (co-author) · System (Timer) |
 | Trigger | The co-author opens a work from "Waiting for my confirmation" or from the notification. |
-| Preconditions | The co-author opens a work from "Waiting for my confirmation" or from the notification. *(PDF chép trùng với Trigger)* |
+| Preconditions | The work is PENDING_CONFIRMATION; the user is a co-author of the work with confirmation status PENDING; the 3-day confirmation deadline has not passed. |
 | Postconditions | The answer is recorded. All accepted: the work is SUBMITTED. One rejected or deadline passed: the work returns to DRAFT. |
 | Business Rules | BR-IN-06 |
 
@@ -155,11 +157,13 @@ Primary Actor: Reporter, Admin · 13 use cases · ID 01–13
 - A2 No reply within 3 days: the scheduled job returns the work to DRAFT and notifies all authors.
 - E1 The co-author has already answered or the work is no longer pending: the work is shown read-only.
 
+> **Ghi chú (đã chốt 2026-10-12):** bước 4 "system sets SUBMITTED" áp dụng cho lần nộp đầu. Nếu đợt xác nhận này đến từ nộp lại có đổi tác giả/tỷ lệ (UC-10 A1) thì tất cả đồng ý → bài về `ASSIGNED` cho đúng Biên tập viên cũ (BR-IN-07).
+
 UC-01, 02, 03, 06, 07, 08, 09, 11, 13 chỉ có mô tả trong bảng Use Cases ở trên.
 
 ## Business Rules for Work Intake (BR-IN)
 
-> **Ghi chú (Vấn đề #3):** PDF in bảng này với mã `BR-RY-01…08`, trùng với luật nhuận bút. Ở đây đổi thành `BR-IN-01…08` cho khớp với tham chiếu trong UC-04/05/10/12. Nội dung giữ nguyên.
+> **Ghi chú (Vấn đề #3 — đã sửa):** bản PDF cũ in bảng này với mã `BR-RY-01…08`; bản SRS trên Google đã đổi thành `BR-IN-01…08`, khớp với tham chiếu trong UC-04/05/10/12.
 
 | BR-ID | Rule |
 |---|---|
