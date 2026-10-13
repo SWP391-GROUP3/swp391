@@ -14,6 +14,8 @@ import SecretaryHome from '../pages/home/SecretaryHome.jsx'
 import HeadHome from '../pages/home/HeadHome.jsx'
 import AccountantHome from '../pages/home/AccountantHome.jsx'
 import AdminHome from '../pages/home/AdminHome.jsx'
+import MyArticles from '../pages/article/MyArticles.jsx'
+import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
@@ -24,9 +26,7 @@ import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
 const TRANG_PV_CHUA_LAM = [
-  { path: '/my-articles',       ten: 'Bài của tôi' },            // UC-01
   { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
-  { path: '/my-articles/:id',   ten: 'Chi tiết bài viết' },      // UC-02
   { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
   { path: '/my-appeals',        ten: 'Khiếu nại điểm' },         // UC-35
   { path: '/my-appeals/new',    ten: 'Gửi khiếu nại' },          // UC-35
@@ -142,6 +142,13 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
         >
           {/* ---- Trang da lam ---- */}
           <Route path="/main" element={<TrangChu nguoiDung={nguoiDung} />} />
+          {vaiTro === 'REPORTER' && (
+            <>
+              {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
+              <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
+              <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
+            </>
+          )}
           {vaiTro === 'HEAD_OF_DEPARTMENT' && (
             <>
               {/* BF-05 (Khang) */}
