@@ -28,7 +28,11 @@ export default function Main({ nguoiDung, onDangXuat }) {
       </header>
 
       <main className="vung-noi-dung">
-        {/* Truong hop 1: Tai khoan Trương ban -> Hien thi man hinh Giao chi tieu thang (UC-59) */}
+        {/* ---------------------------------------------------------------
+            CHO DAT NOI DUNG. Hien tai de trong theo dung yeu cau.
+            --------------------------------------------------------------- */}
+
+        {/* Truong hop 1: Tai khoan Trưởng ban -> Hien thi man hinh Giao chi tieu thang (UC-59) */}
         {laTruongBan && !laAdmin && (
           <MonthlyTargetSetting nguoiDung={nguoiDung} />
         )}
