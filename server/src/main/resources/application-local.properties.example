@@ -14,6 +14,15 @@ spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=swp391_kpi;en
 spring.datasource.username=sa
 spring.datasource.password=DOI_MAT_KHAU_CUA_BAN
 
+# ---------------------------------------------------------------------------
+# Khoa bi mat de ky JWT (dang nhap). BAT BUOC, toi thieu 32 ky tu, thieu thi
+# server bao loi ngay luc khoi dong. Moi may tu dat 1 chuoi ngau nhien bat ky,
+# vd chay lenh (Git Bash):  openssl rand -base64 48
+# Ai biet khoa nay la tu tao duoc token gia -> KHONG commit, KHONG gui len nhom chat.
+# ---------------------------------------------------------------------------
+# Chuoi mau duoi day co tinh NGAN HON 32 ky tu: quen doi la server bao loi ngay.
+app.jwt.secret=DOI_CHUOI_NAY
+
 # Neu dung SQL Server Express thi thuong phai chi ro instance:
 #spring.datasource.url=jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=swp391_kpi;encrypt=true;trustServerCertificate=true
 

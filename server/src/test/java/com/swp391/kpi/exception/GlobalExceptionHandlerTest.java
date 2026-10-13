@@ -54,6 +54,14 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void returns401WhenUnauthorizedExceptionIsThrown() throws Exception {
+        mockMvc.perform(get("/fake/unauthorized"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Email/tên đăng nhập hoặc mật khẩu không đúng."));
+    }
+
+    @Test
     void returns400WithFieldErrorsWhenValidationFails() throws Exception {
         mockMvc.perform(post("/fake/validate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,6 +85,11 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/business")
         public String business() {
             throw new BusinessException("Kỳ nhuận bút đã khoá, không thể sửa");
+        }
+
+        @GetMapping("/unauthorized")
+        public String unauthorized() {
+            throw new UnauthorizedException("Email/tên đăng nhập hoặc mật khẩu không đúng.");
         }
 
         @PostMapping("/validate")
