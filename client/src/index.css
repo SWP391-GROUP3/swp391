@@ -159,7 +159,7 @@ body {
 
 .nut-thoat:hover { background: var(--nen); }
 
-/* Vung noi dung */
+/* Vung noi dung - dang de trong, cho cac chuc nang duoc chen vao*/
 .vung-noi-dung {
   max-width: 1200px;
   margin: 0 auto;
