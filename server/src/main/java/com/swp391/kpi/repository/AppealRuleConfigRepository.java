@@ -2,8 +2,6 @@ package com.swp391.kpi.repository;
 
 import com.swp391.kpi.entity.AppealRuleConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -14,12 +12,15 @@ import java.util.Optional;
 public interface AppealRuleConfigRepository extends JpaRepository<AppealRuleConfig, Integer> {
 
     /**
-     * Lay cau hinh dang ap dung: is_active = 1, effective_from <= ngay kiem tra, lay dong moi nhat.
+     * Lay cau hinh dang ap dung: is_active = 1, effective_from <= ngay kiem tra,
+     * lay dong moi nhat.
      */
-    Optional<AppealRuleConfig> findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate date);
+    Optional<AppealRuleConfig> findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(
+            LocalDate date);
 
     /**
-     * Kiem tra xem da co cau hinh bat dau tu ngay nay chua (UC-44 E2: khong duoc trung effective_from).
+     * Kiem tra xem da co cau hinh bat dau tu ngay nay chua (UC-44 E2: khong duoc
+     * trung effective_from).
      */
     boolean existsByEffectiveFrom(LocalDate effectiveFrom);
 
