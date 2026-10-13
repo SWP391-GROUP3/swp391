@@ -1,10 +1,15 @@
+import { useState } from 'react'
 import { tenVaiTro } from '../auth/taiKhoanTam.js'
+import AppealRuleConfigPage from './admin/AppealRuleConfigPage.jsx'
 
 /**
- * Trang chinh sau khi dang nhap. Hien tai moi co khung, chua co noi dung.
- * Nguoi phu trach tung chuc nang chen phan cua minh vao <main> ben duoi.
+ * Trang chinh sau khi dang nhap.
  */
 export default function Main({ nguoiDung, onDangXuat }) {
+  const [tabHienTai, setTabHienTai] = useState('appeal-rules')
+
+  const laAdmin = nguoiDung?.vaiTro?.includes('ADMIN')
+
   return (
     <>
       <header className="thanh-tren">
@@ -19,10 +24,29 @@ export default function Main({ nguoiDung, onDangXuat }) {
         </div>
       </header>
 
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--vien)', padding: '0 24px' }}>
+        <nav style={{ display: 'flex', gap: 16 }}>
+          <button
+            type="button"
+            onClick={() => setTabHienTai('appeal-rules')}
+            style={{
+              padding: '12px 4px',
+              border: 0,
+              borderBottom: tabHienTai === 'appeal-rules' ? '2px solid var(--chinh)' : '2px solid transparent',
+              background: 'none',
+              fontWeight: tabHienTai === 'appeal-rules' ? 600 : 400,
+              color: tabHienTai === 'appeal-rules' ? 'var(--chinh)' : 'var(--muc-nhat)',
+              cursor: 'pointer',
+              fontSize: 14,
+            }}
+          >
+            Cấu hình khiếu nại (UC-44)
+          </button>
+        </nav>
+      </div>
+
       <main className="vung-noi-dung">
-        {/* ---------------------------------------------------------------
-            CHO DAT NOI DUNG. Hien tai de trong theo dung yeu cau.
-            --------------------------------------------------------------- */}
+        {tabHienTai === 'appeal-rules' && <AppealRuleConfigPage />}
       </main>
     </>
   )
