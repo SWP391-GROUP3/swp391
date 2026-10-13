@@ -1,0 +1,133 @@
+/* ===========================================================================
+   pages/home/ReporterHome.jsx - trang chu Phong vien.
+   Cot trai: 2 khoi (TodoCard, KpiProgressCard - dung chung class
+   .trang-chu-pv__khoi). Cot phai: trang thai bai, kieu cot "To do" cua Figma.
+   =========================================================================== */
+
+.trang-chu-pv__dau { margin-bottom: 24px; }
+
+.trang-chu-pv__tieu-de {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.trang-chu-pv__ngay {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.trang-chu-pv__luoi {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.trang-chu-pv__trai {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* Khung the trang o cot trai - TodoCard va KpiProgressCard cung dung */
+.trang-chu-pv__khoi {
+  padding: 20px 24px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.trang-chu-pv__khoi-dau {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.trang-chu-pv__khoi-tieu-de {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ---- Cot "Trang thai bai": nen xam xanh, the trang ben trong ---- */
+.trang-thai-pv {
+  padding: 20px;
+  background: var(--fm-nen);
+  border-radius: 8px;
+}
+
+.trang-thai-pv__dau {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.trang-thai-pv__tieu-de {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.trang-thai-pv__tong {
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+  font-variant-numeric: tabular-nums;
+}
+
+.trang-thai-pv__ds {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trang-thai-pv__the {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  color: var(--fm-chu);
+  text-decoration: none;
+  background: var(--fm-the);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+  transition: box-shadow .15s;
+}
+
+.trang-thai-pv__the:hover { box-shadow: 0 3px 10px rgba(16, 24, 40, .08); }
+
+.trang-thai-pv__the:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 2px;
+}
+
+.trang-thai-pv__nhan { flex: 1; font-size: 13.5px; }
+
+.trang-thai-pv__so {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Man hinh hep: 2 cot thanh 1 cot, trang thai len tren */
+@media (max-width: 1100px) {
+  .trang-chu-pv__luoi { grid-template-columns: minmax(0, 1fr); }
+  .trang-thai-pv { order: -1; }
+  /* Cot da rong ra het chieu ngang -> xep the trang thai thanh luoi cho gon */
+  .trang-thai-pv__ds {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .trang-chu-pv__khoi { padding: 16px; }
+}
