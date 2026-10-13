@@ -1,17 +1,27 @@
 import { useState } from 'react'
 import { tenVaiTro } from '../auth/taiKhoanTam.js'
+<<<<<<< HEAD
+import AppealRuleConfigPage from './admin/AppealRuleConfigPage.jsx'
+=======
 import KpiBenchmarksConfig from './kpi/KpiBenchmarksConfig.jsx'
 import MonthlyTargetSetting from './kpi/MonthlyTargetSetting.jsx'
+>>>>>>> 6845fa6e3ae75e920768ba51801b4fcb7fa79d00
 
 /**
  * Trang chinh sau khi dang nhap.
  */
 export default function Main({ nguoiDung, onDangXuat }) {
+<<<<<<< HEAD
+  const [tabHienTai, setTabHienTai] = useState('appeal-rules')
+
+  const laAdmin = nguoiDung?.vaiTro?.includes('ADMIN')
+=======
   // Tab hien tai: 'target' (UC-59) hoac 'benchmark' (UC-58)
   const [tabHienTai, setTabHienTai] = useState('target')
 
   const laAdmin = nguoiDung?.vaiTro?.includes('ADMIN')
   const laTruongBan = nguoiDung?.vaiTro?.includes('HEAD_OF_DEPARTMENT')
+>>>>>>> 6845fa6e3ae75e920768ba51801b4fcb7fa79d00
 
   return (
     <>
@@ -27,7 +37,31 @@ export default function Main({ nguoiDung, onDangXuat }) {
         </div>
       </header>
 
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--vien)', padding: '0 24px' }}>
+        <nav style={{ display: 'flex', gap: 16 }}>
+          <button
+            type="button"
+            onClick={() => setTabHienTai('appeal-rules')}
+            style={{
+              padding: '12px 4px',
+              border: 0,
+              borderBottom: tabHienTai === 'appeal-rules' ? '2px solid var(--chinh)' : '2px solid transparent',
+              background: 'none',
+              fontWeight: tabHienTai === 'appeal-rules' ? 600 : 400,
+              color: tabHienTai === 'appeal-rules' ? 'var(--chinh)' : 'var(--muc-nhat)',
+              cursor: 'pointer',
+              fontSize: 14,
+            }}
+          >
+            Cấu hình khiếu nại (UC-44)
+          </button>
+        </nav>
+      </div>
+
       <main className="vung-noi-dung">
+<<<<<<< HEAD
+        {tabHienTai === 'appeal-rules' && <AppealRuleConfigPage />}
+=======
         {/* ---------------------------------------------------------------
             CHO DAT NOI DUNG. Hien tai de trong theo dung yeu cau.
             --------------------------------------------------------------- */}
@@ -65,6 +99,7 @@ export default function Main({ nguoiDung, onDangXuat }) {
             {tabHienTai === 'benchmark' && <KpiBenchmarksConfig />}
           </>
         )}
+>>>>>>> 6845fa6e3ae75e920768ba51801b4fcb7fa79d00
       </main>
     </>
   )
