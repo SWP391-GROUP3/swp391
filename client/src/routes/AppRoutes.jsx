@@ -19,6 +19,9 @@ import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
+import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
+import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
+import MediaFactors from '../pages/royalty/MediaFactors.jsx'
 
 /*
  * Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
@@ -45,7 +48,6 @@ const TRANG_BTV_CHUA_LAM = [
 const TRANG_TK_CHUA_LAM = [
   { path: '/royalty-grading',            ten: 'Bài chờ chấm nhuận bút' },  // UC-46
   { path: '/royalty-grading/:articleId', ten: 'Chấm nhuận bút' },          // UC-47, UC-48
-  { path: '/royalty-periods',            ten: 'Kỳ nhuận bút' },            // UC-49
   { path: '/royalty-periods/:id',        ten: 'Bảng kê kỳ nhuận bút' },    // UC-50
 ]
 
@@ -66,10 +68,8 @@ const TRANG_TB_CHUA_LAM = [
 ]
 
 const TRANG_KT_CHUA_LAM = [
-  { path: '/royalty-periods',     ten: 'Kỳ nhuận bút' },            // UC-49
   { path: '/royalty-periods/:id', ten: 'Bảng kê kỳ nhuận bút' },    // UC-51, 52, 53
   { path: '/royalty-payments',    ten: 'Chi trả nhuận bút' },       // UC-54
-  { path: '/royalty-rates',       ten: 'Đơn giá nhuận bút' },       // UC-55
 ]
 
 const TRANG_ADMIN_CHUA_LAM = [
@@ -81,7 +81,6 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/reviewers',          ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/reviewers/:id',      ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/audit-logs',         ten: 'Nhật ký hệ thống' },        // UC-45
-  { path: '/media-factors',      ten: 'Hệ số ảnh/video' },         // UC-56
   { path: '/reader-imports',     ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
@@ -156,11 +155,25 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
             </>
           )}
+          {vaiTro === 'EDITORIAL_SECRETARY' && (
+            <>
+              {/* BF-04 (Quang): UC-49 ky nhuan but */}
+              <Route path="/royalty-periods" element={<RoyaltyPeriods />} />
+            </>
+          )}
+          {vaiTro === 'ACCOUNTANT' && (
+            <>
+              {/* BF-04 (Quang): UC-49 ky nhuan but, UC-55 don gia */}
+              <Route path="/royalty-periods" element={<RoyaltyPeriods />} />
+              <Route path="/royalty-rates" element={<RoyaltyRates />} />
+            </>
+          )}
           {vaiTro === 'ADMIN' && (
             <>
-              {/* BF-03 (Vu) va BF-05 (Khang) */}
+              {/* BF-03 (Vu), BF-05 (Khang), BF-04 (Quang): UC-56 he so anh/video */}
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
+              <Route path="/media-factors" element={<MediaFactors />} />
             </>
           )}
 

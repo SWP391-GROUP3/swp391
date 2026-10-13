@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { layTrangChuKeToan } from '../../api/accountantHomeApi.js'
-import { layDanhSachDonGia } from '../../api/royaltyApi.js'
+import { getRoyaltyRates } from '../../api/royaltyApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import HomeFrame from '../../components/common/HomeFrame.jsx'
@@ -128,7 +128,7 @@ export default function AccountantHome({ nguoiDung }) {
       .catch(() => { if (conHienThi) setLoi('Không tải được dữ liệu trang chủ.') })
 
     // Don gia: API that cua BF-04 (GET /api/royalty-rates)
-    layDanhSachDonGia()
+    getRoyaltyRates()
       .then((danhSach) => { if (conHienThi) setDonGia(timDonGia(danhSach)) })
       .catch((err) => { if (conHienThi) setLoiDonGia(err.message) })
 

@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
  *
  * Luat hien tai:
  * - POST /api/auth/login: ai cung goi duoc (chua co token thi moi can dang nhap)
+ * - BF-04: them don gia = Ke toan, sua he so anh/video = Admin, xem ky nhuan but = Thu ky + Ke toan
  * - moi API con lai: phai gui header "Authorization: Bearer <token>" hop le
  * Chan theo vai tro (vd chi Ke toan them don gia) -> them .requestMatchers(...).hasRole(...)
  */
@@ -50,6 +51,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         // /error: Spring chuyen loi ve day; khoa lai thi moi loi deu bien thanh 401
                         .requestMatchers("/error").permitAll()
+                        // BF-04: chi Ke toan them don gia (UC-55), chi Admin sua he so anh/video (UC-56)
+                        .requestMatchers(HttpMethod.POST, "/api/royalty-rates").hasRole("ACCOUNTANT")
+                        .requestMatchers(HttpMethod.PUT, "/api/media-factors/**").hasRole("ADMIN")
+                        // BF-04: ky nhuan but co tong tien, chi Thu ky va Ke toan xem (UC-49)
+                        .requestMatchers("/api/royalty-periods/**").hasAnyRole("EDITORIAL_SECRETARY", "ACCOUNTANT")
                         .anyRequest().authenticated())
                 // Bat che do kiem JWT: doc header Authorization, kiem chu ky + han dung bang JwtDecoder
                 .oauth2ResourceServer(oauth2 -> oauth2
