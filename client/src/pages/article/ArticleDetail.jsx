@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { layChiTietBai, rutBai } from '../../api/articleApi.js'
+import { getArticleDetail, withdrawArticle } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
-import { MAU_TRANG_THAI, tenTrangThai, tenTinhChat, tenXacNhan } from '../../utils/trangThaiBai.js'
+import { STATUS_COLORS, statusLabel, natureLabel, confirmLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
 import './ArticleDetail.css'
 
@@ -14,146 +14,146 @@ import './ArticleDetail.css'
 export default function ArticleDetail() {
   const { id } = useParams()
 
-  const [bai, setBai] = useState(null)        // null = dang tai
-  const [loi, setLoi] = useState('')
-  const [hoiRutBai, setHoiRutBai] = useState(false)   // dang hien hop xac nhan rut bai
-  const [dangRut, setDangRut] = useState(false)
-  const [thongBao, setThongBao] = useState('')        // bao thanh cong sau khi rut
+  const [article, setArticle] = useState(null)   // null = dang tai
+  const [error, setError] = useState('')
+  const [confirmingWithdraw, setConfirmingWithdraw] = useState(false)   // dang hien hop xac nhan rut bai
+  const [withdrawing, setWithdrawing] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')            // bao thanh cong sau khi rut
 
   // Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
   useEffect(() => {
-    let conHienThi = true
+    let isMounted = true
 
-    layChiTietBai(id)
-      .then((duLieu) => {
-        if (conHienThi) {
-          setBai(duLieu)
-          setLoi('')
+    getArticleDetail(id)
+      .then((data) => {
+        if (isMounted) {
+          setArticle(data)
+          setError('')
         }
       })
-      .catch((err) => { if (conHienThi) setLoi(err.message) })
+      .catch((err) => { if (isMounted) setError(err.message) })
 
-    return () => { conHienThi = false }
+    return () => { isMounted = false }
   }, [id])
 
   /** Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ban moi. */
-  function xacNhanRutBai() {
-    setDangRut(true)
-    setLoi('')
-    rutBai(id)
-      .then((duLieu) => {
-        setBai(duLieu)
-        setThongBao('Đã rút bài về trạng thái Nháp.')
+  function handleConfirmWithdraw() {
+    setWithdrawing(true)
+    setError('')
+    withdrawArticle(id)
+      .then((data) => {
+        setArticle(data)
+        setSuccessMessage('Đã rút bài về trạng thái Nháp.')
       })
-      .catch((err) => setLoi(err.message))
+      .catch((err) => setError(err.message))
       .finally(() => {
-        setDangRut(false)
-        setHoiRutBai(false)
+        setWithdrawing(false)
+        setConfirmingWithdraw(false)
       })
   }
 
   return (
-    <div className="ct-bai">
-      <Link to="/my-articles" className="ct-bai__quay-lai">
+    <div className="article-detail">
+      <Link to="/my-articles" className="article-detail__back">
         <Icon><path d="M15 6l-6 6 6 6" /></Icon>
         <span>Bài của tôi</span>
       </Link>
 
-      {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
-      {!bai && !loi && <p className="ct-bai__dang-tai">Đang tải…</p>}
+      {error && <p className="thong-bao-loi" role="alert">{error}</p>}
+      {!article && !error && <p className="article-detail__loading">Đang tải…</p>}
 
-      {bai && (
+      {article && (
         <>
-          <div className="ct-bai__dau">
+          <div className="article-detail__header">
             <div>
-              <h1 className="ct-bai__tieu-de">{bai.title}</h1>
-              <span className="ct-bai__trang-thai">
-                <span className={`cham cham--${MAU_TRANG_THAI[bai.status]}`} aria-hidden="true" />
-                {tenTrangThai(bai.status)}
+              <h1 className="article-detail__title">{article.title}</h1>
+              <span className="article-detail__status">
+                <span className={`cham cham--${STATUS_COLORS[article.status]}`} aria-hidden="true" />
+                {statusLabel(article.status)}
               </span>
             </div>
-            {bai.canWithdraw && !hoiRutBai && (
-              <button type="button" className="nut-nhe ct-bai__nut-rut" onClick={() => setHoiRutBai(true)}>
+            {article.canWithdraw && !confirmingWithdraw && (
+              <button type="button" className="nut-nhe article-detail__withdraw-button" onClick={() => setConfirmingWithdraw(true)}>
                 Rút bài
               </button>
             )}
           </div>
 
-          {thongBao && <p className="ct-bai__thanh-cong" role="status">{thongBao}</p>}
+          {successMessage && <p className="article-detail__success" role="status">{successMessage}</p>}
 
           {/* Hop hoi lai truoc khi rut (BR-IN-08) */}
-          {hoiRutBai && (
-            <div className="ct-bai__hop-hoi" role="alertdialog" aria-labelledby="hoi-rut-bai">
-              <p id="hoi-rut-bai">
+          {confirmingWithdraw && (
+            <div className="article-detail__confirm-box" role="alertdialog" aria-labelledby="confirm-withdraw-text">
+              <p id="confirm-withdraw-text">
                 Rút bài về <strong>Nháp</strong>? Bài sẽ rời hàng chờ phân công; bạn sửa xong thì nộp lại.
               </p>
-              <div className="ct-bai__hop-hoi-nut">
-                <button type="button" className="nut-nhe" onClick={() => setHoiRutBai(false)} disabled={dangRut}>
+              <div className="article-detail__confirm-actions">
+                <button type="button" className="nut-nhe" onClick={() => setConfirmingWithdraw(false)} disabled={withdrawing}>
                   Huỷ
                 </button>
-                <button type="button" className="ct-bai__nut-xac-nhan" onClick={xacNhanRutBai} disabled={dangRut}>
-                  {dangRut ? 'Đang rút…' : 'Xác nhận rút bài'}
+                <button type="button" className="article-detail__confirm-button" onClick={handleConfirmWithdraw} disabled={withdrawing}>
+                  {withdrawing ? 'Đang rút…' : 'Xác nhận rút bài'}
                 </button>
               </div>
             </div>
           )}
 
-          <div className="ct-bai__luoi">
+          <div className="article-detail__grid">
             {/* Cot trai: noi dung bai */}
-            <section className="ct-bai__khoi">
-              <h2 className="ct-bai__khoi-tieu-de">Nội dung</h2>
-              <div className="ct-bai__noi-dung">{bai.content || 'Chưa có nội dung.'}</div>
+            <section className="article-detail__section">
+              <h2 className="article-detail__section-title">Nội dung</h2>
+              <div className="article-detail__content">{article.content || 'Chưa có nội dung.'}</div>
             </section>
 
             {/* Cot phai: khai bao, tac gia, lich su */}
-            <div className="ct-bai__phai">
-              <section className="ct-bai__khoi">
-                <h2 className="ct-bai__khoi-tieu-de">Khai báo</h2>
-                <dl className="ct-bai__khai-bao">
+            <div className="article-detail__side">
+              <section className="article-detail__section">
+                <h2 className="article-detail__section-title">Khai báo</h2>
+                <dl className="article-detail__declaration">
                   {/* TODO(admin): hien ten the loai, ten ban khi server tra ve */}
-                  <dt>Thể loại khai</dt><dd>Mã {bai.declaredCategoryId}</dd>
-                  <dt>Thể loại áp dụng</dt><dd>Mã {bai.categoryId}</dd>
-                  <dt>Tính chất</dt><dd>{tenTinhChat(bai.declaredNature)}</dd>
-                  <dt>Sự kiện</dt><dd>{bai.eventId ? `Mã ${bai.eventId}` : 'Không'}</dd>
-                  <dt>Ngày tạo</dt><dd>{formatDate(bai.createdAt)}</dd>
-                  <dt>Nộp gần nhất</dt><dd>{formatDate(bai.submittedAt)}</dd>
-                  {bai.withdrawnAt && (<><dt>Rút gần nhất</dt><dd>{formatDate(bai.withdrawnAt)}</dd></>)}
+                  <dt>Thể loại khai</dt><dd>Mã {article.declaredCategoryId}</dd>
+                  <dt>Thể loại áp dụng</dt><dd>Mã {article.categoryId}</dd>
+                  <dt>Tính chất</dt><dd>{natureLabel(article.declaredNature)}</dd>
+                  <dt>Sự kiện</dt><dd>{article.eventId ? `Mã ${article.eventId}` : 'Không'}</dd>
+                  <dt>Ngày tạo</dt><dd>{formatDate(article.createdAt)}</dd>
+                  <dt>Nộp gần nhất</dt><dd>{formatDate(article.submittedAt)}</dd>
+                  {article.withdrawnAt && (<><dt>Rút gần nhất</dt><dd>{formatDate(article.withdrawnAt)}</dd></>)}
                 </dl>
               </section>
 
-              <section className="ct-bai__khoi">
-                <h2 className="ct-bai__khoi-tieu-de">Tác giả</h2>
-                <ul className="ct-bai__ds">
-                  {bai.authors.map((tacGia) => (
-                    <li key={tacGia.userId} className="ct-bai__tac-gia">
+              <section className="article-detail__section">
+                <h2 className="article-detail__section-title">Tác giả</h2>
+                <ul className="article-detail__list">
+                  {article.authors.map((author) => (
+                    <li key={author.userId} className="article-detail__author">
                       <div>
                         {/* TODO(admin): hien ho ten khi co entity User */}
-                        <span className="ct-bai__ten">Người dùng #{tacGia.userId}</span>
-                        <span className="ct-bai__phu">
-                          {tacGia.mainAuthor ? 'Tác giả chính' : 'Đồng tác giả'} · {Number(tacGia.sharePercent)}%
+                        <span className="article-detail__name">Người dùng #{author.userId}</span>
+                        <span className="article-detail__muted">
+                          {author.mainAuthor ? 'Tác giả chính' : 'Đồng tác giả'} · {Number(author.sharePercent)}%
                         </span>
                       </div>
-                      <span className="ct-bai__phu">
-                        {tenXacNhan(tacGia.confirmStatus)}
-                        {tacGia.confirmStatus === 'PENDING' && tacGia.confirmDeadline
-                          && ` (hạn ${formatDate(tacGia.confirmDeadline)})`}
+                      <span className="article-detail__muted">
+                        {confirmLabel(author.confirmStatus)}
+                        {author.confirmStatus === 'PENDING' && author.confirmDeadline
+                          && ` (hạn ${formatDate(author.confirmDeadline)})`}
                       </span>
                     </li>
                   ))}
                 </ul>
               </section>
 
-              <section className="ct-bai__khoi">
-                <h2 className="ct-bai__khoi-tieu-de">Lịch sử trạng thái</h2>
-                <ol className="ct-bai__ds ct-bai__lich-su">
-                  {bai.statusLogs.map((dong, viTri) => (
-                    <li key={viTri}>
-                      <span className="ct-bai__trang-thai">
-                        <span className={`cham cham--${MAU_TRANG_THAI[dong.toStatus]}`} aria-hidden="true" />
-                        {tenTrangThai(dong.toStatus)}
+              <section className="article-detail__section">
+                <h2 className="article-detail__section-title">Lịch sử trạng thái</h2>
+                <ol className="article-detail__list article-detail__history">
+                  {article.statusLogs.map((log, index) => (
+                    <li key={index}>
+                      <span className="article-detail__status">
+                        <span className={`cham cham--${STATUS_COLORS[log.toStatus]}`} aria-hidden="true" />
+                        {statusLabel(log.toStatus)}
                       </span>
-                      <span className="ct-bai__phu"> · {formatDate(dong.createdAt)}</span>
-                      {dong.note && <p className="ct-bai__ghi-chu">{dong.note}</p>}
+                      <span className="article-detail__muted"> · {formatDate(log.createdAt)}</span>
+                      {log.note && <p className="article-detail__note">{log.note}</p>}
                     </li>
                   ))}
                 </ol>

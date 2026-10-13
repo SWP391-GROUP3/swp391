@@ -1,10 +1,10 @@
 /* ===========================================================================
    pages/article/ArticleDetail.jsx - Chi tiet bai (UC-02) + Rut bai (UC-11).
-   Tien to class: .ct-bai__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+   Tien to class: .article-detail__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
    Bo cuc: cot trai noi dung, cot phai khai bao / tac gia / lich su.
    =========================================================================== */
 
-.ct-bai__quay-lai {
+.article-detail__back {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -14,14 +14,14 @@
   text-decoration: none;
 }
 
-.ct-bai__quay-lai:hover { color: var(--fm-chu); }
+.article-detail__back:hover { color: var(--fm-chu); }
 
-.ct-bai__dang-tai {
+.article-detail__loading {
   font-size: 13px;
   color: var(--fm-chu-nhat);
 }
 
-.ct-bai__dau {
+.article-detail__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -29,14 +29,14 @@
   margin-bottom: 20px;
 }
 
-.ct-bai__tieu-de {
+.article-detail__title {
   margin: 0 0 6px;
   font-size: 22px;
   font-weight: 500;
   text-wrap: balance;
 }
 
-.ct-bai__trang-thai {
+.article-detail__status {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -44,10 +44,10 @@
 }
 
 /* Nut "Rut bai": nut nhe, chu hong de nguoi dung thay day la thao tac can can nhac.
-   Viet kem .ct-bai__dau de thang class chung .nut-nhe (index.css nap sau) */
-.ct-bai__dau .ct-bai__nut-rut { color: var(--fm-hong); }
+   Viet kem .article-detail__header de thang class chung .nut-nhe (index.css nap sau) */
+.article-detail__header .article-detail__withdraw-button { color: var(--fm-hong); }
 
-.ct-bai__thanh-cong {
+.article-detail__success {
   margin: 0 0 16px;
   padding: 9px 12px;
   font-size: 13px;
@@ -56,7 +56,7 @@
 }
 
 /* Hop hoi lai truoc khi rut bai */
-.ct-bai__hop-hoi {
+.article-detail__confirm-box {
   margin-bottom: 20px;
   padding: 16px;
   font-size: 13.5px;
@@ -65,15 +65,15 @@
   border-radius: 8px;
 }
 
-.ct-bai__hop-hoi p { margin: 0 0 12px; }
+.article-detail__confirm-box p { margin: 0 0 12px; }
 
-.ct-bai__hop-hoi-nut {
+.article-detail__confirm-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
 }
 
-.ct-bai__nut-xac-nhan {
+.article-detail__confirm-button {
   padding: 7px 14px;
   font: inherit;
   font-size: 13px;
@@ -85,45 +85,45 @@
   cursor: pointer;
 }
 
-.ct-bai__nut-xac-nhan:disabled,
-.ct-bai__hop-hoi .nut-nhe:disabled { opacity: .6; cursor: not-allowed; }
+.article-detail__confirm-button:disabled,
+.article-detail__confirm-box .nut-nhe:disabled { opacity: .6; cursor: not-allowed; }
 
 /* ---- Luoi 2 cot ---- */
-.ct-bai__luoi {
+.article-detail__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
   gap: 24px;
   align-items: start;
 }
 
-.ct-bai__phai {
+.article-detail__side {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.ct-bai__khoi {
+.article-detail__section {
   padding: 20px 24px;
   background: var(--fm-the);
   border: 1px solid var(--fm-vien);
   border-radius: 8px;
 }
 
-.ct-bai__khoi-tieu-de {
+.article-detail__section-title {
   margin: 0 0 12px;
   font-size: 15px;
   font-weight: 500;
 }
 
 /* Giu xuong dong cua noi dung bai */
-.ct-bai__noi-dung {
+.article-detail__content {
   font-size: 14px;
   line-height: 1.7;
   white-space: pre-wrap;
 }
 
 /* Bang khai bao: nhan ben trai, gia tri ben phai */
-.ct-bai__khai-bao {
+.article-detail__declaration {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 8px 16px;
@@ -131,10 +131,10 @@
   font-size: 13px;
 }
 
-.ct-bai__khai-bao dt { color: var(--fm-chu-nhat); }
-.ct-bai__khai-bao dd { margin: 0; }
+.article-detail__declaration dt { color: var(--fm-chu-nhat); }
+.article-detail__declaration dd { margin: 0; }
 
-.ct-bai__ds {
+.article-detail__list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -143,7 +143,7 @@
   list-style: none;
 }
 
-.ct-bai__tac-gia {
+.article-detail__author {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -151,16 +151,16 @@
   font-size: 13px;
 }
 
-.ct-bai__ten { display: block; font-weight: 500; }
+.article-detail__name { display: block; font-weight: 500; }
 
-.ct-bai__phu {
+.article-detail__muted {
   font-size: 12.5px;
   color: var(--fm-chu-nhat);
 }
 
-.ct-bai__lich-su li { font-size: 13px; }
+.article-detail__history li { font-size: 13px; }
 
-.ct-bai__ghi-chu {
+.article-detail__note {
   margin: 4px 0 0 16px;
   font-size: 12.5px;
   color: var(--fm-chu-nhat);
@@ -168,5 +168,5 @@
 
 /* Man hinh hep: 2 cot thanh 1 cot */
 @media (max-width: 900px) {
-  .ct-bai__luoi { grid-template-columns: 1fr; }
+  .article-detail__grid { grid-template-columns: 1fr; }
 }

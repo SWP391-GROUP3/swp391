@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { layBaiCuaToi } from '../../api/articleApi.js'
+import { getMyArticles } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
-import { NHOM_TRANG_THAI, MAU_TRANG_THAI, tenTrangThai, tenTinhChat } from '../../utils/trangThaiBai.js'
+import { STATUS_GROUPS, STATUS_COLORS, statusLabel, natureLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
 import './MyArticles.css'
 
 /** So bai moi trang (AGENTS.md 3.7: ?page=0&size=10) */
-const SO_DONG_MOI_TRANG = 10
+const PAGE_SIZE = 10
 
 /**
  * UC-01 - "Bai cua toi": bai ma Phong vien la tac gia chinh hoac dong tac gia.
@@ -15,96 +15,96 @@ const SO_DONG_MOI_TRANG = 10
  * dung nhom duoc. Bam tieu de de mo chi tiet bai (UC-02).
  */
 export default function MyArticles() {
-  const [thamSoUrl, setThamSoUrl] = useSearchParams()
-  const chuoiTrangThai = thamSoUrl.get('status') || ''   // vd "ASSIGNED,PENDING_APPROVAL"
-  const trang = Number(thamSoUrl.get('page') || 0)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const statusFilter = searchParams.get('status') || ''   // vd "ASSIGNED,PENDING_APPROVAL"
+  const page = Number(searchParams.get('page') || 0)
 
-  const [ketQua, setKetQua] = useState(null)   // null = dang tai
-  const [loi, setLoi] = useState('')
+  const [result, setResult] = useState(null)   // null = dang tai
+  const [error, setError] = useState('')
 
   // Tai lai danh sach moi khi doi bo loc hoac doi trang.
   // Trong luc tai, bang cu van hien cho toi khi co du lieu moi.
   useEffect(() => {
-    let conHienThi = true
+    let isMounted = true
 
-    const cacTrangThai = chuoiTrangThai ? chuoiTrangThai.split(',') : []
-    layBaiCuaToi(cacTrangThai, trang, SO_DONG_MOI_TRANG)
-      .then((duLieu) => {
-        if (conHienThi) {
-          setKetQua(duLieu)
-          setLoi('')
+    const statuses = statusFilter ? statusFilter.split(',') : []
+    getMyArticles(statuses, page, PAGE_SIZE)
+      .then((data) => {
+        if (isMounted) {
+          setResult(data)
+          setError('')
         }
       })
-      .catch((err) => { if (conHienThi) setLoi(err.message) })
+      .catch((err) => { if (isMounted) setError(err.message) })
 
-    return () => { conHienThi = false }
-  }, [chuoiTrangThai, trang])
+    return () => { isMounted = false }
+  }, [statusFilter, page])
 
   /** Bam 1 nhom loc: ghi vao URL va quay ve trang dau. Chuoi rong = "Tat ca". */
-  function chonNhom(chuoi) {
-    const moi = new URLSearchParams()
-    if (chuoi) {
-      moi.set('status', chuoi)
+  function selectGroup(groupStatuses) {
+    const next = new URLSearchParams()
+    if (groupStatuses) {
+      next.set('status', groupStatuses)
     }
-    setThamSoUrl(moi)
+    setSearchParams(next)
   }
 
-  function chuyenTrang(trangMoi) {
-    const moi = new URLSearchParams(thamSoUrl)
-    moi.set('page', trangMoi)
-    setThamSoUrl(moi)
+  function goToPage(newPage) {
+    const next = new URLSearchParams(searchParams)
+    next.set('page', newPage)
+    setSearchParams(next)
   }
 
   return (
-    <div className="ds-bai">
-      <div className="ds-bai__dau">
+    <div className="my-articles">
+      <div className="my-articles__header">
         <div>
-          <h1 className="ds-bai__tieu-de">Bài của tôi</h1>
-          <p className="ds-bai__mo-ta">Bài bạn là tác giả chính hoặc đồng tác giả, sửa gần nhất xếp trước.</p>
+          <h1 className="my-articles__title">Bài của tôi</h1>
+          <p className="my-articles__subtitle">Bài bạn là tác giả chính hoặc đồng tác giả, sửa gần nhất xếp trước.</p>
         </div>
         {/* UC-03 lam o Iter 2, route /my-articles/new dang la trang "sap co" */}
-        <Link to="/my-articles/new" className="ds-bai__nut-chinh">
+        <Link to="/my-articles/new" className="my-articles__primary-button">
           <Icon><path d="M12 5v14M5 12h14" /></Icon>
           <span>Soạn bài mới</span>
         </Link>
       </div>
 
       {/* Bo loc theo nhom trang thai */}
-      <div className="ds-bai__loc" role="group" aria-label="Lọc theo trạng thái">
+      <div className="my-articles__filters" role="group" aria-label="Lọc theo trạng thái">
         <button
           type="button"
-          className={`ds-bai__chip ${chuoiTrangThai === '' ? 'ds-bai__chip--chon' : ''}`}
-          onClick={() => chonNhom('')}
+          className={`my-articles__chip ${statusFilter === '' ? 'my-articles__chip--selected' : ''}`}
+          onClick={() => selectGroup('')}
         >
           Tất cả
         </button>
-        {NHOM_TRANG_THAI.map((nhom) => {
-          const chuoiNhom = nhom.cacTrangThai.join(',')
+        {STATUS_GROUPS.map((group) => {
+          const groupStatuses = group.statuses.join(',')
           return (
             <button
-              key={nhom.nhan}
+              key={group.label}
               type="button"
-              className={`ds-bai__chip ${chuoiTrangThai === chuoiNhom ? 'ds-bai__chip--chon' : ''}`}
-              onClick={() => chonNhom(chuoiNhom)}
+              className={`my-articles__chip ${statusFilter === groupStatuses ? 'my-articles__chip--selected' : ''}`}
+              onClick={() => selectGroup(groupStatuses)}
             >
-              <span className={`cham cham--${nhom.mau}`} aria-hidden="true" />
-              {nhom.nhan}
+              <span className={`cham cham--${group.color}`} aria-hidden="true" />
+              {group.label}
             </button>
           )
         })}
       </div>
 
-      <div className="ds-bai__the">
-        {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
-        {!ketQua && !loi && <p className="ds-bai__trong">Đang tải…</p>}
+      <div className="my-articles__card">
+        {error && <p className="thong-bao-loi" role="alert">{error}</p>}
+        {!result && !error && <p className="my-articles__empty">Đang tải…</p>}
 
-        {ketQua && ketQua.items.length === 0 && (
-          <p className="ds-bai__trong">Không có bài nào ở bộ lọc này.</p>
+        {result && result.items.length === 0 && (
+          <p className="my-articles__empty">Không có bài nào ở bộ lọc này.</p>
         )}
 
-        {ketQua && ketQua.items.length > 0 && (
-          <div className="ds-bai__cuon">
-            <table className="ds-bai__bang">
+        {result && result.items.length > 0 && (
+          <div className="my-articles__scroll">
+            <table className="my-articles__table">
               <thead>
                 <tr>
                   <th>Tác phẩm</th>
@@ -117,32 +117,32 @@ export default function MyArticles() {
                 </tr>
               </thead>
               <tbody>
-                {ketQua.items.map((bai) => (
-                  <tr key={bai.id}>
+                {result.items.map((article) => (
+                  <tr key={article.id}>
                     <td>
-                      <Link to={`/my-articles/${bai.id}`} className="ds-bai__ten-bai">{bai.title}</Link>
+                      <Link to={`/my-articles/${article.id}`} className="my-articles__article-title">{article.title}</Link>
                     </td>
                     {/* TODO(admin): hien ten the loai khi server tra ve (can entity Genre) */}
-                    <td>Mã {bai.categoryId}</td>
-                    <td className="ds-bai__khong-xuong-dong">{tenTinhChat(bai.declaredNature)}</td>
-                    <td className="ds-bai__khong-xuong-dong">
-                      {bai.myRole === 'MAIN_AUTHOR' ? (
-                        <span className="ds-bai__vai-tro ds-bai__vai-tro--chinh">Tác giả chính</span>
+                    <td>Mã {article.categoryId}</td>
+                    <td className="my-articles__nowrap">{natureLabel(article.declaredNature)}</td>
+                    <td className="my-articles__nowrap">
+                      {article.myRole === 'MAIN_AUTHOR' ? (
+                        <span className="my-articles__role my-articles__role--main">Tác giả chính</span>
                       ) : (
-                        <span className="ds-bai__vai-tro">Đồng tác giả</span>
+                        <span className="my-articles__role">Đồng tác giả</span>
                       )}
-                      {bai.mySharePercent != null && (
-                        <span className="ds-bai__ty-le"> · {Number(bai.mySharePercent)}%</span>
+                      {article.mySharePercent != null && (
+                        <span className="my-articles__share"> · {Number(article.mySharePercent)}%</span>
                       )}
                     </td>
                     <td>
-                      <span className="ds-bai__trang-thai">
-                        <span className={`cham cham--${MAU_TRANG_THAI[bai.status]}`} aria-hidden="true" />
-                        {tenTrangThai(bai.status)}
+                      <span className="my-articles__status">
+                        <span className={`cham cham--${STATUS_COLORS[article.status]}`} aria-hidden="true" />
+                        {statusLabel(article.status)}
                       </span>
                     </td>
-                    <td className="ds-bai__ngay">{formatDate(bai.submittedAt)}</td>
-                    <td className="ds-bai__ngay">{formatDate(bai.updatedAt)}</td>
+                    <td className="my-articles__date">{formatDate(article.submittedAt)}</td>
+                    <td className="my-articles__date">{formatDate(article.updatedAt)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -151,15 +151,15 @@ export default function MyArticles() {
         )}
 
         {/* Phan trang: chi hien khi co tu 2 trang tro len */}
-        {ketQua && ketQua.totalPages > 1 && (
-          <div className="ds-bai__phan-trang">
-            <button type="button" className="nut-nhe" disabled={trang === 0}
-              onClick={() => chuyenTrang(trang - 1)}>
+        {result && result.totalPages > 1 && (
+          <div className="my-articles__pagination">
+            <button type="button" className="nut-nhe" disabled={page === 0}
+              onClick={() => goToPage(page - 1)}>
               Trang trước
             </button>
-            <span>Trang {ketQua.page + 1} / {ketQua.totalPages} · {ketQua.totalElements} bài</span>
-            <button type="button" className="nut-nhe" disabled={trang + 1 >= ketQua.totalPages}
-              onClick={() => chuyenTrang(trang + 1)}>
+            <span>Trang {result.page + 1} / {result.totalPages} · {result.totalElements} bài</span>
+            <button type="button" className="nut-nhe" disabled={page + 1 >= result.totalPages}
+              onClick={() => goToPage(page + 1)}>
               Trang sau
             </button>
           </div>

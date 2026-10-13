@@ -5,7 +5,7 @@
  */
 
 /** articles.status -> chu hien thi */
-export const TEN_TRANG_THAI = {
+export const STATUS_LABELS = {
   DRAFT:                'Nháp',
   PENDING_CONFIRMATION: 'Chờ xác nhận đồng tác giả',
   SUBMITTED:            'Đã nộp',
@@ -17,8 +17,11 @@ export const TEN_TRANG_THAI = {
   PUBLISHED:            'Đã đăng',
 }
 
-/** articles.status -> mau cham nhan (class .cham--<mau> trong index.css) */
-export const MAU_TRANG_THAI = {
+/**
+ * articles.status -> mau cham nhan. Gia tri la duoi cua class chung
+ * .cham--<mau> trong index.css (file dung chung) nen giu nguyen ten.
+ */
+export const STATUS_COLORS = {
   DRAFT:                'xam',
   PENDING_CONFIRMATION: 'cam',
   SUBMITTED:            'xanh-duong',
@@ -34,18 +37,18 @@ export const MAU_TRANG_THAI = {
  * Gop 9 trang thai thanh 7 nhom cho de doc (giong trang chu Phong vien).
  * "Dang cham" gom 3 buoc ben BF-02: BTV cham, cho duyet diem, da cong bo diem.
  */
-export const NHOM_TRANG_THAI = [
-  { nhan: 'Nháp',             mau: 'xam',        cacTrangThai: ['DRAFT'] },
-  { nhan: 'Chờ xác nhận',     mau: 'cam',        cacTrangThai: ['PENDING_CONFIRMATION'] },
-  { nhan: 'Đã nộp',           mau: 'xanh-duong', cacTrangThai: ['SUBMITTED'] },
-  { nhan: 'Đang chấm',        mau: 'tim',        cacTrangThai: ['ASSIGNED', 'PENDING_APPROVAL', 'SCORE_PUBLISHED'] },
-  { nhan: 'Trả về – cần sửa', mau: 'hong',       cacTrangThai: ['REVISION_REQUESTED'] },
-  { nhan: 'Đã đăng',          mau: 'xanh-la',    cacTrangThai: ['PUBLISHED'] },
-  { nhan: 'Từ chối',          mau: 'xam-dam',    cacTrangThai: ['REJECTED'] },
+export const STATUS_GROUPS = [
+  { label: 'Nháp',             color: 'xam',        statuses: ['DRAFT'] },
+  { label: 'Chờ xác nhận',     color: 'cam',        statuses: ['PENDING_CONFIRMATION'] },
+  { label: 'Đã nộp',           color: 'xanh-duong', statuses: ['SUBMITTED'] },
+  { label: 'Đang chấm',        color: 'tim',        statuses: ['ASSIGNED', 'PENDING_APPROVAL', 'SCORE_PUBLISHED'] },
+  { label: 'Trả về – cần sửa', color: 'hong',       statuses: ['REVISION_REQUESTED'] },
+  { label: 'Đã đăng',          color: 'xanh-la',    statuses: ['PUBLISHED'] },
+  { label: 'Từ chối',          color: 'xam-dam',    statuses: ['REJECTED'] },
 ]
 
 /** articles.declared_nature -> chu hien thi */
-export const TEN_TINH_CHAT = {
+export const NATURE_LABELS = {
   ORIGINAL:    'Sáng tác',
   TRANSLATION: 'Dịch',
   COMPILATION: 'Tổng hợp',
@@ -53,7 +56,7 @@ export const TEN_TINH_CHAT = {
 }
 
 /** article_authors.confirm_status -> chu hien thi */
-export const TEN_XAC_NHAN = {
+export const CONFIRM_LABELS = {
   PENDING:  'Chờ xác nhận',
   ACCEPTED: 'Đã đồng ý',
   REJECTED: 'Đã từ chối',
@@ -61,14 +64,14 @@ export const TEN_XAC_NHAN = {
 }
 
 /** Chu cua ma, ma la (chua co trong bang) thi hien nguyen ma. */
-export function tenTrangThai(ma) {
-  return TEN_TRANG_THAI[ma] ?? ma
+export function statusLabel(code) {
+  return STATUS_LABELS[code] ?? code
 }
 
-export function tenTinhChat(ma) {
-  return TEN_TINH_CHAT[ma] ?? ma
+export function natureLabel(code) {
+  return NATURE_LABELS[code] ?? code
 }
 
-export function tenXacNhan(ma) {
-  return TEN_XAC_NHAN[ma] ?? ma
+export function confirmLabel(code) {
+  return CONFIRM_LABELS[code] ?? code
 }
