@@ -11,15 +11,12 @@
 
 Mô tả sơ đồ (3 làn: Editorial Secretary | Accountant | Reporter):
 
-1. Secretary (Start: Article published, from BF-02): Review royalty queue (payment deadline warnings) → Open royalty assessment form (view suggested coefficient) → **Keep suggested coefficient?**
-   - No → Raise coefficient (≤ max factor, enter reason).
-   - Yes → giữ nguyên.
-2. → Confirm work nature (original / translation / compilation / reprint) → Assess images / videos (fixed coefficient by type) → Complete assessment (article joins open period) → **Month-end?** No → bài tiếp theo (quay lại bước 1).
-3. Yes → Review period sheet (incl. adjustment lines) & submit to Accountant. Một điểm vào khác: *Score changed after period locked (from BF-03)* cũng đi vào bước xem bảng kỳ.
-4. Accountant: Check royalty period → **Period valid?**
-   - No → return (reopen period) → quay lại bước 3 của Secretary.
+1. Secretary (Start: Article published, from BF-02): Review royalty queue (payment deadline warnings) → Open royalty assessment form (view system-calculated coefficient) → Confirm work nature (original / translation / compilation / repost) → Assess images / videos (fixed coefficient by type) → Complete assessment (article joins open period) → **Month-end?** No → bài tiếp theo (quay lại bước 1).
+2. Yes → Review period sheet (incl. adjustment lines) & submit to Accountant. Một điểm vào khác: *Score changed after period locked (from BF-03)* cũng đi vào bước xem bảng kỳ.
+3. Accountant: Check royalty period → **Period valid?**
+   - No → return (reopen period) → quay lại bước 2 của Secretary.
    - Yes → Lock period → Issue payment vouchers & record payment.
-5. Reporter: View & reconcile my royalties → End.
+4. Reporter: View & reconcile my royalties → End.
 
 ## Use Case Diagram
 
@@ -38,7 +35,7 @@ Primary actors: Editorial Secretary, Accountant · Others: Reporter, Admin · 12
 | ID | Use Case | Feature | Use Case Description |
 |---|---|---|---|
 | 46 | View Articles Pending Grading | Royalty Grading | The Editorial Secretary views published articles that have not been graded yet, with payment-deadline warnings. |
-| 47 | Grade Article Royalty | Royalty Grading | The system suggests a coefficient = category base factor × score tier (≥90: 1.0; 70–89: 0.8; <70: 0.6), minimum 1. The Secretary may raise it up to the category's max factor with a mandatory reason and confirms the nature (translation 70%, compilation 50%, repost 30%). Saturated events reduce the coefficient by submission order. When grading is complete, the article joins the open period. |
+| 47 | Grade Article Royalty | Royalty Grading | The system calculates the coefficient = category base factor × score / 100, minimum 1, and the Secretary confirms the nature (translation 70%, compilation 50%, repost 30%). Saturated events reduce the coefficient by submission order. When grading is complete, the article joins the open period. |
 | 48 | Grade Media Royalty | Royalty Grading | The Secretary grades each image/video with the fixed coefficient of its media type. Reused or external media receive no royalty. |
 | 49 | View Royalty Periods | Royalty Period | The Secretary and the Accountant view monthly royalty periods with status and total amount. |
 | 50 | Close Royalty Period | Royalty Period | At month-end, the Secretary reviews the period sheet (including adjustment lines) and submits it to the Accountant. |
@@ -63,15 +60,14 @@ Primary actors: Editorial Secretary, Accountant · Others: Reporter, Admin · 12
 | Business Rules | BR-RY-01 … 06 |
 
 **Normal Flow**
-1. System shows the article, score, category and nature, and suggests a coefficient (BR-RY-01).
-2. Secretary keeps the coefficient and confirms the nature.
+1. System shows the article, score, category and nature, and shows the coefficient calculated from the score (BR-RY-01).
+2. Secretary confirms the nature.
 3. System calculates final factor and amount (BR-RY-02, 03).
 4. Secretary grades images/videos if any (BR-RY-04).
 5. Secretary clicks Complete; system saves and adds the article to the OPEN period (BR-RY-05).
 
 **Alternative / Exceptions**
-- A1 Secretary raises the coefficient (≤ max factor, reason required).
-- A2 Score changed after grading (BF-03): a new version is created; if the period is LOCKED the difference goes to the next period (BR-RY-06).
+- A1 Score changed after grading (BF-03): a new version is created; if the period is LOCKED the difference goes to the next period (BR-RY-06).
 - E1 No unit price or no OPEN period: grading cannot be completed.
 
 ### UC-50: Close Royalty Period
@@ -136,7 +132,7 @@ Simple view and configuration use cases (UC-46, 48, 49, 51, 52, 55, 56, 57) are 
 
 | BR-ID | Rule |
 |---|---|
-| BR-RY-01 | Suggested coefficient = category base factor × score tier (≥ 90: 1.0; 70–89: 0.8; < 70: 0.6). The Secretary may only raise it, up to the max factor, with a reason. |
+| BR-RY-01 | Coefficient = category base factor × effective score / 100. It is calculated by the system; the Secretary cannot change it. |
 | BR-RY-02 | Final factor = coefficient × saturation rate × nature rate (Original 100%, Translation 70%, Compilation 50%, Repost 30%); minimum 1. |
 | BR-RY-03 | Amount = final factor × unit price effective on the publish date; split by author shares, rounded to 1,000 VND, remainder to the main author. |
 | BR-RY-04 | Images/videos use the fixed factor of their media type; reused or external media get no royalty. |
@@ -145,6 +141,7 @@ Simple view and configuration use cases (UC-46, 48, 49, 51, 52, 55, 56, 57) are 
 | BR-RY-07 | Period status: OPEN → CLOSED → LOCKED → PAID; only a CLOSED period can be returned or locked. |
 
 > **Ghi chú:**
+> - BR-RY-01 đã đổi theo quyết định của nhóm (13/10/2026): bỏ chia bậc điểm 90/70 (100/80/60%), hệ số = hệ số chuẩn thể loại × điểm / 100, hệ thống tự tính, Thư ký **không** nâng được nữa (nên bỏ luôn UC-47 A1 cũ). `database/data.sql` vẫn còn tham số `SCORE_TIER_*`, `TIER_RATE_*` và comment bảng `royalty_gradings` trong `schema.sql` vẫn ghi chia bậc → sửa ở PR `[DB]` riêng. Cột `tier_rate` giữ lại, lưu bằng điểm; `applied_factor` luôn bằng `suggested_factor`.
 > - UC-53 A1 ghi "period goes back to OPEN" khi Kế toán trả lại; swimlane ghi "return (reopen period)". Hai chỗ khớp nhau.
 > - Làm tròn chia đồng tác giả: BR-RY-03 ghi "rounded to 1,000 VND", GBR-10 nói rõ là **làm tròn xuống (FLOOR)**, phần dư dồn cho tác giả chính.
 > - Giảm hệ số sự kiện bão hoà 100% → 80% → 60% trong cửa sổ 7 ngày, bài có điểm hiệu lực ≥ 90 được miễn (GBR-09). Tỷ lệ này bị khoá lúc nộp bài (BR-IN-03).
