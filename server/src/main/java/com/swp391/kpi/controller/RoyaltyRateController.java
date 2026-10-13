@@ -8,10 +8,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,8 @@ public class RoyaltyRateController {
     @PostMapping
     public ResponseEntity<ApiResponse<RoyaltyRateResponse>> createRate(
             @Valid @RequestBody RoyaltyRateCreateRequest request,
-            @RequestHeader("X-User-Id") Integer currentUserId) {  // TODO(auth): lay tu token
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());   // id nguoi dang nhap, lay tu token
         RoyaltyRateResponse data = royaltyRateService.createRate(request, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Thêm đơn giá thành công", data));

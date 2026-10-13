@@ -1,11 +1,15 @@
 import { useState } from 'react'
-import { dangNhapTam } from '../auth/taiKhoanTam.js'
+import { dangNhap } from '../api/authApi.js'
 
+/**
+ * Man dang nhap (UC-69). Nhap email HOAC ten dang nhap + mat khau.
+ * Tai khoan mau (database/data.sql): mat khau chung 123456.
+ */
 export default function Login({ onDangNhap }) {
-  const [email, setEmail]     = useState('')
-  const [matKhau, setMatKhau] = useState('')
-  const [loi, setLoi]         = useState('')
-  const [dangGui, setDangGui] = useState(false)
+  const [tenDangNhap, setTenDangNhap] = useState('')
+  const [matKhau, setMatKhau]         = useState('')
+  const [loi, setLoi]                 = useState('')
+  const [dangGui, setDangGui]         = useState(false)
 
   async function guiForm(e) {
     e.preventDefault()   // chan trinh duyet tai lai trang theo kieu form HTML co
@@ -13,12 +17,11 @@ export default function Login({ onDangNhap }) {
     setDangGui(true)
 
     try {
-      // >>> CHO DUY NHAT CAN THAY KHI NOI VAO SERVER THAT <<<
-      const nguoiDung = await dangNhapTam(email, matKhau)
-      onDangNhap(nguoiDung)
+      const phien = await dangNhap(tenDangNhap.trim(), matKhau)
+      onDangNhap(phien)
     } catch (err) {
       setLoi(err.message)
-      setMatKhau('')       // xoa mat khau, giu lai email da go
+      setMatKhau('')       // xoa mat khau, giu lai ten dang nhap da go
     } finally {
       setDangGui(false)
     }
@@ -33,16 +36,18 @@ export default function Login({ onDangNhap }) {
         {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
 
         <form onSubmit={guiForm} noValidate>
-          <label className="nhan" htmlFor="email">Email</label>
+          <label className="nhan" htmlFor="tenDangNhap">Email hoặc tên đăng nhập</label>
           <input
             className="o-nhap"
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="tenDangNhap"
+            name="username"
+            type="text"
+            value={tenDangNhap}
+            onChange={(e) => setTenDangNhap(e.target.value)}
             required
             autoFocus
             autoComplete="username"
+            spellCheck={false}
             placeholder="ten.abc@toasoan.vn"
           />
 
@@ -50,6 +55,7 @@ export default function Login({ onDangNhap }) {
           <input
             className="o-nhap"
             id="matKhau"
+            name="password"
             type="password"
             value={matKhau}
             onChange={(e) => setMatKhau(e.target.value)}
@@ -58,27 +64,9 @@ export default function Login({ onDangNhap }) {
           />
 
           <button className="nut-chinh" type="submit" disabled={dangGui}>
-            {dangGui ? 'Đang vào...' : 'Đăng nhập'}
+            {dangGui ? 'Đang vào…' : 'Đăng nhập'}
           </button>
         </form>
-
-        {/* ==================================================================
-            KHOI GOI Y BEN DUOI CHI DE CHAY THU
-            XOA CUNG LUC VOI src/auth/taiKhoanTam.js
-            Khong duoc de lot ra ban nop: no in thang mat khau len man hinh.
-            ================================================================== */}
-        <details className="goi-y">
-          <summary>Tài khoản dùng thử (xoá khi có đăng nhập thật)</summary>
-          <p>Mật khẩu chung cho tất cả: <code>123456</code></p>
-          <ul>
-            <li><code>an.nv@toasoan.vn</code> — Phóng viên</li>
-            <li><code>cuong.lh@toasoan.vn</code> — Biên tập viên</li>
-            <li><code>dung.pt@toasoan.vn</code> — Thư ký toà soạn</li>
-            <li><code>duc.vm@toasoan.vn</code> — Trưởng ban</li>
-            <li><code>chi.hl@toasoan.vn</code> — Kế toán</li>
-            <li><code>admin@toasoan.vn</code> — Quản trị hệ thống</li>
-          </ul>
-        </details>
       </div>
     </div>
   )

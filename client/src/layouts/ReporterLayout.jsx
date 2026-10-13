@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { tenVaiTro } from '../auth/taiKhoanTam.js'
 import { layViTien } from '../api/reporterHomeApi.js'
 import { formatMoney } from '../utils/formatMoney.js'
 import Icon from '../components/common/Icon.jsx'
@@ -109,7 +108,7 @@ export default function ReporterLayout({ nguoiDung, onDangXuat, children }) {
 
             <div className="khung-pv__ten">
               <span className="khung-pv__ho-ten">{nguoiDung.hoTen}</span>
-              <span className="khung-pv__vai-tro">{tenVaiTro(nguoiDung.vaiTro)}</span>
+              <span className="khung-pv__vai-tro">{nguoiDung.tenVaiTro}</span>
             </div>
             <span className="khung-pv__avatar" aria-hidden="true">{chuCaiDau(nguoiDung.hoTen)}</span>
           </div>
