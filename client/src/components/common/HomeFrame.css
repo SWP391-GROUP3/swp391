@@ -1,0 +1,64 @@
+/* ===========================================================================
+   components/common/HomeFrame.jsx - bo cuc trang chu dung chung moi vai tro.
+   .trang-chu__khoi: khung the trang o cot trai (PendingList, SummaryCard,
+   KpiProgressCard... deu dung).
+   =========================================================================== */
+
+.trang-chu__dau { margin-bottom: 24px; }
+
+.trang-chu__tieu-de {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.trang-chu__ngay {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.trang-chu__luoi {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.trang-chu__trai {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* Khung the trang o cot trai */
+.trang-chu__khoi {
+  padding: 20px 24px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.trang-chu__khoi-dau {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.trang-chu__khoi-tieu-de {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Man hinh hep: 2 cot thanh 1 cot (cot dem so luong tu len tren - xem StatusCounter.css) */
+@media (max-width: 1100px) {
+  .trang-chu__luoi { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .trang-chu__khoi { padding: 16px; }
+}

@@ -9,34 +9,7 @@
  * Ten field dat theo DTO tieng Anh ma backend se tra (camelCase), gia tri
  * trang thai dung dung chu trong CHECK cua database/schema.sql.
  */
-
-/** Gia lap do tre mang, de thay duoc trang thai "Dang tai...". */
-const DO_TRE_MS = 300
-
-/**
- * Tra ve ban sao cua du lieu sau DO_TRE_MS.
- * Tra ban sao (structuredClone) de component co lo sua object cung khong
- * lam hong du lieu goc cua file nay.
- */
-function giaLapGoiApi(duLieu) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(structuredClone(duLieu)), DO_TRE_MS)
-  })
-}
-
-/**
- * Ngay gio cach hom nay `soNgay` ngay, dang "2026-10-15T17:00:00"
- * (giong LocalDateTime cua Spring tra ve trong JSON).
- * Tinh theo hom nay de han chot gia luc nao cung con y nghia khi demo.
- */
-function cachHomNay(soNgay) {
-  const ngay = new Date()
-  ngay.setDate(ngay.getDate() + soNgay)
-  const nam = ngay.getFullYear()
-  const thang = String(ngay.getMonth() + 1).padStart(2, '0')
-  const ngayTrongThang = String(ngay.getDate()).padStart(2, '0')
-  return `${nam}-${thang}-${ngayTrongThang}T17:00:00`
-}
+import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 
 /**
  * So du vi cua phong vien dang dang nhap.

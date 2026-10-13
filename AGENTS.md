@@ -234,8 +234,8 @@ client/src/
 ├── api/                 goiApi.js (hàm gọi API chung, tự gắn token) + mỗi luồng 1 file: articleApi.js, royaltyApi.js... — CHỈ chỗ này gọi server
 ├── auth/                phienDangNhap.js: lưu / đọc / xoá { token, nguoiDung } trong sessionStorage
 ├── routes/              AppRoutes.jsx (khai báo route), RequireRole.jsx (chặn route theo role) — dùng chung
-├── layouts/             1 khung / role: ReporterLayout.jsx + ReporterLayout.css, EditorLayout...  — dùng chung
-├── components/common/   thứ dùng ở ≥ 2 màn: Icon, Modal, Pagination...                  — dùng chung
+├── layouts/             AppLayout.jsx (khung chung: sidebar + thanh trên) + 1 file / role chỉ khai báo menu: ReporterLayout, EditorLayout, SecretaryLayout, HeadLayout — dùng chung
+├── components/common/   thứ dùng ở ≥ 2 màn: Icon, HomeFrame/PendingList/StatusCounter/SummaryCard (khối trang chủ)... — dùng chung
 ├── pages/
 │   ├── Login.jsx, ComingSoon.jsx   màn chung
 │   ├── home/            trang chủ theo role: ReporterHome, HeadHome...
@@ -248,7 +248,7 @@ client/src/
    - File CSS thường áp dụng cho **cả trang**, không chỉ riêng component import nó → tên class phải có **tiền tố riêng của màn** (vd `.trang-chu-pv__...`, `.ds-bai__...`) để không đè class của màn khác.
    - Màu, font luôn dùng biến `--fm-*` trong `index.css`, không tự viết mã màu mới. Thiếu màu → thêm biến vào `index.css` (báo nhóm).
 2. **Component chỉ 1 màn dùng** → để cùng thư mục với màn đó (vd `pages/home/TodoCard.jsx`). Màn thứ 2 cần dùng → chuyển lên `components/common/`.
-3. **Route mới** khai báo trong `routes/AppRoutes.jsx`, bọc trong `RequireRole`. Không thêm `if` theo role vào `Main.jsx`.
+3. **Route mới** khai báo trong `routes/AppRoutes.jsx`: trang chưa làm nằm trong mảng `TRANG_..._CHUA_LAM` của vai trò (hiện ComingSoon), làm xong thì xoá dòng đó và thêm `<Route>` trỏ tới trang thật. Menu của vai trò nằm trong `layouts/<VaiTro>Layout.jsx`.
 4. **Ai sửa gì:** `pages/<luồng>/` và `api/<luồng>Api.js` thuộc người phụ trách luồng. File ghi "dùng chung" ở cây trên: sửa phải báo nhóm (giống mục 2).
 
 **Giao diện phải làm theo thiết kế Figma có sẵn:** `docs/Web Dashboard UI - Task & Project Management (Community).fig`

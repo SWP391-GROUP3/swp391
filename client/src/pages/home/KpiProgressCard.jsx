@@ -85,9 +85,9 @@ export default function KpiProgressCard() {
     && kpi.actualAvgScore >= kpi.minAvgScore
 
   return (
-    <section className="trang-chu-pv__khoi" aria-labelledby="tieu-de-kpi">
-      <div className="trang-chu-pv__khoi-dau">
-        <h2 id="tieu-de-kpi" className="trang-chu-pv__khoi-tieu-de">
+    <section className="trang-chu__khoi" aria-labelledby="tieu-de-kpi">
+      <div className="trang-chu__khoi-dau">
+        <h2 id="tieu-de-kpi" className="trang-chu__khoi-tieu-de">
           KPI tháng {kpi ? `${kpi.month}/${kpi.year}` : 'này'}
         </h2>
         {kpi && (

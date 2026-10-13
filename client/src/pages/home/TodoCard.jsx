@@ -1,27 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { layViecCanXuLy } from '../../api/reporterHomeApi.js'
-import { formatDate, daysUntil } from '../../utils/formatDate.js'
+import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import './TodoCard.css'
-
-/** Con <= so ngay nay thi to do han chot cho PV de y. */
-const NGAY_GAP = 1
-
-/**
- * Chu hien han chot. daysUntil lam tron len nen:
- * <= 0 -> da qua han; 1 -> con chua toi 24 tieng; n -> con n ngay.
- */
-function chuHanChot(hanChot) {
-  const soNgay = daysUntil(hanChot)
-  if (soNgay <= 0) {
-    return 'đã quá hạn'
-  }
-  if (soNgay === 1) {
-    return 'còn dưới 1 ngày'
-  }
-  return `còn ${soNgay} ngày`
-}
+import PendingList from '../../components/common/PendingList.jsx'
 
 /**
  * Gop 3 loai viec server tra ve thanh 1 danh sach de ve chung 1 kieu.
@@ -76,7 +57,7 @@ function gopDanhSachViec(duLieu) {
   return danhSach
 }
 
-/** Khoi "Can ban xu ly" o cot trai trang chu Phong vien. */
+/** Khoi "Cho xu ly" o cot trai trang chu Phong vien: tai du lieu roi giao cho PendingList ve. */
 export default function TodoCard() {
   const [danhSach, setDanhSach] = useState(null)   // null = dang tai
   const [loi, setLoi] = useState('')
@@ -86,51 +67,11 @@ export default function TodoCard() {
 
     layViecCanXuLy()
       .then((duLieu) => { if (conHienThi) setDanhSach(gopDanhSachViec(duLieu)) })
-      .catch(() => { if (conHienThi) setLoi('Không tải được danh sách việc cần xử lý.') })
+      .catch(() => { if (conHienThi) setLoi('Không tải được danh sách việc chờ xử lý.') })
 
     return () => { conHienThi = false }
   }, [])
 
-  return (
-    <section className="trang-chu-pv__khoi" aria-labelledby="tieu-de-viec">
-      <div className="trang-chu-pv__khoi-dau">
-        <h2 id="tieu-de-viec" className="trang-chu-pv__khoi-tieu-de">Cần bạn xử lý</h2>
-        {danhSach && danhSach.length > 0 && (
-          <span className="viec-pv__huy-hieu">
-            {danhSach.length}<span className="an-di"> việc</span>
-          </span>
-        )}
-      </div>
-
-      {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
-      {!danhSach && !loi && <p className="dang-tai">Đang tải…</p>}
-
-      {danhSach && danhSach.length === 0 && (
-        <p className="trong-rong">Bạn không có việc nào cần xử lý 🎉</p>
-      )}
-
-      {danhSach && danhSach.length > 0 && (
-        <ul className="viec-pv__ds">
-          {danhSach.map((viec) => (
-            <li key={viec.khoa} className="viec-pv__muc">
-              <div className="viec-pv__noi-dung">
-                <p className="viec-pv__loai">
-                  <span className={`cham cham--${viec.mau}`} aria-hidden="true" />
-                  {viec.loai}
-                  {viec.hanChot && (
-                    <span className={daysUntil(viec.hanChot) <= NGAY_GAP ? 'viec-pv__han viec-pv__han--gap' : 'viec-pv__han'}>
-                      · {chuHanChot(viec.hanChot)}
-                    </span>
-                  )}
-                </p>
-                <p className="viec-pv__tieu-de">{viec.tieuDe}</p>
-                <p className="viec-pv__mo-ta">{viec.moTa}</p>
-              </div>
-              <Link to={viec.duongDan} className="nut-nhe">{viec.nut}</Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  )
+  // Phan ve dung chung voi trang chu cac vai tro khac
+  return <PendingList danhSach={danhSach} loi={loi} />
 }
