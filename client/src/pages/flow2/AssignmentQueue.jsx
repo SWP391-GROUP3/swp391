@@ -1,0 +1,214 @@
+import { useState, useEffect } from 'react'
+
+export default function AssignmentQueue({ nguoiDung }) {
+  // Danh sách bài viết mẫu chờ phân công (SUBMITTED)
+  const [articles] = useState([
+    { id: 101, title: 'Điều tra đường dây buôn lậu khoáng sản qua biên giới', author: 'Nguyễn Văn An', category: 'Phóng sự điều tra', categoryId: 1, submittedAt: '13/10/2026 08:30' },
+    { id: 102, title: 'Phỏng vấn Tổng cục trưởng về chính sách thuế mới cho báo chí', author: 'Trần Thị Bình', category: 'Phỏng vấn', categoryId: 2, submittedAt: '13/10/2026 09:15' },
+    { id: 103, title: 'Bình luận: Cơ hội và thách thức của AI trong tác nghiệp phóng viên', author: 'Đỗ Quốc Hưng', category: 'Bình luận', categoryId: 3, submittedAt: '13/10/2026 10:00' }
+  ])
+
+  // Danh sách BTV để chọn giao việc
+  const editors = [
+    { id: 3, name: 'Lê Hoàng Cường (Editor chính)', username: 'cuong.lh' },
+    { id: 4, name: 'Phạm Thu Dung (BTV dự khuyết)', username: 'dung.pt' }
+  ]
+
+  const [selectedArticleId, setSelectedArticleId] = useState(101)
+  const [selectedEditorId, setSelectedEditorId] = useState(3)
+  const [wasSuggested, setWasSuggested] = useState(false)
+  const [workload, setWorkload] = useState(null)
+  const [currentAssignment, setCurrentAssignment] = useState(null)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    loadWorkload(selectedEditorId)
+  }, [selectedEditorId])
+
+  useEffect(() => {
+    loadCurrentAssignment(selectedArticleId)
+  }, [selectedArticleId])
+
+  async function loadWorkload(editorId) {
+    try {
+      const res = await fetch(`/api/assignments/editor/${editorId}/workload`)
+      if (res.ok) {
+        const data = await res.json()
+        setWorkload(data.activeArticleCount)
+      }
+    } catch {
+      // bỏ qua nếu lỗi
+    }
+  }
+
+  async function loadCurrentAssignment(articleId) {
+    setCurrentAssignment(null)
+    try {
+      const res = await fetch(`/api/assignments/article/${articleId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setCurrentAssignment(data)
+      }
+    } catch {
+      // chưa có phân công
+    }
+  }
+
+  async function handleAssign(e) {
+    e.preventDefault()
+    setMessage('')
+    setError('')
+    setLoading(true)
+
+    try {
+      const payload = {
+        articleId: Number(selectedArticleId),
+        editorId: Number(selectedEditorId),
+        assignedBy: nguoiDung?.id || 5, // ID của Trưởng ban Vũ Minh Đức
+        wasSuggested: wasSuggested
+      }
+
+      const res = await fetch('/api/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setMessage(`Phân công thành công Bài #${data.articleId} cho BTV (ID: ${data.editorId})!`)
+        setCurrentAssignment(data)
+        loadWorkload(selectedEditorId)
+      } else {
+        const txt = await res.text()
+        setError(txt || 'Giao bài thất bại')
+      }
+    } catch (err) {
+      setError('Lỗi kết nối: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const selectedArticle = articles.find(a => a.id === Number(selectedArticleId))
+
+  return (
+    <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
+      <h3 style={{ marginTop: 0, color: '#1b2430' }}>📋 Hàng chờ phân công bài viết (Trưởng ban - UC-18, UC-20)</h3>
+      <p style={{ color: '#64748b', fontSize: '14px' }}>
+        Trưởng ban chọn bài viết đã nộp và chỉ định một Biên tập viên chịu trách nhiệm chấm chất lượng (Quy tắc BR-QA-04: Mỗi bài chỉ có 1 BTV chính).
+      </p>
+
+      {/* Thông báo */}
+      {message && <div style={{ padding: '10px 14px', background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', borderRadius: '6px', marginBottom: '16px' }}>{message}</div>}
+      {error && <div style={{ padding: '10px 14px', background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '16px' }}>{error}</div>}
+
+      {/* Danh sách bài chờ giao */}
+      <h4 style={{ margin: '0 0 8px' }}>Danh sách bài viết đã gửi (SUBMITTED):</h4>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', marginBottom: '20px' }}>
+        <thead>
+          <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
+            <th style={{ padding: '8px', border: '1px solid #e2e8f0', width: '50px' }}>Mã bài</th>
+            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Tiêu đề bài viết</th>
+            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Thể loại</th>
+            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Tác giả</th>
+            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Thời gian gửi</th>
+            <th style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>Chọn</th>
+          </tr>
+        </thead>
+        <tbody>
+          {articles.map(art => (
+            <tr key={art.id} style={{ background: selectedArticleId === art.id ? '#f0fdf4' : 'transparent' }}>
+              <td style={{ padding: '8px', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>#{art.id}</td>
+              <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{art.title}</td>
+              <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{art.category}</td>
+              <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{art.author}</td>
+              <td style={{ padding: '8px', border: '1px solid #e2e8f0', color: '#64748b' }}>{art.submittedAt}</td>
+              <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedArticleId(art.id)}
+                  style={{
+                    padding: '4px 10px',
+                    background: selectedArticleId === art.id ? '#14532d' : '#f1f5f9',
+                    color: selectedArticleId === art.id ? '#fff' : '#1b2430',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {selectedArticleId === art.id ? 'Đang chọn' : 'Chọn'}
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Form giao việc cho bài được chọn */}
+      <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+        <h4 style={{ margin: '0 0 12px' }}>
+          Giao việc cho Bài #{selectedArticleId}: <em>"{selectedArticle?.title}"</em>
+        </h4>
+
+        {currentAssignment && (
+          <div style={{ padding: '8px 12px', background: '#eff6ff', color: '#1e40af', borderRadius: '6px', marginBottom: '14px', fontSize: '13.5px' }}>
+            ℹ️ Bài này hiện đã được giao cho <strong>BTV #{currentAssignment.editorId}</strong> vào lúc {new Date(currentAssignment.assignedAt).toLocaleString('vi-VN')}. (Phân công lại sẽ cập nhật BTV mới).
+          </div>
+        )}
+
+        <form onSubmit={handleAssign} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: '600', marginBottom: '6px', fontSize: '13px' }}>
+              Chỉ định Biên tập viên (BTV):
+            </label>
+            <select
+              value={selectedEditorId}
+              onChange={(e) => setSelectedEditorId(Number(e.target.value))}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+            >
+              {editors.map(ed => (
+                <option key={ed.id} value={ed.id}>{ed.name} ({ed.username})</option>
+              ))}
+            </select>
+
+            {workload !== null && (
+              <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#047857' }}>
+                📊 Khối lượng công việc: BTV này đang phụ trách <strong>{workload}</strong> bài viết (UC-19).
+              </p>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', marginBottom: '12px' }}>
+              <input
+                type="checkbox"
+                checked={wasSuggested}
+                onChange={(e) => setWasSuggested(e.target.checked)}
+              />
+              <span>Ghi nhận giao theo gợi ý của hệ thống (was_suggested)</span>
+            </label>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                padding: '10px 18px',
+                background: '#14532d',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              {loading ? 'Đang lưu...' : 'Xác nhận Phân công bài viết'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
