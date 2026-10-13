@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { tenVaiTro } from '../auth/taiKhoanTam.js'
 import KpiBenchmarksConfig from './kpi/KpiBenchmarksConfig.jsx'
 import MonthlyTargetSetting from './kpi/MonthlyTargetSetting.jsx'
 import AppealRuleConfigPage from './admin/AppealRuleConfigPage.jsx'
@@ -32,7 +31,7 @@ export default function Main({ nguoiDung, onDangXuat }) {
 
         <div className="thanh-tren__nguoi-dung">
           <span className="ho-ten">{nguoiDung.hoTen}</span>
-          <span className="vai-tro">{tenVaiTro(nguoiDung.vaiTro)}</span>
+          <span className="vai-tro">{nguoiDung.tenVaiTro}</span>
           <button className="nut-thoat" type="button" onClick={onDangXuat}>
             Đăng xuất
           </button>

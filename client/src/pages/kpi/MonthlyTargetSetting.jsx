@@ -101,8 +101,8 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
             targetMonth: Number(thang),
             minPublished: Number(formMinPublished),
             minAvgScore: Number(formMinAvgScore),
-          },
-          nguoiDung?.id || 5
+          }
+          // nguoi giao (set_by): server tu lay tu token dang nhap
         )
         setThongBao('Giao chỉ tiêu mới thành công!')
       }
