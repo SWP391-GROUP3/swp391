@@ -405,7 +405,9 @@ Chú ý điều kiện `&& token`: **chưa có token mà bị 401** là đăng n
 
 `dangNhap(login, matKhau)` gọi API rồi **đổi tên field** từ DTO tiếng Anh sang dạng các màn đang dùng: `fullName → hoTen`, `roleCode → vaiTro: ['REPORTER']` (mảng, vì `RequireRole`/`AppRoutes` dùng `.includes()`), `roleName → tenVaiTro`. Nhờ vậy **các màn khác không phải sửa**.
 
-`Login.jsx`: ô nhập đổi thành "Email hoặc tên đăng nhập" (`type="text"`), **xoá khối "Tài khoản dùng thử"** (in mật khẩu lên màn hình). Sai mật khẩu → hiện lỗi + xoá ô mật khẩu.
+`Login.jsx`: ô nhập đổi thành "Email hoặc tên đăng nhập" (`type="text"`). Sai mật khẩu → hiện lỗi + xoá ô mật khẩu.
+
+Dưới form có **danh sách 9 tài khoản mẫu** (lấy từ `data.sql`, mật khẩu chung `123456`); bấm 1 dòng là điền sẵn cả 2 ô. Danh sách bọc trong `{import.meta.env.DEV && (...)}`: biến này của Vite bằng `true` khi chạy `npm run dev` và `false` khi `npm run build`, nên **bản build để nộp/deploy tự loại bỏ cả khối** (đã kiểm: file build không chứa danh sách). Style để riêng trong `pages/Login.css` theo quy ước CSS cạnh component.
 
 `App.jsx`: `useState(() => docPhien()?.nguoiDung ?? null)` — hàm trong `useState` chạy **1 lần** lúc mở app để F5 vẫn còn đăng nhập.
 
