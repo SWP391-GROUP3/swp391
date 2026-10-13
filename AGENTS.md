@@ -222,13 +222,28 @@ Mọi API trả `com.swp391.kpi.dto.ApiResponse`:
 
 ```
 client/src/
-├── api/            axiosClient.js (baseURL '/api', xử lý lỗi chung), mỗi luồng 1 file: royaltyApi.js...
-├── pages/          chia theo luồng: article/, assessment/, appeal/, royalty/, kpi/, admin/
-├── components/common/   Button, Table, Modal... dùng chung
-├── layouts/        layout theo role
-├── routes/         khai báo route + chặn route theo role
-└── utils/          formatMoney, formatDate
+├── main.jsx             khởi động React — không sửa
+├── App.jsx              giữ trạng thái đăng nhập, gọi <AppRoutes />                     — dùng chung
+├── index.css            CHỈ biến màu Figma (--fm-*), reset, class dùng chung (.an-di...) — dùng chung
+├── api/                 mỗi luồng 1 file: articleApi.js, royaltyApi.js... — CHỈ chỗ này gọi server
+├── auth/                thông tin đăng nhập (Context); taiKhoanTam.js là tài khoản giả, xoá khi có đăng nhập thật
+├── routes/              AppRoutes.jsx (khai báo route), RequireRole.jsx (chặn route theo role) — dùng chung
+├── layouts/             1 khung / role: ReporterLayout.jsx + ReporterLayout.css, EditorLayout...  — dùng chung
+├── components/common/   thứ dùng ở ≥ 2 màn: Icon, Modal, Pagination...                  — dùng chung
+├── pages/
+│   ├── Login.jsx, ComingSoon.jsx   màn chung
+│   ├── home/            trang chủ theo role: ReporterHome, HeadHome...
+│   └── article/ assessment/ appeal/ royalty/ kpi/ admin/   — 1 thư mục / luồng
+└── utils/               formatMoney, formatNumber, formatDate                           — dùng chung
 ```
+
+**Đặt file ở đâu:**
+1. **CSS để cạnh component:** `Xxx.jsx` đi kèm `Xxx.css`, `import './Xxx.css'` ở đầu file jsx. Không thêm style riêng của màn vào `index.css`.
+   - File CSS thường áp dụng cho **cả trang**, không chỉ riêng component import nó → tên class phải có **tiền tố riêng của màn** (vd `.trang-chu-pv__...`, `.ds-bai__...`) để không đè class của màn khác.
+   - Màu, font luôn dùng biến `--fm-*` trong `index.css`, không tự viết mã màu mới. Thiếu màu → thêm biến vào `index.css` (báo nhóm).
+2. **Component chỉ 1 màn dùng** → để cùng thư mục với màn đó (vd `pages/home/TodoCard.jsx`). Màn thứ 2 cần dùng → chuyển lên `components/common/`.
+3. **Route mới** khai báo trong `routes/AppRoutes.jsx`, bọc trong `RequireRole`. Không thêm `if` theo role vào `Main.jsx`.
+4. **Ai sửa gì:** `pages/<luồng>/` và `api/<luồng>Api.js` thuộc người phụ trách luồng. File ghi "dùng chung" ở cây trên: sửa phải báo nhóm (giống mục 2).
 
 **Giao diện phải làm theo thiết kế Figma có sẵn:** `docs/Web Dashboard UI - Task & Project Management (Community).fig`
 - Bố cục, màu, font, khoảng cách, kiểu bảng/form/nút/menu lấy theo file này. Không tự nghĩ ra phong cách giao diện khác.
@@ -252,7 +267,9 @@ client/src/
 | Bảng, cột | snake_case (đã có trong schema) | `royalty_periods.period_month` |
 | URL | kebab-case, số nhiều | `/api/royalty-periods` |
 
-- Tên trong code mới bằng **tiếng Anh**. Comment bằng **tiếng Việt không dấu** trong file Java (giống code hiện có), chỉ comment ở chỗ có logic nghiệp vụ.
+- **Backend (Java):** tên trong code bằng **tiếng Anh**.
+- **Frontend (React):** tên component và tên file component bằng **tiếng Anh** PascalCase (`ReporterHome.jsx`); tên hàm, biến, class CSS bằng **tiếng Việt không dấu** (`layDinhMucChuan()`, `tenVaiTro`, `.trang-chu-pv`), giống code hiện có. Field nhận từ API giữ **đúng tên tiếng Anh của DTO** (`balance`, `confirmDeadline`), không đổi sang tiếng Việt.
+- Comment bằng **tiếng Việt không dấu** trong file Java và JS/JSX (giống code hiện có), chỉ comment ở chỗ có logic nghiệp vụ.
 - Không có "số ma": ngưỡng, tỷ lệ, số ngày... đặt thành hằng số có tên hoặc lấy từ bảng cấu hình.
 - File lưu UTF-8.
 

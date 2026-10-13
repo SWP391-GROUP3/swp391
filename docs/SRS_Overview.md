@@ -214,7 +214,7 @@ Chi tiết từng luồng (swimlane, UC, luật) nằm trong file riêng của l
 | 3 | Editor | Score assigned articles by criteria, then accept, return or reject them; perform blind re-evaluations when assigned. |
 | 4 | Head of Editorial Department | Assign evaluators, review and approve evaluation results before scores are finalized, and view KPI reports. |
 | 5 | Accountant | Manage unit prices, review monthly royalty statements (return or lock the period), and record payments. |
-| 6 | Editorial Secretary | Grade royalty for published articles (confirm the nature, set the applied coefficient up to the category maximum, grade images/videos), review the monthly royalty statement and submit the period to the Accountant. |
+| 6 | Editorial Secretary | Grade royalty for published articles (confirm the nature, grade images/videos), review the monthly royalty statement and submit the period to the Accountant. |
 | 7 | System (Timer) | Run scheduled jobs: expire co-author confirmations after 3 days and close the appeal window after 7 days. |
 
 ### 4.2 Use Cases (UC) — mục lục
