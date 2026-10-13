@@ -1,0 +1,176 @@
+/* ===========================================================================
+   pages/article/MyArticles.jsx - "Bai cua toi" (UC-01).
+   Tien to class: .ds-bai__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+   Bo cuc tham khao mockup: tieu de + nut ben phai, hang chip loc, bang trong the trang.
+   =========================================================================== */
+
+.ds-bai__dau {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ds-bai__tieu-de {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.ds-bai__mo-ta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+/* Nut chinh mau xanh duong Figma ("Soan bai moi") */
+.ds-bai__nut-chinh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fm-the);
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--fm-xanh-duong);
+  border-radius: 6px;
+}
+
+.ds-bai__nut-chinh:hover { opacity: .9; }
+
+.ds-bai__nut-chinh:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 2px;
+}
+
+/* ---- Hang chip loc trang thai ---- */
+.ds-bai__loc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ds-bai__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.ds-bai__chip:hover { color: var(--fm-chu); }
+
+.ds-bai__chip--chon {
+  color: var(--fm-chu);
+  font-weight: 500;
+  background: var(--fm-chon);
+  border-color: var(--fm-chon);
+}
+
+.ds-bai__chip:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 2px;
+}
+
+/* ---- The trang chua bang ---- */
+.ds-bai__the {
+  padding: 8px 0;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.ds-bai__the .thong-bao-loi { margin: 12px 16px; }
+
+.ds-bai__trong {
+  margin: 0;
+  padding: 32px 16px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--fm-chu-nhat);
+}
+
+/* Bang rong hon man hinh thi cuon ngang trong the, khong vo khung trang */
+.ds-bai__cuon { overflow-x: auto; }
+
+.ds-bai__bang {
+  width: 100%;
+  font-size: 13px;
+  border-collapse: collapse;
+}
+
+.ds-bai__bang th {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--fm-chu-nhat);
+  border-bottom: 1px solid var(--fm-vien);
+}
+
+.ds-bai__bang td {
+  padding: 12px 16px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--fm-vien);
+}
+
+.ds-bai__bang tbody tr:last-child td { border-bottom: 0; }
+.ds-bai__bang tbody tr:hover { background: var(--fm-nen); }
+
+.ds-bai__ten-bai {
+  font-weight: 500;
+  color: var(--fm-chu);
+  text-decoration: none;
+}
+
+.ds-bai__ten-bai:hover { color: var(--fm-xanh-duong); text-decoration: underline; }
+
+.ds-bai__khong-xuong-dong { white-space: nowrap; }
+
+.ds-bai__vai-tro { white-space: nowrap; }
+.ds-bai__vai-tro--chinh { font-weight: 500; }
+
+.ds-bai__ty-le { color: var(--fm-chu-nhat); }
+
+.ds-bai__trang-thai {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.ds-bai__ngay {
+  white-space: nowrap;
+  color: var(--fm-chu-nhat);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Phan trang ---- */
+.ds-bai__phan-trang {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 16px 4px;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.ds-bai__phan-trang .nut-nhe:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Man hinh hep: tieu de va nut xep doc */
+@media (max-width: 640px) {
+  .ds-bai__dau { flex-direction: column; }
+}
