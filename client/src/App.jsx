@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/Login.jsx'
-import Main from './pages/Main.jsx'
+import AppRoutes from './routes/AppRoutes.jsx'
 
 /** Khoa luu nguoi dung trong sessionStorage. */
 const KHOA_PHIEN = 'nguoiDung'
@@ -27,6 +25,10 @@ function docPhien() {
   }
 }
 
+/**
+ * Goc cua app: chi giu trang thai dang nhap.
+ * Khai bao route nam o routes/AppRoutes.jsx (AGENTS.md muc 4).
+ */
 export default function App() {
   const [nguoiDung, setNguoiDung] = useState(docPhien)
 
@@ -40,34 +42,5 @@ export default function App() {
     setNguoiDung(null)
   }
 
-  return (
-    <Routes>
-      {/* Vao "/" thi day sang /main; chua dang nhap thi /main lai day tiep ve /login */}
-      <Route path="/" element={<Navigate to="/main" replace />} />
-
-      <Route
-        path="/login"
-        element={
-          // Da dang nhap roi thi khong cho xem lai form nua
-          nguoiDung
-            ? <Navigate to="/main" replace />
-            : <Login onDangNhap={dangNhap} />
-        }
-      />
-
-      <Route
-        path="/main"
-        element={
-          // Cho chan: chua dang nhap la bi da ve /login.
-          // replace = khong luu vao lich su, de bam Back khong quay lai duoc.
-          nguoiDung
-            ? <Main nguoiDung={nguoiDung} onDangXuat={dangXuat} />
-            : <Navigate to="/login" replace />
-        }
-      />
-
-      {/* Duong dan la - nem ve trang chu */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
+  return <AppRoutes nguoiDung={nguoiDung} onDangNhap={dangNhap} onDangXuat={dangXuat} />
 }
