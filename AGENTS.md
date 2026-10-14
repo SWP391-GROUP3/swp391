@@ -208,10 +208,16 @@ Mọi API trả `com.swp391.kpi.dto.ApiResponse`:
 - Phân trang: `?page=0&size=10` bằng `Pageable`, trang đầu là 0.
 - **Không dùng `@CrossOrigin`**: client gọi qua Vite proxy nên không có CORS.
 
-### 3.8 Đăng nhập & người thao tác [ĐỀ XUẤT]
+### 3.8 Đăng nhập & người thao tác
 
-- Đích: Spring Security + JWT, mật khẩu BCrypt (`users.password_hash`), chặn role ở tầng controller/security.
-- **Trước khi có đăng nhập:** API cần biết ai thao tác thì tạm nhận `@RequestHeader("X-User-Id") Integer currentUserId` ở controller rồi truyền vào service, ghi `// TODO(auth): lấy từ token`. Không tự viết cơ chế đăng nhập riêng trong luồng.
+Đã có: Spring Security + JWT, mật khẩu BCrypt (`users.password_hash`). File dùng chung: `config/SecurityConfig.java`, `config/JwtConfig.java`, `service/AuthService.java`, `service/TokenService.java`.
+
+- Đăng nhập: `POST /api/auth/login` body `{ "login": "<email hoặc username>", "password": "..." }` → trả `token` + thông tin user. Tài khoản mẫu trong `data.sql`, mật khẩu chung `123456`.
+- **Mọi API khác bắt buộc gửi** header `Authorization: Bearer <token>`. Thiếu / sai / hết hạn → 401.
+- **Biết ai đang thao tác:** thêm tham số `@AuthenticationPrincipal Jwt jwt` vào hàm controller, rồi `Integer currentUserId = Integer.valueOf(jwt.getSubject());` và truyền vào service. **Không dùng header `X-User-Id` nữa.**
+- **Chặn theo vai trò** (403): thêm luật trong `SecurityConfig`, vd `.requestMatchers(HttpMethod.POST, "/api/royalty-rates").hasRole("ACCOUNTANT")` (tên vai trò = `roles.code`). Sửa `SecurityConfig` phải báo nhóm.
+- Mỗi máy phải có `app.jwt.secret` (≥ 32 ký tự) trong `application-local.properties`, thiếu thì server không khởi động (xem `application-local.properties.example`).
+- Không tự viết cơ chế đăng nhập riêng trong luồng.
 
 ### 3.9 Test
 
@@ -225,11 +231,11 @@ client/src/
 ├── main.jsx             khởi động React — không sửa
 ├── App.jsx              giữ trạng thái đăng nhập, gọi <AppRoutes />                     — dùng chung
 ├── index.css            CHỈ biến màu Figma (--fm-*), reset, class dùng chung (.an-di...) — dùng chung
-├── api/                 mỗi luồng 1 file: articleApi.js, royaltyApi.js... — CHỈ chỗ này gọi server
-├── auth/                thông tin đăng nhập (Context); taiKhoanTam.js là tài khoản giả, xoá khi có đăng nhập thật
+├── api/                 goiApi.js (hàm gọi API chung, tự gắn token) + mỗi luồng 1 file: articleApi.js, royaltyApi.js... — CHỈ chỗ này gọi server
+├── auth/                phienDangNhap.js: lưu / đọc / xoá { token, nguoiDung } trong sessionStorage
 ├── routes/              AppRoutes.jsx (khai báo route), RequireRole.jsx (chặn route theo role) — dùng chung
-├── layouts/             1 khung / role: ReporterLayout.jsx + ReporterLayout.css, EditorLayout...  — dùng chung
-├── components/common/   thứ dùng ở ≥ 2 màn: Icon, Modal, Pagination...                  — dùng chung
+├── layouts/             AppLayout.jsx (khung chung: sidebar + thanh trên) + 1 file / role chỉ khai báo menu: ReporterLayout, EditorLayout, SecretaryLayout, HeadLayout — dùng chung
+├── components/common/   thứ dùng ở ≥ 2 màn: Icon, HomeFrame/PendingList/StatusCounter/SummaryCard (khối trang chủ)... — dùng chung
 ├── pages/
 │   ├── Login.jsx, ComingSoon.jsx   màn chung
 │   ├── home/            trang chủ theo role: ReporterHome, HeadHome...
@@ -242,7 +248,7 @@ client/src/
    - File CSS thường áp dụng cho **cả trang**, không chỉ riêng component import nó → tên class phải có **tiền tố riêng của màn** (vd `.trang-chu-pv__...`, `.ds-bai__...`) để không đè class của màn khác.
    - Màu, font luôn dùng biến `--fm-*` trong `index.css`, không tự viết mã màu mới. Thiếu màu → thêm biến vào `index.css` (báo nhóm).
 2. **Component chỉ 1 màn dùng** → để cùng thư mục với màn đó (vd `pages/home/TodoCard.jsx`). Màn thứ 2 cần dùng → chuyển lên `components/common/`.
-3. **Route mới** khai báo trong `routes/AppRoutes.jsx`, bọc trong `RequireRole`. Không thêm `if` theo role vào `Main.jsx`.
+3. **Route mới** khai báo trong `routes/AppRoutes.jsx`: trang chưa làm nằm trong mảng `TRANG_..._CHUA_LAM` của vai trò (hiện ComingSoon), làm xong thì xoá dòng đó và thêm `<Route>` trỏ tới trang thật. Menu của vai trò nằm trong `layouts/<VaiTro>Layout.jsx`.
 4. **Ai sửa gì:** `pages/<luồng>/` và `api/<luồng>Api.js` thuộc người phụ trách luồng. File ghi "dùng chung" ở cây trên: sửa phải báo nhóm (giống mục 2).
 
 **Giao diện phải làm theo thiết kế Figma có sẵn:** `docs/Web Dashboard UI - Task & Project Management (Community).fig`
@@ -253,6 +259,8 @@ client/src/
 
 - Function component + hooks. Không Redux; thông tin đăng nhập để trong một Context.
 - **Chỉ gọi API qua file trong `src/api/`**, URL bắt đầu bằng `/api/...`. Không bao giờ viết `http://localhost:8080` trong code React.
+- **Trong file `api/` luôn gọi `goiApi(...)`, không gọi `fetch` trực tiếp**: `goiApi` tự gắn token, tự đổi lỗi server thành `Error` tiếng Việt, token hết hạn thì tự về trang đăng nhập. Vd `goiApi('/api/royalty-rates', { method: 'POST', body: duLieu })` → trả phần `data`.
+- Người đang đăng nhập: prop `nguoiDung` = `{ id, username, email, hoTen, vaiTro: ['REPORTER'], tenVaiTro, sectionId }`.
 - Tiền: dùng chung `formatMoney()` (`Intl.NumberFormat('vi-VN')`).
 - Tên file: component `PascalCase.jsx`, file khác `camelCase.js`.
 - Thư viện **[ĐỀ XUẤT, chưa cài]**: `axios` để gọi API, Ant Design (`antd`) cho bảng/form. Chưa được nhóm duyệt thì dùng `fetch` và HTML/CSS thường.
@@ -324,7 +332,7 @@ Yêu cầu còn mơ hồ hoặc có nhiều cách hiểu → hỏi tiếp, **kh�
 |---|---|---|
 | 1 | Tách Service thành interface + Impl? | Không (trừ khi thầy yêu cầu) |
 | 2 | Tên luồng BF-03 | **Đã chốt:** `appeal` (khiếu nại, chấm mù theo SRS). Duyệt đăng UC-33 thuộc `assessment` |
-| 3 | Đăng nhập | Spring Security + JWT; tạm thời header `X-User-Id` |
+| 3 | Đăng nhập | **Đã làm:** Spring Security + JWT (mục 3.8). Bỏ header `X-User-Id` |
 | 4 | Thư viện frontend | `axios` + Ant Design |
 | 5 | Ai làm luồng `admin` + đăng nhập? | Chưa có |
 | 6 | Ai là chủ DB? | Chưa có |

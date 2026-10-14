@@ -1,11 +1,40 @@
 import { useState } from 'react'
-import { dangNhapTam } from '../auth/taiKhoanTam.js'
+import { dangNhap } from '../api/authApi.js'
+import './Login.css'
 
+/**
+ * Tai khoan mau - chep tu database/data.sql, mat khau chung 123456.
+ * CHI HIEN KHI CHAY DEV (npm run dev): import.meta.env.DEV cua Vite = true luc dev,
+ * = false khi npm run build -> ban build de nop/deploy tu an, khong lo mat khau.
+ */
+const MAT_KHAU_MAU = '123456'
+const TAI_KHOAN_MAU = [
+  { username: 'an.nv',    email: 'an.nv@toasoan.vn',    vaiTro: 'Phóng viên (Thời sự)' },
+  { username: 'binh.tt',  email: 'binh.tt@toasoan.vn',  vaiTro: 'Phóng viên (Thời sự)' },
+  { username: 'hung.dq',  email: 'hung.dq@toasoan.vn',  vaiTro: 'Phóng viên (Kinh tế)' },
+  { username: 'cuong.lh', email: 'cuong.lh@toasoan.vn', vaiTro: 'Biên tập viên (Thời sự)' },
+  { username: 'giang.nt', email: 'giang.nt@toasoan.vn', vaiTro: 'Biên tập viên (Kinh tế)' },
+  { username: 'duc.vm',   email: 'duc.vm@toasoan.vn',   vaiTro: 'Trưởng ban (Thời sự)' },
+  { username: 'dung.pt',  email: 'dung.pt@toasoan.vn',  vaiTro: 'Thư ký toà soạn' },
+  { username: 'chi.hl',   email: 'chi.hl@toasoan.vn',   vaiTro: 'Kế toán' },
+  { username: 'admin',    email: 'admin@toasoan.vn',    vaiTro: 'Quản trị hệ thống' },
+]
+
+/**
+ * Man dang nhap (UC-69). Nhap email HOAC ten dang nhap + mat khau.
+ */
 export default function Login({ onDangNhap }) {
-  const [email, setEmail]     = useState('')
-  const [matKhau, setMatKhau] = useState('')
-  const [loi, setLoi]         = useState('')
-  const [dangGui, setDangGui] = useState(false)
+  const [tenDangNhap, setTenDangNhap] = useState('')
+  const [matKhau, setMatKhau]         = useState('')
+  const [loi, setLoi]                 = useState('')
+  const [dangGui, setDangGui]         = useState(false)
+
+  // Bam 1 tai khoan mau -> dien san ca 2 o, chi con bam "Dang nhap"
+  function chonTaiKhoanMau(username) {
+    setTenDangNhap(username)
+    setMatKhau(MAT_KHAU_MAU)
+    setLoi('')
+  }
 
   async function guiForm(e) {
     e.preventDefault()   // chan trinh duyet tai lai trang theo kieu form HTML co
@@ -13,12 +42,11 @@ export default function Login({ onDangNhap }) {
     setDangGui(true)
 
     try {
-      // >>> CHO DUY NHAT CAN THAY KHI NOI VAO SERVER THAT <<<
-      const nguoiDung = await dangNhapTam(email, matKhau)
-      onDangNhap(nguoiDung)
+      const phien = await dangNhap(tenDangNhap.trim(), matKhau)
+      onDangNhap(phien)
     } catch (err) {
       setLoi(err.message)
-      setMatKhau('')       // xoa mat khau, giu lai email da go
+      setMatKhau('')       // xoa mat khau, giu lai ten dang nhap da go
     } finally {
       setDangGui(false)
     }
@@ -33,23 +61,26 @@ export default function Login({ onDangNhap }) {
         {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
 
         <form onSubmit={guiForm} noValidate>
-          <label className="nhan" htmlFor="email">Email hoặc Tên tài khoản</label>
+          <label className="nhan" htmlFor="tenDangNhap">Email hoặc tên đăng nhập</label>
           <input
             className="o-nhap"
-            id="email"
+            id="tenDangNhap"
+            name="username"
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={tenDangNhap}
+            onChange={(e) => setTenDangNhap(e.target.value)}
             required
             autoFocus
             autoComplete="username"
-            placeholder="Ví dụ: an.nv hoặc an.nv@toasoan.vn"
+            spellCheck={false}
+            placeholder="ten.abc@toasoan.vn"
           />
 
           <label className="nhan" htmlFor="matKhau">Mật khẩu</label>
           <input
             className="o-nhap"
             id="matKhau"
+            name="password"
             type="password"
             value={matKhau}
             onChange={(e) => setMatKhau(e.target.value)}
@@ -58,27 +89,30 @@ export default function Login({ onDangNhap }) {
           />
 
           <button className="nut-chinh" type="submit" disabled={dangGui}>
-            {dangGui ? 'Đang vào...' : 'Đăng nhập'}
+            {dangGui ? 'Đang vào…' : 'Đăng nhập'}
           </button>
         </form>
 
-        {/* ==================================================================
-            KHOI GOI Y BEN DUOI CHI DE CHAY THU
-            XOA CUNG LUC VOI src/auth/taiKhoanTam.js
-            Khong duoc de lot ra ban nop: no in thang mat khau len man hinh.
-            ================================================================== */}
-        <details className="goi-y">
-          <summary>Tài khoản dùng thử (xoá khi có đăng nhập thật)</summary>
-          <p>Mật khẩu chung cho tất cả: <code>123456</code></p>
-          <ul>
-            <li><code>an.nv@toasoan.vn</code> (hoặc <code>admin@toasoan.vn</code>) — Quản trị hệ thống (ADMIN)</li>
-            <li><code>binh.tt@toasoan.vn</code> (hoặc <code>duc.vm@toasoan.vn</code>) — Trưởng ban (HEAD_OF_DEPARTMENT)</li>
-            <li><code>duong.pt@toasoan.vn</code> (hoặc <code>cuong.lh@toasoan.vn</code>) — Biên tập viên (EDITOR)</li>
-            <li><code>dung.pt@toasoan.vn</code> — Thư ký toà soạn</li>
-            <li><code>chi.hl@toasoan.vn</code> — Kế toán</li>
-            <li><code>hung.dq@toasoan.vn</code> — Phóng viên</li>
-          </ul>
-        </details>
+        {import.meta.env.DEV && (
+          <details className="the-login__goi-y" open>
+            <summary>Tài khoản mẫu (chỉ hiện khi chạy dev)</summary>
+            <p>
+              Mật khẩu chung: <code>{MAT_KHAU_MAU}</code>. Bấm 1 dòng để điền sẵn,
+              đăng nhập bằng email hoặc tên đăng nhập đều được.
+            </p>
+            <ul>
+              {TAI_KHOAN_MAU.map((tk) => (
+                <li key={tk.username}>
+                  <button type="button" onClick={() => chonTaiKhoanMau(tk.username)}>
+                    <code>{tk.username}</code>
+                    <span className="the-login__goi-y-email">{tk.email}</span>
+                    <span className="the-login__goi-y-vai-tro">{tk.vaiTro}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </div>
     </div>
   )

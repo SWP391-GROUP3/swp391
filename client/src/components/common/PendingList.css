@@ -1,10 +1,10 @@
 /* ===========================================================================
-   pages/home/TodoCard.jsx - khoi "Can ban xu ly". Moi class bat dau "viec-pv".
-   Khung the ngoai cung dung .trang-chu-pv__khoi (ReporterHome.css).
+   components/common/PendingList.jsx - khoi "Cho xu ly" (trang chu moi vai tro). Moi class bat dau "ds-cho".
+   Khung the ngoai cung dung .trang-chu__khoi (HomeFrame.css).
    =========================================================================== */
 
-/* So dem canh tieu de "Can ban xu ly" */
-.viec-pv__huy-hieu {
+/* So dem canh tieu de "Cho xu ly" */
+.ds-cho__huy-hieu {
   min-width: 22px;
   padding: 1px 7px;
   font-size: 12px;
@@ -15,13 +15,13 @@
   border-radius: 999px;
 }
 
-.viec-pv__ds {
+.ds-cho__ds {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.viec-pv__muc {
+.ds-cho__muc {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -29,12 +29,12 @@
   border-top: 1px solid var(--fm-vien);
 }
 
-.viec-pv__muc:first-child { border-top: 0; }
+.ds-cho__muc:first-child { border-top: 0; }
 
-.viec-pv__noi-dung { flex: 1; min-width: 0; }
+.ds-cho__noi-dung { flex: 1; min-width: 0; }
 
 /* Dong nhan nho viet hoa, giong "• DESIGN SYSTEM" tren the Figma */
-.viec-pv__loai {
+.ds-cho__loai {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -45,10 +45,10 @@
   color: var(--fm-chu-nhat);
 }
 
-.viec-pv__han      { text-transform: none; letter-spacing: 0; }
-.viec-pv__han--gap { color: #c4004d; font-weight: 600; }   /* hong dam, du tuong phan tren nen trang */
+.ds-cho__han      { text-transform: none; letter-spacing: 0; }
+.ds-cho__han--gap { color: #c4004d; font-weight: 600; }   /* hong dam, du tuong phan tren nen trang */
 
-.viec-pv__tieu-de {
+.ds-cho__tieu-de {
   margin: 4px 0 0;
   font-size: 14.5px;
   font-weight: 500;
@@ -57,7 +57,7 @@
   white-space: nowrap;
 }
 
-.viec-pv__mo-ta {
+.ds-cho__mo-ta {
   margin: 2px 0 0;
   font-size: 12.5px;
   color: var(--fm-chu-nhat);
@@ -67,8 +67,8 @@
 /* Dien thoai: nut xuong duoi chu, khong bop chu thanh cot hep.
    Dat CUOI file: cung do uu tien thi luat viet sau thang. */
 @media (max-width: 600px) {
-  .viec-pv__muc { flex-wrap: wrap; gap: 10px; }
-  .viec-pv__noi-dung { flex-basis: 100%; }
-  .viec-pv__loai { flex-wrap: wrap; }
-  .viec-pv__tieu-de { white-space: normal; }
+  .ds-cho__muc { flex-wrap: wrap; gap: 10px; }
+  .ds-cho__noi-dung { flex-basis: 100%; }
+  .ds-cho__loai { flex-wrap: wrap; }
+  .ds-cho__tieu-de { white-space: normal; }
 }

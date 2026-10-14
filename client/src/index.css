@@ -121,20 +121,6 @@ body {
   border-radius: 6px;
 }
 
-/* Khoi goi y tai khoan - xoa cung luc voi src/auth/taiKhoanTam.js */
-.goi-y {
-  margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1px dashed var(--vien);
-  font-size: 12.5px;
-  color: var(--muc-nhat);
-}
-
-.goi-y summary { cursor: pointer; font-weight: 600; }
-.goi-y ul      { margin: 8px 0 0; padding-left: 18px; }
-.goi-y li      { margin-bottom: 3px; }
-.goi-y code    { font-size: 12px; background: var(--nen); padding: 1px 4px; border-radius: 3px; }
-
 /* ------------------------------------------------------------------- MAIN */
 
 .thanh-tren {
