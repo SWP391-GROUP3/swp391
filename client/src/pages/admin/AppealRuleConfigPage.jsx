@@ -85,7 +85,8 @@ export default function AppealRuleConfigPage() {
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: 20 }}>Cấu hình quy tắc khiếu nại &amp; Tham số chấm (UC-44)</h2>
+          {/* UC-44: Cấu hình quy tắc khiếu nại */}
+          <h2 style={{ margin: 0, fontSize: 20 }}>Cấu hình quy tắc khiếu nại &amp; Tham số chấm</h2>
           <p style={{ margin: '4px 0 0', color: 'var(--muc-nhat)', fontSize: 13.5 }}>
             Quản trị thời hạn khiếu nại, số lượt tối đa và ngưỡng chênh lệch điểm (T) theo phiên bản hiệu lực.
           </p>

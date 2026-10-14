@@ -33,17 +33,17 @@ export default function Login({ onDangNhap }) {
         {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
 
         <form onSubmit={guiForm} noValidate>
-          <label className="nhan" htmlFor="email">Email</label>
+          <label className="nhan" htmlFor="email">Email hoặc Tên tài khoản</label>
           <input
             className="o-nhap"
             id="email"
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoFocus
             autoComplete="username"
-            placeholder="ten.abc@toasoan.vn"
+            placeholder="Ví dụ: an.nv hoặc an.nv@toasoan.vn"
           />
 
           <label className="nhan" htmlFor="matKhau">Mật khẩu</label>
@@ -71,12 +71,12 @@ export default function Login({ onDangNhap }) {
           <summary>Tài khoản dùng thử (xoá khi có đăng nhập thật)</summary>
           <p>Mật khẩu chung cho tất cả: <code>123456</code></p>
           <ul>
-            <li><code>an.nv@toasoan.vn</code> — Phóng viên</li>
-            <li><code>cuong.lh@toasoan.vn</code> — Biên tập viên</li>
+            <li><code>an.nv@toasoan.vn</code> (hoặc <code>admin@toasoan.vn</code>) — Quản trị hệ thống (ADMIN)</li>
+            <li><code>binh.tt@toasoan.vn</code> (hoặc <code>duc.vm@toasoan.vn</code>) — Trưởng ban (HEAD_OF_DEPARTMENT)</li>
+            <li><code>duong.pt@toasoan.vn</code> (hoặc <code>cuong.lh@toasoan.vn</code>) — Biên tập viên (EDITOR)</li>
             <li><code>dung.pt@toasoan.vn</code> — Thư ký toà soạn</li>
-            <li><code>duc.vm@toasoan.vn</code> — Trưởng ban</li>
             <li><code>chi.hl@toasoan.vn</code> — Kế toán</li>
-            <li><code>admin@toasoan.vn</code> — Quản trị hệ thống</li>
+            <li><code>hung.dq@toasoan.vn</code> — Phóng viên</li>
           </ul>
         </details>
       </div>

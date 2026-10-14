@@ -25,7 +25,7 @@ export default function Flow2Dashboard({ nguoiDung }) {
     { id: 'CRITERIA', label: '⚙️ Cấu hình Tiêu chí (Admin)' },
     { id: 'ASSIGNMENT', label: '📋 Phân công Bài viết (Trưởng ban)' },
     { id: 'EDITOR_TASKS', label: '✍️ Hàng việc của tôi (Biên tập viên)' },
-    { id: 'CALCULATOR', label: '🧮 Mô phỏng Tính điểm & BR-QA-08' }
+    { id: 'CALCULATOR', label: '🧮 Mô phỏng Tính điểm' }
   ]
 
   return (

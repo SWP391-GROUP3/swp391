@@ -96,9 +96,10 @@ export default function AssignmentQueue({ nguoiDung }) {
 
   return (
     <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
-      <h3 style={{ marginTop: 0, color: '#1b2430' }}>📋 Hàng chờ phân công bài viết (Trưởng ban - UC-18, UC-20)</h3>
+      {/* UC-18, UC-20; BR-QA-04: Trưởng ban phân công bài viết */}
+      <h3 style={{ marginTop: 0, color: '#1b2430' }}>📋 Hàng chờ phân công bài viết</h3>
       <p style={{ color: '#64748b', fontSize: '14px' }}>
-        Trưởng ban chọn bài viết đã nộp và chỉ định một Biên tập viên chịu trách nhiệm chấm chất lượng (Quy tắc BR-QA-04: Mỗi bài chỉ có 1 BTV chính).
+        Trưởng ban chọn bài viết đã nộp và chỉ định một Biên tập viên chịu trách nhiệm chấm chất lượng (Mỗi bài chỉ có 1 BTV chính).
       </p>
 
       {/* Thông báo */}
@@ -175,8 +176,9 @@ export default function AssignmentQueue({ nguoiDung }) {
             </select>
 
             {workload !== null && (
+              /* UC-19: Gợi ý BTV và xem khối lượng bài đang phụ trách */
               <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#047857' }}>
-                📊 Khối lượng công việc: BTV này đang phụ trách <strong>{workload}</strong> bài viết (UC-19).
+                📊 Khối lượng công việc: BTV này đang phụ trách <strong>{workload}</strong> bài viết.
               </p>
             )}
           </div>

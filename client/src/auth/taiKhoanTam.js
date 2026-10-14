@@ -34,8 +34,9 @@ const TEN_VAI_TRO = {
 }
 
 const DANH_SACH = [
-  { username: 'an.nv',    hoTen: 'Nguyễn Văn An',  email: 'an.nv@toasoan.vn',    vaiTro: ['REPORTER'] },
-  { username: 'binh.tt',  hoTen: 'Trần Thị Bình',  email: 'binh.tt@toasoan.vn',  vaiTro: ['REPORTER'] },
+  { username: 'an.nv',    hoTen: 'Nguyễn Văn An',  email: 'an.nv@toasoan.vn',    vaiTro: ['ADMIN'] },
+  { username: 'binh.tt',  hoTen: 'Trần Thị Bình',  email: 'binh.tt@toasoan.vn',  vaiTro: ['HEAD_OF_DEPARTMENT'] },
+  { username: 'duong.pt', hoTen: 'Phan Tùng Dương', email: 'duong.pt@toasoan.vn', vaiTro: ['EDITOR'] },
   { username: 'cuong.lh', hoTen: 'Lê Hoàng Cường', email: 'cuong.lh@toasoan.vn', vaiTro: ['EDITOR'] },
   { username: 'dung.pt',  hoTen: 'Phạm Thu Dung',  email: 'dung.pt@toasoan.vn',  vaiTro: ['EDITORIAL_SECRETARY'] },
   { username: 'duc.vm',   hoTen: 'Vũ Minh Đức',    email: 'duc.vm@toasoan.vn',   vaiTro: ['HEAD_OF_DEPARTMENT'] },
@@ -60,8 +61,10 @@ export async function dangNhapTam(email, matKhau) {
   // Cho 300ms cho giong do tre mang that, de thay duoc trang thai "Dang vao..."
   await new Promise((r) => setTimeout(r, 300))
 
-  const canEmail = (email ?? '').trim().toLowerCase()
-  const nguoiDung = DANH_SACH.find((tk) => tk.email.toLowerCase() === canEmail)
+  const canNhap = (email ?? '').trim().toLowerCase()
+  const nguoiDung = DANH_SACH.find(
+    (tk) => tk.email.toLowerCase() === canNhap || tk.username.toLowerCase() === canNhap
+  )
 
   if (!nguoiDung || matKhau !== MAT_KHAU_CHUNG) {
     throw new Error('Email hoặc mật khẩu không đúng.')

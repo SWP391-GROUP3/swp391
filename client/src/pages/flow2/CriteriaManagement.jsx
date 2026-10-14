@@ -132,9 +132,10 @@ export default function CriteriaManagement({ nguoiDung }) {
 
   return (
     <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
-      <h3 style={{ marginTop: 0, color: '#1b2430' }}>⚙️ Cấu hình Bộ tiêu chí chấm điểm (Admin - UC-14 đến UC-17)</h3>
+      {/* UC-14 đến UC-17; BR-QA-01: Admin cấu hình bộ tiêu chí chấm điểm */}
+      <h3 style={{ marginTop: 0, color: '#1b2430' }}>⚙️ Cấu hình Bộ tiêu chí chấm điểm</h3>
       <p style={{ color: '#64748b', fontSize: '14px' }}>
-        Thiết lập các tiêu chí chất lượng cho từng thể loại. Mỗi tiêu chí có trọng số riêng, tổng các trọng số bắt buộc bằng 100% (BR-QA-01).
+        Thiết lập các tiêu chí chất lượng cho từng thể loại. Mỗi tiêu chí có trọng số riêng, tổng các trọng số bắt buộc bằng 100%.
       </p>
 
       {/* Chọn thể loại */}
@@ -215,9 +216,9 @@ export default function CriteriaManagement({ nguoiDung }) {
         )}
       </div>
 
-      {/* Form tạo phiên bản mới */}
+      {/* Form tạo phiên bản mới - UC-15, BR-QA-02 */}
       <form onSubmit={handleCreateNewVersion}>
-        <h4 style={{ margin: '0 0 12px' }}>➕ Tạo Phiên bản Bộ tiêu chí mới (BR-QA-02)</h4>
+        <h4 style={{ margin: '0 0 12px' }}>➕ Tạo Phiên bản Bộ tiêu chí mới</h4>
 
         <div style={{ marginBottom: '14px', overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>

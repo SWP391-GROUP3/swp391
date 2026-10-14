@@ -31,7 +31,8 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
 
   return (
     <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
-      <h3 style={{ marginTop: 0, color: '#1b2430' }}>✍️ Hàng việc của Biên tập viên (Editor - UC-21)</h3>
+      {/* UC-21: Hàng việc của Biên tập viên */}
+      <h3 style={{ marginTop: 0, color: '#1b2430' }}>✍️ Hàng việc của Biên tập viên</h3>
       <p style={{ color: '#64748b', fontSize: '14px' }}>
         Danh sách tất cả các bài viết được Trưởng ban phân công cho BTV này. BTV chọn bài để tiến hành đọc bài và chấm điểm chất lượng.
       </p>

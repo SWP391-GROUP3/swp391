@@ -31,9 +31,10 @@ export default function ScoreCalculatorTester() {
 
   return (
     <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
-      <h3 style={{ marginTop: 0, color: '#1b2430' }}>🧮 Trình mô phỏng Tính điểm Chất lượng (Score Calculator & BR-QA-08)</h3>
+      {/* Trình mô phỏng tính điểm có trọng số - BR-QA-08 */}
+      <h3 style={{ marginTop: 0, color: '#1b2430' }}>🧮 Trình mô phỏng Tính điểm Chất lượng</h3>
       <p style={{ color: '#64748b', fontSize: '14px' }}>
-        Giao diện thử nghiệm công thức tính tổng điểm có trọng số và kiểm tra quy tắc nghiệp vụ <strong>BR-QA-08</strong>: 
+        Giao diện thử nghiệm công thức tính tổng điểm có trọng số:
         <em> "Bất kỳ tiêu chí nào chấm dưới 50 điểm bắt buộc phải nhập nhận xét lý do"</em>.
       </p>
 
@@ -91,7 +92,7 @@ export default function ScoreCalculatorTester() {
                   />
                   {isMissingComment && (
                     <span style={{ color: '#e11d48', fontSize: '12px', display: 'block', marginTop: '2px' }}>
-                      * Vi phạm BR-QA-08: Tiêu chí dưới 50 điểm bắt buộc phải có lý do!
+                      * Tiêu chí dưới 50 điểm bắt buộc phải có nhận xét lý do!
                     </span>
                   )}
                 </td>
