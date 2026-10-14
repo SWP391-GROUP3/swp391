@@ -515,7 +515,103 @@ import MediaFactors from '../pages/royalty/MediaFactors.jsx'
 
 Dữ liệu thử (đơn giá 01/12/2026, hệ số đã sửa) đã được trả lại như `data.sql` sau khi thử.
 
-## 13. Câu hỏi thầy dễ hỏi
+## 13. Test case: happy, edge, bad
+
+- **Happy case**: người dùng làm đúng luồng, dữ liệu hợp lệ → chức năng chạy như mong đợi.
+- **Edge case** (ca biên): dữ liệu nằm **sát ranh giới** giữa đúng và sai (bằng đúng ngày giới hạn, số nhỏ nhất hợp lệ, làm tròn...). Lỗi hay nằm ở đây nhất.
+- **Bad case**: dữ liệu sai, thiếu, sai quyền, không tìm thấy → hệ thống phải **từ chối** và báo lỗi tiếng Việt dễ hiểu, không ghi gì vào DB.
+
+Cột **Đã kiểm** ghi cách kiểm:
+- **UI**: bấm thật trên trình duyệt.
+- **API**: gọi thật bằng curl.
+- **UT**: unit test, kèm tên hàm test.
+- **Theo code**: chưa chạy, suy ra từ code. Những ca này nếu chạy sẽ ghi dữ liệu thật vào DB, nên để dành lúc demo.
+
+Kết quả ghi trong bảng là **kết quả thật** đã chạy ngày 14/10/2026. Sau khi chạy, DB vẫn khớp `data.sql`.
+
+### 13.1 UC-55 Đơn giá nhuận bút
+
+| # | Loại | Tình huống | Dữ liệu vào | Kết quả | Đã kiểm |
+|---|---|---|---|---|---|
+| H1 | Happy | Kế toán thêm đơn giá hợp lệ | Lương 2.500.000, ngày 01/12/2026 | 201. Đơn giá **250.000 ₫**, dòng mới ở đầu bảng, nhãn "Sắp áp dụng" | UI |
+| H2 | Happy | Thêm đơn giá đầu tiên khi bảng còn trống | Lương 2.340.000 | Đơn giá 234.000 ₫, không cần kiểm ngày | UT `createFirstRateWhenNoRateExists` |
+| H3 | Happy | Xem lịch sử | — | Mới nhất xếp trước, đúng 1 dòng "Đang áp dụng" | UI |
+| E1 | Edge | Ngày hiệu lực **bằng đúng** ngày của đơn giá mới nhất | Ngày 01/01/2026 | 409 *"Ngày hiệu lực phải sau ngày 01/01/2026 của đơn giá mới nhất."* | API, UT `createRateRejectsDateNotAfterLatestRate` |
+| E2 | Edge | Ngày hiệu lực = ngày mới nhất **+ 1** | Ngày 02/01/2026 | Hợp lệ. Lịch trên giao diện cũng chỉ cho chọn từ ngày này trở đi | Theo code |
+| E3 | Edge | Lương cơ sở quá nhỏ: 10% làm tròn xuống bằng 0 | Lương 9 | 409 *"Lương cơ sở quá nhỏ, đơn giá tính ra bằng 0 đồng."* | API |
+| E4 | Edge | Lương cơ sở nhỏ nhất cho đơn giá > 0 | Lương 10 | Hợp lệ, đơn giá 1 ₫ | Theo code |
+| E5 | Edge | Lương cơ sở lẻ, đơn giá bỏ phần lẻ dưới 1 đồng | 2.345.678 | Đơn giá 234.567 ₫ | UT `unitPriceIsBaseSalaryTimesPercent` |
+| B1 | Bad | Lương cơ sở bằng 0 | `baseSalary: 0` | 400 *"Lương cơ sở phải lớn hơn 0"* | API |
+| B2 | Bad | Bỏ trống cả 2 ô | `{}` | 400, báo cả 2 lỗi *"Lương cơ sở không được để trống"*, *"Ngày hiệu lực không được để trống"* | API |
+| B3 | Bad | Lương cơ sở có số lẻ | `2500000.5` | 400 *"Lương cơ sở phải là số nguyên đồng, tối đa 18 chữ số"* | API |
+| B4 | Bad | Thư ký, Admin, Phóng viên thêm đơn giá | Token sai vai trò | 403 *"Bạn không có quyền thực hiện chức năng này."* | API |
+| B5 | Bad | Không đăng nhập / token sai | Không có token | 401 *"Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn."* | API |
+| B6 | Bad | Nhập chữ hoặc số âm vào ô lương | `-5` | Frontend báo *"Lương cơ sở phải là số nguyên dương (đồng)."*, **không gọi API** | Theo code |
+| B7 | Bad | DB thiếu tham số `UNIT_PRICE_PERCENT` | Xoá tham số | `RoyaltyCalculator` báo *"Thiếu tham số hệ thống: UNIT_PRICE_PERCENT"* | UT `throwsWhenAParameterIsMissing` |
+
+### 13.2 UC-56 Hệ số ảnh/video
+
+| # | Loại | Tình huống | Dữ liệu vào | Kết quả | Đã kiểm |
+|---|---|---|---|---|---|
+| H1 | Happy | Admin sửa hệ số Ảnh tác nghiệp | 1 → 1.2 | 200. Thông báo thành công, dòng đổi thành 1,2 | UI, UT `updateFactorSavesNewFactor` |
+| H2 | Happy | Xem danh sách | — | 3 loại GRAPHIC, PHOTO, VIDEO kèm hệ số | UI |
+| H3 | Happy | Bấm Sửa rồi bấm Huỷ | — | Thoát chế độ sửa, giữ số cũ, không gọi API | Theo code |
+| E1 | Edge | Hệ số nhỏ nhất hợp lệ | 0.01 | Hợp lệ | Theo code (`@DecimalMin("0.01")`) |
+| E2 | Edge | 3 chữ số thập phân | 1.234 | 400 *"Hệ số tối đa 3 chữ số phần nguyên và 2 chữ số thập phân"* | API |
+| E3 | Edge | **Lỗi đã biết:** hệ số vượt `max_factor` cũ của DB | PHOTO 2.50 (trần cũ 2.00) | **500**, lỗi SQL từ CHECK `ck_media_factors_factor`. Hết lỗi khi PR `[DB]` bỏ cột `max_factor` được merge | API |
+| B1 | Bad | Hệ số bằng 0 | 0 | 400 *"Hệ số phải lớn hơn 0"* | API |
+| B2 | Bad | Bỏ trống | `{}` | 400 *"Hệ số không được để trống"* | API |
+| B3 | Bad | Loại ảnh/video không tồn tại | id 999 | 404 *"Không tìm thấy loại ảnh/video có ID: 999"* | API, UT `updateFactorThrowsWhenIdNotFound` |
+| B4 | Bad | Kế toán, Thư ký, Phóng viên sửa hệ số | Token sai vai trò | 403 | API |
+| B5 | Bad | Gõ 1.234 trên giao diện | 1.234 | Frontend báo lỗi ngay (regex), không gọi API | Theo code |
+
+### 13.3 UC-49 Kỳ nhuận bút
+
+| # | Loại | Tình huống | Dữ liệu vào | Kết quả | Đã kiểm |
+|---|---|---|---|---|---|
+| H1 | Happy | Kế toán xem danh sách kỳ | — | Tháng 9/2026, Đang mở, 1 bài, 1.404.000 ₫ | UI |
+| H2 | Happy | Thư ký xem danh sách kỳ | — | Cùng bảng như Kế toán | UI |
+| H3 | Happy | Tổng tiền và số bài tính đúng | Kỳ có các dòng nhuận bút | Tổng 1.233.000 ₫, 2 bài | UT `getAllPeriodsAddsTotalAmountAndGradedArticleCount` |
+| E1 | Edge | Kỳ chưa có dòng nhuận bút nào | Kỳ mới mở | Tổng 0 ₫, 0 bài (nhờ `COALESCE(SUM(amount), 0)`, không bị `null`) | Theo code |
+| E2 | Edge | Kỳ chưa khoá, chưa chi | `lockedAt`, `paidAt` = `null` | Hiện "—" | UI |
+| E3 | Edge | Chưa có kỳ nào | Bảng trống | *"Chưa có kỳ nhuận bút nào."* | Theo code |
+| B1 | Bad | Phóng viên hoặc Admin xem kỳ | Token sai vai trò | 403 | API |
+| B2 | Bad | Không có token / token sai | — | 401 | API |
+
+### 13.4 `RoyaltyCalculator`: 19 unit test chia theo loại
+
+| Loại | Tên test | Kiểm điều gì |
+|---|---|---|
+| Happy | `createsCalculatorWhenAllParametersArePresent` | Đủ tham số thì tạo được bộ tính |
+| Happy | `suggestedFactorIsBaseFactorTimesScorePercent` | Hệ số = hệ số chuẩn × điểm / 100 (BR-RY-01) |
+| Happy | `natureRateComesFromSystemParameters` | Tỷ lệ tính chất lấy từ `system_parameters` |
+| Happy | `finalFactorMultipliesSaturationAndNatureRates` | 5,00 × 80% × 70% = 2,80 (BR-RY-02) |
+| Happy | `unitPriceIsBaseSalaryTimesPercent` | Đơn giá = lương cơ sở × 10% |
+| Happy | `amountIsFactorTimesUnitPriceRoundedDownToThousand` | Tiền = hệ số × đơn giá, làm tròn xuống 1.000 ₫ |
+| Happy | `coAuthorsAreRoundedDownAndMainAuthorTakesTheRest` | Chia 40/35/25%, phần dư cho tác giả chính (GBR-10) |
+| Edge | `suggestedFactorIsRoundedToTwoDecimals` | Làm tròn hệ số 2 chữ số |
+| Edge | `articleNotInEventGetsFullSaturationRate` | Bài không thuộc sự kiện → 100% |
+| Edge | `scoreBelowExemptScoreKeepsArticleSaturationRate` | Điểm 89,99, sát dưới ngưỡng 90 → vẫn bị giảm |
+| Edge | `scoreAtOrAboveExemptScoreIsExempt` | Điểm **đúng 90** → được miễn giảm |
+| Edge | `natureRateFollowsChangedParameter` | Đổi tham số 70 → 65 thì kết quả đổi theo |
+| Edge | `finalFactorIsRoundedOnlyOnceAtTheEnd` | Ra 2,27 chứ không phải 2,28 (chỉ làm tròn 1 lần ở cuối) |
+| Edge | `finalFactorIsAtLeastMinFinalFactor` | 0,693 → nâng lên tối thiểu 1 |
+| Edge | `splitPartsAlwaysAddUpToTheWholeAmount` | Chia 33,34 / 33,33 / 33,33 vẫn cộng lại đúng tổng |
+| Edge | `singleAuthorGetsTheWholeAmount` | Một tác giả nhận đủ 100% |
+| Bad | `throwsWhenAParameterIsMissing` | Thiếu tham số → báo lỗi rõ tên tham số |
+| Bad | `throwsWhenAParameterIsNotANumber` | Tham số không phải số → báo lỗi |
+| Bad | `throwsWhenSharesDoNotAddUpTo100` | Tỷ lệ chia 60 + 30 = 90% → báo lỗi *"…đang là 90"* |
+
+**Chạy test:**
+
+```
+mvn -f server/pom.xml test
+mvn -f server/pom.xml test -Dtest=RoyaltyCalculatorTest
+```
+
+Lệnh thứ hai chỉ chạy 19 test của `RoyaltyCalculator`, hợp để demo nhanh trước mặt thầy.
+
+## 14. Câu hỏi thầy dễ hỏi
 
 **Vì sao frontend không tự tính đơn giá 10%?**
 Tỷ lệ nằm trong bảng `system_parameters` (`UNIT_PRICE_PERCENT`). Tính ở server thì đổi tỷ lệ chỉ cần sửa DB, không phải sửa và build lại React. Và số tiền luôn tính bằng `BigDecimal` ở server, không bị sai số như số thực của JavaScript.
@@ -547,7 +643,7 @@ BR-RY-03 và comment bảng `royalty_rates`: không sửa dòng cũ, chỉ thêm
 **Gọi API mà không viết `http://localhost:8080`?**
 Vite proxy chuyển mọi đường dẫn `/api/...` từ cổng 5173 sang 8080 (`vite.config.js`). Trình duyệt chỉ thấy 1 địa chỉ nên không bị lỗi CORS.
 
-## 14. Bài luyện sửa code
+## 15. Bài luyện sửa code
 
 1. **Hiện thêm cột "Người tạo" ở bảng đơn giá.**
    Thêm `<th>Người tạo</th>` và `<td>{rate.createdBy}</td>` trong `RoyaltyRates.jsx`. Muốn hiện tên thay vì id thì phải sửa DTO `RoyaltyRateResponse` ở server.
@@ -569,7 +665,7 @@ Vite proxy chuyển mọi đường dẫn `/api/...` từ cổng 5173 sang 8080 
    - Frontend: `if (salary < 1000000) { setFormError(...); return }`.
    - Server: đổi `@DecimalMin("1")` thành `@DecimalMin("1000000")` trong `RoyaltyRateCreateRequest`.
 
-## 15. Việc còn lại
+## 16. Việc còn lại
 
 - **Khởi động lại server** (`mvn -f server/pom.xml spring-boot:run`) để luật phân quyền mới có hiệu lực.
 - **Báo nhóm**: đã sửa `SecurityConfig` (file dùng chung). Từ giờ Phóng viên và Admin gọi `/api/royalty-periods` nhận 403; chỉ Kế toán thêm được đơn giá; chỉ Admin sửa được hệ số.
