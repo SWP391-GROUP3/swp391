@@ -3,7 +3,7 @@ import { capNhatHoSo, layHoSo } from '../../api/userApi.js'
 import { chuCaiDau } from '../../utils/chuCaiDau.js'
 import { formatDate } from '../../utils/formatDate.js'
 import ChangePasswordForm from './ChangePasswordForm.jsx'
-import './UserProfile.css'
+import '../../styles/UserProfile.css'
 
 const TEN_TRANG_THAI = {
   ACTIVE: 'Đang hoạt động',

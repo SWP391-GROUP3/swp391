@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { layKhieuNaiCuaToi } from '../../api/appealApi.js'
 import { dinhDangThoiGian } from './appealFormat.js'
-import './AppealPage.css'
+import '../../styles/AppealPage.css'
 
 const TEN_TRANG_THAI = {
   SUBMITTED: 'Đã gửi',

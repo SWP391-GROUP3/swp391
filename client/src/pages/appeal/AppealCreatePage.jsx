@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { guiKhieuNai, layDieuKienKhieuNai, layBaiCoTheKhieuNai } from '../../api/appealApi.js'
 import { dinhDangThoiGian, thoiGianConLai } from './appealFormat.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import './AppealPage.css'
+import '../../styles/AppealPage.css'
 
 export default function AppealCreatePage() {
   const [searchParams, setSearchParams] = useSearchParams()

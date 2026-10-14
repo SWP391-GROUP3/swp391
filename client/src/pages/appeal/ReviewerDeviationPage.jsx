@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { layBaoCaoDoLech } from '../../api/reviewerDeviationApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import './QualityReportPage.css'
+import '../../styles/QualityReportPage.css'
 
 export default function ReviewerDeviationPage() {
   const [danhSach, setDanhSach] = useState(null)

@@ -27,7 +27,7 @@ bin/
 
 # VS Code
 .vscode/
-
+.run/
 # NetBeans
 nbproject/private/
 nbbuild/

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import Icon from '../components/common/Icon.jsx'
 import { chuCaiDau } from '../utils/chuCaiDau.js'
-import './AppLayout.css'
+import '../styles/AppLayout.css'
 
 /** Muc "Trang chủ" - vai tro nao cung co, AppLayout tu them o dau menu. */
 const MUC_TRANG_CHU = {
