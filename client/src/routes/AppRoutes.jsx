@@ -22,6 +22,7 @@ import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
+import UserProfile from '../pages/profile/UserProfile.jsx'
 
 /*
  * Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
@@ -104,7 +105,7 @@ const KHUNG_THEO_VAI_TRO = {
  * chi nhom do ton tai, nen cung la "/main" nhung moi vai tro thay trang chu
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
  */
-export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
+export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)
   const vaiTro = nguoiDung?.vaiTro?.[0]
   const khung = KHUNG_THEO_VAI_TRO[vaiTro]
@@ -141,6 +142,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
         >
           {/* ---- Trang da lam ---- */}
           <Route path="/main" element={<TrangChu nguoiDung={nguoiDung} />} />
+          {/* Ho so ca nhan: moi vai tro deu co, mo tu menu avatar o thanh tren */}
+          <Route path="/profile" element={<UserProfile onCapNhatNguoiDung={onCapNhatNguoiDung} />} />
           {vaiTro === 'REPORTER' && (
             <>
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
