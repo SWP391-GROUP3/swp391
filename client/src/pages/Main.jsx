@@ -3,6 +3,8 @@ import { tenVaiTro } from '../auth/taiKhoanTam.js'
 import KpiBenchmarksConfig from './kpi/KpiBenchmarksConfig.jsx'
 import MonthlyTargetSetting from './kpi/MonthlyTargetSetting.jsx'
 import AppealRuleConfigPage from './admin/AppealRuleConfigPage.jsx'
+import ReviewerDeviationPage from './appeal/ReviewerDeviationPage.jsx'
+import AuditLogPage from './appeal/AuditLogPage.jsx'
 
 /**
  * Trang chinh sau khi dang nhap (cac vai tro chua co layout rieng).
@@ -16,10 +18,14 @@ export default function Main({ nguoiDung, onDangXuat }) {
   const cacTab = []
   if (laTruongBan) {
     cacTab.push({ ma: 'target', nhan: 'Giao chỉ tiêu tháng' })              // UC-59
+    cacTab.push({ ma: 'reviewer-deviations', nhan: 'Độ lệch điểm' })        // UC-41
+    cacTab.push({ ma: 'audit-logs', nhan: 'Nhật ký chấm điểm' })            // UC-45
   }
   if (laAdmin) {
     cacTab.push({ ma: 'benchmark', nhan: 'Cấu hình định mức chuẩn' })       // UC-58
     cacTab.push({ ma: 'appeal-rules', nhan: 'Cấu hình khiếu nại' })         // UC-44 (Actor: Admin)
+    cacTab.push({ ma: 'reviewer-deviations', nhan: 'Độ lệch điểm' })        // UC-41
+    cacTab.push({ ma: 'audit-logs', nhan: 'Nhật ký chấm điểm' })            // UC-45
   }
 
   // Mac dinh mo tab dau tien cua vai tro
@@ -58,6 +64,8 @@ export default function Main({ nguoiDung, onDangXuat }) {
         {tabHienTai === 'target' && <MonthlyTargetSetting nguoiDung={nguoiDung} />}
         {tabHienTai === 'benchmark' && <KpiBenchmarksConfig />}
         {tabHienTai === 'appeal-rules' && <AppealRuleConfigPage />}
+        {tabHienTai === 'reviewer-deviations' && <ReviewerDeviationPage />}
+        {tabHienTai === 'audit-logs' && <AuditLogPage />}
 
         {cacTab.length === 0 && (
           <p className="trong-rong">Chưa có chức năng nào cho vai trò này.</p>

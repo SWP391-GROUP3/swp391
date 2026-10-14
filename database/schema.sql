@@ -1,3 +1,4 @@
+﻿-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Hệ thống đánh giá chất lượng bài báo và quản lý nhuận bút
    Schema cho SQL Server 2019 trở lên. Khớp ERD tổng thể (SWP391_ERD_TongThe):
@@ -547,12 +548,14 @@ CREATE TABLE appeals (
     article_id          INT          NOT NULL,
     scoring_attempt_id  INT          NOT NULL,   -- lần chấm bị khiếu nại
     appellant_id        INT          NOT NULL,
+    rule_config_id      INT          NOT NULL,   -- đóng băng luật áp dụng tại lúc gửi (BR-QC-12)
     status              VARCHAR(10)  NOT NULL DEFAULT 'SUBMITTED',
     submitted_at        DATETIME2    NOT NULL DEFAULT SYSDATETIME(),
     resolved_at         DATETIME2    NULL,
     CONSTRAINT fk_appeals_article   FOREIGN KEY (article_id)         REFERENCES articles(id),
     CONSTRAINT fk_appeals_attempt   FOREIGN KEY (scoring_attempt_id) REFERENCES scoring_attempts(id),
     CONSTRAINT fk_appeals_appellant FOREIGN KEY (appellant_id)       REFERENCES users(id),
+    CONSTRAINT uq_appeals_article   UNIQUE (article_id),
     CONSTRAINT ck_appeals_status    CHECK (status IN ('SUBMITTED','IN_REVIEW','RESOLVED')),
     CONSTRAINT ck_appeals_resolved  CHECK ((status =  'RESOLVED' AND resolved_at IS NOT NULL) OR
                                            (status <> 'RESOLVED' AND resolved_at IS NULL))
@@ -582,11 +585,13 @@ CREATE TABLE appeal_resolutions (
     appeal_id             INT          NOT NULL UNIQUE,
     rule_applied          VARCHAR(20)  NOT NULL,
     effective_attempt_id  INT          NOT NULL,
+    effective_score       DECIMAL(5,2) NULL, -- Diem so da xac nhan; NULL cho du lieu cu dung effective_attempt_id.
     finalized_by          INT          NOT NULL,
     finalized_at          DATETIME2    NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT fk_appeal_resolutions_appeal    FOREIGN KEY (appeal_id)            REFERENCES appeals(id),
     CONSTRAINT fk_appeal_resolutions_attempt   FOREIGN KEY (effective_attempt_id) REFERENCES scoring_attempts(id),
     CONSTRAINT fk_appeal_resolutions_finalizer FOREIGN KEY (finalized_by)         REFERENCES users(id),
+    CONSTRAINT ck_appeal_resolutions_score CHECK (effective_score BETWEEN 0 AND 100),
     CONSTRAINT ck_appeal_resolutions_rule      CHECK (rule_applied IN ('KEEP_ORIGINAL','USE_RESCORE'))
 );
 
@@ -601,9 +606,13 @@ CREATE TABLE appeal_rule_configs (
     is_active                BIT           NOT NULL DEFAULT 1,
     updated_by               INT           NOT NULL,
     CONSTRAINT fk_appeal_rule_configs_updater FOREIGN KEY (updated_by) REFERENCES users(id),
+    CONSTRAINT uq_appeal_rule_configs_effective UNIQUE (effective_from),
     CONSTRAINT ck_appeal_rule_configs_values  CHECK (appeal_window_days > 0 AND max_appeals_per_article > 0
                                                      AND variance_threshold BETWEEN 0 AND 100)
 );
+
+ALTER TABLE appeals
+    ADD CONSTRAINT fk_appeals_rule_config FOREIGN KEY (rule_config_id) REFERENCES appeal_rule_configs(id);
 
 /* Đợt chấm chéo: lấy mẫu bài đã chấm trong khoảng ngày, giao người khác
    chấm lại để đo độ lệch của BTV. */

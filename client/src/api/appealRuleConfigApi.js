@@ -3,17 +3,21 @@
  * Quy tac AGENTS.md: Chi goi qua /api/..., khong dung http://localhost:8080.
  */
 
+import { layHeaderNguoiDung } from './appealSessionHeaders.js'
+
 export async function getActiveConfig() {
-  const res = await fetch('/api/appeal-rule-configs/active')
+  const res = await fetch('/api/appeal-rule-configs/active', { headers: layHeaderNguoiDung() })
   const json = await res.json()
   if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Không thể tải cấu hình khiếu nại hiện tại')
+    const loi = new Error(json.message || 'Không thể tải cấu hình khiếu nại hiện tại')
+    loi.status = res.status
+    throw loi
   }
   return json.data
 }
 
 export async function getAllConfigs() {
-  const res = await fetch('/api/appeal-rule-configs')
+  const res = await fetch('/api/appeal-rule-configs', { headers: layHeaderNguoiDung() })
   const json = await res.json()
   if (!res.ok || !json.success) {
     throw new Error(json.message || 'Không thể tải danh sách lịch sử cấu hình')
@@ -26,7 +30,7 @@ export async function createConfig(data) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-User-Id': '8', // TODO(auth): Tam thoi truyen Admin ID theo de xuat AGENTS.md
+      ...layHeaderNguoiDung(),
     },
     body: JSON.stringify(data),
   })

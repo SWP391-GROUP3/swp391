@@ -23,8 +23,9 @@ public class AppealRuleConfigController {
      * Lay cau hinh dang ap dung hien tai.
      */
     @GetMapping("/active")
-    public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> getActiveConfig() {
-        AppealRuleConfigResponse data = appealRuleConfigService.getActiveConfig();
+    public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> getActiveConfig(
+            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+        AppealRuleConfigResponse data = appealRuleConfigService.getActiveConfig(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy cấu hình khiếu nại đang áp dụng thành công", data));
     }
 
@@ -32,8 +33,9 @@ public class AppealRuleConfigController {
      * Lay toan bo lich su cac phien ban cau hinh (Admin xem).
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AppealRuleConfigResponse>>> getAllConfigs() {
-        List<AppealRuleConfigResponse> data = appealRuleConfigService.getAllConfigs();
+    public ResponseEntity<ApiResponse<List<AppealRuleConfigResponse>>> getAllConfigs(
+            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+        List<AppealRuleConfigResponse> data = appealRuleConfigService.getAllConfigs(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách cấu hình khiếu nại thành công", data));
     }
 
@@ -43,7 +45,7 @@ public class AppealRuleConfigController {
     @PostMapping
     public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> createConfig(
             @Valid @RequestBody AppealRuleConfigCreateRequest request,
-            @RequestHeader(value = "X-User-Id", defaultValue = "8") Integer currentUserId // TODO(auth): lay tu token
+            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId // TODO(auth): lay tu token
     ) {
         AppealRuleConfigResponse data = appealRuleConfigService.createConfig(request, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED)

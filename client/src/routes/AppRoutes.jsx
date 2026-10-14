@@ -5,6 +5,8 @@ import Main from '../pages/Main.jsx'
 import ComingSoon from '../pages/ComingSoon.jsx'
 import ReporterLayout from '../layouts/ReporterLayout.jsx'
 import ReporterHome from '../pages/home/ReporterHome.jsx'
+import AppealCreatePage from '../pages/appeal/AppealCreatePage.jsx'
+import MyAppealsPage from '../pages/appeal/MyAppealsPage.jsx'
 
 /**
  * Trang cua Phong vien chua lam: menu (ReporterLayout) va nut trong
@@ -16,8 +18,6 @@ const TRANG_PV_CHUA_LAM = [
   { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
   { path: '/my-articles/:id',   ten: 'Chi tiết bài viết' },      // UC-02
   { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
-  { path: '/my-appeals',        ten: 'Khiếu nại điểm' },         // UC-35
-  { path: '/my-appeals/new',    ten: 'Gửi khiếu nại' },          // UC-35
   { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
   { path: '/my-kpi',            ten: 'KPI cá nhân' },            // UC-60, UC-67
 ]
@@ -63,6 +63,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
           }
         >
           <Route path="/main" element={<ReporterHome nguoiDung={nguoiDung} />} />
+          <Route path="/my-appeals" element={<MyAppealsPage />} />
+          <Route path="/my-appeals/new" element={<AppealCreatePage />} />
           {TRANG_PV_CHUA_LAM.map((trang) => (
             <Route
               key={trang.path}
