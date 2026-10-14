@@ -19,12 +19,15 @@ import java.util.List;
 public class AppealRuleConfigService {
 
     private final AppealRuleConfigRepository appealRuleConfigRepository;
+    private final AuditService auditService;
+    private final UserReadService userReadService;
 
     /**
      * Lay cau hinh khiieu nai dang co hieu luc tinh den ngay hom nay.
      */
     @Transactional(readOnly = true)
-    public AppealRuleConfigResponse getActiveConfig() {
+    public AppealRuleConfigResponse getActiveConfig(Integer currentUserId) {
+        userReadService.requireActive(currentUserId, "ADMIN");
         AppealRuleConfig config = getActiveConfigEntity();
         return AppealRuleConfigResponse.from(config);
     }
@@ -43,7 +46,8 @@ public class AppealRuleConfigService {
      * Lay danh sach tat ca cac phien ban cau hinh de Admin theo doi lich su (UC-44 Normal Flow 1).
      */
     @Transactional(readOnly = true)
-    public List<AppealRuleConfigResponse> getAllConfigs() {
+    public List<AppealRuleConfigResponse> getAllConfigs(Integer currentUserId) {
+        userReadService.requireActive(currentUserId, "ADMIN");
         List<AppealRuleConfig> list = appealRuleConfigRepository.findAllByOrderByEffectiveFromDesc();
         List<AppealRuleConfigResponse> result = new ArrayList<>();
         for (AppealRuleConfig config : list) {
@@ -58,10 +62,16 @@ public class AppealRuleConfigService {
      */
     @Transactional
     public AppealRuleConfigResponse createConfig(AppealRuleConfigCreateRequest request, Integer currentUserId) {
+        userReadService.requireActive(currentUserId, "ADMIN");
         // UC-44 E2: Kiem tra trung ngay hieu luc
         if (appealRuleConfigRepository.existsByEffectiveFrom(request.getEffectiveFrom())) {
             throw new BusinessException("Đã có cấu hình áp dụng từ ngày này.");
         }
+
+        String oldValue = appealRuleConfigRepository
+                .findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate.now())
+                .map(this::toAuditValue)
+                .orElse(null);
 
         AppealRuleConfig entity = new AppealRuleConfig();
         entity.setAppealWindowDays(request.getAppealWindowDays());
@@ -72,6 +82,21 @@ public class AppealRuleConfigService {
         entity.setUpdatedBy(currentUserId);
 
         AppealRuleConfig saved = appealRuleConfigRepository.save(entity);
+        auditService.log(
+                currentUserId,
+                "CREATE",
+                "appeal_rule_configs",
+                saved.getId(),
+                oldValue,
+                toAuditValue(saved)
+        );
         return AppealRuleConfigResponse.from(saved);
+    }
+
+    private String toAuditValue(AppealRuleConfig config) {
+        return "{\"appealWindowDays\":" + config.getAppealWindowDays()
+                + ",\"maxAppealsPerArticle\":" + config.getMaxAppealsPerArticle()
+                + ",\"varianceThreshold\":" + config.getVarianceThreshold()
+                + ",\"effectiveFrom\":\"" + config.getEffectiveFrom() + "\"}";
     }
 }

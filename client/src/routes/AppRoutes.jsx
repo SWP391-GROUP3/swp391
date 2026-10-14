@@ -8,6 +8,10 @@ import SecretaryLayout from '../layouts/SecretaryLayout.jsx'
 import HeadLayout from '../layouts/HeadLayout.jsx'
 import AccountantLayout from '../layouts/AccountantLayout.jsx'
 import AdminLayout from '../layouts/AdminLayout.jsx'
+import AppealCreatePage from '../pages/appeal/AppealCreatePage.jsx'
+import MyAppealsPage from '../pages/appeal/MyAppealsPage.jsx'
+import ReviewerDeviationPage from '../pages/appeal/ReviewerDeviationPage.jsx'
+import AuditLogPage from '../pages/appeal/AuditLogPage.jsx'
 import ReporterHome from '../pages/home/ReporterHome.jsx'
 import EditorHome from '../pages/home/EditorHome.jsx'
 import SecretaryHome from '../pages/home/SecretaryHome.jsx'
@@ -27,6 +31,7 @@ import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
 import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
 import Flow2Dashboard from '../pages/flow2/Flow2Dashboard.jsx'
 import ScoreCalculatorTester from '../pages/flow2/ScoreCalculatorTester.jsx'
+import UserProfile from '../pages/profile/UserProfile.jsx'
 
 /*
  * Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
@@ -36,8 +41,6 @@ import ScoreCalculatorTester from '../pages/flow2/ScoreCalculatorTester.jsx'
 const TRANG_PV_CHUA_LAM = [
   { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
   { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
-  { path: '/my-appeals',        ten: 'Khiếu nại điểm' },         // UC-35
-  { path: '/my-appeals/new',    ten: 'Gửi khiếu nại' },          // UC-35
   { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
   { path: '/my-kpi',            ten: 'KPI cá nhân' },            // UC-60, UC-67
 ]
@@ -62,9 +65,7 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/appeals',               ten: 'Khiếu nại' },               // UC-38
   { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
-  { path: '/reviewers',             ten: 'Độ lệch & hồ sơ BTV' },     // UC-41
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
   { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
@@ -80,8 +81,9 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/genres',             ten: 'Thể loại' },
   { path: '/system-parameters',  ten: 'Tham số hệ thống' },        // UC-13
   { path: '/reviewers',          ten: 'Hồ sơ biên tập viên' },     // UC-42
+  { path: '/criteria-sets',      ten: 'Bộ tiêu chí' },             // UC-14, 15
+  { path: '/criteria-sets/:id',  ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
   { path: '/reviewers/:id',      ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs',         ten: 'Nhật ký hệ thống' },        // UC-45
   { path: '/reader-imports',     ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
@@ -105,7 +107,7 @@ const KHUNG_THEO_VAI_TRO = {
  * chi nhom do ton tai, nen cung la "/main" nhung moi vai tro thay trang chu
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
  */
-export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
+export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)
   const vaiTro = nguoiDung?.vaiTro?.[0]
   const khung = KHUNG_THEO_VAI_TRO[vaiTro]
@@ -145,8 +147,12 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
           <Route path="/calculator" element={<ScoreCalculatorTester />} />
           <Route path="/flow2" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
 
+          {/* Ho so ca nhan: moi vai tro deu co, mo tu menu avatar o thanh tren */}
+          <Route path="/profile" element={<UserProfile onCapNhatNguoiDung={onCapNhatNguoiDung} />} />
           {vaiTro === 'REPORTER' && (
             <>
+              <Route path="/my-appeals" element={<MyAppealsPage />} />
+              <Route path="/my-appeals/new" element={<AppealCreatePage />} />
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
@@ -192,6 +198,14 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
               <Route path="/media-factors" element={<MediaFactors />} />
+            </>
+          )}
+
+          {['HEAD_OF_DEPARTMENT', 'ADMIN'].includes(vaiTro) && (
+            <>
+              <Route path="/reviewers" element={<ReviewerDeviationPage />} />
+              <Route path="/reviewer-deviations" element={<ReviewerDeviationPage />} />
+              <Route path="/audit-logs" element={<AuditLogPage />} />
             </>
           )}
 

@@ -23,5 +23,24 @@ export default function App() {
     setNguoiDung(null)
   }
 
-  return <AppRoutes nguoiDung={nguoiDung} onDangNhap={dangNhap} onDangXuat={dangXuat} />
+  // Sua ho so xong (vd doi ho ten): cap nhat ca state lan phien da luu,
+  // de thanh tren doi ten ngay va F5 khong hien lai ten cu. Token giu nguyen.
+  function capNhatNguoiDung(thayDoi) {
+    const phien = docPhien()
+    if (!phien) {
+      return
+    }
+    const nguoiDungMoi = { ...phien.nguoiDung, ...thayDoi }
+    luuPhien({ ...phien, nguoiDung: nguoiDungMoi })
+    setNguoiDung(nguoiDungMoi)
+  }
+
+  return (
+    <AppRoutes
+      nguoiDung={nguoiDung}
+      onDangNhap={dangNhap}
+      onDangXuat={dangXuat}
+      onCapNhatNguoiDung={capNhatNguoiDung}
+    />
+  )
 }
