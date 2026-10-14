@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   layBoTieuChiActive,
+  layDanhSachBoTieuChi,
   taoBoTieuChiDraft,
   kichHoatBoTieuChi
 } from '../../api/assessmentApi.js'
@@ -8,6 +9,10 @@ import {
 export default function CriteriaManagement({ nguoiDung }) {
   const [categoryId, setCategoryId] = useState(1)
   const [activeVersion, setActiveVersion] = useState(null)
+  const [allVersions, setAllVersions] = useState([])
+  const [previewVersion, setPreviewVersion] = useState(null)
+  const [newlyCreatedVersion, setNewlyCreatedVersion] = useState(null)
+  const [autoActivateNew, setAutoActivateNew] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -23,19 +28,31 @@ export default function CriteriaManagement({ nguoiDung }) {
   const totalWeight = criteriaList.reduce((sum, c) => sum + (Number(c.weight) || 0), 0)
 
   useEffect(() => {
-    loadActiveVersion(categoryId)
+    loadCategoryData(categoryId)
   }, [categoryId])
 
-  async function loadActiveVersion(catId) {
+  async function loadCategoryData(catId) {
     setLoading(true)
     setError('')
     setMessage('')
+    setNewlyCreatedVersion(null)
+    setPreviewVersion(null)
     try {
-      const data = await layBoTieuChiActive(catId)
-      setActiveVersion(data)
-    } catch (err) {
-      // 404 hoặc chưa có bản ACTIVE
-      setActiveVersion(null)
+      // 1. Tải bản ACTIVE
+      try {
+        const activeData = await layBoTieuChiActive(catId)
+        setActiveVersion(activeData)
+      } catch {
+        setActiveVersion(null)
+      }
+
+      // 2. Tải toàn bộ danh sách phiên bản của thể loại này
+      try {
+        const versionsData = await layDanhSachBoTieuChi(catId)
+        setAllVersions(Array.isArray(versionsData) ? versionsData : [])
+      } catch {
+        setAllVersions([])
+      }
     } finally {
       setLoading(false)
     }
@@ -66,6 +83,7 @@ export default function CriteriaManagement({ nguoiDung }) {
     e.preventDefault()
     setError('')
     setMessage('')
+    setNewlyCreatedVersion(null)
 
     if (totalWeight !== 100) {
       setError(`Tổng trọng số phải bằng 100.00% (Hiện tại: ${totalWeight}%)`)
@@ -75,6 +93,7 @@ export default function CriteriaManagement({ nguoiDung }) {
     try {
       const payload = {
         categoryId: Number(categoryId),
+        autoActivate: Boolean(autoActivateNew),
         criteria: criteriaList.map((c, idx) => ({
           name: c.name,
           description: c.description,
@@ -85,13 +104,13 @@ export default function CriteriaManagement({ nguoiDung }) {
       }
 
       const created = await taoBoTieuChiDraft(payload)
-      setMessage(`Tạo thành công Phiên bản ${created.versionNo} (Trạng thái: ${created.status})! Mã ID: ${created.id}`)
-      // Nếu chưa có bản ACTIVE nào, hỏi kích hoạt
-      if (!activeVersion && created.id) {
-        if (confirm('Thể loại này chưa có phiên bản áp dụng. Bạn có muốn Kích hoạt (ACTIVE) phiên bản này ngay không?')) {
-          await handleActivate(created.id)
-        }
+      if (autoActivateNew || created.status === 'ACTIVE') {
+        setMessage(`Tạo và Kích hoạt thành công Phiên bản ${created.versionNo} (ACTIVE)!`)
+      } else {
+        setMessage(`Tạo thành công Phiên bản ${created.versionNo} (Trạng thái: ${created.status})! Mã ID: ${created.id}`)
+        setNewlyCreatedVersion(created)
       }
+      await loadCategoryData(categoryId)
     } catch (err) {
       setError('Lỗi khi gửi yêu cầu: ' + err.message)
     }
@@ -102,8 +121,9 @@ export default function CriteriaManagement({ nguoiDung }) {
     setMessage('')
     try {
       const data = await kichHoatBoTieuChi(versionId)
-      setMessage(`Đã kích hoạt thành công Phiên bản ${data.versionNo}!`)
-      setActiveVersion(data)
+      setMessage(`Đã kích hoạt thành công Phiên bản ${data.versionNo} (ACTIVE)!`)
+      setNewlyCreatedVersion(null)
+      await loadCategoryData(categoryId)
     } catch (err) {
       setError('Lỗi kích hoạt: ' + err.message)
     }
@@ -142,6 +162,27 @@ export default function CriteriaManagement({ nguoiDung }) {
       {/* Thông báo */}
       {message && <div style={{ padding: '10px 14px', background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', borderRadius: '6px', marginBottom: '16px' }}>{message}</div>}
       {error && <div style={{ padding: '10px 14px', background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '16px' }}>{error}</div>}
+
+      {/* Hộp hành động nhanh khi vừa tạo xong bản DRAFT */}
+      {newlyCreatedVersion && newlyCreatedVersion.status === 'DRAFT' && (
+        <div style={{ padding: '14px 18px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+          <div>
+            <div style={{ fontWeight: '600', color: '#1e40af', fontSize: '14px' }}>
+              💡 Bạn vừa tạo Phiên bản {newlyCreatedVersion.versionNo} (ID: #{newlyCreatedVersion.id}) ở trạng thái Bản nháp (DRAFT).
+            </div>
+            <div style={{ fontSize: '13px', color: '#3b82f6', marginTop: '2px' }}>
+              Bấm nút bên cạnh để kích hoạt phiên bản này thành phiên bản áp dụng chính thức (ACTIVE) ngay lập tức:
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleActivate(newlyCreatedVersion.id)}
+            style={{ padding: '8px 16px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '13px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            ⚡ Kích hoạt (ACTIVE) ngay
+          </button>
+        </div>
+      )}
 
       {/* Phiên bản ACTIVE hiện tại */}
       <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
@@ -192,6 +233,75 @@ export default function CriteriaManagement({ nguoiDung }) {
           <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
             Thể loại này hiện chưa có bộ tiêu chí ACTIVE nào. Vui lòng tạo phiên bản mới bên dưới và kích hoạt.
           </p>
+        )}
+      </div>
+
+      {/* Danh sách các phiên bản đã tạo của Thể loại này - UC-14 */}
+      <div style={{ padding: '16px', background: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+        <h4 style={{ margin: '0 0 12px', color: '#1b2430' }}>📚 Tất cả các phiên bản của Thể loại này:</h4>
+        {allVersions.length === 0 ? (
+          <p style={{ color: '#64748b', fontSize: '14px' }}>Chưa có phiên bản nào được lưu trong hệ thống.</p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+            <thead>
+              <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
+                <th style={{ padding: '8px', border: '1px solid #cbd5e1' }}>Phiên bản</th>
+                <th style={{ padding: '8px', border: '1px solid #cbd5e1' }}>Mã ID</th>
+                <th style={{ padding: '8px', border: '1px solid #cbd5e1' }}>Trạng thái</th>
+                <th style={{ padding: '8px', border: '1px solid #cbd5e1' }}>Số tiêu chí</th>
+                <th style={{ padding: '8px', border: '1px solid #cbd5e1' }}>Thời gian tạo</th>
+                <th style={{ padding: '8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allVersions.map((v) => (
+                <tr key={v.id} style={{ background: v.status === 'ACTIVE' ? '#f0fdf4' : '#fff' }}>
+                  <td style={{ padding: '8px', border: '1px solid #cbd5e1', fontWeight: '600' }}>
+                    Phiên bản {v.versionNo}
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #cbd5e1' }}>#{v.id}</td>
+                  <td style={{ padding: '8px', border: '1px solid #cbd5e1' }}>
+                    {v.status === 'ACTIVE' && (
+                      <span style={{ background: '#10b981', color: '#fff', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: '600' }}>
+                        ACTIVE (Đang dùng)
+                      </span>
+                    )}
+                    {v.status === 'DRAFT' && (
+                      <span style={{ background: '#f59e0b', color: '#fff', fontSize: '11px', padding: '2px 8px', borderRadius: '10px', fontWeight: '600' }}>
+                        DRAFT (Bản nháp)
+                      </span>
+                    )}
+                    {v.status === 'RETIRED' && (
+                      <span style={{ background: '#94a3b8', color: '#fff', fontSize: '11px', padding: '2px 8px', borderRadius: '10px' }}>
+                        RETIRED (Lưu trữ)
+                      </span>
+                    )}
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
+                    {v.criteria ? v.criteria.length : '—'}
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #cbd5e1', color: '#64748b' }}>
+                    {v.createdAt ? new Date(v.createdAt).toLocaleString('vi-VN') : '—'}
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
+                    {v.status === 'DRAFT' ? (
+                      <button
+                        type="button"
+                        onClick={() => handleActivate(v.id)}
+                        style={{ padding: '5px 12px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}
+                      >
+                        ⚡ Kích hoạt (ACTIVE)
+                      </button>
+                    ) : (
+                      <span style={{ color: '#94a3b8', fontSize: '12px' }}>
+                        {v.status === 'ACTIVE' ? 'Đang áp dụng' : 'Đã thay thế'}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
@@ -274,6 +384,17 @@ export default function CriteriaManagement({ nguoiDung }) {
               {totalWeight}% {totalWeight === 100 ? '✓ (Hợp lệ)' : '✗ (Bắt buộc phải đúng 100%)'}
             </span>
           </div>
+        </div>
+
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#1e293b' }}>
+            <input
+              type="checkbox"
+              checked={autoActivateNew}
+              onChange={(e) => setAutoActivateNew(e.target.checked)}
+            />
+            <span><strong>Kích hoạt áp dụng (ACTIVE) ngay lập tức</strong> sau khi lưu phiên bản này</span>
+          </label>
         </div>
 
         <button

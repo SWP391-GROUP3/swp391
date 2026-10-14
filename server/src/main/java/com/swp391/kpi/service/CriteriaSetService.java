@@ -25,11 +25,15 @@ import java.util.Optional;
  * Thực thi các Use Cases: UC-14, UC-15, UC-16, UC-17 và Business Rules: BR-QA-01, 02, 03.
  */
 @Service
-@RequiredArgsConstructor
 public class CriteriaSetService {
 
     private final CriteriaSetVersionRepository criteriaSetVersionRepository;
     private final CriteriaRepository criteriaRepository;
+
+    public CriteriaSetService(CriteriaSetVersionRepository criteriaSetVersionRepository, CriteriaRepository criteriaRepository) {
+        this.criteriaSetVersionRepository = criteriaSetVersionRepository;
+        this.criteriaRepository = criteriaRepository;
+    }
 
     /**
      * Lấy toàn bộ danh sách phiên bản bộ tiêu chí của một thể loại (UC-14).
@@ -142,13 +146,15 @@ public class CriteriaSetService {
         }
 
         // Chuyển phiên bản ACTIVE cũ thành RETIRED (nếu có)
+        // Bắt buộc dùng saveAndFlush để ghi ngay trạng thái RETIRED xuống Database,
+        // tránh vi phạm Unique Filtered Index 'uq_criteria_set_versions_active' khi kích hoạt bản mới
         Optional<CriteriaSetVersion> currentActive = criteriaSetVersionRepository
                 .findByCategoryIdAndStatus(versionToActivate.getCategoryId(), CriteriaSetStatus.ACTIVE);
 
         if (currentActive.isPresent()) {
             CriteriaSetVersion oldActive = currentActive.get();
             oldActive.setStatus(CriteriaSetStatus.RETIRED);
-            criteriaSetVersionRepository.save(oldActive);
+            criteriaSetVersionRepository.saveAndFlush(oldActive);
         }
 
         // Cập nhật phiên bản mới thành ACTIVE
@@ -156,7 +162,7 @@ public class CriteriaSetService {
         versionToActivate.setActivatedBy(activatedBy != null ? activatedBy : 1);
         versionToActivate.setActivatedAt(LocalDateTime.now());
 
-        CriteriaSetVersion activated = criteriaSetVersionRepository.save(versionToActivate);
+        CriteriaSetVersion activated = criteriaSetVersionRepository.saveAndFlush(versionToActivate);
         List<Criteria> criteriaList = criteriaRepository.findByCriteriaSetVersionIdOrderBySortOrderAsc(activated.getId());
 
         return CriteriaSetVersionResponse.from(activated, criteriaList);

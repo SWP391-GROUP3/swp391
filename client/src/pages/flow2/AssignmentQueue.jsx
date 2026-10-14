@@ -6,11 +6,11 @@ import {
 } from '../../api/assessmentApi.js'
 
 export default function AssignmentQueue({ nguoiDung }) {
-  // Danh sách bài viết mẫu chờ phân công (SUBMITTED)
+  // Danh sách bài viết chờ phân công (SUBMITTED) khớp 100% với Database
   const [articles] = useState([
-    { id: 101, title: 'Điều tra đường dây buôn lậu khoáng sản qua biên giới', author: 'Nguyễn Văn An', category: 'Phóng sự điều tra', categoryId: 1, submittedAt: '13/10/2026 08:30' },
-    { id: 102, title: 'Phỏng vấn Tổng cục trưởng về chính sách thuế mới cho báo chí', author: 'Trần Thị Bình', category: 'Phỏng vấn', categoryId: 2, submittedAt: '13/10/2026 09:15' },
-    { id: 103, title: 'Bình luận: Cơ hội và thách thức của AI trong tác nghiệp phóng viên', author: 'Đỗ Quốc Hưng', category: 'Bình luận', categoryId: 3, submittedAt: '13/10/2026 10:00' }
+    { id: 4, title: 'Điều tra đường dây buôn lậu khoáng sản qua biên giới', author: 'Nguyễn Văn An', category: 'Phóng sự điều tra', categoryId: 6, submittedAt: '13/10/2026 08:30' },
+    { id: 3, title: 'Giá xăng giảm lần thứ ba liên tiếp', author: 'Nguyễn Văn An', category: 'Tin sâu / Thời sự', categoryId: 2, submittedAt: '27/09/2026 08:00' },
+    { id: 5, title: 'Bình luận: Cơ hội và thách thức của AI trong tác nghiệp phóng viên', author: 'Trần Thị Bình', category: 'Bình luận', categoryId: 5, submittedAt: '13/10/2026 10:00' }
   ])
 
   // Danh sách BTV để chọn giao việc (theo data.sql: cuong.lh id=3, giang.nt id=9)
@@ -20,7 +20,7 @@ export default function AssignmentQueue({ nguoiDung }) {
     { id: 4, name: 'Phạm Thu Dung (Thư ký toà soạn)', username: 'dung.pt' }
   ]
 
-  const [selectedArticleId, setSelectedArticleId] = useState(101)
+  const [selectedArticleId, setSelectedArticleId] = useState(4)
   const [selectedEditorId, setSelectedEditorId] = useState(3)
   const [wasSuggested, setWasSuggested] = useState(false)
   const [workload, setWorkload] = useState(null)
