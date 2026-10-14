@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { createRoyaltyRate, getRoyaltyRates } from '../../api/royaltyApi.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import { formatDate } from '../../utils/formatDate.js'
-import './Royalty.css'
+import '../../styles/Royalty.css'
 
 /**
  * UC-55 - "Don gia nhuan but" (Ke toan).

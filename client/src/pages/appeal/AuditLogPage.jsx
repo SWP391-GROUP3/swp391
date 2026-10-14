@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { layNhatKy } from '../../api/auditLogApi.js'
 import { dinhDangThoiGian } from './appealFormat.js'
-import './QualityReportPage.css'
+import '../../styles/QualityReportPage.css'
 
 export default function AuditLogPage() {
   const [danhSach, setDanhSach] = useState(null)

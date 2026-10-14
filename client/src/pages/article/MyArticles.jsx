@@ -4,7 +4,7 @@ import { getMyArticles } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { STATUS_GROUPS, STATUS_COLORS, statusLabel, natureLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
-import './MyArticles.css'
+import '../../styles/MyArticles.css'
 
 /** So bai moi trang (AGENTS.md 3.7: ?page=0&size=10) */
 const PAGE_SIZE = 10
