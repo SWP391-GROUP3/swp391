@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { layBaiDuocGiaoCuaBtv } from '../../api/assessmentApi.js'
 
 export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
   // Lấy ID BTV: Nếu đang đăng nhập thì lấy ID (ví dụ cuong.lh = 3), hoặc mặc định là 3
@@ -15,15 +16,11 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
     setLoading(true)
     setMessage('')
     try {
-      const res = await fetch(`/api/assignments/editor/${editorId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setTasks(data)
-      } else {
-        setTasks([])
-      }
+      const data = await layBaiDuocGiaoCuaBtv(editorId)
+      setTasks(data || [])
     } catch (err) {
       setMessage('Không thể kết nối máy chủ: ' + err.message)
+      setTasks([])
     } finally {
       setLoading(false)
     }

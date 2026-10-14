@@ -4,6 +4,7 @@ import com.swp391.kpi.dto.AssignmentCreateRequest;
 import com.swp391.kpi.dto.AssignmentResponse;
 import com.swp391.kpi.dto.EditorWorkloadDTO;
 import com.swp391.kpi.entity.Assignment;
+import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.repository.AssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,13 +29,13 @@ public class AssignmentService {
     @Transactional
     public AssignmentResponse assignArticle(AssignmentCreateRequest request) {
         if (request.getArticleId() == null) {
-            throw new IllegalArgumentException("Mã bài viết không được để trống");
+            throw new BusinessException("Mã bài viết không được để trống");
         }
         if (request.getEditorId() == null) {
-            throw new IllegalArgumentException("Vui lòng chọn Biên tập viên để giao bài");
+            throw new BusinessException("Vui lòng chọn Biên tập viên để giao bài");
         }
         if (request.getAssignedBy() == null) {
-            throw new IllegalArgumentException("Mã người giao bài không được để trống");
+            throw new BusinessException("Mã người giao bài không được để trống");
         }
 
         // Kiểm tra xem bài đã có phân công chưa (BR-QA-04)

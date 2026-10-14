@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react'
+import {
+  layBoTieuChiActive,
+  taoBoTieuChiDraft,
+  kichHoatBoTieuChi
+} from '../../api/assessmentApi.js'
 
 export default function CriteriaManagement({ nguoiDung }) {
   const [categoryId, setCategoryId] = useState(1)
@@ -26,18 +31,11 @@ export default function CriteriaManagement({ nguoiDung }) {
     setError('')
     setMessage('')
     try {
-      const res = await fetch(`/api/criteria-sets/active/${catId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setActiveVersion(data)
-      } else if (res.status === 404) {
-        setActiveVersion(null)
-      } else {
-        const txt = await res.text()
-        setError(txt || 'Lỗi khi tải bộ tiêu chí')
-      }
+      const data = await layBoTieuChiActive(catId)
+      setActiveVersion(data)
     } catch (err) {
-      setError('Không thể kết nối đến máy chủ: ' + err.message)
+      // 404 hoặc chưa có bản ACTIVE
+      setActiveVersion(null)
     } finally {
       setLoading(false)
     }
@@ -86,24 +84,13 @@ export default function CriteriaManagement({ nguoiDung }) {
         }))
       }
 
-      const res = await fetch('/api/criteria-sets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (res.ok) {
-        const created = await res.json()
-        setMessage(`Tạo thành công Phiên bản ${created.versionNo} (Trạng thái: ${created.status})! Mã ID: ${created.id}`)
-        // Nếu chưa có bản ACTIVE nào, hỏi kích hoạt
-        if (!activeVersion && created.id) {
-          if (confirm('Thể loại này chưa có phiên bản áp dụng. Bạn có muốn Kích hoạt (ACTIVE) phiên bản này ngay không?')) {
-            await handleActivate(created.id)
-          }
+      const created = await taoBoTieuChiDraft(payload)
+      setMessage(`Tạo thành công Phiên bản ${created.versionNo} (Trạng thái: ${created.status})! Mã ID: ${created.id}`)
+      // Nếu chưa có bản ACTIVE nào, hỏi kích hoạt
+      if (!activeVersion && created.id) {
+        if (confirm('Thể loại này chưa có phiên bản áp dụng. Bạn có muốn Kích hoạt (ACTIVE) phiên bản này ngay không?')) {
+          await handleActivate(created.id)
         }
-      } else {
-        const txt = await res.text()
-        setError(txt || 'Tạo phiên bản thất bại')
       }
     } catch (err) {
       setError('Lỗi khi gửi yêu cầu: ' + err.message)
@@ -114,17 +101,9 @@ export default function CriteriaManagement({ nguoiDung }) {
     setError('')
     setMessage('')
     try {
-      const res = await fetch(`/api/criteria-sets/${versionId}/activate`, {
-        method: 'PUT'
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setMessage(`Đã kích hoạt thành công Phiên bản ${data.versionNo}!`)
-        setActiveVersion(data)
-      } else {
-        const txt = await res.text()
-        setError(txt || 'Kích hoạt thất bại')
-      }
+      const data = await kichHoatBoTieuChi(versionId)
+      setMessage(`Đã kích hoạt thành công Phiên bản ${data.versionNo}!`)
+      setActiveVersion(data)
     } catch (err) {
       setError('Lỗi kích hoạt: ' + err.message)
     }

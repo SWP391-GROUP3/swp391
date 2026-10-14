@@ -22,6 +22,11 @@ import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
+import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
+import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
+import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
+import Flow2Dashboard from '../pages/flow2/Flow2Dashboard.jsx'
+import ScoreCalculatorTester from '../pages/flow2/ScoreCalculatorTester.jsx'
 
 /*
  * Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
@@ -38,7 +43,6 @@ const TRANG_PV_CHUA_LAM = [
 ]
 
 const TRANG_BTV_CHUA_LAM = [
-  { path: '/assigned-articles',     ten: 'Bài được giao' },          // UC-21
   { path: '/assigned-articles/:id', ten: 'Chấm bài' },               // UC-22…28
   { path: '/re-reviews',            ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
   { path: '/re-reviews/:id',        ten: 'Phiếu chấm lại' },         // UC-36, UC-37
@@ -52,7 +56,6 @@ const TRANG_TK_CHUA_LAM = [
 ]
 
 const TRANG_TB_CHUA_LAM = [
-  { path: '/assignments',           ten: 'Phân công chấm' },          // UC-18, 19, 20
   { path: '/score-approvals',       ten: 'Duyệt điểm' },              // UC-29
   { path: '/score-approvals/:id',   ten: 'Chi tiết kết quả chấm' },   // UC-30, 31, 32
   { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
@@ -76,8 +79,6 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/users',              ten: 'Tài khoản' },
   { path: '/genres',             ten: 'Thể loại' },
   { path: '/system-parameters',  ten: 'Tham số hệ thống' },        // UC-13
-  { path: '/criteria-sets',      ten: 'Bộ tiêu chí' },             // UC-14, 15
-  { path: '/criteria-sets/:id',  ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
   { path: '/reviewers',          ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/reviewers/:id',      ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/audit-logs',         ten: 'Nhật ký hệ thống' },        // UC-45
@@ -141,6 +142,9 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
         >
           {/* ---- Trang da lam ---- */}
           <Route path="/main" element={<TrangChu nguoiDung={nguoiDung} />} />
+          <Route path="/calculator" element={<ScoreCalculatorTester />} />
+          <Route path="/flow2" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
+
           {vaiTro === 'REPORTER' && (
             <>
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
@@ -148,8 +152,18 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
             </>
           )}
+          {vaiTro === 'EDITOR' && (
+            <>
+              {/* BF-02 (Duong): UC-21 Bài được giao */}
+              <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
+              <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
+            </>
+          )}
           {vaiTro === 'HEAD_OF_DEPARTMENT' && (
             <>
+              {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm */}
+              <Route path="/assignments" element={<AssignmentQueue nguoiDung={nguoiDung} />} />
+              <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
               <Route path="/kpi-targets" element={<MonthlyTargetSetting nguoiDung={nguoiDung} />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
@@ -170,6 +184,10 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
           )}
           {vaiTro === 'ADMIN' && (
             <>
+              {/* BF-02 (Duong): UC-14…17 Bộ tiêu chí chấm điểm */}
+              <Route path="/criteria-sets" element={<CriteriaManagement nguoiDung={nguoiDung} />} />
+              <Route path="/criteria-sets/:id" element={<CriteriaManagement nguoiDung={nguoiDung} />} />
+              <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-03 (Vu), BF-05 (Khang), BF-04 (Quang): UC-56 he so anh/video */}
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />

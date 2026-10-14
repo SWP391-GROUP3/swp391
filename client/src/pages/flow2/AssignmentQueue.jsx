@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react'
+import {
+  layKhoiLuongCongViecBtv,
+  layPhanCongBaiViet,
+  phanCongBaiViet
+} from '../../api/assessmentApi.js'
 
 export default function AssignmentQueue({ nguoiDung }) {
   // Danh sách bài viết mẫu chờ phân công (SUBMITTED)
@@ -8,10 +13,11 @@ export default function AssignmentQueue({ nguoiDung }) {
     { id: 103, title: 'Bình luận: Cơ hội và thách thức của AI trong tác nghiệp phóng viên', author: 'Đỗ Quốc Hưng', category: 'Bình luận', categoryId: 3, submittedAt: '13/10/2026 10:00' }
   ])
 
-  // Danh sách BTV để chọn giao việc
+  // Danh sách BTV để chọn giao việc (theo data.sql: cuong.lh id=3, giang.nt id=9)
   const editors = [
-    { id: 3, name: 'Lê Hoàng Cường (Editor chính)', username: 'cuong.lh' },
-    { id: 4, name: 'Phạm Thu Dung (BTV dự khuyết)', username: 'dung.pt' }
+    { id: 3, name: 'Lê Hoàng Cường (Editor Thời sự)', username: 'cuong.lh' },
+    { id: 9, name: 'Ngô Thu Giang (Editor Kinh tế)', username: 'giang.nt' },
+    { id: 4, name: 'Phạm Thu Dung (Thư ký toà soạn)', username: 'dung.pt' }
   ]
 
   const [selectedArticleId, setSelectedArticleId] = useState(101)
@@ -33,11 +39,8 @@ export default function AssignmentQueue({ nguoiDung }) {
 
   async function loadWorkload(editorId) {
     try {
-      const res = await fetch(`/api/assignments/editor/${editorId}/workload`)
-      if (res.ok) {
-        const data = await res.json()
-        setWorkload(data.activeArticleCount)
-      }
+      const data = await layKhoiLuongCongViecBtv(editorId)
+      setWorkload(data.activeArticleCount)
     } catch {
       // bỏ qua nếu lỗi
     }
@@ -46,11 +49,8 @@ export default function AssignmentQueue({ nguoiDung }) {
   async function loadCurrentAssignment(articleId) {
     setCurrentAssignment(null)
     try {
-      const res = await fetch(`/api/assignments/article/${articleId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setCurrentAssignment(data)
-      }
+      const data = await layPhanCongBaiViet(articleId)
+      setCurrentAssignment(data)
     } catch {
       // chưa có phân công
     }
@@ -70,23 +70,12 @@ export default function AssignmentQueue({ nguoiDung }) {
         wasSuggested: wasSuggested
       }
 
-      const res = await fetch('/api/assignments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        setMessage(`Phân công thành công Bài #${data.articleId} cho BTV (ID: ${data.editorId})!`)
-        setCurrentAssignment(data)
-        loadWorkload(selectedEditorId)
-      } else {
-        const txt = await res.text()
-        setError(txt || 'Giao bài thất bại')
-      }
+      const data = await phanCongBaiViet(payload)
+      setMessage(`Phân công thành công Bài #${data.articleId} cho BTV (ID: ${data.editorId})!`)
+      setCurrentAssignment(data)
+      loadWorkload(selectedEditorId)
     } catch (err) {
-      setError('Lỗi kết nối: ' + err.message)
+      setError('Giao bài thất bại: ' + err.message)
     } finally {
       setLoading(false)
     }

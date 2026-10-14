@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    SWP391 - Hệ thống đánh giá chất lượng bài báo và quản lý nhuận bút
    Schema cho SQL Server 2019 trở lên. Khớp ERD tổng thể (SWP391_ERD_TongThe):
    40 bảng, chia theo package của server:
