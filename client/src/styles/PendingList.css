@@ -10,7 +10,7 @@
   font-size: 12px;
   font-weight: 600;
   text-align: center;
-  color: #fff;
+  color: var(--fm-the);
   background: var(--fm-hong);
   border-radius: 999px;
 }
@@ -46,7 +46,7 @@
 }
 
 .ds-cho__han      { text-transform: none; letter-spacing: 0; }
-.ds-cho__han--gap { color: #c4004d; font-weight: 600; }   /* hong dam, du tuong phan tren nen trang */
+.ds-cho__han--gap { color: var(--fm-canh-bao); font-weight: 600; }
 
 .ds-cho__tieu-de {
   margin: 4px 0 0;

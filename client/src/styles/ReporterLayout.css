@@ -18,7 +18,7 @@
   touch-action: manipulation;
 }
 
-.khung-pv__vi:hover   { background: #dcebfb; }
+.khung-pv__vi:hover   { background: var(--fm-chon-dam); }
 .khung-pv__vi .icon   { color: var(--fm-xanh-duong); }
 .khung-pv__vi-so      { font-variant-numeric: tabular-nums; white-space: nowrap; }
 

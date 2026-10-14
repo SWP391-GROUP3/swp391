@@ -101,7 +101,7 @@ export default function RoyaltyRates() {
               required
             />
           </label>
-          <button type="submit" className="royalty__primary-button" disabled={isSaving}>
+          <button type="submit" className="nut-chinh-fm" disabled={isSaving}>
             {isSaving ? 'Đang lưu…' : 'Thêm đơn giá'}
           </button>
         </form>
@@ -119,7 +119,7 @@ export default function RoyaltyRates() {
 
         {rates && rates.length > 0 && (
           <div className="royalty__scroll">
-            <table className="royalty__table">
+            <table className="bang-fm">
               <thead>
                 <tr>
                   <th>Áp dụng từ</th>

@@ -82,7 +82,7 @@ export default function MediaFactors() {
 
         {factors && factors.length > 0 && (
           <div className="royalty__scroll">
-            <table className="royalty__table">
+            <table className="bang-fm">
               <thead>
                 <tr>
                   <th>Loại</th>
@@ -109,7 +109,7 @@ export default function MediaFactors() {
                           />
                         </td>
                         <td className="royalty__actions">
-                          <button type="button" className="royalty__primary-button" disabled={isSaving}
+                          <button type="button" className="nut-chinh-fm" disabled={isSaving}
                             onClick={() => saveEdit(mediaFactor)}>
                             {isSaving ? 'Đang lưu…' : 'Lưu'}
                           </button>

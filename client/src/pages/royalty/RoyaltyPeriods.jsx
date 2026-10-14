@@ -40,7 +40,7 @@ export default function RoyaltyPeriods() {
 
         {periods && periods.length > 0 && (
           <div className="royalty__scroll">
-            <table className="royalty__table">
+            <table className="bang-fm">
               <thead>
                 <tr>
                   <th>Kỳ</th>

@@ -89,58 +89,15 @@
   color: var(--fm-chu-nhat);
 }
 
-/* Nut chinh mau xanh duong Figma (giong "Soan bai moi") */
-.royalty__primary-button {
-  padding: 9px 16px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--fm-the);
-  white-space: nowrap;
-  background: var(--fm-xanh-duong);
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.royalty__primary-button:hover:not(:disabled) { opacity: .9; }
-.royalty__primary-button:disabled { opacity: .6; cursor: not-allowed; }
-
-.royalty__primary-button:focus-visible {
-  outline: 2px solid var(--fm-xanh-duong);
-  outline-offset: 2px;
-}
+/* Nut chinh dung class chung .nut-chinh-fm (index.css) */
 
 /* ---- Bang ---- */
 .royalty__scroll { overflow-x: auto; }
 
-.royalty__table {
-  width: 100%;
-  font-size: 13px;
-  border-collapse: collapse;
-}
-
-.royalty__table th {
-  padding: 10px 16px;
-  font-size: 12px;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  color: var(--fm-chu-nhat);
-  border-bottom: 1px solid var(--fm-vien);
-}
-
-.royalty__table td {
-  padding: 12px 16px;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--fm-vien);
-}
-
-.royalty__table tbody tr:last-child td { border-bottom: 0; }
-.royalty__table tbody tr:hover { background: var(--fm-nen); }
+/* Bang dung class chung .bang-fm (index.css) */
 
 /* Cot so (tien, he so, so bai): can phai, chu so thang hang */
-.royalty__table .royalty__number {
+.bang-fm .royalty__number {
   text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -181,7 +138,7 @@
 }
 
 .royalty__badge--current { color: var(--fm-chu); font-weight: 500; background: var(--fm-chon); }
-.royalty__badge--future  { color: var(--fm-chu); background: #fff4e5; }
+.royalty__badge--future  { color: var(--fm-chu); background: var(--fm-chu-y-nen); }
 
 .royalty__actions {
   display: flex;

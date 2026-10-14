@@ -198,7 +198,7 @@
   height: 38px;
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--fm-the);
   background: var(--fm-cam);
   border-radius: 50%;
 }

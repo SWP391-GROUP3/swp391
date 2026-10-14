@@ -84,7 +84,7 @@ export default function ChangePasswordForm() {
         </label>
 
         <div className="ho-so__hang-nut">
-          <button type="submit" className="ho-so__nut-chinh" disabled={dangLuu}>
+          <button type="submit" className="nut-chinh-fm" disabled={dangLuu}>
             {dangLuu ? 'Đang lưu…' : 'Đổi mật khẩu'}
           </button>
         </div>
