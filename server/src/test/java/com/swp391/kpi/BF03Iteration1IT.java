@@ -10,12 +10,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.time.Instant;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.jwt.secret=bf03-integration-test-only-secret-32-bytes")
 @AutoConfigureMockMvc
 @Transactional
 class BF03Iteration1IT {
@@ -23,35 +29,47 @@ class BF03Iteration1IT {
     @Autowired JdbcTemplate jdbc;
     @Autowired ObjectMapper json;
     @Autowired EntityManager entityManager;
+    @Autowired JwtEncoder jwtEncoder;
+
+    private String bearer(Integer userId) {
+        String role = jdbc.queryForObject(
+                "SELECT r.code FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=?",
+                String.class, userId);
+        Instant now = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder().subject(userId.toString())
+                .claim("role", role).issuedAt(now).expiresAt(now.plusSeconds(300)).build();
+        return "Bearer " + jwtEncoder.encode(JwtEncoderParameters.from(
+                JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
+    }
 
     @Test void realDatabaseEnforcesIdentityRoleAndLockedAccount() throws Exception {
         for (String path : List.of("/api/audit-logs", "/api/reports/reviewer-deviations",
                 "/api/appeal-rule-configs", "/api/appeal-rule-configs/active")) {
-            mvc.perform(get(path)).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.success").value(false));
-            mvc.perform(get(path).header("X-User-Id", 1)).andExpect(status().isForbidden());
-            mvc.perform(get(path).header("X-User-Id", 8)).andExpect(status().isOk());
+            mvc.perform(get(path).header("X-User-Id", 8)).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.success").value(false));
+            mvc.perform(get(path).header("Authorization", bearer(1))).andExpect(status().isForbidden());
+            mvc.perform(get(path).header("Authorization", bearer(8))).andExpect(status().isOk());
         }
         Integer locked = jdbc.queryForObject("""
                 INSERT INTO users(username, email, password_hash, full_name, role_id, status)
                 OUTPUT INSERTED.id VALUES (?, ?, 'test-only', N'Locked test admin', 6, 'LOCKED')
                 """, Integer.class, "bf3_" + UUID.randomUUID(), UUID.randomUUID() + "@test.local");
-        mvc.perform(get("/api/appeal-rule-configs").header("X-User-Id", locked))
+        mvc.perform(get("/api/appeal-rule-configs").header("Authorization", bearer(locked)))
                 .andExpect(status().isForbidden());
-        mvc.perform(get("/api/appeals/mine").header("X-User-Id", 8)).andExpect(status().isForbidden());
+        mvc.perform(get("/api/appeals/mine").header("Authorization", bearer(8)).header("X-User-Id", 1)).andExpect(status().isForbidden());
         mvc.perform(get("/api/appeals/mine")).andExpect(status().isUnauthorized());
     }
 
     @Test void submitStoresCriteriaBoundConfigAuditAndNotificationInOneTransaction() throws Exception {
         Fixture fixture = fixture(1, 1);
-        mvc.perform(get("/api/appeals/eligible-articles").header("X-User-Id", 1))
+        mvc.perform(get("/api/appeals/eligible-articles").header("Authorization", bearer(1)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data[*].articleId")
                         .value(org.hamcrest.Matchers.hasItem(fixture.articleId)));
-        mvc.perform(get("/api/articles/" + fixture.articleId + "/appeal-eligibility").header("X-User-Id", 1))
+        mvc.perform(get("/api/articles/" + fixture.articleId + "/appeal-eligibility").header("Authorization", bearer(1)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.totalScore").value(70));
-        mvc.perform(get("/api/articles/" + fixture.articleId + "/appeal-eligibility").header("X-User-Id", 2))
+        mvc.perform(get("/api/articles/" + fixture.articleId + "/appeal-eligibility").header("Authorization", bearer(2)))
                 .andExpect(status().isConflict());
         String payload = payload(fixture.articleId, fixture.criterionId);
-        mvc.perform(post("/api/appeals").header("X-User-Id", 1)
+        mvc.perform(post("/api/appeals").header("Authorization", bearer(1))
                 .contentType("application/json").content(payload))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.data.status").value("SUBMITTED"));
         Integer appealId = jdbc.queryForObject("SELECT id FROM appeals WHERE article_id = ?", Integer.class, fixture.articleId);
@@ -61,32 +79,32 @@ class BF03Iteration1IT {
                 Integer.class, appealId));
         assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM notifications WHERE article_id=? AND user_id=5",
                 Integer.class, fixture.articleId));
-        mvc.perform(get("/api/appeals/eligible-articles").header("X-User-Id", 1))
+        mvc.perform(get("/api/appeals/eligible-articles").header("Authorization", bearer(1)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data[*].articleId")
                         .value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem(fixture.articleId))));
-        mvc.perform(post("/api/appeals").header("X-User-Id", 1).contentType("application/json").content(payload))
+        mvc.perform(post("/api/appeals").header("Authorization", bearer(1)).contentType("application/json").content(payload))
                 .andExpect(status().isConflict());
     }
 
     @Test void headCannotReadOtherDepartmentAuditEvenWithDirectFilters() throws Exception {
         Fixture fixture = fixture(7, 2);
-        mvc.perform(post("/api/appeals").header("X-User-Id", 7).contentType("application/json")
+        mvc.perform(post("/api/appeals").header("Authorization", bearer(7)).contentType("application/json")
                 .content(payload(fixture.articleId, fixture.criterionId))).andExpect(status().isCreated());
         Integer appealId = jdbc.queryForObject("SELECT id FROM appeals WHERE article_id = ?", Integer.class, fixture.articleId);
         assertNotNull(appealId, "Expected the newly created appeal ID.");
-        mvc.perform(get("/api/audit-logs").param("articleId", fixture.articleId.toString()).header("X-User-Id", 5))
+        mvc.perform(get("/api/audit-logs").param("articleId", fixture.articleId.toString()).header("Authorization", bearer(5)))
                 .andExpect(status().isForbidden());
         mvc.perform(get("/api/audit-logs").param("entityType", "appeals")
-                .param("entityId", appealId.toString()).header("X-User-Id", 5)).andExpect(status().isForbidden());
-        mvc.perform(get("/api/audit-logs").param("appealId", appealId.toString()).header("X-User-Id", 8))
+                .param("entityId", appealId.toString()).header("Authorization", bearer(5))).andExpect(status().isForbidden());
+        mvc.perform(get("/api/audit-logs").param("appealId", appealId.toString()).header("Authorization", bearer(8)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.length()").value(1));
-        mvc.perform(get("/api/reports/reviewer-deviations").param("sectionId", "2").header("X-User-Id", 5))
+        mvc.perform(get("/api/reports/reviewer-deviations").param("sectionId", "2").header("Authorization", bearer(5)))
                 .andExpect(status().isForbidden());
     }
 
     @Test void reportRecalculatesActualResolvedAppealAndCrossReview() throws Exception {
         Fixture fixture = fixture(1, 1);
-        mvc.perform(post("/api/appeals").header("X-User-Id", 1).contentType("application/json")
+        mvc.perform(post("/api/appeals").header("Authorization", bearer(1)).contentType("application/json")
                 .content(payload(fixture.articleId, fixture.criterionId))).andExpect(status().isCreated());
         Integer appealId = jdbc.queryForObject("SELECT id FROM appeals WHERE article_id = ?", Integer.class, fixture.articleId);
         var now = LocalDateTime.now();
@@ -106,7 +124,7 @@ class BF03Iteration1IT {
                 """, batchId, fixture.articleId, fixture.attemptId, now);
         entityManager.clear();
         String response = mvc.perform(get("/api/reports/reviewer-deviations")
-                .header("X-User-Id", 5).param("period", now.toLocalDate().withDayOfMonth(1).toString()))
+                .header("Authorization", bearer(5)).param("period", now.toLocalDate().withDayOfMonth(1).toString()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         var data = json.readTree(response).path("data");
         assertEquals(1, data.size());
@@ -115,7 +133,7 @@ class BF03Iteration1IT {
         assertEquals(100.0, data.get(0).path("overturnRate").asDouble());
         assertEquals(1, data.get(0).path("appealCount").asInt());
         // Chay lai de chung minh update cung chi so, khong tao trung.
-        mvc.perform(get("/api/reports/reviewer-deviations").header("X-User-Id", 5)
+        mvc.perform(get("/api/reports/reviewer-deviations").header("Authorization", bearer(5))
                 .param("period", now.toLocalDate().withDayOfMonth(1).toString())).andExpect(status().isOk());
         assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM reviewer_deviation_indices WHERE editor_id=3 AND period=?",
                 Integer.class, now.toLocalDate().withDayOfMonth(1)));
@@ -125,16 +143,16 @@ class BF03Iteration1IT {
         String config = """
                 {"appealWindowDays":7,"maxAppealsPerArticle":1,"varianceThreshold":5,"effectiveFrom":"2099-12-31"}
                 """;
-        mvc.perform(post("/api/appeal-rule-configs").header("X-User-Id", 5).contentType("application/json").content(config))
+        mvc.perform(post("/api/appeal-rule-configs").header("Authorization", bearer(5)).contentType("application/json").content(config))
                 .andExpect(status().isForbidden());
-        mvc.perform(post("/api/appeal-rule-configs").header("X-User-Id", 8).contentType("application/json").content(config))
+        mvc.perform(post("/api/appeal-rule-configs").header("Authorization", bearer(8)).contentType("application/json").content(config))
                 .andExpect(status().isCreated());
         Integer configId = jdbc.queryForObject("SELECT id FROM appeal_rule_configs WHERE effective_from='2099-12-31'", Integer.class);
         assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM audit_logs WHERE entity_type='appeal_rule_configs' AND entity_id=?",
                 Integer.class, configId));
-        mvc.perform(post("/api/appeal-rule-configs").header("X-User-Id", 8).contentType("application/json").content(config))
+        mvc.perform(post("/api/appeal-rule-configs").header("Authorization", bearer(8)).contentType("application/json").content(config))
                 .andExpect(status().isConflict());
-        mvc.perform(post("/api/appeal-rule-configs").header("X-User-Id", 8).contentType("application/json")
+        mvc.perform(post("/api/appeal-rule-configs").header("Authorization", bearer(8)).contentType("application/json")
                 .content(config.replace("\"varianceThreshold\":5", "\"varianceThreshold\":101")))
                 .andExpect(status().isBadRequest());
         assertEquals(1, jdbc.queryForObject("SELECT rule_config_id FROM appeals WHERE id=1", Integer.class));

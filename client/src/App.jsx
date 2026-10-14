@@ -1,46 +1,46 @@
 import { useState } from 'react'
 import AppRoutes from './routes/AppRoutes.jsx'
-
-/** Khoa luu nguoi dung trong sessionStorage. */
-const KHOA_PHIEN = 'nguoiDung'
-
-/**
- * Doc lai nguoi dung da dang nhap tu sessionStorage.
- *
- * Vi sao can: React giu state trong bo nho, F5 mot cai la mat sach. Khong co
- * buoc nay thi cu tai lai trang la bi da ve man hinh dang nhap.
- *
- * Vi sao dung sessionStorage chu khong phai localStorage: sessionStorage tu
- * xoa khi dong tab, giong cach HttpSession het han. localStorage thi nam lai
- * mai tren may - dung o phong may truong thi nguoi sau mo ra van thay tai
- * khoan nguoi truoc.
- */
-function docPhien() {
-  try {
-    const raw = sessionStorage.getItem(KHOA_PHIEN)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    // JSON hong (bi sua tay, hoac doi cau truc du lieu) - coi nhu chua dang nhap
-    return null
-  }
-}
+import { docPhien, luuPhien, xoaPhien } from './auth/phienDangNhap.js'
 
 /**
  * Goc cua app: chi giu trang thai dang nhap.
- * Khai bao route nam o routes/AppRoutes.jsx (AGENTS.md muc 4).
+ * Token + thong tin nguoi dung luu trong sessionStorage (auth/phienDangNhap.js),
+ * F5 van con. Khai bao route nam o routes/AppRoutes.jsx (AGENTS.md muc 4).
  */
 export default function App() {
-  const [nguoiDung, setNguoiDung] = useState(docPhien)
+  // Ham trong useState chi chay 1 lan luc mo app: doc lai phien cu neu co
+  const [nguoiDung, setNguoiDung] = useState(() => docPhien()?.nguoiDung ?? null)
 
-  function dangNhap(tk) {
-    sessionStorage.setItem(KHOA_PHIEN, JSON.stringify(tk))
-    setNguoiDung(tk)
+  // phien = { token, nguoiDung } tu authApi.dangNhap()
+  function dangNhap(phien) {
+    luuPhien(phien)
+    setNguoiDung(phien.nguoiDung)
   }
 
+  // UC-70: server khong luu phien (JWT), xoa token o trinh duyet la xong
   function dangXuat() {
-    sessionStorage.removeItem(KHOA_PHIEN)
+    xoaPhien()
     setNguoiDung(null)
   }
 
-  return <AppRoutes nguoiDung={nguoiDung} onDangNhap={dangNhap} onDangXuat={dangXuat} />
+  // Sua ho so xong (vd doi ho ten): cap nhat ca state lan phien da luu,
+  // de thanh tren doi ten ngay va F5 khong hien lai ten cu. Token giu nguyen.
+  function capNhatNguoiDung(thayDoi) {
+    const phien = docPhien()
+    if (!phien) {
+      return
+    }
+    const nguoiDungMoi = { ...phien.nguoiDung, ...thayDoi }
+    luuPhien({ ...phien, nguoiDung: nguoiDungMoi })
+    setNguoiDung(nguoiDungMoi)
+  }
+
+  return (
+    <AppRoutes
+      nguoiDung={nguoiDung}
+      onDangNhap={dangNhap}
+      onDangXuat={dangXuat}
+      onCapNhatNguoiDung={capNhatNguoiDung}
+    />
+  )
 }

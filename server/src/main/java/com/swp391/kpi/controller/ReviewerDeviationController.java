@@ -6,10 +6,11 @@ import com.swp391.kpi.service.ReviewerDeviationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -28,8 +29,9 @@ public class ReviewerDeviationController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate period,
             @RequestParam(required = false) Integer editorId,
             @RequestParam(required = false) Integer sectionId,
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId
+            @AuthenticationPrincipal Jwt jwt
     ) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         List<ReviewerDeviationResponse> data =
                 reviewerDeviationService.getReport(period, editorId, sectionId, currentUserId);
         String message = data.isEmpty()

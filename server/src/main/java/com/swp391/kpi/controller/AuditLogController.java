@@ -6,10 +6,11 @@ import com.swp391.kpi.service.AppealAuditQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class AuditLogController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<AuditLogResponse>>> getLogs(
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId,
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam(required = false) Integer articleId,
             @RequestParam(required = false) Integer appealId,
             @RequestParam(required = false) Integer editorId,
@@ -37,6 +38,7 @@ public class AuditLogController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toTime
     ) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         List<AuditLogResponse> data = auditService.getLogs(
                 currentUserId,
                 actorId,

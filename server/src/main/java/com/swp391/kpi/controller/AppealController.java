@@ -9,11 +9,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,8 @@ public class AppealController {
 
     @GetMapping("/appeals/eligible-articles")
     public ResponseEntity<ApiResponse<List<AppealEligibilityResponse>>> getEligibleArticles(
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         return ResponseEntity.ok(ApiResponse.success("Lấy bài có thể khiếu nại thành công",
                 appealService.getEligibleArticles(currentUserId)));
     }
@@ -36,7 +38,8 @@ public class AppealController {
     @PostMapping("/appeals")
     public ResponseEntity<ApiResponse<AppealResponse>> submitAppeal(
             @Valid @RequestBody AppealCreateRequest request,
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         AppealResponse data = appealService.submitAppeal(request, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Gửi khiếu nại thành công", data));
@@ -44,7 +47,8 @@ public class AppealController {
 
     @GetMapping("/appeals/mine")
     public ResponseEntity<ApiResponse<List<AppealResponse>>> getMyAppeals(
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         List<AppealResponse> data = appealService.getMyAppeals(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách khiếu nại thành công", data));
     }
@@ -52,7 +56,8 @@ public class AppealController {
     @GetMapping("/articles/{articleId}/appeal-eligibility")
     public ResponseEntity<ApiResponse<AppealEligibilityResponse>> getEligibility(
             @PathVariable Integer articleId,
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         AppealEligibilityResponse data = appealService.getEligibility(articleId, currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Bài viết đủ điều kiện khiếu nại", data));
     }

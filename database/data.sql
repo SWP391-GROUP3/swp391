@@ -3,9 +3,10 @@
    SWP391 - Dữ liệu mẫu
    Chạy SAU schema.sql. Chỉ dùng để dev và demo.
 
-   LƯU Ý mật khẩu: cột password_hash phải chứa BCrypt hash, không phải plain text.
-   Chuỗi bên dưới là PLACEHOLDER. Người phụ trách auth thay bằng hash thật
-   (BCryptPasswordEncoder.encode("123456")) khi làm chức năng đăng nhập.
+   TÀI KHOẢN MẪU: mọi user bên dưới có mật khẩu 123456. Đăng nhập bằng email
+   hoặc username. Cột password_hash lưu BCrypt hash của "123456" (tạo bằng
+   BCryptPasswordEncoder.encode("123456")), KHÔNG lưu mật khẩu thô.
+   Cả 9 dòng dùng chung 1 hash cho gọn - chỉ dùng cho dữ liệu mẫu.
 
    schema.sql vừa tạo lại bảng nên IDENTITY bắt đầu từ 1: các id tham chiếu
    bên dưới (role_id = 1, author_id = 1, ...) dựa vào thứ tự INSERT.
@@ -36,15 +37,15 @@ INSERT INTO sections (code, name) VALUES
 
 /* PV / BTV / Trưởng ban có ban. TKTS, Kế toán, Admin: section_id = NULL. */
 INSERT INTO users (username, email, password_hash, full_name, role_id, section_id) VALUES
-    ('an.nv',    'an.nv@toasoan.vn',    'REPLACE_WITH_BCRYPT_HASH', N'Nguyễn Văn An',  1, 1),     -- 1 PV Thời sự
-    ('binh.tt',  'binh.tt@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', N'Trần Thị Bình',  1, 1),     -- 2 PV Thời sự
-    ('cuong.lh', 'cuong.lh@toasoan.vn', 'REPLACE_WITH_BCRYPT_HASH', N'Lê Hoàng Cường', 2, 1),     -- 3 BTV Thời sự
-    ('dung.pt',  'dung.pt@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', N'Phạm Thu Dung',  4, NULL),  -- 4 TKTS
-    ('duc.vm',   'duc.vm@toasoan.vn',   'REPLACE_WITH_BCRYPT_HASH', N'Vũ Minh Đức',    3, 1),     -- 5 Trưởng ban Thời sự
-    ('chi.hl',   'chi.hl@toasoan.vn',   'REPLACE_WITH_BCRYPT_HASH', N'Hoàng Lan Chi',  5, NULL),  -- 6 Kế toán
-    ('hung.dq',  'hung.dq@toasoan.vn',  'REPLACE_WITH_BCRYPT_HASH', N'Đỗ Quốc Hưng',   1, 2),     -- 7 PV Kinh tế
-    ('admin',    'admin@toasoan.vn',    'REPLACE_WITH_BCRYPT_HASH', N'Quản trị viên',  6, NULL),  -- 8 Admin
-    ('giang.nt', 'giang.nt@toasoan.vn', 'REPLACE_WITH_BCRYPT_HASH', N'Ngô Thu Giang',  2, 2);     -- 9 BTV Kinh tế
+    ('an.nv',    'an.nv@toasoan.vn',    '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Nguyễn Văn An',  1, 1),     -- 1 PV Thời sự
+    ('binh.tt',  'binh.tt@toasoan.vn',  '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Trần Thị Bình',  1, 1),     -- 2 PV Thời sự
+    ('cuong.lh', 'cuong.lh@toasoan.vn', '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Lê Hoàng Cường', 2, 1),     -- 3 BTV Thời sự
+    ('dung.pt',  'dung.pt@toasoan.vn',  '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Phạm Thu Dung',  4, NULL),  -- 4 TKTS
+    ('duc.vm',   'duc.vm@toasoan.vn',   '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Vũ Minh Đức',    3, 1),     -- 5 Trưởng ban Thời sự
+    ('chi.hl',   'chi.hl@toasoan.vn',   '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Hoàng Lan Chi',  5, NULL),  -- 6 Kế toán
+    ('hung.dq',  'hung.dq@toasoan.vn',  '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Đỗ Quốc Hưng',   1, 2),     -- 7 PV Kinh tế
+    ('admin',    'admin@toasoan.vn',    '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Quản trị viên',  6, NULL),  -- 8 Admin
+    ('giang.nt', 'giang.nt@toasoan.vn', '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Ngô Thu Giang',  2, 2);     -- 9 BTV Kinh tế
 
 INSERT INTO genres (code, name, nd_group, base_factor, max_factor) VALUES
     ('TIN_VAN',   N'Tin vắn',           N'Tin',                    1.00,  2.00),   -- 1

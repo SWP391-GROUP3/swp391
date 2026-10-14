@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +26,8 @@ public class AppealRuleConfigController {
      */
     @GetMapping("/active")
     public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> getActiveConfig(
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         AppealRuleConfigResponse data = appealRuleConfigService.getActiveConfig(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy cấu hình khiếu nại đang áp dụng thành công", data));
     }
@@ -34,7 +37,8 @@ public class AppealRuleConfigController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<AppealRuleConfigResponse>>> getAllConfigs(
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId) {
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
         List<AppealRuleConfigResponse> data = appealRuleConfigService.getAllConfigs(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách cấu hình khiếu nại thành công", data));
     }
@@ -45,8 +49,9 @@ public class AppealRuleConfigController {
     @PostMapping
     public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> createConfig(
             @Valid @RequestBody AppealRuleConfigCreateRequest request,
-            @RequestHeader(value = "X-User-Id", required = false) Integer currentUserId // TODO(auth): lay tu token
+            @AuthenticationPrincipal Jwt jwt
     ) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());   // id nguoi dang nhap, lay tu token
         AppealRuleConfigResponse data = appealRuleConfigService.createConfig(request, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Tạo cấu hình khiếu nại mới thành công", data));

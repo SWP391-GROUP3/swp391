@@ -1,4 +1,4 @@
-import { layHeaderNguoiDung } from './appealSessionHeaders.js'
+import { goiApi } from './goiApi.js'
 
 export async function layBaoCaoDoLech(boLoc = {}) {
   const query = new URLSearchParams()
@@ -9,10 +9,5 @@ export async function layBaoCaoDoLech(boLoc = {}) {
   const duongDan = query.size > 0
     ? `/api/reports/reviewer-deviations?${query.toString()}`
     : '/api/reports/reviewer-deviations'
-  const response = await fetch(duongDan, { headers: layHeaderNguoiDung() })
-  const body = await response.json()
-  if (!response.ok || !body.success) {
-    throw new Error(body.message || 'Không thể tải báo cáo độ lệch điểm.')
-  }
-  return body.data
+  return goiApi(duongDan)
 }

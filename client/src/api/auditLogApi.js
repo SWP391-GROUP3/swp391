@@ -1,4 +1,4 @@
-import { layHeaderNguoiDung } from './appealSessionHeaders.js'
+import { goiApi } from './goiApi.js'
 
 export async function layNhatKy(boLoc = {}) {
   const query = new URLSearchParams()
@@ -15,10 +15,5 @@ export async function layNhatKy(boLoc = {}) {
   const duongDan = query.size > 0
     ? `/api/audit-logs?${query.toString()}`
     : '/api/audit-logs'
-  const response = await fetch(duongDan, { headers: layHeaderNguoiDung() })
-  const body = await response.json()
-  if (!response.ok || !body.success) {
-    throw new Error(body.message || 'Không thể tải nhật ký hệ thống.')
-  }
-  return body.data
+  return goiApi(duongDan)
 }
