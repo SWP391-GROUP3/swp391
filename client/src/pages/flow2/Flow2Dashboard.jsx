@@ -3,6 +3,9 @@ import CriteriaManagement from './CriteriaManagement.jsx'
 import AssignmentQueue from './AssignmentQueue.jsx'
 import EditorTaskQueue from './EditorTaskQueue.jsx'
 import ScoreCalculatorTester from './ScoreCalculatorTester.jsx'
+import Icon from '../../components/common/Icon.jsx'
+import { BT_TIEU_CHI, BT_PHAN_CONG, BT_BAI_DUOC_GIAO, BT_MAY_TINH } from './bieuTuongBf02.jsx'
+import '../../styles/Flow2.css'
 
 /**
  * Dashboard tong hop cho Luong BF-02 (Phan cong, Danh gia chat luong & Duyet dang).
@@ -22,51 +25,43 @@ export default function Flow2Dashboard({ nguoiDung }) {
   const [activeTab, setActiveTab] = useState(defaultTab)
 
   const tabs = [
-    { id: 'CRITERIA', label: '⚙️ Cấu hình Tiêu chí (Admin)' },
-    { id: 'ASSIGNMENT', label: '📋 Phân công Bài viết (Trưởng ban)' },
-    { id: 'EDITOR_TASKS', label: '✍️ Hàng việc của tôi (Biên tập viên)' },
-    { id: 'CALCULATOR', label: '🧮 Mô phỏng Tính điểm' }
+    { id: 'CRITERIA', label: 'Cấu hình Tiêu chí (Admin)', icon: BT_TIEU_CHI },
+    { id: 'ASSIGNMENT', label: 'Phân công Bài viết (Trưởng ban)', icon: BT_PHAN_CONG },
+    { id: 'EDITOR_TASKS', label: 'Hàng việc của tôi (Biên tập viên)', icon: BT_BAI_DUOC_GIAO },
+    { id: 'CALCULATOR', label: 'Mô phỏng Tính điểm', icon: BT_MAY_TINH }
   ]
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
+    <div className="bf02">
       {/* Header thong tin module */}
-      <div style={{ marginBottom: '20px', paddingBottom: '14px', borderBottom: '2px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="bf02__dau">
         <div>
-          <h2 style={{ margin: 0, color: '#14532d', fontSize: '22px' }}>
+          <h2 className="bf02__ten-luong">
             Luồng BF-02: Phân công &amp; Đánh giá chất lượng
           </h2>
-          <span style={{ color: '#64748b', fontSize: '13.5px' }}>
+          <p className="bf02__phu-de">
             Phân hệ phụ trách: <strong>Nguyễn Tùng Dương</strong> | Iteration 1 (Giao diện chuẩn chức năng Backend)
-          </span>
+          </p>
         </div>
 
         {nguoiDung && (
-          <div style={{ textAlign: 'right', fontSize: '13px', color: '#475569' }}>
+          <div className="bf02__nguoi-dung">
             Đang đăng nhập: <strong>{nguoiDung.hoTen}</strong>
           </div>
         )}
       </div>
 
       {/* Thanh chuyen Tab */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
+      <div className="bf02__tabs">
         {tabs.map(t => (
           <button
             key={t.id}
             type="button"
             onClick={() => setActiveTab(t.id)}
-            style={{
-              padding: '9px 16px',
-              fontSize: '14px',
-              fontWeight: activeTab === t.id ? '600' : '400',
-              color: activeTab === t.id ? '#14532d' : '#475569',
-              background: activeTab === t.id ? '#dcfce7' : '#f8fafc',
-              border: activeTab === t.id ? '1px solid #86efac' : '1px solid #e2e8f0',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
+            className={activeTab === t.id ? 'bf02__tab bf02__tab--chon' : 'bf02__tab'}
+            aria-pressed={activeTab === t.id}
           >
+            <Icon>{t.icon}</Icon>
             {t.label}
           </button>
         ))}

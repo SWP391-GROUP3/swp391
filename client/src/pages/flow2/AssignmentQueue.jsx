@@ -4,6 +4,9 @@ import {
   layPhanCongBaiViet,
   phanCongBaiViet
 } from '../../api/assessmentApi.js'
+import Icon from '../../components/common/Icon.jsx'
+import { BT_PHAN_CONG, BT_THONG_TIN, BT_BIEU_DO } from './bieuTuongBf02.jsx'
+import '../../styles/Flow2.css'
 
 export default function AssignmentQueue({ nguoiDung }) {
   // Danh sách bài viết chờ phân công (SUBMITTED) khớp 100% với Database
@@ -84,80 +87,80 @@ export default function AssignmentQueue({ nguoiDung }) {
   const selectedArticle = articles.find(a => a.id === Number(selectedArticleId))
 
   return (
-    <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
+    <div className="bf02__the">
       {/* UC-18, UC-20; BR-QA-04: Trưởng ban phân công bài viết */}
-      <h3 style={{ marginTop: 0, color: '#1b2430' }}>📋 Hàng chờ phân công bài viết</h3>
-      <p style={{ color: '#64748b', fontSize: '14px' }}>
+      <h3 className="bf02__tieu-de"><Icon>{BT_PHAN_CONG}</Icon>Hàng chờ phân công bài viết</h3>
+      <p className="bf02__mo-ta">
         Trưởng ban chọn bài viết đã nộp và chỉ định một Biên tập viên chịu trách nhiệm chấm chất lượng (Mỗi bài chỉ có 1 BTV chính).
       </p>
 
       {/* Thông báo */}
-      {message && <div style={{ padding: '10px 14px', background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', borderRadius: '6px', marginBottom: '16px' }}>{message}</div>}
-      {error && <div style={{ padding: '10px 14px', background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '6px', marginBottom: '16px' }}>{error}</div>}
+      {message && <div className="thong-bao-thanh-cong">{message}</div>}
+      {error && <div className="thong-bao-loi">{error}</div>}
 
       {/* Danh sách bài chờ giao */}
-      <h4 style={{ margin: '0 0 8px' }}>Danh sách bài viết đã gửi (SUBMITTED):</h4>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', marginBottom: '20px' }}>
-        <thead>
-          <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
-            <th style={{ padding: '8px', border: '1px solid #e2e8f0', width: '50px' }}>Mã bài</th>
-            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Tiêu đề bài viết</th>
-            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Thể loại</th>
-            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Tác giả</th>
-            <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Thời gian gửi</th>
-            <th style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>Chọn</th>
-          </tr>
-        </thead>
-        <tbody>
-          {articles.map(art => (
-            <tr key={art.id} style={{ background: selectedArticleId === art.id ? '#f0fdf4' : 'transparent' }}>
-              <td style={{ padding: '8px', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>#{art.id}</td>
-              <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{art.title}</td>
-              <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{art.category}</td>
-              <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{art.author}</td>
-              <td style={{ padding: '8px', border: '1px solid #e2e8f0', color: '#64748b' }}>{art.submittedAt}</td>
-              <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedArticleId(art.id)}
-                  style={{
-                    padding: '4px 10px',
-                    background: selectedArticleId === art.id ? '#14532d' : '#f1f5f9',
-                    color: selectedArticleId === art.id ? '#fff' : '#1b2430',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {selectedArticleId === art.id ? 'Đang chọn' : 'Chọn'}
-                </button>
-              </td>
+      <h4 className="bf02__tieu-de-nho">Danh sách bài viết đã gửi (SUBMITTED):</h4>
+      <div className="bf02__cuon">
+        <table className="bang-fm">
+          <thead>
+            <tr>
+              <th>Mã bài</th>
+              <th>Tiêu đề bài viết</th>
+              <th>Thể loại</th>
+              <th>Tác giả</th>
+              <th>Thời gian gửi</th>
+              <th className="bf02__giua">Chọn</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {articles.map(art => (
+              <tr key={art.id} className={selectedArticleId === art.id ? 'bf02__dong--chon' : undefined}>
+                <td className="bf02__dam">#{art.id}</td>
+                <td>{art.title}</td>
+                <td>{art.category}</td>
+                <td>{art.author}</td>
+                <td className="bf02__nhat">{art.submittedAt}</td>
+                <td className="bf02__giua">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedArticleId(art.id)}
+                    className={selectedArticleId === art.id ? 'nut-chinh-fm' : 'nut-nhe'}
+                    aria-pressed={selectedArticleId === art.id}
+                  >
+                    {selectedArticleId === art.id ? 'Đang chọn' : 'Chọn'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Form giao việc cho bài được chọn */}
-      <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-        <h4 style={{ margin: '0 0 12px' }}>
+      <div className="bf02__khung-phu">
+        <h4 className="bf02__tieu-de-nho">
           Giao việc cho Bài #{selectedArticleId}: <em>"{selectedArticle?.title}"</em>
         </h4>
 
         {currentAssignment && (
-          <div style={{ padding: '8px 12px', background: '#eff6ff', color: '#1e40af', borderRadius: '6px', marginBottom: '14px', fontSize: '13.5px' }}>
-            ℹ️ Bài này hiện đã được giao cho <strong>BTV #{currentAssignment.editorId}</strong> vào lúc {new Date(currentAssignment.assignedAt).toLocaleString('vi-VN')}. (Phân công lại sẽ cập nhật BTV mới).
+          <div className="bf02__thong-tin">
+            <Icon>{BT_THONG_TIN}</Icon>
+            <span>
+              Bài này hiện đã được giao cho <strong>BTV #{currentAssignment.editorId}</strong> vào lúc {new Date(currentAssignment.assignedAt).toLocaleString('vi-VN')}. (Phân công lại sẽ cập nhật BTV mới).
+            </span>
           </div>
         )}
 
-        <form onSubmit={handleAssign} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <form onSubmit={handleAssign} className="bf02__form-luoi">
           <div>
-            <label style={{ display: 'block', fontWeight: '600', marginBottom: '6px', fontSize: '13px' }}>
+            <label className="nhan" htmlFor="phan-cong-btv">
               Chỉ định Biên tập viên (BTV):
             </label>
             <select
+              id="phan-cong-btv"
               value={selectedEditorId}
               onChange={(e) => setSelectedEditorId(Number(e.target.value))}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+              className="o-nhap-ngan bf02__o-nhap"
             >
               {editors.map(ed => (
                 <option key={ed.id} value={ed.id}>{ed.name} ({ed.username})</option>
@@ -166,14 +169,15 @@ export default function AssignmentQueue({ nguoiDung }) {
 
             {workload !== null && (
               /* UC-19: Gợi ý BTV và xem khối lượng bài đang phụ trách */
-              <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#047857' }}>
-                📊 Khối lượng công việc: BTV này đang phụ trách <strong>{workload}</strong> bài viết.
+              <p className="bf02__goi-y">
+                <Icon>{BT_BIEU_DO}</Icon>
+                <span>Khối lượng công việc: BTV này đang phụ trách <strong>{workload}</strong> bài viết.</span>
               </p>
             )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', marginBottom: '12px' }}>
+          <div className="bf02__cot-nut">
+            <label className="bf02__hop-chon">
               <input
                 type="checkbox"
                 checked={wasSuggested}
@@ -182,19 +186,7 @@ export default function AssignmentQueue({ nguoiDung }) {
               <span>Ghi nhận giao theo gợi ý của hệ thống (was_suggested)</span>
             </label>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                padding: '10px 18px',
-                background: '#14532d',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '6px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
-            >
+            <button type="submit" disabled={loading} className="nut-chinh-fm">
               {loading ? 'Đang lưu...' : 'Xác nhận Phân công bài viết'}
             </button>
           </div>

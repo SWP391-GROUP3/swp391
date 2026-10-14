@@ -10,12 +10,12 @@
   padding: 2px 10px;
   font-size: 12px;
   font-weight: 500;
-  color: #9a5b00;
-  background: #fff4e0;
+  color: var(--fm-chu-y);
+  background: var(--fm-chu-y-nen);
   border-radius: 999px;
 }
 
-.kpi-pv__nhan--dat { color: #1f6f1a; background: #e8f6e6; }
+.kpi-pv__nhan--dat { color: var(--fm-tot); background: var(--fm-tot-nen); }
 
 .kpi-pv__dong { margin-top: 14px; }
 
@@ -56,14 +56,14 @@
   color: var(--fm-chu-nhat);
 }
 
-.kpi-pv__goi-y--dat { color: #1f6f1a; }
+.kpi-pv__goi-y--dat { color: var(--fm-tot); }
 
 .kpi-pv__xem {
   display: inline-block;
   margin-top: 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #0b6fb0;   /* xanh duong dam, du tuong phan cho chu nho */
+  color: var(--fm-thong-tin);
   text-decoration: none;
 }
 

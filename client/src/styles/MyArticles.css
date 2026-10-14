@@ -24,29 +24,6 @@
   color: var(--fm-chu-nhat);
 }
 
-/* Nut chinh mau xanh duong Figma ("Soan bai moi") */
-.my-articles__primary-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--fm-the);
-  text-decoration: none;
-  white-space: nowrap;
-  background: var(--fm-xanh-duong);
-  border-radius: 6px;
-}
-
-.my-articles__primary-button:hover { opacity: .9; }
-
-.my-articles__primary-button:focus-visible {
-  outline: 2px solid var(--fm-xanh-duong);
-  outline-offset: 2px;
-}
-
 /* ---- Hang chip loc trang thai ---- */
 .my-articles__filters {
   display: flex;
@@ -104,30 +81,7 @@
 /* Bang rong hon man hinh thi cuon ngang trong the, khong vo khung trang */
 .my-articles__scroll { overflow-x: auto; }
 
-.my-articles__table {
-  width: 100%;
-  font-size: 13px;
-  border-collapse: collapse;
-}
-
-.my-articles__table th {
-  padding: 10px 16px;
-  font-size: 12px;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  color: var(--fm-chu-nhat);
-  border-bottom: 1px solid var(--fm-vien);
-}
-
-.my-articles__table td {
-  padding: 12px 16px;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--fm-vien);
-}
-
-.my-articles__table tbody tr:last-child td { border-bottom: 0; }
-.my-articles__table tbody tr:hover { background: var(--fm-nen); }
+/* Bang dung class chung .bang-fm (index.css) */
 
 .my-articles__article-title {
   font-weight: 500;

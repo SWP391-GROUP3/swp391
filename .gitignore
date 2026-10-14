@@ -44,3 +44,8 @@ logs/
 
 # File nhap do AI xuat ra, khong commit
 Claude outputs/
+
+# Ghi chu review ca nhan, khong commit
+docs/review/
+# File tam cua Word khi dang mo .docx
+~$*

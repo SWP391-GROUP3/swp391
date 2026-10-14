@@ -12,8 +12,8 @@
   border-radius: 999px;
 }
 
-.tom-tat__nhan--tot    { color: #1f6f1a; background: #e8f6e6; }
-.tom-tat__nhan--chu-y  { color: #9a5b00; background: #fff4e0; }
+.tom-tat__nhan--tot    { color: var(--fm-tot); background: var(--fm-tot-nen); }
+.tom-tat__nhan--chu-y  { color: var(--fm-chu-y); background: var(--fm-chu-y-nen); }
 .tom-tat__nhan--thuong { color: var(--fm-chu-nhat); background: var(--fm-nen); }
 
 .tom-tat__ds { margin: 8px 0 0; }
@@ -38,14 +38,14 @@
   white-space: nowrap;
 }
 
-.tom-tat__so--canh-bao { color: #c4004d; }   /* hong dam, du tuong phan tren nen trang */
+.tom-tat__so--canh-bao { color: var(--fm-canh-bao); }
 
 .tom-tat__xem {
   display: inline-block;
   margin-top: 12px;
   font-size: 13px;
   font-weight: 500;
-  color: #0b6fb0;   /* xanh duong dam, du tuong phan cho chu nho */
+  color: var(--fm-thong-tin);
   text-decoration: none;
 }
 

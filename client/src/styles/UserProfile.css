@@ -66,7 +66,7 @@
   height: 56px;
   font-size: 22px;
   font-weight: 600;
-  color: #fff;
+  color: var(--fm-the);
   background: var(--fm-cam);
   border-radius: 50%;
 }
@@ -145,27 +145,7 @@
   margin-top: 4px;
 }
 
-/* Nut chinh mau xanh duong Figma (giong "Soan bai moi") */
-.ho-so__nut-chinh {
-  padding: 9px 16px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--fm-the);
-  white-space: nowrap;
-  background: var(--fm-xanh-duong);
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.ho-so__nut-chinh:hover:not(:disabled) { opacity: .9; }
-.ho-so__nut-chinh:disabled { opacity: .6; cursor: not-allowed; }
-
-.ho-so__nut-chinh:focus-visible {
-  outline: 2px solid var(--fm-xanh-duong);
-  outline-offset: 2px;
-}
+/* Nut chinh dung class chung .nut-chinh-fm (index.css) */
 
 @media (max-width: 600px) {
   .ho-so__dong { grid-template-columns: 1fr; gap: 2px; }

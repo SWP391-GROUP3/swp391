@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import { layBaiDuocGiaoCuaBtv } from '../../api/assessmentApi.js'
+import Icon from '../../components/common/Icon.jsx'
+import { BT_BAI_DUOC_GIAO, BT_DAU_TICH } from './bieuTuongBf02.jsx'
+import '../../styles/Flow2.css'
 
 export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
   // Lấy ID BTV: Nếu đang đăng nhập thì lấy ID (ví dụ cuong.lh = 3), hoặc mặc định là 3
@@ -27,87 +30,78 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
   }
 
   return (
-    <div style={{ padding: '20px', background: '#fff', borderRadius: '8px', border: '1px solid #dfe3e8', marginBottom: '24px' }}>
+    <div className="bf02__the">
       {/* UC-21: Hàng việc của Biên tập viên */}
-      <h3 style={{ marginTop: 0, color: '#1b2430' }}>✍️ Hàng việc của Biên tập viên</h3>
-      <p style={{ color: '#64748b', fontSize: '14px' }}>
+      <h3 className="bf02__tieu-de"><Icon>{BT_BAI_DUOC_GIAO}</Icon>Hàng việc của Biên tập viên</h3>
+      <p className="bf02__mo-ta">
         Danh sách tất cả các bài viết được Trưởng ban phân công cho BTV này. BTV chọn bài để tiến hành đọc bài và chấm điểm chất lượng.
       </p>
 
       {/* Bộ lọc xem theo BTV */}
-      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <label style={{ fontWeight: '600', fontSize: '14px' }}>Mã BTV cần xem việc:</label>
+      <div className="bf02__hang">
+        <label className="bf02__nhan" htmlFor="btv-ma">Mã BTV cần xem việc:</label>
         <input
+          id="btv-ma"
           type="number"
           value={editorId}
           onChange={(e) => setEditorId(Number(e.target.value))}
-          style={{ width: '80px', padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+          className="o-nhap-ngan bf02__o-nhap--so"
         />
-        <button
-          type="button"
-          onClick={loadEditorTasks}
-          style={{ padding: '6px 14px', background: '#f4f6f8', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer' }}
-        >
+        <button type="button" onClick={loadEditorTasks} className="nut-nhe">
           Làm mới
         </button>
       </div>
 
-      {message && <div style={{ color: '#b91c1c', marginBottom: '12px' }}>{message}</div>}
+      {message && <div className="thong-bao-loi">{message}</div>}
 
       {loading ? (
-        <p style={{ color: '#64748b' }}>Đang tải danh sách bài được giao...</p>
+        <p className="bf02__nhat">Đang tải danh sách bài được giao...</p>
       ) : tasks.length === 0 ? (
-        <div style={{ padding: '24px', textAlign: 'center', background: '#f8fafc', borderRadius: '6px', color: '#64748b' }}>
+        <div className="bf02__trong">
           Hiện tại BTV #{editorId} chưa được phân công bài viết nào. (Hãy qua tab "Phân công bài viết" để giao việc thử).
         </div>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
-              <th style={{ padding: '8px', border: '1px solid #e2e8f0', width: '60px' }}>STT</th>
-              <th style={{ padding: '8px', border: '1px solid #e2e8f0', width: '100px' }}>Mã bài</th>
-              <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Thời điểm giao</th>
-              <th style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Gợi ý bởi HT?</th>
-              <th style={{ padding: '8px', border: '1px solid #e2e8f0', width: '140px', textAlign: 'center' }}>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((task, idx) => (
-              <tr key={task.id}>
-                <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>{idx + 1}</td>
-                <td style={{ padding: '8px', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>#{task.articleId}</td>
-                <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>{new Date(task.assignedAt).toLocaleString('vi-VN')}</td>
-                <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>
-                  {task.wasSuggested ? (
-                    <span style={{ color: '#047857', fontWeight: '500' }}>✓ Đúng (Thuật toán)</span>
-                  ) : (
-                    <span style={{ color: '#64748b' }}>Trưởng ban chọn tay</span>
-                  )}
-                </td>
-                <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (onSelectTaskToScore) onSelectTaskToScore(task)
-                      else alert(`Mở bài #${task.articleId} để chấm điểm (Sẵn sàng tích hợp sang Iteration 2)!`)
-                    }}
-                    style={{
-                      padding: '5px 12px',
-                      background: '#14532d',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '13px'
-                    }}
-                  >
-                    Bắt đầu Chấm bài
-                  </button>
-                </td>
+        <div className="bf02__cuon">
+          <table className="bang-fm">
+            <thead>
+              <tr>
+                <th className="bf02__giua">STT</th>
+                <th>Mã bài</th>
+                <th>Thời điểm giao</th>
+                <th>Gợi ý bởi HT?</th>
+                <th className="bf02__giua">Hành động</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tasks.map((task, idx) => (
+                <tr key={task.id}>
+                  <td className="bf02__giua">{idx + 1}</td>
+                  <td className="bf02__dam">#{task.articleId}</td>
+                  <td>{new Date(task.assignedAt).toLocaleString('vi-VN')}</td>
+                  <td>
+                    {task.wasSuggested ? (
+                      <span className="nhan-tt nhan-tt--tot"><Icon>{BT_DAU_TICH}</Icon>Đúng (Thuật toán)</span>
+                    ) : (
+                      <span className="bf02__nhat">Trưởng ban chọn tay</span>
+                    )}
+                  </td>
+                  <td className="bf02__giua">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onSelectTaskToScore) onSelectTaskToScore(task)
+                        else alert(`Mở bài #${task.articleId} để chấm điểm (Sẵn sàng tích hợp sang Iteration 2)!`)
+                      }}
+                      className="nut-chinh-fm"
+                    >
+                      Bắt đầu Chấm bài
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )
