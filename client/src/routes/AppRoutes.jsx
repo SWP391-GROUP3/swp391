@@ -8,6 +8,10 @@ import SecretaryLayout from '../layouts/SecretaryLayout.jsx'
 import HeadLayout from '../layouts/HeadLayout.jsx'
 import AccountantLayout from '../layouts/AccountantLayout.jsx'
 import AdminLayout from '../layouts/AdminLayout.jsx'
+import AppealCreatePage from '../pages/appeal/AppealCreatePage.jsx'
+import MyAppealsPage from '../pages/appeal/MyAppealsPage.jsx'
+import ReviewerDeviationPage from '../pages/appeal/ReviewerDeviationPage.jsx'
+import AuditLogPage from '../pages/appeal/AuditLogPage.jsx'
 import ReporterHome from '../pages/home/ReporterHome.jsx'
 import EditorHome from '../pages/home/EditorHome.jsx'
 import SecretaryHome from '../pages/home/SecretaryHome.jsx'
@@ -32,8 +36,6 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
 const TRANG_PV_CHUA_LAM = [
   { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
   { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
-  { path: '/my-appeals',        ten: 'Khiếu nại điểm' },         // UC-35
-  { path: '/my-appeals/new',    ten: 'Gửi khiếu nại' },          // UC-35
   { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
   { path: '/my-kpi',            ten: 'KPI cá nhân' },            // UC-60, UC-67
 ]
@@ -60,9 +62,7 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/appeals',               ten: 'Khiếu nại' },               // UC-38
   { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
-  { path: '/reviewers',             ten: 'Độ lệch & hồ sơ BTV' },     // UC-41
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
   { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
@@ -79,9 +79,7 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/system-parameters',  ten: 'Tham số hệ thống' },        // UC-13
   { path: '/criteria-sets',      ten: 'Bộ tiêu chí' },             // UC-14, 15
   { path: '/criteria-sets/:id',  ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-  { path: '/reviewers',          ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/reviewers/:id',      ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs',         ten: 'Nhật ký hệ thống' },        // UC-45
   { path: '/reader-imports',     ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
@@ -146,6 +144,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           <Route path="/profile" element={<UserProfile onCapNhatNguoiDung={onCapNhatNguoiDung} />} />
           {vaiTro === 'REPORTER' && (
             <>
+              <Route path="/my-appeals" element={<MyAppealsPage />} />
+              <Route path="/my-appeals/new" element={<AppealCreatePage />} />
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
@@ -177,6 +177,14 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
               <Route path="/media-factors" element={<MediaFactors />} />
+            </>
+          )}
+
+          {['HEAD_OF_DEPARTMENT', 'ADMIN'].includes(vaiTro) && (
+            <>
+              <Route path="/reviewers" element={<ReviewerDeviationPage />} />
+              <Route path="/reviewer-deviations" element={<ReviewerDeviationPage />} />
+              <Route path="/audit-logs" element={<AuditLogPage />} />
             </>
           )}
 

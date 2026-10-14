@@ -1,3 +1,4 @@
+﻿-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Dữ liệu mẫu
    Chạy SAU schema.sql. Chỉ dùng để dev và demo.
@@ -177,14 +178,9 @@ INSERT INTO score_approvals (scoring_attempt_id, decision, decided_by, decided_a
 /* ---------- APPEAL ---------- */
 
 INSERT INTO appeal_rule_configs (appeal_window_days, max_appeals_per_article, variance_threshold, effective_from, updated_by) VALUES
-    (7, 1, 10.00, '2026-01-01', 8);
+    (7, 1, 5.00, '2026-01-01', 8);
 
-/* PV An khiếu nại điểm "Tính thời sự" của bài 1, đang chờ xử lý. */
-INSERT INTO appeals (article_id, scoring_attempt_id, appellant_id, status, submitted_at) VALUES
-    (1, 1, 1, 'SUBMITTED', '2026-09-13 09:00');   -- 1
-
-INSERT INTO appeal_criteria (appeal_id, criterion_id, reason) VALUES
-    (1, 4, N'Bài đăng ngay trong ngày bão đổ bộ, không chậm hơn báo khác.');
+/* Chưa tạo sẵn khiếu nại để có thể demo UC-35 bằng bài 1. */
 
 INSERT INTO cross_review_batches (batch_name, period_start, period_end, created_by, status, created_at) VALUES
     (N'Chấm chéo tháng 09/2026', '2026-09-01', '2026-09-30', 5, 'OPEN', '2026-09-20 08:00');   -- 1
@@ -194,7 +190,7 @@ INSERT INTO cross_review_tasks (batch_id, article_id, reviewer_id, original_scor
     (1, 1, 9, 1, 'PENDING');
 
 INSERT INTO reviewer_deviation_indices (editor_id, period, avg_deviation, appeal_count, overturn_rate, workload_count, last_updated) VALUES
-    (3, '2026-09-01', 0.00, 1, 0.00, 1, '2026-09-20 00:00');
+    (3, '2026-09-01', 0.00, 0, 0.00, 1, '2026-09-20 00:00');
 
 /* ---------- ROYALTY: phiếu chấm bài 1 ----------
    score 77 -> bậc 70-89 -> tier_rate 80%
@@ -244,7 +240,6 @@ INSERT INTO reader_interactions (article_id, record_date, page_views, rating_cou
 INSERT INTO notifications (user_id, article_id, message, is_read, created_at) VALUES
     (1, 1, N'Bài "Người dân khu Bắc Hà khốn khổ vì ngập sau bão" đã được xuất bản.', 1, '2026-09-15 09:00'),
     (2, 1, N'Bạn là đồng tác giả của bài vừa được xuất bản.',                        0, '2026-09-15 09:00'),
-    (5, 1, N'Có khiếu nại mới về điểm bài của PV Nguyễn Văn An.',                    0, '2026-09-13 09:00'),
     (5, 3, N'Có bài mới chờ phân công biên tập viên.',                               0, '2026-09-27 08:00');
 
 INSERT INTO audit_logs (actor_id, action_type, entity_type, entity_id, old_value, new_value, created_at) VALUES

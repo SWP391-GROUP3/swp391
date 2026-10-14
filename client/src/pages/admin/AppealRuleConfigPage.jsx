@@ -28,8 +28,11 @@ export default function AppealRuleConfigPage() {
     setError('')
     try {
       const [active, list] = await Promise.all([
-        getActiveConfig().catch(() => null),
-        getAllConfigs().catch(() => []),
+        getActiveConfig().catch((loi) => {
+          if (loi.status === 404) return null
+          throw loi
+        }),
+        getAllConfigs(),
       ])
       setActiveConfig(active)
       setHistoryList(list)
