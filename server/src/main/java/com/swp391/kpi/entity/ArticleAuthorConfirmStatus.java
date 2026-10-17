@@ -3,6 +3,9 @@ package com.swp391.kpi.entity;
 /**
  * Trang thai xac nhan cua tung tac gia trong bai (cot article_authors.confirm_status).
  * Ten hang trung dung gia tri trong CHECK ck_article_authors_status cua schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   11  gia tri                      - PENDING, ACCEPTED, REJECTED, EXPIRED
  */
 public enum ArticleAuthorConfirmStatus {
     PENDING,   // chua tra loi

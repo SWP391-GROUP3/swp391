@@ -3,6 +3,9 @@ package com.swp391.kpi.entity;
 /**
  * Trang thai bai viet (cot articles.status).
  * Ten hang trung dung gia tri trong CHECK ck_articles_status cua schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   11  gia tri                      - DRAFT, PENDING_CONFIRMATION, SUBMITTED, ASSIGNED, REVISION_REQUESTED, R…
  */
 public enum ArticleStatus {
     DRAFT,                // ban nhap, tac gia chinh con sua duoc (BR-IN-01)

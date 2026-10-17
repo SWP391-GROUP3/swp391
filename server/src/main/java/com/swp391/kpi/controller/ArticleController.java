@@ -24,6 +24,15 @@ import java.util.List;
 /**
  * API bai viet BF-01. Nguoi thao tac lay tu token dang nhap (AGENTS.md muc 3.8):
  * subject cua JWT la id nguoi dung.
+ *
+ * MUC LUC (so dong)
+ *   42  field                        - service duoc inject
+ *   49  getMyArticles()              - UC-01: bai cua toi. Loc nhieu trang thai ngan bang dau phay, khong truy…
+ *   64  getMyStatusCounts()          - Trang chu Phong vien: so bai theo tung trang thai.
+ *   76  getMyRevisionRequests()      - Trang chu Phong vien: bai bi tra ve can sua kem ghi chu moi nhat.
+ *   88  getMyCoAuthorInvites()       - Trang chu Phong vien: loi moi dong tac gia dang cho minh tra loi.
+ *  100  getArticleDetail()           - UC-02: chi tiet 1 bai.
+ *  113  withdrawArticle()            - UC-11: rut bai da nop ve Nhap.
  */
 @RestController
 @RequestMapping("/api/articles")

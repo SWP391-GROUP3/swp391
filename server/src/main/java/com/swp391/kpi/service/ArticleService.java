@@ -8,6 +8,7 @@ import com.swp391.kpi.dto.ArticleRevisionRequestResponse;
 import com.swp391.kpi.dto.ArticleStatusCountResponse;
 import com.swp391.kpi.dto.ArticleStatusLogResponse;
 import com.swp391.kpi.dto.ArticleSummaryResponse;
+import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleAuthor;
 import com.swp391.kpi.entity.ArticleAuthorConfirmStatus;
@@ -35,6 +36,21 @@ import java.util.Map;
 /**
  * Nghiep vu bai viet BF-01. Moi lan doi articles.status deu di qua changeStatus()
  * de ghi kem 1 dong article_status_logs (AGENTS.md muc 2).
+ *
+ * MUC LUC (so dong)
+ *   60  hang so                      - So dong toi da 1 trang, tranh client xin qua nhieu 1 lan
+ *   65  field                        - repository / service duoc inject
+ *   76  getMyArticles()              - UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nh…
+ *  120  getArticleDetail()           - UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai.
+ *  135  withdrawArticle()            - UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAF…
+ *  158  getMyStatusCounts()          - Trang chu Phong vien: so bai cua nguoi dung o tung trang thai.
+ *  179  getMyRevisionRequests()      - Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can …
+ *  199  getMyCoAuthorInvites()       - Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi …
+ *  221  findArticle()                - Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  227  isAuthor()                   - Tac gia chinh (articles.author_id) hoac co dong trong article_authors
+ *  238  changeStatus()               - Doi trang thai bai va ghi 1 dong lich su trong cung transaction (AGENTS…
+ *  257  toDetailResponse()           - Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
+ *  279  loadUserNames()              - Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao di…
  */
 @Service
 @RequiredArgsConstructor
@@ -49,6 +65,8 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ArticleStatusLogRepository articleStatusLogRepository;
+    // Ho ten nguoi dung la du lieu luong admin -> goi service cua ho, khong query bang users (AGENTS.md muc 2)
+    private final UserReadService userReadService;
 
     /**
      * UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau.
@@ -182,6 +200,7 @@ public class ArticleService {
         List<ArticleAuthor> pendingRows = articleAuthorRepository
                 .findByUserIdAndConfirmStatusOrderByConfirmDeadlineAsc(currentUserId, ArticleAuthorConfirmStatus.PENDING);
 
+        Map<Integer, String> userNames = loadUserNames();
         List<ArticleCoAuthorInviteResponse> result = new ArrayList<>();
         for (ArticleAuthor row : pendingRows) {
             Article article = articleRepository.findById(row.getArticleId()).orElse(null);
@@ -191,13 +210,14 @@ public class ArticleService {
                     || article.getAuthorId().equals(currentUserId)) {
                 continue;
             }
-            result.add(ArticleCoAuthorInviteResponse.from(article, row));
+            result.add(ArticleCoAuthorInviteResponse.from(article, row, userNames.get(article.getAuthorId())));
         }
         return result;
     }
 
     // ---------------------------------------------------------------- ham phu
 
+    // Tim bai theo ma, khong co thi bao 404 (NotFoundException)
     private Article findArticle(Integer articleId) {
         return articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết có mã " + articleId + "."));
@@ -233,21 +253,34 @@ public class ArticleService {
         articleRepository.save(article);
     }
 
+    // Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
     private ArticleDetailResponse toDetailResponse(Article article, Integer currentUserId) {
+        Map<Integer, String> userNames = loadUserNames();
+
         List<ArticleAuthorResponse> authors = new ArrayList<>();
         for (ArticleAuthor author : articleAuthorRepository.findByArticleIdOrderBySharePercentDesc(article.getId())) {
-            authors.add(ArticleAuthorResponse.from(author, article.getAuthorId()));
+            authors.add(ArticleAuthorResponse.from(author, article.getAuthorId(), userNames.get(author.getUserId())));
         }
 
         List<ArticleStatusLogResponse> statusLogs = new ArrayList<>();
         for (ArticleStatusLog log : articleStatusLogRepository.findByArticleIdOrderByCreatedAtAscIdAsc(article.getId())) {
-            statusLogs.add(ArticleStatusLogResponse.from(log));
+            statusLogs.add(ArticleStatusLogResponse.from(log, userNames.get(log.getActorId())));
         }
 
         // Nut "Rut bai" chi hien voi tac gia chinh khi bai dang SUBMITTED (BR-IN-08)
         boolean canWithdraw = article.getAuthorId().equals(currentUserId)
                 && article.getStatus() == ArticleStatus.SUBMITTED;
 
-        return ArticleDetailResponse.from(article, authors, statusLogs, canWithdraw);
+        return ArticleDetailResponse.from(article, userNames.get(article.getAuthorId()),
+                authors, statusLogs, canWithdraw);
+    }
+
+    // Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien
+    private Map<Integer, String> loadUserNames() {
+        Map<Integer, String> names = new HashMap<>();
+        for (UserAccessResponse user : userReadService.getUsers()) {
+            names.put(user.id(), user.fullName());
+        }
+        return names;
     }
 }

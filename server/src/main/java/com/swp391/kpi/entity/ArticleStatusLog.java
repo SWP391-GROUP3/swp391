@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 /**
  * Lich su xu ly bai (bang article_status_logs). Chi INSERT, khong sua, khong xoa.
  * Moi lan doi articles.status phai ghi 1 dong o day (AGENTS.md muc 2).
+ *
+ * MUC LUC (so dong)
+ *   33  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "article_status_logs")
