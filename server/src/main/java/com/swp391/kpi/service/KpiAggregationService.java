@@ -2,6 +2,8 @@ package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.DepartmentKpiDashboardResponse;
 import com.swp391.kpi.dto.DepartmentKpiItemResponse;
+import com.swp391.kpi.dto.ReporterKpiArticleItemResponse;
+import com.swp391.kpi.dto.ReporterKpiDetailResponse;
 import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleAuthor;
 import com.swp391.kpi.entity.ArticleStatus;
@@ -10,10 +12,12 @@ import com.swp391.kpi.entity.KpiSnapshotStatus;
 import com.swp391.kpi.entity.KpiTarget;
 import com.swp391.kpi.entity.User;
 import com.swp391.kpi.exception.BusinessException;
+import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.ArticleAuthorRepository;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.KpiSnapshotRepository;
 import com.swp391.kpi.repository.KpiTargetRepository;
+import com.swp391.kpi.repository.ReaderInteractionRepository;
 import com.swp391.kpi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,6 +47,7 @@ public class KpiAggregationService {
     private final KpiTargetRepository kpiTargetRepository;
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
+    private final ReaderInteractionRepository readerInteractionRepository;
     private final UserRepository userRepository;
 
     // Dung may tinh toan thuan KpiCalculator (AGENTS.md muc 3.1)
@@ -234,6 +239,146 @@ public class KpiAggregationService {
         response.setItems(items);
 
         return response;
+    }
+
+    /**
+     * Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60).
+     * Bao gom danh sach bai viet da xuat ban, ty le dong tac gia quy doi (0.6 / 0.4),
+     * diem chat luong va luot xem tich luy tu doc gia.
+     */
+    @Transactional(readOnly = true)
+    public ReporterKpiDetailResponse getReporterKpiDetail(Integer reporterId, Short year, Byte month) {
+        validatePeriod(year, month);
+
+        User reporter = userRepository.findById(reporterId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy phóng viên với ID: " + reporterId));
+
+        // 1. Lay chi tieu giao trong ky (kpi_targets)
+        Optional<KpiTarget> targetOpt = kpiTargetRepository.findByReporterIdAndTargetYearAndTargetMonth(reporterId, year, month);
+        int minPublished = targetOpt.map(KpiTarget::getMinPublished).orElse(0);
+        BigDecimal minAvgScore = targetOpt.map(KpiTarget::getMinAvgScore).orElse(BigDecimal.ZERO);
+
+        // 2. Lay snapshot (neu co)
+        Optional<KpiSnapshot> snapshotOpt = kpiSnapshotRepository.findByReporterIdAndPeriodYearAndPeriodMonth(reporterId, year, month);
+
+        // 3. Lay danh sach bai viet PUBLISHED trong thang va nam
+        LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+        List<Article> allArticles = articleRepository.findAll();
+        List<Article> publishedArticlesInPeriod = new ArrayList<>();
+        List<Integer> publishedArticleIds = new ArrayList<>();
+        for (Article a : allArticles) {
+            if (a.getStatus() == ArticleStatus.PUBLISHED && a.getPublishedAt() != null) {
+                if (!a.getPublishedAt().isBefore(startOfMonth) && !a.getPublishedAt().isAfter(endOfMonth)) {
+                    publishedArticlesInPeriod.add(a);
+                    publishedArticleIds.add(a.getId());
+                }
+            }
+        }
+
+        // 4. Loc cac bai ma phong vien la tac gia hoac dong tac gia
+        List<ArticleAuthor> authorRecords = publishedArticleIds.isEmpty()
+                ? Collections.emptyList()
+                : articleAuthorRepository.findByUserIdAndArticleIdIn(reporterId, publishedArticleIds);
+
+        Map<Integer, ArticleAuthor> authorMap = new HashMap<>();
+        for (ArticleAuthor aa : authorRecords) {
+            authorMap.put(aa.getArticleId(), aa);
+        }
+
+        // 5. Lay tong luot xem tich luy tu reader_interactions theo bai viet
+        Map<Integer, Integer> pageViewsMap = new HashMap<>();
+        if (!publishedArticleIds.isEmpty()) {
+            List<Object[]> viewResults = readerInteractionRepository.sumPageViewsByArticleIds(publishedArticleIds);
+            for (Object[] row : viewResults) {
+                Integer artId = (Integer) row[0];
+                Number sumViews = (Number) row[1];
+                pageViewsMap.put(artId, sumViews != null ? sumViews.intValue() : 0);
+            }
+        }
+
+        // 6. Tao danh sach bai viet chi tiet cua phong vien kem ty le dong tac gia
+        List<ReporterKpiArticleItemResponse> articleResponses = new ArrayList<>();
+        List<KpiCalculator.ArticleKpiItem> kpiItems = new ArrayList<>();
+        int totalViews = 0;
+
+        for (Article a : publishedArticlesInPeriod) {
+            ArticleAuthor author = authorMap.get(a.getId());
+            if (author != null) {
+                BigDecimal sharePercent = author.getSharePercent() != null ? author.getSharePercent() : ONE_HUNDRED;
+                BigDecimal converted = sharePercent.divide(ONE_HUNDRED, 2, RoundingMode.HALF_UP);
+                Integer views = pageViewsMap.getOrDefault(a.getId(), 0);
+                totalViews += views;
+
+                // Diem chat luong (neu co snapshot thi lay diem snapshot, hoac tam de null neu chua cham)
+                BigDecimal score = snapshotOpt.map(KpiSnapshot::getActualAvgScore).orElse(null);
+
+                ReporterKpiArticleItemResponse item = new ReporterKpiArticleItemResponse();
+                item.setArticleId(a.getId());
+                item.setTitle(a.getTitle());
+                item.setCategoryId(a.getCategoryId());
+                item.setNature(a.getDeclaredNature() != null ? a.getDeclaredNature().name() : "ORIGINAL");
+                item.setPublishedAt(a.getPublishedAt());
+                item.setSharePercent(sharePercent);
+                item.setConvertedArticles(converted);
+                item.setEffectiveScore(score);
+                item.setPageViews(views);
+
+                articleResponses.add(item);
+                kpiItems.add(new KpiCalculator.ArticleKpiItem(a.getId(), sharePercent, score));
+            }
+        }
+
+        // 7. Tinh toan tien do va trang thai
+        int actualArticles;
+        BigDecimal exactActualArticles;
+        BigDecimal actualAvgScore;
+        KpiSnapshotStatus snapshotStatus;
+        String notes = null;
+
+        if (snapshotOpt.isPresent()) {
+            KpiSnapshot snap = snapshotOpt.get();
+            actualArticles = snap.getActualArticles();
+            exactActualArticles = kpiCalculator.calculateExactConvertedArticles(kpiItems);
+            actualAvgScore = snap.getActualAvgScore();
+            snapshotStatus = snap.getStatus();
+            notes = snap.getNotes();
+        } else {
+            actualArticles = kpiCalculator.calculateConvertedArticles(kpiItems);
+            exactActualArticles = kpiCalculator.calculateExactConvertedArticles(kpiItems);
+            actualAvgScore = kpiCalculator.calculateAverageScore(kpiItems);
+            snapshotStatus = KpiSnapshotStatus.DRAFT;
+        }
+
+        BigDecimal progressPercent = BigDecimal.ZERO;
+        if (minPublished > 0) {
+            progressPercent = BigDecimal.valueOf(actualArticles)
+                    .multiply(ONE_HUNDRED)
+                    .divide(BigDecimal.valueOf(minPublished), 1, RoundingMode.HALF_UP);
+        }
+
+        boolean isPass = kpiCalculator.evaluatePassStatus(actualArticles, actualAvgScore, minPublished, minAvgScore);
+
+        ReporterKpiDetailResponse detail = new ReporterKpiDetailResponse();
+        detail.setReporterId(reporter.getId());
+        detail.setReporterName(reporter.getFullName() != null ? reporter.getFullName() : reporter.getUsername());
+        detail.setReporterEmail(reporter.getEmail());
+        detail.setYear(year);
+        detail.setMonth(month);
+        detail.setMinPublished(minPublished);
+        detail.setMinAvgScore(minAvgScore);
+        detail.setActualArticles(actualArticles);
+        detail.setExactActualArticles(exactActualArticles);
+        detail.setActualAvgScore(actualAvgScore);
+        detail.setTotalViews(totalViews);
+        detail.setArticleProgressPercent(progressPercent);
+        detail.setProjectedStatus(isPass ? "PASS" : "NOT_PASS");
+        detail.setSnapshotStatus(snapshotStatus);
+        detail.setNotes(notes);
+        detail.setArticles(articleResponses);
+
+        return detail;
     }
 
     private void validatePeriod(Short year, Byte month) {

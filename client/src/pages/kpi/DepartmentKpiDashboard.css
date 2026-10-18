@@ -234,3 +234,22 @@
   margin-bottom: 16px;
   font-size: 14px;
 }
+
+.bang-kpi-ban__link-chi-tiet {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fm-primary, #3b82f6);
+  text-decoration: none;
+  background-color: #eff6ff;
+  transition: all 0.2s;
+}
+
+.bang-kpi-ban__link-chi-tiet:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+

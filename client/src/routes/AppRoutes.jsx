@@ -23,6 +23,8 @@ import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
+import ReporterKpiDetails from '../pages/kpi/ReporterKpiDetails.jsx'
+import PersonalKpiProgress from '../pages/kpi/PersonalKpiProgress.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyPeriodDetail from '../pages/royalty/RoyaltyPeriodDetail.jsx'
@@ -46,7 +48,6 @@ const TRANG_PV_CHUA_LAM = [
   { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
   { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
   { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
-  { path: '/my-kpi',            ten: 'KPI cá nhân' },            // UC-60, UC-67
 ]
 
 const TRANG_BTV_CHUA_LAM = [
@@ -67,7 +68,6 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
 
@@ -155,6 +155,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
+              {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
+              <Route path="/my-kpi" element={<PersonalKpiProgress nguoiDung={nguoiDung} />} />
             </>
           )}
           {vaiTro === 'EDITOR' && (
@@ -171,6 +173,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
               <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
+              <Route path="/kpi-board/:reporterId" element={<ReporterKpiDetails nguoiDung={nguoiDung} />} />
               <Route path="/kpi-targets" element={<MonthlyTargetSetting nguoiDung={nguoiDung} />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
             </>

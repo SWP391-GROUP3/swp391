@@ -60,3 +60,11 @@ export async function layBangKpiBan(nam, thang) {
 export async function tongHopKpiThang(nam, thang) {
   return goiApi(`/api/kpi-snapshots/aggregate?year=${nam}&month=${thang}`, { method: 'POST' })
 }
+
+/**
+ * Lấy chi tiết KPI của một phóng viên theo chu kỳ tháng (UC-62, UC-60).
+ */
+export async function layChiTietKpiPhongVien(reporterId, nam, thang) {
+  return goiApi(`/api/kpi-snapshots/reporters/${reporterId}/details?year=${nam}&month=${thang}`)
+}
+
