@@ -1,33 +1,80 @@
 package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.ArticlePublishedResponse;
+import com.swp391.kpi.dto.ArticleRoyaltyAttachmentResponse;
+import com.swp391.kpi.dto.ArticleRoyaltyAuthorResponse;
+import com.swp391.kpi.dto.ArticleRoyaltyInfoResponse;
+import com.swp391.kpi.dto.RoyaltyGradingAuthorResponse;
+import com.swp391.kpi.dto.RoyaltyGradingCreateRequest;
+import com.swp391.kpi.dto.RoyaltyGradingMediaResponse;
+import com.swp391.kpi.dto.RoyaltyGradingResponse;
 import com.swp391.kpi.dto.RoyaltyPendingArticleResponse;
+import com.swp391.kpi.dto.ScoringReadResponse;
+import com.swp391.kpi.entity.Event;
+import com.swp391.kpi.entity.MediaFactor;
+import com.swp391.kpi.entity.RoyaltyGrading;
+import com.swp391.kpi.entity.RoyaltyLine;
+import com.swp391.kpi.entity.RoyaltyLineType;
+import com.swp391.kpi.entity.RoyaltyMediaItem;
+import com.swp391.kpi.entity.RoyaltyNature;
+import com.swp391.kpi.entity.RoyaltyPeriod;
+import com.swp391.kpi.entity.RoyaltyPeriodStatus;
+import com.swp391.kpi.entity.RoyaltyRate;
 import com.swp391.kpi.exception.BusinessException;
+import com.swp391.kpi.exception.NotFoundException;
+import com.swp391.kpi.repository.EventRepository;
+import com.swp391.kpi.repository.MediaFactorRepository;
 import com.swp391.kpi.repository.RoyaltyGradingRepository;
+import com.swp391.kpi.repository.RoyaltyLineRepository;
+import com.swp391.kpi.repository.RoyaltyMediaItemRepository;
+import com.swp391.kpi.repository.RoyaltyPeriodRepository;
+import com.swp391.kpi.repository.RoyaltyRateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
- * Cham nhuan but (Thu ky toa soan): danh sach bai cho cham (UC-46).
+ * Cham nhuan but (Thu ky toa soan):
+ *   UC-46 danh sach bai cho cham, UC-47 cham phan bai viet, UC-48 cham anh/video.
+ * Cong thuc nam trong RoyaltyCalculator (Iter 1); class nay lay du lieu,
+ * goi may tinh va luu ket qua.
  */
 @Service
 @RequiredArgsConstructor
 public class RoyaltyGradingService {
 
     private static final String ROYALTY_FLOW = "BF-04";  // gia tri cot system_parameters.flow cua luong nhuan but
+    private static final int FIRST_VERSION = 1;          // Iter 2: moi bai chi co phieu phien ban 1
+    private static final String HASH_DUPLICATE = "DUPLICATE";  // trung y het file anh da co
+    private static final String HASH_SIMILAR = "SIMILAR";      // dhash gan giong anh da co
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final RoyaltyGradingRepository royaltyGradingRepository;
+    private final RoyaltyMediaItemRepository royaltyMediaItemRepository;
+    private final RoyaltyLineRepository royaltyLineRepository;
+    private final RoyaltyPeriodRepository royaltyPeriodRepository;
+    private final RoyaltyRateRepository royaltyRateRepository;
+    private final MediaFactorRepository mediaFactorRepository;
+    private final EventRepository eventRepository;
     private final ArticlePublishedService articlePublishedService;  // service cua BF-01, khong query bang articles
+    private final ScoringReadService scoringReadService;            // service cua BF-02: diem da duyet
+    private final GenreService genreService;                        // luong admin: he so chuan the loai
     private final SystemParameterService systemParameterService;
+    private final AuditService auditService;
+
+    // ------------------------------------------------------------------ UC-46
 
     // UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap toi han.
     // Thu tu giu nguyen nhu BF-01 tra ve: bai dang som nhat (gan han nhat) len dau.
@@ -53,6 +100,263 @@ public class RoyaltyGradingService {
         }
         return result;
     }
+
+    // ------------------------------------------------------------- UC-47, 48
+
+    // UC-47 buoc 1-4: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
+    // nature = tinh chat Thu ky dang chon; null thi lay tinh chat PV da khai.
+    @Transactional(readOnly = true)
+    public RoyaltyGradingResponse previewGrading(Integer articleId, RoyaltyNature nature) {
+        ArticleRoyaltyInfoResponse article = articlePublishedService.getArticleForRoyalty(articleId);
+        RoyaltyNature confirmedNature = nature;
+        if (confirmedNature == null) {
+            confirmedNature = RoyaltyNature.valueOf(article.getDeclaredNature());
+        }
+        RoyaltyRate rate = findRateOnPublishDate(article);
+        RoyaltyGradingResponse preview = calculate(article, confirmedNature, rate);
+
+        // Cho Thu ky biet bai se vao ky nao. Chua co ky OPEN thi de trong, luc Hoan tat moi bao loi.
+        Optional<RoyaltyPeriod> openPeriod = findOpenPeriod();
+        if (openPeriod.isPresent()) {
+            fillPeriod(preview, openPeriod.get());
+        }
+        return preview;
+    }
+
+    // UC-47 buoc 5 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien
+    // cua tung nguoi vao ky dang OPEN (BR-RY-05). Tat ca trong 1 transaction: loi la khong luu gi.
+    @Transactional
+    public RoyaltyGradingResponse completeGrading(RoyaltyGradingCreateRequest request, Integer currentUserId) {
+        ArticleRoyaltyInfoResponse article = articlePublishedService.getArticleForRoyalty(request.getArticleId());
+        if (royaltyGradingRepository.existsByArticleId(article.getId())) {
+            throw new BusinessException("Bài này đã được chấm nhuận bút.");
+        }
+        // UC-47 E1: khong co ky OPEN thi khong hoan tat duoc
+        RoyaltyPeriod period = findOpenPeriod().orElseThrow(() -> new BusinessException(
+                "Chưa có kỳ nhuận bút đang mở, chưa thể hoàn tất chấm nhuận bút."));
+        RoyaltyRate rate = findRateOnPublishDate(article);
+        RoyaltyGradingResponse result = calculate(article, request.getNature(), rate);
+
+        RoyaltyGrading grading = saveGrading(result, period, rate, currentUserId);
+        saveArticleLines(grading, period, result.getAuthors());
+        saveMediaItemsAndLines(grading, period, result.getMediaItems());
+        auditService.log(currentUserId, "CREATE", "royalty_gradings", grading.getId(), null,
+                "{\"final_factor\":" + grading.getFinalFactor() + ",\"amount\":" + grading.getAmount() + "}");
+
+        result.setGradingId(grading.getId());
+        fillPeriod(result, period);
+        return result;
+    }
+
+    // ------------------------------------------------------------ tinh toan
+
+    // Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
+    private RoyaltyGradingResponse calculate(ArticleRoyaltyInfoResponse article, RoyaltyNature nature,
+                                             RoyaltyRate rate) {
+        ScoringReadResponse attempt = scoringReadService.getPublishedAttempt(article.getId());  // diem da duyet
+        BigDecimal score = attempt.totalScore();
+        BigDecimal baseFactor = genreService.getBaseFactor(article.getCategoryId());
+        RoyaltyCalculator calculator = new RoyaltyCalculator(systemParameterService.getValuesByFlow(ROYALTY_FLOW));
+        BigDecimal unitPrice = rate.getAmount();
+
+        BigDecimal suggestedFactor = calculator.suggestedFactor(baseFactor, score);                // BR-RY-01
+        BigDecimal saturationRate = findSaturationRate(article, score, calculator);               // GBR-09
+        BigDecimal finalFactor = calculator.finalFactor(suggestedFactor, saturationRate, nature); // BR-RY-02
+        BigDecimal articleAmount = calculator.calculateAmount(finalFactor, unitPrice);            // BR-RY-03
+
+        RoyaltyGradingResponse response = new RoyaltyGradingResponse();
+        response.setArticleId(article.getId());
+        response.setTitle(article.getTitle());
+        response.setPublishedAt(article.getPublishedAt());
+        response.setScoringAttemptId(attempt.id());
+        response.setScoreUsed(score);
+        response.setCategoryId(article.getCategoryId());
+        response.setBaseFactor(baseFactor);
+        response.setSuggestedFactor(suggestedFactor);
+        response.setSaturationRate(saturationRate);
+        response.setNature(nature);
+        response.setNatureRate(calculator.natureRate(nature));
+        response.setFinalFactor(finalFactor);
+        response.setUnitPrice(unitPrice);
+        response.setArticleAmount(articleAmount);
+        response.setAuthors(splitArticleAmount(article.getAuthors(), articleAmount, calculator));
+        response.setMediaItems(gradeMedia(article.getAttachments(), unitPrice, calculator));
+        response.setMediaAmount(sumMediaAmount(response.getMediaItems()));
+        response.setTotalAmount(articleAmount.add(response.getMediaAmount()));
+        return response;
+    }
+
+    // Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100;
+    // co su kien thi RoyaltyCalculator xet mien giam theo exempt_score cua su kien.
+    private BigDecimal findSaturationRate(ArticleRoyaltyInfoResponse article, BigDecimal score,
+                                          RoyaltyCalculator calculator) {
+        if (article.getEventId() == null) {
+            return calculator.effectiveSaturationRate(score, null, null);
+        }
+        Event event = eventRepository.findById(article.getEventId())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy sự kiện có ID: " + article.getEventId()));
+        return calculator.effectiveSaturationRate(score, article.getSaturationRate(), event.getExemptScore());
+    }
+
+    // Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d,
+    // tac gia chinh nhan phan con lai. RoyaltyCalculator.splitAmount can tac gia chinh o vi tri 0.
+    private List<RoyaltyGradingAuthorResponse> splitArticleAmount(List<ArticleRoyaltyAuthorResponse> authors,
+                                                                  BigDecimal amount, RoyaltyCalculator calculator) {
+        if (authors.isEmpty() || !authors.get(0).isMainAuthor()) {
+            throw new BusinessException("Dữ liệu tác giả của bài không hợp lệ, chưa thể chia nhuận bút.");
+        }
+        List<BigDecimal> shares = new ArrayList<>();
+        for (ArticleRoyaltyAuthorResponse author : authors) {
+            shares.add(author.getSharePercent());
+        }
+        List<BigDecimal> parts = calculator.splitAmount(amount, shares);  // cung thu tu voi authors
+
+        List<RoyaltyGradingAuthorResponse> result = new ArrayList<>();
+        for (int i = 0; i < authors.size(); i++) {
+            result.add(RoyaltyGradingAuthorResponse.from(authors.get(i), parts.get(i)));
+        }
+        return result;
+    }
+
+    // UC-48: cham tung anh/video. Anh duoc tinh tien = he so co dinh cua loai x don gia (BR-RY-04).
+    private List<RoyaltyGradingMediaResponse> gradeMedia(List<ArticleRoyaltyAttachmentResponse> attachments,
+                                                         BigDecimal unitPrice, RoyaltyCalculator calculator) {
+        List<RoyaltyGradingMediaResponse> result = new ArrayList<>();
+        for (ArticleRoyaltyAttachmentResponse attachment : attachments) {
+            String noRoyaltyReason = findNoRoyaltyReason(attachment);
+            if (noRoyaltyReason != null) {
+                result.add(RoyaltyGradingMediaResponse.from(attachment, null, BigDecimal.ZERO, noRoyaltyReason));
+                continue;
+            }
+            BigDecimal factor = findMediaFactor(attachment.getMediaKind());
+            BigDecimal amount = calculator.calculateAmount(factor, unitPrice);
+            result.add(RoyaltyGradingMediaResponse.from(attachment, factor, amount, null));
+        }
+        return result;
+    }
+
+    // Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05):
+    //  - lay tu nguon ngoai
+    //  - trung (DUPLICATE / SIMILAR) voi anh DA TUNG duoc tra nhuan but = tai su dung.
+    //    Trung voi anh chua tung tra tien thi van tinh (comment bang article_attachments).
+    private String findNoRoyaltyReason(ArticleRoyaltyAttachmentResponse attachment) {
+        if (attachment.getExternalSource() != null && !attachment.getExternalSource().isBlank()) {
+            return "Lấy từ nguồn ngoài: " + attachment.getExternalSource();
+        }
+        String hashResult = attachment.getHashResult();
+        boolean duplicated = HASH_DUPLICATE.equals(hashResult) || HASH_SIMILAR.equals(hashResult);
+        if (duplicated && royaltyMediaItemRepository.existsByAttachmentId(attachment.getMatchedAttachmentId())) {
+            return "Trùng ảnh/video đã được trả nhuận bút (tái sử dụng)";
+        }
+        return null;
+    }
+
+    // He so co dinh cua loai anh/video (bang media_factors, UC-56)
+    private BigDecimal findMediaFactor(String mediaKind) {
+        MediaFactor mediaFactor = mediaFactorRepository.findByMediaKind(mediaKind)
+                .orElseThrow(() -> new BusinessException("Chưa có hệ số cho loại ảnh/video " + mediaKind + "."));
+        return mediaFactor.getFactor();
+    }
+
+    private static BigDecimal sumMediaAmount(List<RoyaltyGradingMediaResponse> mediaItems) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (RoyaltyGradingMediaResponse media : mediaItems) {
+            total = total.add(media.getAmount());
+        }
+        return total;
+    }
+
+    // UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
+    private RoyaltyRate findRateOnPublishDate(ArticleRoyaltyInfoResponse article) {
+        LocalDate publishDate = article.getPublishedAt().toLocalDate();
+        return royaltyRateRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(publishDate)
+                .orElseThrow(() -> new BusinessException("Chưa có đơn giá nhuận bút hiệu lực tại ngày đăng "
+                        + publishDate.format(DATE_FORMAT) + "."));
+    }
+
+    private Optional<RoyaltyPeriod> findOpenPeriod() {
+        return royaltyPeriodRepository.findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc(RoyaltyPeriodStatus.OPEN);
+    }
+
+    private static void fillPeriod(RoyaltyGradingResponse response, RoyaltyPeriod period) {
+        response.setPeriodId(period.getId());
+        response.setPeriodYear(period.getPeriodYear());
+        response.setPeriodMonth(period.getPeriodMonth());
+    }
+
+    // ------------------------------------------------------------------ luu
+
+    // Phieu cham phien ban 1. tier_rate luu bang diem, applied = suggested (BR-RY-01 moi).
+    private RoyaltyGrading saveGrading(RoyaltyGradingResponse result, RoyaltyPeriod period, RoyaltyRate rate,
+                                       Integer currentUserId) {
+        RoyaltyGrading grading = new RoyaltyGrading();
+        grading.setScoringAttemptId(result.getScoringAttemptId());
+        grading.setArticleId(result.getArticleId());
+        grading.setCategoryId(result.getCategoryId());
+        grading.setGradedBy(currentUserId);
+        grading.setVersionNo(FIRST_VERSION);
+        grading.setPeriod(period);
+        grading.setRate(rate);
+        grading.setScoreUsed(result.getScoreUsed());
+        grading.setTierRate(result.getScoreUsed());
+        grading.setBaseFactor(result.getBaseFactor());
+        grading.setSuggestedFactor(result.getSuggestedFactor());
+        grading.setAppliedFactor(result.getSuggestedFactor());
+        grading.setSaturationRate(result.getSaturationRate());
+        grading.setNature(result.getNature());
+        grading.setNatureRate(result.getNatureRate());
+        grading.setFinalFactor(result.getFinalFactor());
+        grading.setUnitPrice(result.getUnitPrice());
+        grading.setAmount(result.getArticleAmount());
+        grading.setGradedAt(LocalDateTime.now());  // cot co DEFAULT nhung Hibernate van ghi NULL neu de trong
+        return royaltyGradingRepository.save(grading);
+    }
+
+    // Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
+    private void saveArticleLines(RoyaltyGrading grading, RoyaltyPeriod period,
+                                  List<RoyaltyGradingAuthorResponse> authors) {
+        for (RoyaltyGradingAuthorResponse author : authors) {
+            RoyaltyLine line = newLine(grading, period, author.getUserId(), RoyaltyLineType.ARTICLE, author.getAmount());
+            line.setSharePercent(author.getSharePercent());
+            royaltyLineRepository.save(line);
+        }
+    }
+
+    // Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh.
+    // Anh khong tinh tien thi khong tao dong nao (BR-RY-04).
+    private void saveMediaItemsAndLines(RoyaltyGrading grading, RoyaltyPeriod period,
+                                        List<RoyaltyGradingMediaResponse> mediaItems) {
+        for (RoyaltyGradingMediaResponse media : mediaItems) {
+            if (!media.getPayable()) {
+                continue;
+            }
+            RoyaltyMediaItem item = new RoyaltyMediaItem();
+            item.setGrading(grading);
+            item.setAttachmentId(media.getAttachmentId());
+            item.setFactor(media.getFactor());
+            item.setUnitPrice(grading.getUnitPrice());
+            item.setAmount(media.getAmount());
+            RoyaltyMediaItem savedItem = royaltyMediaItemRepository.save(item);
+
+            RoyaltyLine line = newLine(grading, period, media.getAuthorId(), RoyaltyLineType.MEDIA, media.getAmount());
+            line.setMediaItem(savedItem);
+            royaltyLineRepository.save(line);
+        }
+    }
+
+    private static RoyaltyLine newLine(RoyaltyGrading grading, RoyaltyPeriod period, Integer userId,
+                                       RoyaltyLineType lineType, BigDecimal amount) {
+        RoyaltyLine line = new RoyaltyLine();
+        line.setPeriod(period);
+        line.setGrading(grading);
+        line.setUserId(userId);
+        line.setLineType(lineType);
+        line.setAmount(amount);
+        line.setCreatedAt(LocalDateTime.now());
+        return line;
+    }
+
+    // ---------------------------------------------------------------- tien ich
 
     // Lay 1 tham so so nguyen. Thieu hoac sai dinh dang thi bao loi ro rang,
     // khong tu dung so mac dinh (AGENTS.md muc 5: khong viet cung so trong code).

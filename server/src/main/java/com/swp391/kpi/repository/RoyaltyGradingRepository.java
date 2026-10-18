@@ -15,4 +15,7 @@ public interface RoyaltyGradingRepository extends JpaRepository<RoyaltyGrading, 
     // DISTINCT vi 1 bai cham lai co nhieu phien ban, chi can lay id 1 lan.
     @Query("SELECT DISTINCT g.articleId FROM RoyaltyGrading g")
     List<Integer> findGradedArticleIds();
+
+    // Bai da co phieu cham chua (UC-47: Iter 2 moi bai chi cham 1 lan, cham lai la Iter 3)
+    boolean existsByArticleId(Integer articleId);
 }
