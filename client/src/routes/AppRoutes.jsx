@@ -18,6 +18,7 @@ import MyArticles from '../pages/article/MyArticles.jsx'
 import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
+import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
@@ -62,7 +63,6 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/reviewers',             ten: 'Độ lệch & hồ sơ BTV' },     // UC-41
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
-  { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
@@ -151,6 +151,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat }) {
           {vaiTro === 'HEAD_OF_DEPARTMENT' && (
             <>
               {/* BF-05 (Khang) */}
+              <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
               <Route path="/kpi-targets" element={<MonthlyTargetSetting nguoiDung={nguoiDung} />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
             </>
