@@ -1,4 +1,3 @@
-﻿/* ==========================================================================
 ﻿-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Hệ thống đánh giá chất lượng bài báo và quản lý nhuận bút
@@ -29,7 +28,7 @@
    - Tên bảng/cột snake_case tiếng Anh. Spring Boot tự map
      authorId <-> author_id, entity không cần @Column(name=...).
    - Tiền: DECIMAL(18,0) (VND). Hệ số, điểm, phần trăm: DECIMAL(5,2).
-   - Điểm chất lượng thang 0-100 (ngưỡng bậc 90 / 70 theo BR-RY-01).
+   - Điểm chất lượng thang 0-100 (hệ số nhuận bút = base_factor x điểm / 100, BR-RY-01).
    - Mọi cột *_rate, *_percent lưu dạng PHẦN TRĂM: 100.00 = giữ nguyên,
      70.00 = còn 70%. Khi nhân thì chia 100.
    - Khoá ngoại KHÔNG dùng ON DELETE CASCADE: nhiều FK cùng trỏ về users sẽ
@@ -106,18 +105,18 @@ CREATE TABLE users (
     CONSTRAINT ck_users_status  CHECK (status IN ('ACTIVE','LOCKED'))
 );
 
-/* Thể loại bài. base_factor = hệ số chuẩn (dùng để gợi ý), max_factor = trần
-   TKTS được nâng tới (BR-RY-01). nd_group = nhóm thể loại theo khung
-   Nghị định 18/2014 (thay bằng NĐ 287/2026 từ 01/09/2026). */
+/* Thể loại bài. base_factor = hệ số chuẩn: hệ số nhuận bút của bài
+   = base_factor x điểm / 100, hệ thống tự tính, TKTS không nâng (BR-RY-01).
+   nd_group = nhóm thể loại theo khung Nghị định 18/2014 (thay bằng
+   NĐ 287/2026 từ 01/09/2026). */
 CREATE TABLE genres (
     id           INT IDENTITY(1,1) PRIMARY KEY,
     code         VARCHAR(30)   NOT NULL UNIQUE,
     name         NVARCHAR(100) NOT NULL,
     nd_group     NVARCHAR(100) NOT NULL,
     base_factor  DECIMAL(5,2)  NOT NULL,
-    max_factor   DECIMAL(5,2)  NOT NULL,
     is_active    BIT           NOT NULL DEFAULT 1,
-    CONSTRAINT ck_genres_factor CHECK (base_factor > 0 AND base_factor <= max_factor)
+    CONSTRAINT ck_genres_factor CHECK (base_factor > 0)
 );
 
 /* Hệ số ảnh/video theo loại tác phẩm (BR-RY-04: dùng hệ số cố định factor).
@@ -127,12 +126,11 @@ CREATE TABLE media_factors (
     id          INT IDENTITY(1,1) PRIMARY KEY,
     media_kind  VARCHAR(20)  NOT NULL UNIQUE,
     factor      DECIMAL(5,2) NOT NULL,
-    max_factor  DECIMAL(5,2) NOT NULL,
-    CONSTRAINT ck_media_factors_factor CHECK (factor > 0 AND factor <= max_factor)
+    CONSTRAINT ck_media_factors_factor CHECK (factor > 0)
 );
 
 /* Tham số hệ thống dạng key-value: số ngày xác nhận đồng tác giả, số tác giả
-   tối đa, ngưỡng bậc điểm, tỷ lệ tính chất bài, đơn vị làm tròn...
+   tối đa, tỷ lệ tính chất bài, đơn vị làm tròn, hạn chi nhuận bút...
    Code đọc theo param_key, KHÔNG viết cứng số trong Java.
    flow = luồng dùng tham số (BF-01 ... BF-05), NULL = dùng chung. */
 CREATE TABLE system_parameters (
@@ -300,6 +298,7 @@ CREATE TABLE article_attachments (
     CONSTRAINT fk_article_attachments_version FOREIGN KEY (version_id)            REFERENCES article_versions(id),
     CONSTRAINT fk_article_attachments_author  FOREIGN KEY (author_id)             REFERENCES users(id),
     CONSTRAINT fk_article_attachments_matched FOREIGN KEY (matched_attachment_id) REFERENCES article_attachments(id),
+    CONSTRAINT fk_article_attachments_kind    FOREIGN KEY (media_kind)            REFERENCES media_factors(media_kind),
     CONSTRAINT ck_article_attachments_type    CHECK (media_type IN ('IMAGE','VIDEO')),
     CONSTRAINT ck_article_attachments_result  CHECK (hash_result IN ('NEW','DUPLICATE','SIMILAR')),
     CONSTRAINT ck_article_attachments_bits    CHECK (distance_bits <= 64),
@@ -675,7 +674,8 @@ CREATE TABLE reviewer_deviation_indices (
    ROYALTY - BF-04 Chấm & chi nhuận bút
    ========================================================================== */
 
-/* Giá trị 1 hệ số. amount = 10% base_salary (lương cơ sở).
+/* Giá trị 1 hệ số. amount = base_salary (lương cơ sở) x UNIT_PRICE_PERCENT / 100
+   (system_parameters, hiện 10%), làm tròn xuống tới đồng.
    Đơn giá áp dụng = dòng có effective_from lớn nhất mà <= ngày đăng bài
    (BR-RY-03). Không sửa dòng cũ, chỉ thêm dòng mới. */
 CREATE TABLE royalty_rates (
@@ -683,7 +683,6 @@ CREATE TABLE royalty_rates (
     base_salary     DECIMAL(18,0) NOT NULL,
     amount          DECIMAL(18,0) NOT NULL,
     effective_from  DATE          NOT NULL UNIQUE,
-    legal_ref       NVARCHAR(200) NULL,       -- văn bản căn cứ, vd NĐ 287/2026/NĐ-CP
     created_by      INT           NOT NULL,   -- Kế toán / Admin
     CONSTRAINT fk_royalty_rates_creator FOREIGN KEY (created_by) REFERENCES users(id),
     CONSTRAINT ck_royalty_rates_amount  CHECK (base_salary > 0 AND amount > 0)
@@ -719,15 +718,19 @@ CREATE TABLE royalty_periods (
 
 /* Phiếu chấm nhuận bút phần bài viết. Mỗi lần tính lại là 1 PHIÊN BẢN MỚI
    (version_no tăng, bắt buộc recalc_reason), không sửa phiên bản cũ.
-   Công thức (lưu đủ từng bước để giải trình):
-     1. tier_rate        = % theo bậc điểm score_used (>= 90: 100, 70-89: 80, < 70: 60)
-     2. suggested_factor = base_factor * tier_rate / 100
-     3. applied_factor   = TKTS giữ hoặc NÂNG (<= genres.max_factor, kèm raise_reason)
-     4. saturation_rate  = lấy từ articles (100 nếu không thuộc sự kiện)
-     5. nature_rate      = % theo tính chất: ORIGINAL 100, TRANSLATION 70,
-                           COMPILATION 50, REPOST 30
+   Công thức (lưu đủ từng bước để giải trình), BR-RY-01..03:
+     1. tier_rate        = score_used (nhóm bỏ chia bậc 90/70 ngày 13/10/2026,
+                           giữ cột để không đổi cấu trúc, lưu bằng điểm)
+     2. suggested_factor = base_factor * score_used / 100
+     3. applied_factor   = suggested_factor (hệ thống tự tính, TKTS không nâng,
+                           raise_reason luôn NULL)
+     4. saturation_rate  = lấy từ articles (100 nếu không thuộc sự kiện hoặc
+                           điểm >= events.exempt_score)
+     5. nature_rate      = % theo tính chất (system_parameters NATURE_RATE_*):
+                           ORIGINAL 100, TRANSLATION 70, COMPILATION 50, REPOST 30
      6. final_factor     = applied * saturation_rate/100 * nature_rate/100, tối thiểu 1
-     7. amount           = final_factor * unit_price
+     7. amount           = final_factor * unit_price, làm tròn XUỐNG tới bội số
+                           ROUNDING_UNIT (1.000đ)
    unit_price lấy từ rate_id (đơn giá hiệu lực tại ngày đăng).
    period_id = kỳ đang OPEN lúc hoàn tất chấm (BR-RY-05): kiểm ở service. */
 CREATE TABLE royalty_gradings (
@@ -761,11 +764,13 @@ CREATE TABLE royalty_gradings (
     CONSTRAINT fk_royalty_gradings_grader   FOREIGN KEY (graded_by)          REFERENCES users(id),
     CONSTRAINT uq_royalty_gradings_version  UNIQUE (article_id, version_no),
     CONSTRAINT ck_royalty_gradings_score    CHECK (score_used BETWEEN 0 AND 100),
-    CONSTRAINT ck_royalty_gradings_rates    CHECK (tier_rate > 0 AND tier_rate <= 100
+    -- tier_rate = điểm nên được bằng 0 (bài 0 điểm vẫn có hệ số cuối tối thiểu 1).
+    CONSTRAINT ck_royalty_gradings_rates    CHECK (tier_rate >= 0 AND tier_rate <= 100
                                                    AND saturation_rate > 0 AND saturation_rate <= 100
                                                    AND nature_rate > 0 AND nature_rate <= 100),
     CONSTRAINT ck_royalty_gradings_nature   CHECK (nature IN ('ORIGINAL','TRANSLATION','COMPILATION','REPOST')),
-    -- TKTS chỉ được NÂNG hệ số, nâng thì phải có lý do (BR-RY-01).
+    -- Lưới an toàn từ thiết kế cũ (TKTS được nâng hệ số kèm lý do). Theo BR-RY-01
+    -- mới, service luôn ghi applied = suggested và raise_reason = NULL.
     CONSTRAINT ck_royalty_gradings_applied  CHECK (applied_factor >= suggested_factor
                                                    AND (applied_factor = suggested_factor OR raise_reason IS NOT NULL)),
     CONSTRAINT ck_royalty_gradings_final    CHECK (final_factor >= 1),
