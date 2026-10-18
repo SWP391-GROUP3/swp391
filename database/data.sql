@@ -1,4 +1,3 @@
-﻿/* ==========================================================================
 ﻿-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Dữ liệu mẫu
@@ -48,18 +47,18 @@ INSERT INTO users (username, email, password_hash, full_name, role_id, section_i
     ('admin',    'admin@toasoan.vn',    '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Quản trị viên',  6, NULL),  -- 8 Admin
     ('giang.nt', 'giang.nt@toasoan.vn', '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Ngô Thu Giang',  2, 2);     -- 9 BTV Kinh tế
 
-INSERT INTO genres (code, name, nd_group, base_factor, max_factor) VALUES
-    ('TIN_VAN',   N'Tin vắn',           N'Tin',                    1.00,  2.00),   -- 1
-    ('TIN_SAU',   N'Tin sâu',           N'Tin',                    2.00,  4.00),   -- 2
-    ('PHAN_ANH',  N'Bài phản ánh',      N'Bài viết',               5.00,  7.00),   -- 3
-    ('PHONG_VAN', N'Bài phỏng vấn',     N'Bài viết',               6.00,  8.00),   -- 4
-    ('BINH_LUAN', N'Bình luận',         N'Bình luận, chính luận',  4.00,  6.00),   -- 5
-    ('PHONG_SU',  N'Phóng sự điều tra', N'Phóng sự, điều tra',    10.00, 15.00);   -- 6
+INSERT INTO genres (code, name, nd_group, base_factor) VALUES
+    ('TIN_VAN',   N'Tin vắn',           N'Tin',                    1.00),   -- 1
+    ('TIN_SAU',   N'Tin sâu',           N'Tin',                    2.00),   -- 2
+    ('PHAN_ANH',  N'Bài phản ánh',      N'Bài viết',               5.00),   -- 3
+    ('PHONG_VAN', N'Bài phỏng vấn',     N'Bài viết',               6.00),   -- 4
+    ('BINH_LUAN', N'Bình luận',         N'Bình luận, chính luận',  4.00),   -- 5
+    ('PHONG_SU',  N'Phóng sự điều tra', N'Phóng sự, điều tra',    10.00);   -- 6
 
-INSERT INTO media_factors (media_kind, factor, max_factor) VALUES
-    ('PHOTO',   1.00, 2.00),
-    ('GRAPHIC', 1.50, 3.00),
-    ('VIDEO',   3.00, 5.00);
+INSERT INTO media_factors (media_kind, factor) VALUES
+    ('PHOTO',   1.00),
+    ('GRAPHIC', 1.50),
+    ('VIDEO',   3.00);
 
 INSERT INTO system_parameters (param_key, param_value, unit, flow, updated_by) VALUES
     ('MAX_AUTHORS_PER_ARTICLE',     N'5',    N'người', 'BF-01', 8),
@@ -68,17 +67,15 @@ INSERT INTO system_parameters (param_key, param_value, unit, flow, updated_by) V
     ('DHASH_MAX_BITS',              N'5',    N'bit',   'BF-01', 8),
     ('DUP_WARN_PERCENT',            N'20',   N'%',     'BF-01', 8),
     ('DUP_BLOCK_PERCENT',           N'50',   N'%',     'BF-01', 8),
-    ('SCORE_TIER_HIGH',             N'90',   N'điểm',  'BF-04', 8),
-    ('SCORE_TIER_MID',              N'70',   N'điểm',  'BF-04', 8),
-    ('TIER_RATE_HIGH',              N'100',  N'%',     'BF-04', 8),
-    ('TIER_RATE_MID',               N'80',   N'%',     'BF-04', 8),
-    ('TIER_RATE_LOW',               N'60',   N'%',     'BF-04', 8),
     ('NATURE_RATE_ORIGINAL',        N'100',  N'%',     'BF-04', 8),
     ('NATURE_RATE_TRANSLATION',     N'70',   N'%',     'BF-04', 8),
     ('NATURE_RATE_COMPILATION',     N'50',   N'%',     'BF-04', 8),
     ('NATURE_RATE_REPOST',          N'30',   N'%',     'BF-04', 8),
     ('MIN_FINAL_FACTOR',            N'1',    NULL,     'BF-04', 8),
-    ('ROUNDING_UNIT',               N'1000', N'VND',   'BF-04', 8);
+    ('ROUNDING_UNIT',               N'1000', N'VND',   'BF-04', 8),
+    ('UNIT_PRICE_PERCENT',          N'10',   N'%',     'BF-04', 8),   -- đơn giá 1 hệ số = lương cơ sở x 10%
+    ('PAYMENT_DEADLINE_DAYS',       N'30',   N'ngày',  'BF-04', 8),   -- hạn chi = ngày đăng + 30 ngày (UC-46)
+    ('PAYMENT_WARN_DAYS',           N'7',    N'ngày',  'BF-04', 8);   -- còn <= 7 ngày tới hạn thì cảnh báo
 
 /* ---------- ROYALTY: danh mục ---------- */
 
@@ -86,8 +83,8 @@ INSERT INTO events (name, start_date, end_date, window_days, k_limit, exempt_sco
     (N'Bão số 3 năm 2026', '2026-09-05', '2026-09-20', 7, 10, 90, 4);   -- 1
 
 /* 1 hệ số = 10% lương cơ sở 2.340.000đ. */
-INSERT INTO royalty_rates (base_salary, amount, effective_from, legal_ref, created_by) VALUES
-    (2340000, 234000, '2026-01-01', N'Nghị định 18/2014/NĐ-CP, quy chế nhuận bút toà soạn', 6);   -- 1
+INSERT INTO royalty_rates (base_salary, amount, effective_from, created_by) VALUES
+    (2340000, 234000, '2026-01-01', 6);   -- 1
 
 INSERT INTO royalty_periods (period_year, period_month, status) VALUES
     (2026, 9, 'OPEN');   -- 1
@@ -97,7 +94,14 @@ INSERT INTO royalty_periods (period_year, period_month, status) VALUES
 /* Bài 1: PUBLISHED, thuộc sự kiện bão (xếp thứ 3 <= k_limit nên không giảm),
           có đồng tác giả, đã chấm điểm, đã chấm nhuận bút.
    Bài 2: DRAFT, chưa nộp.
-   Bài 3: SUBMITTED, chờ Trưởng ban phân công BTV. */
+   Bài 3: SUBMITTED, chờ Trưởng ban phân công BTV.
+   Bài 4, 5: PUBLISHED, đã duyệt điểm nhưng CHƯA chấm nhuận bút, để demo
+          UC-46 (danh sách chờ chấm) và UC-47/48 (chấm bài + ảnh):
+     Bài 4: 1 tác giả, Tin sâu, bài DỊCH (70%), điểm 84.50, đăng 22/09
+            -> hạn chi 22/10, gần hạn nên có cảnh báo.
+     Bài 5: 2 tác giả 60/40, Bài phản ánh, điểm 82.50, đăng 12/10, có 3 ảnh:
+            1 ảnh mới (được tính tiền), 1 ảnh nguồn ngoài và 1 ảnh trùng ảnh
+            bài 1 đã trả nhuận bút (2 ảnh này không tính tiền, BR-RY-04). */
 INSERT INTO articles (author_id, section_id, declared_category_id, category_id, event_id, approved_by,
                       title, content, declared_nature, status, saturation_rank, saturation_rate,
                       created_at, updated_at, submitted_at, published_at) VALUES
@@ -109,14 +113,23 @@ INSERT INTO articles (author_id, section_id, declared_category_id, category_id, 
         '2026-09-25 14:00', '2026-09-25 14:00', NULL, NULL),
     (1, 1, 2, 2, NULL, NULL, N'Giá xăng giảm lần thứ ba liên tiếp',
         N'Nội dung bản nộp...', 'ORIGINAL', 'SUBMITTED', NULL, NULL,
-        '2026-09-27 07:30', '2026-09-27 08:00', '2026-09-27 08:00', NULL);
+        '2026-09-27 07:30', '2026-09-27 08:00', '2026-09-27 08:00', NULL),
+    (2, 1, 2, 2, NULL, 5, N'Liên Hợp Quốc cảnh báo nguy cơ thiếu lương thực toàn cầu',
+        N'Bản dịch đã biên tập...', 'TRANSLATION', 'PUBLISHED', NULL, NULL,
+        '2026-09-17 08:00', '2026-09-22 09:00', '2026-09-17 10:00', '2026-09-22 09:00'),
+    (1, 1, 3, 3, NULL, 5, N'Đường dân sinh xuống cấp sau mùa mưa ở xã ven đô',
+        N'Nội dung bản đã biên tập...', 'ORIGINAL', 'PUBLISHED', NULL, NULL,
+        '2026-10-05 08:00', '2026-10-12 09:00', '2026-10-05 10:00', '2026-10-12 09:00');
 
 /* Tác giả chính ACCEPTED ngay; đồng tác giả đã xác nhận trong hạn 3 ngày. */
 INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, confirm_deadline, responded_at) VALUES
     (1, 1,  70.00, 'ACCEPTED', NULL,               '2026-09-10 10:00'),
     (1, 2,  30.00, 'ACCEPTED', '2026-09-13 10:00', '2026-09-10 11:00'),
     (2, 2, 100.00, 'ACCEPTED', NULL,               '2026-09-25 14:00'),
-    (3, 1, 100.00, 'ACCEPTED', NULL,               '2026-09-27 08:00');
+    (3, 1, 100.00, 'ACCEPTED', NULL,               '2026-09-27 08:00'),
+    (4, 2, 100.00, 'ACCEPTED', NULL,               '2026-09-17 10:00'),
+    (5, 1,  60.00, 'ACCEPTED', NULL,               '2026-10-05 10:00'),
+    (5, 2,  40.00, 'ACCEPTED', '2026-10-08 10:00', '2026-10-05 15:00');
 
 INSERT INTO article_versions (article_id, version_no, kind, title, content, change_type, created_by, created_at) VALUES
     (1, 1, 'SUBMISSION', N'Người dân khu Bắc Hà khốn khổ vì ngập sau bão',
@@ -124,7 +137,13 @@ INSERT INTO article_versions (article_id, version_no, kind, title, content, chan
     (1, 2, 'EDITED',     N'Người dân khu Bắc Hà khốn khổ vì ngập sau bão',
         N'Nội dung bản đã biên tập...', 'MINOR', 3, '2026-09-12 16:00'),        -- 2
     (3, 1, 'SUBMISSION', N'Giá xăng giảm lần thứ ba liên tiếp',
-        N'Nội dung bản nộp...', 'INITIAL', 1, '2026-09-27 08:00');              -- 3
+        N'Nội dung bản nộp...', 'INITIAL', 1, '2026-09-27 08:00'),              -- 3
+    (4, 1, 'SUBMISSION', N'Liên Hợp Quốc cảnh báo nguy cơ thiếu lương thực toàn cầu',
+        N'Bản dịch PV nộp...', 'INITIAL', 2, '2026-09-17 10:00'),               -- 4
+    (5, 1, 'SUBMISSION', N'Đường dân sinh xuống cấp sau mùa mưa ở xã ven đô',
+        N'Nội dung bản PV nộp...', 'INITIAL', 1, '2026-10-05 10:00'),           -- 5
+    (5, 2, 'EDITED',     N'Đường dân sinh xuống cấp sau mùa mưa ở xã ven đô',
+        N'Nội dung bản đã biên tập...', 'MINOR', 3, '2026-10-07 16:00');        -- 6
 
 /* Ảnh của PV Bình (đồng tác giả) chụp, không trùng ảnh nào. */
 INSERT INTO article_attachments (article_id, version_id, author_id, media_type, media_kind, url,
@@ -132,6 +151,22 @@ INSERT INTO article_attachments (article_id, version_id, author_id, media_type, 
     (1, 1, 2, 'IMAGE', 'PHOTO', N'/uploads/2026/09/bac-ha-ngap-1.jpg',
         '3b7e2f9c41d08a65e1c4b92d7f306a8e5c19b04d72e6f3a18c5d90b47e2a6f1c',
         'c3a1e0f07b1d2c4e', 'NEW', N'Nước ngập ngang gối tại ngõ 12');   -- 1
+
+/* Ảnh bài 5, gắn bản nộp (version 5):
+   2: ảnh mới của PV Bình -> được tính tiền.
+   3: đồ hoạ lấy từ nguồn ngoài -> không tính tiền.
+   4: ảnh trùng y hệt ảnh 1 (bài 1, đã trả nhuận bút) -> tái sử dụng, không tính tiền. */
+INSERT INTO article_attachments (article_id, version_id, author_id, media_type, media_kind, external_source, url,
+                                 file_hash, dhash, hash_result, distance_bits, matched_attachment_id, caption) VALUES
+    (5, 5, 2, 'IMAGE', 'PHOTO', NULL, N'/uploads/2026/10/duong-xuong-cap-1.jpg',
+        '9d4c1a7e52b0f3866e2d18c5a9f04b7d31e6c82a5f9b07d4e1c3a68f2b5d90e7',
+        'a5c3e1f0d2b49786', 'NEW', NULL, NULL, N'Mặt đường bong tróc tại thôn Đông'),       -- 2
+    (5, 5, 1, 'IMAGE', 'GRAPHIC', N'Sở Giao thông vận tải', N'/uploads/2026/10/ban-do-tuyen-duong.png',
+        '4f7a2c9e1b8d3065a2e7c4f19b0d6e38c5a17f2d9e4b60c8a3f15e7d2c9b04a6',
+        NULL, 'NEW', NULL, NULL, N'Bản đồ tuyến đường (nguồn: Sở GTVT)'),                 -- 3
+    (5, 5, 1, 'IMAGE', 'PHOTO', NULL, N'/uploads/2026/10/ngap-dung-lai.jpg',
+        '3b7e2f9c41d08a65e1c4b92d7f306a8e5c19b04d72e6f3a18c5d90b47e2a6f1c',
+        'c3a1e0f07b1d2c4e', 'DUPLICATE', 0, 1, N'Ảnh minh hoạ dùng lại từ bài cũ');        -- 4
 
 INSERT INTO duplication_checks (article_id, version_id, max_overlap_percent, result, explanation, checked_at) VALUES
     (1, 1, 0.00, 'NORMAL', N'Không có đoạn trùng với bài đã đăng.',              '2026-09-10 10:01'),   -- 1
@@ -143,7 +178,9 @@ INSERT INTO duplication_matches (check_id, matched_article_id, overlap_percent, 
 /* ---------- ASSESSMENT ---------- */
 
 INSERT INTO assignments (article_id, editor_id, assigned_by, assigned_at, was_suggested) VALUES
-    (1, 3, 5, '2026-09-10 14:00', 1);   -- 1
+    (1, 3, 5, '2026-09-10 14:00', 1),   -- 1
+    (4, 3, 5, '2026-09-17 14:00', 1),   -- 2
+    (5, 3, 5, '2026-10-06 09:00', 1);   -- 3
 
 /* Mỗi thể loại có 1 bộ tiêu chí ACTIVE, tổng trọng số = 100. */
 INSERT INTO criteria_set_versions (category_id, version_no, status, created_by, created_at, activated_by, activated_at) VALUES
@@ -165,16 +202,31 @@ INSERT INTO scoring_attempts (article_id, version_id, assignment_id, reviewer_id
                               criteria_set_version_id, category_id, total_score, decision, decision_note,
                               opened_at, submitted_at) VALUES
     (1, 1, 1, 3, 1, 'INITIAL', 1, 3, 77.00, 'ACCEPT',
-        N'Đề tài tốt, cần thêm ý kiến cơ quan chức năng.', '2026-09-11 08:30', '2026-09-11 09:00');   -- 1
+        N'Đề tài tốt, cần thêm ý kiến cơ quan chức năng.', '2026-09-11 08:30', '2026-09-11 09:00'),   -- 1
+    -- Bài 4 (Tin sâu, bộ tiêu chí 2): 85*40% + 80*35% + 90*25% = 34 + 28 + 22.5 = 84.50
+    (4, 4, 2, 3, 1, 'INITIAL', 2, 2, 84.50, 'ACCEPT',
+        N'Bản dịch chính xác, trình bày tốt.', '2026-09-18 08:30', '2026-09-18 09:00'),               -- 2
+    -- Bài 5 (Bài phản ánh, bộ tiêu chí 1): 90*30% + 80*20% + 85*30% + 70*20% = 27 + 16 + 25.5 + 14 = 82.50
+    (5, 5, 3, 3, 1, 'INITIAL', 1, 3, 82.50, 'ACCEPT',
+        N'Phát hiện vấn đề dân sinh, có số liệu.', '2026-10-07 08:30', '2026-10-07 09:00');           -- 3
 
 INSERT INTO scoring_attempt_details (scoring_attempt_id, criterion_id, score, comment) VALUES
     (1, 1, 80.00, NULL),
     (1, 2, 70.00, NULL),
     (1, 3, 90.00, N'Viết rõ ràng, có nhân chứng.'),
-    (1, 4, 60.00, N'Đăng chậm hơn báo khác 1 ngày.');
+    (1, 4, 60.00, N'Đăng chậm hơn báo khác 1 ngày.'),
+    (2, 5, 85.00, NULL),
+    (2, 6, 80.00, NULL),
+    (2, 7, 90.00, NULL),
+    (3, 1, 90.00, NULL),
+    (3, 2, 80.00, NULL),
+    (3, 3, 85.00, NULL),
+    (3, 4, 70.00, NULL);
 
 INSERT INTO score_approvals (scoring_attempt_id, decision, decided_by, decided_at, announced_at) VALUES
-    (1, 'APPROVED', 5, '2026-09-12 08:00', '2026-09-12 08:05');
+    (1, 'APPROVED', 5, '2026-09-12 08:00', '2026-09-12 08:05'),
+    (2, 'APPROVED', 5, '2026-09-19 08:00', '2026-09-19 08:05'),
+    (3, 'APPROVED', 5, '2026-10-08 08:00', '2026-10-08 08:05');
 
 /* ---------- APPEAL ---------- */
 
@@ -194,17 +246,18 @@ INSERT INTO reviewer_deviation_indices (editor_id, period, avg_deviation, appeal
     (3, '2026-09-01', 0.00, 0, 0.00, 1, '2026-09-20 00:00');
 
 /* ---------- ROYALTY: phiếu chấm bài 1 ----------
-   score 77 -> bậc 70-89 -> tier_rate 80%
-   suggested = 5.00 * 80% = 4.00, TKTS nâng lên 5.00 (có lý do)
-   final = 5.00 * 100% (bão hoà) * 100% (ORIGINAL) = 5.00
-   amount = 5.00 * 234.000 = 1.170.000đ */
+   Công thức BR-RY-01..03 (nhóm chốt 13/10/2026, bỏ chia bậc điểm):
+   tier_rate = điểm = 77.00
+   suggested = applied = 5.00 (Bài phản ánh) * 77 / 100 = 3.85
+   final = 3.85 * 100% (bão hoà) * 100% (ORIGINAL) = 3.85
+   amount = 3.85 * 234.000 = 900.900 -> làm tròn xuống 1.000đ = 900.000đ */
 INSERT INTO royalty_gradings (scoring_attempt_id, article_id, version_no, period_id, rate_id, category_id,
                               score_used, tier_rate, base_factor, suggested_factor, applied_factor, raise_reason,
                               saturation_rate, nature, nature_rate, final_factor, unit_price, amount,
                               graded_by, graded_at) VALUES
     (1, 1, 1, 1, 1, 3,
-        77.00, 80.00, 5.00, 4.00, 5.00, N'Phản ánh kịp thời vấn đề dân sinh sau bão.',
-        100.00, 'ORIGINAL', 100.00, 5.00, 234000, 1170000,
+        77.00, 77.00, 5.00, 3.85, 3.85, NULL,
+        100.00, 'ORIGINAL', 100.00, 3.85, 234000, 900000,
         4, '2026-09-16 10:00');   -- 1
 
 /* Ảnh PHOTO hệ số 1.00 -> 234.000đ cho tác giả ảnh. */
@@ -212,10 +265,11 @@ INSERT INTO royalty_media_items (grading_id, attachment_id, factor, unit_price, 
     (1, 1, 1.00, 234000, 234000);   -- 1
 
 /* Kỳ còn OPEN nên payment_id = NULL.
-   Phần bài 1.170.000đ chia 70/30: 819.000 + 351.000 = 1.170.000 (khớp đúng). */
+   Phần bài 900.000đ chia 70/30 (GBR-10): đồng tác giả Bình 30% = 270.000,
+   tác giả chính An nhận phần còn lại 630.000 -> 630.000 + 270.000 = 900.000 (khớp đúng). */
 INSERT INTO royalty_lines (period_id, grading_id, media_item_id, user_id, line_type, share_percent, amount, created_at) VALUES
-    (1, 1, NULL, 1, 'ARTICLE', 70.00, 819000, '2026-09-16 10:00'),
-    (1, 1, NULL, 2, 'ARTICLE', 30.00, 351000, '2026-09-16 10:00'),
+    (1, 1, NULL, 1, 'ARTICLE', 70.00, 630000, '2026-09-16 10:00'),
+    (1, 1, NULL, 2, 'ARTICLE', 30.00, 270000, '2026-09-16 10:00'),
     (1, 1, 1,    2, 'MEDIA',   NULL,  234000, '2026-09-16 10:00');
 
 /* ---------- KPI ---------- */
@@ -245,7 +299,7 @@ INSERT INTO notifications (user_id, article_id, message, is_read, created_at) VA
 
 INSERT INTO audit_logs (actor_id, action_type, entity_type, entity_id, old_value, new_value, created_at) VALUES
     (8, 'UPDATE', 'system_parameters', 1, N'{"param_value":"4"}', N'{"param_value":"5"}', '2026-09-01 08:00'),
-    (4, 'CREATE', 'royalty_gradings',  1, NULL, N'{"final_factor":5.00,"amount":1170000}', '2026-09-16 10:00');
+    (4, 'CREATE', 'royalty_gradings',  1, NULL, N'{"final_factor":3.85,"amount":900000}', '2026-09-16 10:00');
 
 /* Lịch sử bài: theo vòng đời DRAFT -> (PENDING_CONFIRMATION nếu có đồng tác giả)
    -> SUBMITTED -> ASSIGNED -> PENDING_APPROVAL -> SCORE_PUBLISHED -> PUBLISHED.
@@ -260,7 +314,20 @@ INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_s
     (1, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-09-15 09:00'),
     (2, 2, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-25 14:00'),
     (3, 1, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-27 07:30'),
-    (3, 1, 'SUBMIT',        'DRAFT',                'SUBMITTED',            NULL,              '2026-09-27 08:00');
+    (3, 1, 'SUBMIT',        'DRAFT',                'SUBMITTED',            NULL,              '2026-09-27 08:00'),
+    (4, 2, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-17 08:00'),
+    (4, 2, 'SUBMIT',        'DRAFT',                'SUBMITTED',            NULL,              '2026-09-17 10:00'),
+    (4, 5, 'ASSIGN',        'SUBMITTED',            'ASSIGNED',             N'Giao BTV Cường', '2026-09-17 14:00'),
+    (4, 3, 'SUBMIT_SCORE',  'ASSIGNED',             'PENDING_APPROVAL',     NULL,              '2026-09-18 09:00'),
+    (4, 5, 'APPROVE_SCORE', 'PENDING_APPROVAL',     'SCORE_PUBLISHED',      NULL,              '2026-09-19 08:05'),
+    (4, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-09-22 09:00'),
+    (5, 1, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-10-05 08:00'),
+    (5, 1, 'SUBMIT',        'DRAFT',                'PENDING_CONFIRMATION', NULL,              '2026-10-05 10:00'),
+    (5, 2, 'CONFIRM',       'PENDING_CONFIRMATION', 'SUBMITTED',            NULL,              '2026-10-05 15:00'),
+    (5, 5, 'ASSIGN',        'SUBMITTED',            'ASSIGNED',             N'Giao BTV Cường', '2026-10-06 09:00'),
+    (5, 3, 'SUBMIT_SCORE',  'ASSIGNED',             'PENDING_APPROVAL',     NULL,              '2026-10-07 09:00'),
+    (5, 5, 'APPROVE_SCORE', 'PENDING_APPROVAL',     'SCORE_PUBLISHED',      NULL,              '2026-10-08 08:05'),
+    (5, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-10-12 09:00');
 GO
 
 /* ---------- BF-03: ba bai mau de gui khieu nai (UC-35) ----------
