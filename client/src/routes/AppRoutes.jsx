@@ -22,6 +22,7 @@ import MyArticles from '../pages/article/MyArticles.jsx'
 import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
+import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyPeriodDetail from '../pages/royalty/RoyaltyPeriodDetail.jsx'
@@ -66,7 +67,6 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
@@ -170,6 +170,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/assignments" element={<AssignmentQueue nguoiDung={nguoiDung} />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
+              <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
               <Route path="/kpi-targets" element={<MonthlyTargetSetting nguoiDung={nguoiDung} />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
             </>
