@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { layBangKpiBan, tongHopKpiThang } from '../../api/kpiApi.js'
 import './DepartmentKpiDashboard.css'
 
@@ -141,6 +142,7 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
                 <th>Tiến độ bài</th>
                 <th style={{ textAlign: 'center' }}>Trạng thái dự kiến</th>
                 <th style={{ textAlign: 'center' }}>Bản ghi</th>
+                <th style={{ textAlign: 'center' }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -198,6 +200,14 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
                     >
                       {item.snapshotStatus || 'DRAFT'}
                     </span>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <Link
+                      to={`/kpi-board/${item.reporterId}?year=${nam}&month=${thang}`}
+                      className="bang-kpi-ban__link-chi-tiet"
+                    >
+                      Chi tiết →
+                    </Link>
                   </td>
                 </tr>
               ))}

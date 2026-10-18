@@ -3,11 +3,13 @@ package com.swp391.kpi.controller;
 import com.swp391.kpi.dto.ApiResponse;
 import com.swp391.kpi.dto.DepartmentKpiDashboardResponse;
 import com.swp391.kpi.dto.KpiSnapshotResponse;
+import com.swp391.kpi.dto.ReporterKpiDetailResponse;
 import com.swp391.kpi.entity.KpiSnapshot;
 import com.swp391.kpi.service.KpiAggregationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +39,20 @@ public class KpiSnapshotController {
     ) {
         DepartmentKpiDashboardResponse data = kpiAggregationService.getDepartmentDashboard(year, month);
         return ResponseEntity.ok(ApiResponse.success("Lấy dữ liệu bảng KPI ban biên tập thành công", data));
+    }
+
+    /**
+     * Lay chi tiet hieu suat KPI cua mot phong vien theo chu ky thang (UC-62, UC-60).
+     * GET /api/kpi-snapshots/reporters/{reporterId}/details?year=2026&month=9
+     */
+    @GetMapping("/reporters/{reporterId}/details")
+    public ResponseEntity<ApiResponse<ReporterKpiDetailResponse>> getReporterKpiDetail(
+            @PathVariable Integer reporterId,
+            @RequestParam Short year,
+            @RequestParam Byte month
+    ) {
+        ReporterKpiDetailResponse data = kpiAggregationService.getReporterKpiDetail(reporterId, year, month);
+        return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết KPI phóng viên thành công", data));
     }
 
     /**
