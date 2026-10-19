@@ -1,14 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import Icon from '../components/common/Icon.jsx'
-import { chuCaiDau } from '../utils/chuCaiDau.js'
-import '../styles/AppLayout.css'
+import './AppLayout.css'
 
 /** Muc "Trang chủ" - vai tro nao cung co, AppLayout tu them o dau menu. */
 const MUC_TRANG_CHU = {
   path: '/main',
   nhan: 'Trang chủ',
   icon: <><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><rect x="14" y="14" width="6" height="6" rx="1" /></>,
+}
+
+/** Chu cai dau cua ten (vd "Nguyễn Văn An" -> "A") de lam avatar. */
+function chuCaiDau(hoTen = '') {
+  const cacTu = hoTen.trim().split(' ')
+  return cacTu[cacTu.length - 1].charAt(0).toUpperCase()
 }
 
 /** 1 muc menu. NavLink tu them class "active" va aria-current="page" cho trang dang mo. */
@@ -20,74 +24,6 @@ function MucMenu({ muc }) {
       <Icon>{muc.icon}</Icon>
       <span>{muc.nhan}</span>
     </NavLink>
-  )
-}
-
-/**
- * Ten + avatar o goc phai thanh tren. Bam vao -> menu tha: "Hồ sơ của tôi", "Đăng xuất".
- * Bam ra ngoai menu hoac nhan Esc thi dong.
- */
-function MenuTaiKhoan({ nguoiDung, onDangXuat }) {
-  const [moMenu, setMoMenu] = useState(false)
-  const vungRef = useRef(null)   // ca nut + menu, de biet cu bam co nam ngoai khong
-
-  useEffect(() => {
-    if (!moMenu) {
-      return
-    }
-    function bamRaNgoai(event) {
-      if (vungRef.current && !vungRef.current.contains(event.target)) {
-        setMoMenu(false)
-      }
-    }
-    function nhanPhim(event) {
-      if (event.key === 'Escape') {
-        setMoMenu(false)
-      }
-    }
-    document.addEventListener('mousedown', bamRaNgoai)
-    document.addEventListener('keydown', nhanPhim)
-    // Dong menu / roi trang thi go 2 ham nghe, khong de chay mai
-    return () => {
-      document.removeEventListener('mousedown', bamRaNgoai)
-      document.removeEventListener('keydown', nhanPhim)
-    }
-  }, [moMenu])
-
-  return (
-    <div className="khung-app__tai-khoan" ref={vungRef}>
-      <button
-        type="button"
-        className="khung-app__nut-tai-khoan"
-        aria-expanded={moMenu}
-        aria-controls="menu-tai-khoan"
-        onClick={() => setMoMenu(!moMenu)}
-      >
-        <span className="khung-app__ten">
-          <span className="khung-app__ho-ten">{nguoiDung.hoTen}</span>
-          <span className="khung-app__vai-tro">{nguoiDung.tenVaiTro}</span>
-        </span>
-        <span className="khung-app__avatar" aria-hidden="true">{chuCaiDau(nguoiDung.hoTen)}</span>
-        <span className="an-di">Mở menu tài khoản</span>
-      </button>
-
-      {moMenu && (
-        <div id="menu-tai-khoan" className="khung-app__menu-tk">
-          <div className="khung-app__menu-tk-dau">
-            <span className="khung-app__ho-ten">{nguoiDung.hoTen}</span>
-            <span className="khung-app__vai-tro">{nguoiDung.email}</span>
-          </div>
-          <Link to="/profile" className="khung-app__menu-tk-muc" onClick={() => setMoMenu(false)}>
-            <Icon><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></Icon>
-            Hồ sơ của tôi
-          </Link>
-          <button type="button" className="khung-app__menu-tk-muc" onClick={onDangXuat}>
-            <Icon><path d="M10 4H5v16h5" /><path d="M14 8l4 4-4 4M18 12H9" /></Icon>
-            Đăng xuất
-          </button>
-        </div>
-      )}
-    </div>
   )
 }
 
@@ -148,7 +84,11 @@ export default function AppLayout({ nguoiDung, onDangXuat, tenMenu, nhomMenu, ph
 
             {phanThem}
 
-            <MenuTaiKhoan nguoiDung={nguoiDung} onDangXuat={onDangXuat} />
+            <div className="khung-app__ten">
+              <span className="khung-app__ho-ten">{nguoiDung.hoTen}</span>
+              <span className="khung-app__vai-tro">{nguoiDung.tenVaiTro}</span>
+            </div>
+            <span className="khung-app__avatar" aria-hidden="true">{chuCaiDau(nguoiDung.hoTen)}</span>
           </div>
         </header>
 

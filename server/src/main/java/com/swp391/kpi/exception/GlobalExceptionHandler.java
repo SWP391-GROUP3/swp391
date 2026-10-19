@@ -17,20 +17,7 @@ import java.util.Map;
  * Loi khac (sai URL, sai method...) de Spring tu xu ly de giu dung status.
  */
 @RestControllerAdvice
-@SuppressWarnings("unused") // Cac handler duoc Spring goi qua @ExceptionHandler.
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataConflict() {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error("Dữ liệu bị trùng hoặc không còn hợp lệ. Vui lòng tải lại và thử lại.", null));
-    }
-
-    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
-    public ResponseEntity<ApiResponse<Void>> handleStatus(org.springframework.web.server.ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode())
-                .body(ApiResponse.error(ex.getReason(), null));
-    }
 
     // @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
     @ExceptionHandler(MethodArgumentNotValidException.class)

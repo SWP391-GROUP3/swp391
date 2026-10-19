@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getMediaFactors, updateMediaFactor } from '../../api/royaltyApi.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import { mediaKindLabel } from '../../utils/royaltyLabels.js'
-import '../../styles/Royalty.css'
+import './Royalty.css'
 
 /** He so: so duong, toi da 3 chu so phan nguyen va 2 chu so thap phan (cot DECIMAL(5,2)). */
 const FACTOR_PATTERN = /^\d{1,3}(\.\d{1,2})?$/
@@ -82,7 +82,7 @@ export default function MediaFactors() {
 
         {factors && factors.length > 0 && (
           <div className="royalty__scroll">
-            <table className="bang-fm">
+            <table className="royalty__table">
               <thead>
                 <tr>
                   <th>Loại</th>
@@ -109,7 +109,7 @@ export default function MediaFactors() {
                           />
                         </td>
                         <td className="royalty__actions">
-                          <button type="button" className="nut-chinh-fm" disabled={isSaving}
+                          <button type="button" className="royalty__primary-button" disabled={isSaving}
                             onClick={() => saveEdit(mediaFactor)}>
                             {isSaving ? 'Đang lưu…' : 'Lưu'}
                           </button>

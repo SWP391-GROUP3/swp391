@@ -141,8 +141,7 @@ Simple view and configuration use cases (UC-46, 48, 49, 51, 52, 55, 56, 57) are 
 | BR-RY-07 | Period status: OPEN → CLOSED → LOCKED → PAID; only a CLOSED period can be returned or locked. |
 
 > **Ghi chú:**
-> - BR-RY-01 đã đổi theo quyết định của nhóm (13/10/2026): bỏ chia bậc điểm 90/70 (100/80/60%), hệ số = hệ số chuẩn thể loại × điểm / 100, hệ thống tự tính, Thư ký **không** nâng được nữa (nên bỏ luôn UC-47 A1 cũ). PR `[DB]` ngày 18/10/2026 đã bỏ tham số `SCORE_TIER_*`, `TIER_RATE_*`, sửa comment bảng `royalty_gradings` và bỏ cột `genres.max_factor`. Cột `tier_rate` giữ lại, lưu bằng điểm (cho phép 0); `applied_factor` luôn bằng `suggested_factor`.
-> - Hạn chi nhuận bút (UC-46): SRS không ghi số ngày. Nhóm chốt (14/10/2026) tham số `PAYMENT_DEADLINE_DAYS` = 30 ngày kể từ ngày đăng, cảnh báo khi còn ≤ `PAYMENT_WARN_DAYS` = 7 ngày.
+> - BR-RY-01 đã đổi theo quyết định của nhóm (13/10/2026): bỏ chia bậc điểm 90/70 (100/80/60%), hệ số = hệ số chuẩn thể loại × điểm / 100, hệ thống tự tính, Thư ký **không** nâng được nữa (nên bỏ luôn UC-47 A1 cũ). `database/data.sql` vẫn còn tham số `SCORE_TIER_*`, `TIER_RATE_*` và comment bảng `royalty_gradings` trong `schema.sql` vẫn ghi chia bậc → sửa ở PR `[DB]` riêng. Cột `tier_rate` giữ lại, lưu bằng điểm; `applied_factor` luôn bằng `suggested_factor`.
 > - UC-53 A1 ghi "period goes back to OPEN" khi Kế toán trả lại; swimlane ghi "return (reopen period)". Hai chỗ khớp nhau.
 > - Làm tròn chia đồng tác giả: BR-RY-03 ghi "rounded to 1,000 VND", GBR-10 nói rõ là **làm tròn xuống (FLOOR)**, phần dư dồn cho tác giả chính.
 > - Giảm hệ số sự kiện bão hoà 100% → 80% → 60% trong cửa sổ 7 ngày, bài có điểm hiệu lực ≥ 90 được miễn (GBR-09). Tỷ lệ này bị khoá lúc nộp bài (BR-IN-03).
