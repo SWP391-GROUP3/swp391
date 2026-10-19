@@ -8,6 +8,10 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   21  field                        - cac truong tra ve cho giao dien
+ */
 @Getter
 @Setter
 public class AppealCreateRequest {

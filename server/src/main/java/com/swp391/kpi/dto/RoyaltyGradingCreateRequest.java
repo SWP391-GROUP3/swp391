@@ -8,6 +8,9 @@ import lombok.Setter;
 /**
  * Thu ky bam Hoan tat cham nhuan but 1 bai (UC-47 buoc 5).
  * Chi gui bai nao + tinh chat Thu ky xac nhan; moi con so khac he thong tu tinh (BR-RY-01).
+ *
+ * MUC LUC (so dong)
+ *   20  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

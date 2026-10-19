@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 /**
  * Phiên bản bộ tiêu chí chấm của một thể loại bài viết.
  * Bảng: criteria_set_versions
+ *
+ * MUC LUC (so dong)
+ *   26  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "criteria_set_versions")

@@ -4,6 +4,9 @@ import '../styles/ComingSoon.css'
 /**
  * Trang tam cho chuc nang chua lam, de bam menu khong bi day ve trang chu.
  * Lam xong chuc nang nao thi doi route cua no trong routes/AppRoutes.jsx sang trang that.
+ *
+ * MUC LUC (so dong)
+ *   11  ComingSoon                   - Trang tam cho chuc nang chua lam, de bam menu khong bi day ve trang chu.
  */
 export default function ComingSoon({ tenChucNang }) {
   return (

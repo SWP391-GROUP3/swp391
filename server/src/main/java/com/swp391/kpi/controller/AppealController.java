@@ -20,6 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   36  field                        - service duoc inject
+ *   39  getEligibleArticles()
+ *   47  submitAppeal()
+ *   57  getMyAppeals()
+ *   65  getEligibility()
+ */
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor

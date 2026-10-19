@@ -3,6 +3,9 @@ package com.swp391.kpi.entity;
 /**
  * Loại lần chấm bài viết.
  * Khớp với CHECK (attempt_type IN ('INITIAL','RESCORE','APPEAL')) trong schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   11  gia tri                      - INITIAL, RESCORE, APPEAL
  */
 public enum AttemptType {
     INITIAL,

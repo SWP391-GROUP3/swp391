@@ -9,6 +9,17 @@ import {
 
 /**
  * Màn hình Cấu hình Định mức Chuẩn (UC-58) & Giao Chỉ tiêu KPI Tháng (UC-59).
+ *
+ * MUC LUC (so dong)
+ *   24  MonthlyTargetSetting         - Màn hình Cấu hình Định mức Chuẩn (UC-58) & Giao Chỉ tiêu KPI Tháng (UC-…
+ *   42    useEffect                  - Tải định mức chuẩn khi mở trang
+ *   49    useEffect                  - Tải danh sách chỉ tiêu theo tháng
+ *   53    taiDanhSachChiTieu()
+ *   67    moModalThemMoi()
+ *   77    moModalSua()
+ *   87    apDungDinhMuc()
+ *   92    xuLyLuuForm()
+ *  129    xuLyXoa()
  */
 export default function MonthlyTargetSetting({ nguoiDung }) {
   const [nam, setNam] = useState(2026)

@@ -8,6 +8,14 @@
  * Vi sao dung sessionStorage chu khong phai localStorage: sessionStorage tu xoa
  * khi dong tab. localStorage thi nam lai mai tren may - dung o phong may truong
  * thi nguoi sau mo ra van con token cua nguoi truoc.
+ *
+ * MUC LUC (so dong)
+ *   21  KHOA_PHIEN
+ *   24  KHOA_CU                      - Khoa cu (thoi dung tai khoan gia, chua co token) - xoa di cho sach.
+ *   27  docPhien
+ *   42  luuPhien
+ *   47  xoaPhien                     - Dang xuat (UC-70): server khong luu phien nen chi can xoa token o day.
+ *   52  layToken                     - Token de gan vao header Authorization; null neu chua dang nhap.
  */
 
 const KHOA_PHIEN = 'phienDangNhap'

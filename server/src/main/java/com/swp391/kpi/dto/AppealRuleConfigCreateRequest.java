@@ -10,6 +10,10 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * MUC LUC (so dong)
+ *   23  field                        - cac truong tra ve cho giao dien
+ */
 @Getter
 @Setter
 public class AppealRuleConfigCreateRequest {

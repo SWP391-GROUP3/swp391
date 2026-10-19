@@ -12,6 +12,13 @@ import java.util.Optional;
 
 /**
  * Doc bang royalty_periods (ky nhuan but, UC-49).
+ *
+ * MUC LUC (so dong)
+ *   26  findAllByOrderByPeriodYearDescPeriodMonthDesc() - Cac ky, thang moi nhat len dau
+ *   30  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc() - Ky dang o 1 trang thai, ky cu nhat len dau. UC-47 dung voi OPEN: bai ch…
+ *   33  existsByPeriodYearAndPeriodMonth() - Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi t…
+ *   39  sumLineAmountByPeriodId()
+ *   44  countGradedArticlesByPeriodId()
  */
 public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, Integer> {
 

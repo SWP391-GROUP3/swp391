@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   19  field                        - repository / service duoc inject
+ *   23  notifyHeads()
+ *   40  notifyRole()                 - Bao cho moi nguoi dang ACTIVE cua 1 vai tro (roles.code, vd "ACCOUNTANT…
+ */
 @Service
 @RequiredArgsConstructor
 public class NotificationService {

@@ -23,8 +23,12 @@ import AccountantHome from '../pages/home/AccountantHome.jsx'
 import AdminHome from '../pages/home/AdminHome.jsx'
 import MyArticles from '../pages/article/MyArticles.jsx'
 import ArticleDetail from '../pages/article/ArticleDetail.jsx'
+import CoAuthorInvites from '../pages/article/CoAuthorInvites.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
+import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
+import ReporterKpiDetails from '../pages/kpi/ReporterKpiDetails.jsx'
+import PersonalKpiProgress from '../pages/kpi/PersonalKpiProgress.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyPeriodDetail from '../pages/royalty/RoyaltyPeriodDetail.jsx'
@@ -46,9 +50,7 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  */
 const TRANG_PV_CHUA_LAM = [
   { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
-  { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
   { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
-  { path: '/my-kpi',            ten: 'KPI cá nhân' },            // UC-60, UC-67
 ]
 
 const TRANG_BTV_CHUA_LAM = [
@@ -66,6 +68,8 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/score-approvals/:id',   ten: 'Chi tiết kết quả chấm' },   // UC-30, 31, 32
   { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
+  { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
+  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
   { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
@@ -103,6 +107,16 @@ const KHUNG_THEO_VAI_TRO = {
  * Moi vai tro co 1 NHOM route rieng. Nguoi dang nhap la vai tro nao thi
  * chi nhom do ton tai, nen cung la "/main" nhung moi vai tro thay trang chu
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
+ *
+ * MUC LUC (so dong)
+ *   48  TRANG_PV_CHUA_LAM            - Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
+ *   53  TRANG_BTV_CHUA_LAM
+ *   61  TRANG_TK_CHUA_LAM            - Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
+ *   63  TRANG_TB_CHUA_LAM
+ *   77  TRANG_KT_CHUA_LAM
+ *   81  TRANG_ADMIN_CHUA_LAM
+ *   96  KHUNG_THEO_VAI_TRO           - Moi vai tro co khung trang (menu) rieng, khai bao o day:
+ *  122  AppRoutes                    - Khai bao toan bo route cua app (AGENTS.md muc 4: route moi them o day).
  */
 export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)
@@ -153,6 +167,10 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
+              {/* BF-01 (Minh): UC-12 danh sach loi moi dong tac gia */}
+              <Route path="/co-author-invites" element={<CoAuthorInvites />} />
+              {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
+              <Route path="/my-kpi" element={<PersonalKpiProgress nguoiDung={nguoiDung} />} />
             </>
           )}
           {vaiTro === 'EDITOR' && (
@@ -170,6 +188,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/appeals/:id" element={<AppealDetailPage />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
+              <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
+              <Route path="/kpi-board/:reporterId" element={<ReporterKpiDetails nguoiDung={nguoiDung} />} />
               <Route path="/kpi-targets" element={<MonthlyTargetSetting nguoiDung={nguoiDung} />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
             </>

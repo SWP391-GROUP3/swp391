@@ -19,6 +19,11 @@ function tenGoi(hoTen = '') {
  * - cot phai (cotPhai): cot dem so luong, thuong la <StatusCounter />
  * goiCaTen: true khi ho ten khong phai ten nguoi (vd tai khoan "Quản trị viên"),
  * chao bang ca ten thay vi chu cuoi.
+ *
+ * MUC LUC (so dong)
+ *    4  DINH_DANG_NGAY               - "Thứ Ba, 13 tháng 10, 2026"
+ *    9  tenGoi                       - Ten goi (chu cuoi cua ho ten): "Nguyễn Văn An" -> "An".
+ *   28  HomeFrame                    - Bo cuc chung cua trang chu moi vai tro (theo trang chu Phong vien / Fig…
  */
 export default function HomeFrame({ nguoiDung, cotPhai, goiCaTen = false, children }) {
   return (

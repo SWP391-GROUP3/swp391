@@ -15,6 +15,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * MUC LUC (so dong)
+ *   29  field                        - repository / service duoc inject
+ *   37  refresh()
+ *  106  getPeriods()
+ *  119  inScope()
+ *  124  inPeriod()
+ *  128  addDifference()
+ */
 @Service @RequiredArgsConstructor
 public class ReviewerDeviationRefreshService {
     private final UserReadService userReadService;

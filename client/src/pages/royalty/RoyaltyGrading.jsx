@@ -13,6 +13,15 @@ import '../../styles/Royalty.css'
  *   1. xac nhan tinh chat bai -> goi lai xem truoc de thay so moi
  *   2. xem anh/video nao duoc tinh tien (UC-48)
  *   3. bam Hoan tat -> luu phieu, bai vao ky dang mo (BR-RY-05)
+ *
+ * MUC LUC (so dong)
+ *   26  RoyaltyGrading               - UC-47, UC-48 - "Cham nhuan but" 1 bai (Thu ky toa soan).
+ *   36    useEffect                  - Moi lan doi tinh chat thi tinh lai (xem truoc, chua luu)
+ *   45    handleNatureChange()
+ *   52    handleComplete()
+ *  145  FormulaCard                  - Cac buoc cong thuc (BR-RY-01..03): server tinh, man hinh chi hien de Th…
+ *  172  AuthorCard                   - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong, ta…
+ *  198  MediaCard                    - UC-48: tung anh/video. Anh khong tinh tien (nguon ngoai, tai su dung) h…
  */
 export default function RoyaltyGrading() {
   const { articleId } = useParams()

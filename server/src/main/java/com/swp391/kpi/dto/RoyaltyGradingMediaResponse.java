@@ -8,6 +8,10 @@ import java.math.BigDecimal;
 /**
  * Ket qua cham 1 anh/video (UC-48, BR-RY-04).
  * payable = false thi kem ly do (nguon ngoai, tai su dung) va khong tao dong tien.
+ *
+ * MUC LUC (so dong)
+ *   20  field                        - cac truong tra ve cho giao dien
+ *   31  from()                       - noRoyaltyReason = null nghia la anh duoc tinh tien
  */
 @Getter
 @Setter

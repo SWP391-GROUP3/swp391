@@ -4,6 +4,10 @@ import AppLayout from './AppLayout.jsx'
  * Menu cua Bien tap vien (luong assessment BF-02 + appeal BF-03).
  * Man "Chấm bài" (UC-22…28) mo tu danh sach "Bài được giao", khong nam tren menu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
+ *
+ * MUC LUC (so dong)
+ *   12  MENU_BIEN_TAP_VIEN           - Menu cua Bien tap vien (luong assessment BF-02 + appeal BF-03).
+ *   27  EditorLayout                 - Khung trang cua Bien tap vien.
  */
 const MENU_BIEN_TAP_VIEN = [
   {

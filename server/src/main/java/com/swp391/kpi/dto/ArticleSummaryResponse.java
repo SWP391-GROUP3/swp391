@@ -10,6 +10,11 @@ import java.time.LocalDateTime;
 
 /**
  * 1 dong trong danh sach "Bai cua toi" (UC-01).
+ *
+ * MUC LUC (so dong)
+ *   24  hang so                      - Vai tro cua nguoi dang xem trong bai
+ *   27  field                        - cac truong tra ve cho giao dien
+ *   40  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

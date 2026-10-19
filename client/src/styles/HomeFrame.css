@@ -2,6 +2,11 @@
    components/common/HomeFrame.jsx - bo cuc trang chu dung chung moi vai tro.
    .trang-chu__khoi: khung the trang o cot trai (PendingList, SummaryCard,
    KpiProgressCard... deu dung).
+
+   MUC LUC (so dong)
+     12  tieu de, bo cuc dau trang
+     63  man hinh hep (@media)
+     67  man hinh hep (@media)
    =========================================================================== */
 
 .trang-chu__dau { margin-bottom: 24px; }

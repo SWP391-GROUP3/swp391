@@ -69,6 +69,13 @@ function taoCacNhom(duLieu) {
 /**
  * Trang chu cua Thu ky toa soan (BF-04).
  * Cot trai: viec cho xu ly + tom tat ky nhuan but dang mo. Cot phai: so bai theo nhom.
+ *
+ * MUC LUC (so dong)
+ *   14  NHAN_TRANG_THAI_KY           - Nhan hien thi cho royalty_periods.status (BR-RY-07: OPEN -> CLOSED -> L…
+ *   25  gopDanhSachViec              - Gop viec cua Thu ky thanh 1 danh sach "Chờ xử lý":
+ *   61  taoCacNhom                   - Cac o dem ben phai. 2 o dau chong nhau (sap toi han nam trong cho cham)…
+ *   80  SecretaryHome                - Trang chu cua Thu ky toa soan (BF-04).
+ *   84    useEffect                  - tai du lieu khi mo trang
  */
 export default function SecretaryHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)   // null = dang tai

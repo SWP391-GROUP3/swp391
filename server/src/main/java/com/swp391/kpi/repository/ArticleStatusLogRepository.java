@@ -7,6 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * MUC LUC (so dong)
+ *   18  findByArticleIdOrderByCreatedAtAscIdAsc() - Lich su trang thai cua 1 bai, cu nhat len dau (UC-02)
+ *   21  findFirstByArticleIdAndToStatusOrderByCreatedAtDescIdDesc() - Lan gan nhat bai duoc chuyen sang 1 trang thai (vd lay ghi chu luc bi t…
+ */
 public interface ArticleStatusLogRepository extends JpaRepository<ArticleStatusLog, Integer> {
 
     // Lich su trang thai cua 1 bai, cu nhat len dau (UC-02)

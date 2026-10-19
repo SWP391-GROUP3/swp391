@@ -6,6 +6,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * MUC LUC (so dong)
+ *   18  field                        - cac truong tra ve cho giao dien
+ */
 @Getter
 @Setter
 public class AppealCriterionRequest {

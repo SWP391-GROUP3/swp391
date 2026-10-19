@@ -7,6 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * MUC LUC (so dong)
+ *   19  findByScoringAttemptId()     - Lấy toàn bộ điểm chi tiết của một lần chấm (UC-30, UC-34)
+ *   22  findByScoringAttemptIdAndCriterionId() - Lấy điểm của một tiêu chí cụ thể trong lần chấm
+ */
 @Repository
 public interface ScoringAttemptDetailRepository extends JpaRepository<ScoringAttemptDetail, Integer> {
 

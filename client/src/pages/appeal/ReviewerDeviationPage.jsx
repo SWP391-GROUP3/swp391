@@ -6,6 +6,14 @@ import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/QualityReportPage.css'
 
+/**
+ * MUC LUC (so dong)
+ *   15  ReviewerDeviationPage
+ *   20    useEffect                  - tai du lieu khi mo trang
+ *   28    locBaoCao()
+ *   38    doiBoLoc()
+ */
+
 export default function ReviewerDeviationPage() {
   const location = useLocation()
   const [danhSach, setDanhSach] = useState(null)

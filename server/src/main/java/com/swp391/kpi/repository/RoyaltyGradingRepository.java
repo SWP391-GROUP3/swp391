@@ -8,6 +8,11 @@ import java.util.List;
 
 /**
  * Doc/ghi bang royalty_gradings (phieu cham nhuan but, UC-46, UC-47).
+ *
+ * MUC LUC (so dong)
+ *   22  findGradedArticleIds()       - Id cac bai DA co phieu cham (UC-46 loai cac bai nay khoi danh sach cho …
+ *   25  existsByArticleId()          - Bai da co phieu cham chua (UC-47: Iter 2 moi bai chi cham 1 lan, cham l…
+ *   29  findByPeriodIdOrderByGradedAtAsc() - Cac phieu cham thuoc 1 ky, cham truoc len dau (bang ke ky, UC-50).
  */
 public interface RoyaltyGradingRepository extends JpaRepository<RoyaltyGrading, Integer> {
 

@@ -113,6 +113,16 @@ function taoDongDonGia({ dangApDung, sapApDung }) {
 /**
  * Trang chu cua Ke toan (BF-04).
  * Cot trai: viec cho xu ly + don gia dang ap dung (API THAT). Cot phai: so ky theo trang thai.
+ *
+ * MUC LUC (so dong)
+ *   12  NHOM_TRANG_THAI_KY           - Nhom theo royalty_periods.status (BR-RY-07: OPEN -> CLOSED -> LOCKED ->…
+ *   20  tinhSoKyTheoNhom             - Doi { status, count } thanh cac nhom cho StatusCounter; status khong co…
+ *   35  gopDanhSachViec              - Gop viec cua Ke toan: ky cho duyet bang ke truoc, roi ky da khoa con ng…
+ *   70  homNayDangChuoi              - Ngay hom nay dang "2026-10-14" theo gio may (de so voi effectiveFrom cu…
+ *   83  timDonGia                    - Tu danh sach don gia (moi nhat truoc), tim:
+ *   98  taoDongDonGia                - Cac dong cua the "Đơn giá nhuận bút".
+ *  127  AccountantHome               - Trang chu cua Ke toan (BF-04).
+ *  133    useEffect                  - tai du lieu khi mo trang
  */
 export default function AccountantHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)       // null = dang tai

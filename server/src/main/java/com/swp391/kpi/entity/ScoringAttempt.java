@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 /**
  * Một lần chấm bài viết (lần đầu, chấm lại do Trưởng ban trả về, hoặc chấm khiếu nại).
  * Bảng: scoring_attempts
+ *
+ * MUC LUC (so dong)
+ *   27  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "scoring_attempts")

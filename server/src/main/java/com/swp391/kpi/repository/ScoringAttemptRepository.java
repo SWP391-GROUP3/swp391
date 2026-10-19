@@ -11,6 +11,13 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * MUC LUC (so dong)
+ *   21  findByArticleIdOrderByAttemptNoAsc() - Lấy toàn bộ lịch sử các lần chấm của một bài viết sắp xếp theo attempt_…
+ *   24  findByArticleIdAndAttemptNo() - Lấy lần chấm cụ thể theo bài viết và số lần chấm (article_id, attempt_n…
+ *   27  findTopByArticleIdOrderByAttemptNoDesc() - Lấy lần chấm mới nhất của một bài viết
+ *   30  findTopByAssignmentIdOrderByAttemptNoDesc() - Lấy lần chấm theo lượt phân công
+ */
 @Repository
 public interface ScoringAttemptRepository extends JpaRepository<ScoringAttempt, Integer> {
 

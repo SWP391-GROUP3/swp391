@@ -13,6 +13,13 @@ const PAGE_SIZE = 10
  * UC-01 - "Bai cua toi": bai ma Phong vien la tac gia chinh hoac dong tac gia.
  * Loc theo nhom trang thai bang URL (?status=A,B), nen trang chu link thang toi
  * dung nhom duoc. Bam tieu de de mo chi tiet bai (UC-02).
+ *
+ * MUC LUC (so dong)
+ *   10  PAGE_SIZE                    - So bai moi trang (AGENTS.md 3.7: ?page=0&size=10)
+ *   24  MyArticles                   - UC-01 - "Bai cua toi": bai ma Phong vien la tac gia chinh hoac dong tac…
+ *   34    useEffect                  - Tai lai danh sach moi khi doi bo loc hoac doi trang.
+ *   51    selectGroup()              - Bam 1 nhom loc: ghi vao URL va quay ve trang dau. Chuoi rong = "Tat ca".
+ *   60    goToPage()                 - Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc.
  */
 export default function MyArticles() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -49,6 +56,7 @@ export default function MyArticles() {
     setSearchParams(next)
   }
 
+  /** Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc. */
   function goToPage(newPage) {
     const next = new URLSearchParams(searchParams)
     next.set('page', newPage)

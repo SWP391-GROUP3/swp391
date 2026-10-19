@@ -5,6 +5,10 @@ import AppLayout from './AppLayout.jsx'
  * Duyet bang ke / tra ky / khoa ky (UC-51, 52, 53) lam trong man chi tiet ky,
  * mo tu "Kỳ nhuận bút", khong nam tren menu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
+ *
+ * MUC LUC (so dong)
+ *   13  MENU_KE_TOAN                 - Menu cua Ke toan (luong royalty BF-04).
+ *   28  AccountantLayout             - Khung trang cua Ke toan.
  */
 const MENU_KE_TOAN = [
   {

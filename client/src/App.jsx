@@ -6,6 +6,12 @@ import { docPhien, luuPhien, xoaPhien } from './auth/phienDangNhap.js'
  * Goc cua app: chi giu trang thai dang nhap.
  * Token + thong tin nguoi dung luu trong sessionStorage (auth/phienDangNhap.js),
  * F5 van con. Khai bao route nam o routes/AppRoutes.jsx (AGENTS.md muc 4).
+ *
+ * MUC LUC (so dong)
+ *   16  App                          - Goc cua app: chi giu trang thai dang nhap.
+ *   21    dangNhap()                 - phien = { token, nguoiDung } tu authApi.dangNhap()
+ *   27    dangXuat()                 - UC-70: server khong luu phien (JWT), xoa token o trinh duyet la xong
+ *   34    capNhatNguoiDung()         - Sua ho so xong (vd doi ho ten): cap nhat ca state lan phien da luu,
  */
 export default function App() {
   // Ham trong useState chi chay 1 lan luc mo app: doc lai phien cu neu co

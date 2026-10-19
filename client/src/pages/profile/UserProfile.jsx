@@ -16,6 +16,16 @@ const TEN_TRANG_THAI = {
  * Vai tro, ban, username do Admin quan ly nen chi hien, khong sua.
  *
  * - onCapNhatNguoiDung: bao App.jsx ten/email moi de thanh tren doi theo ngay
+ *
+ * MUC LUC (so dong)
+ *    8  TEN_TRANG_THAI
+ *   30  UserProfile                  - "Hồ sơ của tôi" - moi vai tro, mo tu menu avatar o thanh tren.
+ *   37    useEffect                  - Luon tai lai tu server (khong dung ban luu trong phien) de thay du lieu…
+ *   45    luuXong()
+ *   52    batDauSua()
+ *   98  ProfileDetails               - Bang thong tin chi doc.
+ *  115  EditProfileForm              - Form sua ho ten + email. Server kiem lai (@Valid + email trung).
+ *  121    guiForm()
  */
 export default function UserProfile({ onCapNhatNguoiDung }) {
   const [hoSo, setHoSo] = useState(null)        // null = dang tai

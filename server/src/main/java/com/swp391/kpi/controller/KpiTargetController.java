@@ -26,6 +26,16 @@ import java.util.List;
 
 /**
  * Controller cung cấp REST API cho chức năng cấu hình định mức & giao chỉ tiêu tháng (UC-58, UC-59).
+ *
+ * MUC LUC (so dong)
+ *   45  field                        - service duoc inject
+ *   52  getBenchmarks()              - Lấy danh sách định mức chuẩn theo ngạch phóng viên (UC-58).
+ *   62  updateBenchmarks()           - Cập nhật danh sách định mức chuẩn theo ngạch phóng viên (UC-58).
+ *   74  getTargets()                 - Lấy danh sách chỉ tiêu theo kỳ (năm và tháng) (UC-59).
+ *   87  getTargetById()              - Lấy chi tiết một chỉ tiêu theo ID.
+ *   97  createTarget()               - Giao chỉ tiêu tháng mới cho phóng viên (UC-59).
+ *  112  updateTarget()               - Điều chỉnh chỉ tiêu đã giao (UC-59 Nhánh ngoại lệ A2).
+ *  125  deleteTarget()               - Xoá chỉ tiêu KPI.
  */
 @RestController
 @RequestMapping("/api/kpi-targets")

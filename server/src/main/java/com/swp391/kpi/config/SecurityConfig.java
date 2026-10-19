@@ -31,6 +31,13 @@ import java.nio.charset.StandardCharsets;
  *   cham nhuan but = Thu ky
  * - moi API con lai: phai gui header "Authorization: Bearer <token>" hop le
  * Chan theo vai tro (vd chi Ke toan them don gia) -> them .requestMatchers(...).hasRole(...)
+ *
+ * MUC LUC (so dong)
+ *   46  hang so                      - hang so dung trong file
+ *   49  field                        - cac truong du lieu
+ *   52  securityFilterChain()
+ *   89  jwtAuthenticationConverter() - Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER",
+ *  100  writeError()                 - Ghi loi ra response dang { success: false, message: "..." } giong Globa…
  */
 @Configuration
 @RequiredArgsConstructor

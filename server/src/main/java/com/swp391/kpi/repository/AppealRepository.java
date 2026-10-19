@@ -10,6 +10,11 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * MUC LUC (so dong)
+ *   15  existsByArticleId()
+ *   17  findAllByAppellantIdOrderBySubmittedAtDesc()
+ */
 public interface AppealRepository extends JpaRepository<Appeal, Integer> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

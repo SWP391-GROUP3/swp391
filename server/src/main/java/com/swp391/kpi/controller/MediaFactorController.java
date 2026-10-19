@@ -18,6 +18,11 @@ import java.util.List;
 
 /**
  * API he so anh/video cho man Media Factor (UC-56, Admin).
+ *
+ * MUC LUC (so dong)
+ *   32  field                        - service duoc inject
+ *   36  getAllMediaFactors()         - GET /api/media-factors: danh sach loai anh/video va he so
+ *   43  updateFactor()               - PUT /api/media-factors/{id}: sua he so 1 loai
  */
 @RestController
 @RequestMapping("/api/media-factors")

@@ -15,6 +15,10 @@ import java.util.List;
 
 /**
  * Response DTO trả về thông tin chi tiết của 1 phiên bản bộ tiêu chí kèm các tiêu chí thành phần.
+ *
+ * MUC LUC (so dong)
+ *   29  field                        - cac truong tra ve cho giao dien
+ *   40  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

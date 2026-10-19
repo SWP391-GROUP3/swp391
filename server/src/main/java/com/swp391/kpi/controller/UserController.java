@@ -20,6 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
  * Ho so cua nguoi dang dang nhap. Duong dan "/me" = "chinh toi":
  * id lay tu token, KHONG nhan id tu URL -> khong ai sua duoc ho so nguoi khac.
  * Moi vai tro deu dung duoc (SecurityConfig: anyRequest().authenticated()).
+ *
+ * MUC LUC (so dong)
+ *   35  field                        - service duoc inject
+ *   39  getMyProfile()               - GET /api/users/me
+ *   47  updateMyProfile()            - PUT /api/users/me body: { "fullName": "...", "email": "..." }
+ *   57  changeMyPassword()           - PUT /api/users/me/password body: { "currentPassword", "newPassword", "c…
  */
 @RestController
 @RequestMapping("/api/users/me")
