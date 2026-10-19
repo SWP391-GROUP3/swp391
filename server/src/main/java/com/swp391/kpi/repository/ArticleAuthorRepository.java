@@ -7,6 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   20  findByArticleIdOrderBySharePercentDesc() - Moi tac gia cua 1 bai, ty le cao xep truoc
+ *   23  existsByArticleIdAndUserId() - Nguoi dung co phai la 1 tac gia cua bai khong (BR-IN-01: dong tac gia d…
+ *   26  findByUserIdAndArticleIdIn() - Dong cua nguoi dung trong nhieu bai cung luc (lay vai tro, ty le cho tr…
+ *   29  findByUserIdAndConfirmStatusOrderByConfirmDeadlineAsc() - Loi moi dong tac gia cua nguoi dung theo trang thai (vd PENDING), sap h…
+ */
 public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, ArticleAuthorId> {
 
     // Moi tac gia cua 1 bai, ty le cao xep truoc

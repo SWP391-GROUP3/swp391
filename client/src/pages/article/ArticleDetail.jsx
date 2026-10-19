@@ -10,6 +10,11 @@ import '../../styles/ArticleDetail.css'
  * UC-02 - Chi tiet bai: noi dung, khai bao, tac gia + trang thai xac nhan,
  * lich su trang thai. Tac gia chinh rut duoc bai dang "Da nop" (UC-11, BR-IN-08):
  * server tra canWithdraw de biet co hien nut hay khong.
+ *
+ * MUC LUC (so dong)
+ *   19  ArticleDetail                - UC-02 - Chi tiet bai: noi dung, khai bao, tac gia + trang thai xac nhan,
+ *   29    useEffect                  - Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
+ *   45    handleConfirmWithdraw()    - Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ba…
  */
 export default function ArticleDetail() {
   const { id } = useParams()
@@ -127,8 +132,7 @@ export default function ArticleDetail() {
                   {article.authors.map((author) => (
                     <li key={author.userId} className="article-detail__author">
                       <div>
-                        {/* TODO(admin): hien ho ten khi co entity User */}
-                        <span className="article-detail__name">Người dùng #{author.userId}</span>
+                        <span className="article-detail__name">{author.fullName || `Người dùng #${author.userId}`}</span>
                         <span className="article-detail__muted">
                           {author.mainAuthor ? 'Tác giả chính' : 'Đồng tác giả'} · {Number(author.sharePercent)}%
                         </span>
@@ -152,7 +156,9 @@ export default function ArticleDetail() {
                         <span className={`cham cham--${STATUS_COLORS[log.toStatus]}`} aria-hidden="true" />
                         {statusLabel(log.toStatus)}
                       </span>
-                      <span className="article-detail__muted"> · {formatDate(log.createdAt)}</span>
+                      <span className="article-detail__muted">
+                        {' · '}{formatDate(log.createdAt)}{log.actorName && ` · ${log.actorName}`}
+                      </span>
                       {log.note && <p className="article-detail__note">{log.note}</p>}
                     </li>
                   ))}

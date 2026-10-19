@@ -10,6 +10,10 @@ import java.util.List;
 
 /**
  * Man chi tiet bai (UC-02): noi dung, khai bao, tac gia va lich su trang thai.
+ *
+ * MUC LUC (so dong)
+ *   22  field                        - cac truong tra ve cho giao dien
+ *   46  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter
@@ -18,7 +22,8 @@ public class ArticleDetailResponse {
     private Integer id;
     private String title;
     private String content;
-    private Integer authorId;            // tac gia chinh. TODO(admin): tra them ho ten
+    private Integer authorId;            // tac gia chinh
+    private String authorName;           // ho ten tac gia chinh, lay qua UserReadService
     private Integer sectionId;
     private Integer declaredCategoryId;  // the loai PV khai
     private Integer categoryId;          // the loai ap dung
@@ -39,6 +44,7 @@ public class ArticleDetailResponse {
     private List<ArticleStatusLogResponse> statusLogs;
 
     public static ArticleDetailResponse from(Article article,
+                                             String authorName,
                                              List<ArticleAuthorResponse> authors,
                                              List<ArticleStatusLogResponse> statusLogs,
                                              boolean canWithdraw) {
@@ -47,6 +53,7 @@ public class ArticleDetailResponse {
         dto.setTitle(article.getTitle());
         dto.setContent(article.getContent());
         dto.setAuthorId(article.getAuthorId());
+        dto.setAuthorName(authorName);
         dto.setSectionId(article.getSectionId());
         dto.setDeclaredCategoryId(article.getDeclaredCategoryId());
         dto.setCategoryId(article.getCategoryId());
