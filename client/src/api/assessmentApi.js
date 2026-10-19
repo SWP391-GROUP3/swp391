@@ -41,3 +41,11 @@ export function layPhieuChamMoiNhat(articleId) {
   return goiApi(`/api/scoring-attempts/article/${articleId}/latest`)
 }
 
+export function doiTheLoaiBaiViet(articleId, newCategoryId) {
+  return goiApi(`/api/scoring-attempts/article/${articleId}/change-category`, {
+    method: 'POST',
+    body: { newCategoryId }
+  })
+}
+
+

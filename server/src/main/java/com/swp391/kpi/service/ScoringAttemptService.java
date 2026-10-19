@@ -28,6 +28,8 @@ public class ScoringAttemptService {
     private final AssignmentRepository assignmentRepository;
     private final ArticleRepository articleRepository;
     private final ArticleVersionRepository articleVersionRepository;
+    private final CategoryChangeLogRepository categoryChangeLogRepository;
+    private final GenreRepository genreRepository;
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
     @Transactional
@@ -130,6 +132,82 @@ public class ScoringAttemptService {
         List<ScoringAttemptDetailResponse> detailResponses = details.stream()
                 .map(ScoringAttemptDetailResponse::from)
                 .toList();
+
+        return ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
+    }
+
+    // BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
+    @Transactional
+    public ScoringAttemptResponse changeCategory(Integer articleId, Integer newCategoryId, Integer editorId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+
+        Assignment assignment = assignmentRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new BusinessException("Bài viết chưa được phân công"));
+
+        if (!assignment.getEditorId().equals(editorId)) {
+            throw new BusinessException("Bạn không được phân công chấm bài viết này!");
+        }
+
+        genreRepository.findById(newCategoryId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy thể loại mới với ID: " + newCategoryId));
+
+        Integer currentCategoryId = article.getCategoryId() != null ? article.getCategoryId() : article.getDeclaredCategoryId();
+        if (currentCategoryId.equals(newCategoryId)) {
+            throw new BusinessException("Thể loại mới phải khác với thể loại hiện tại của bài viết!");
+        }
+
+        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+                .orElseGet(() -> {
+                    openScoringAttempt(articleId, editorId);
+                    return scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId).orElseThrow();
+                });
+
+        if (attempt.getSubmittedAt() != null) {
+            throw new BusinessException("Không thể đổi thể loại cho phiếu chấm đã nộp!");
+        }
+
+        CriteriaSetVersion newActiveCriteriaSet = criteriaSetVersionRepository
+                .findByCategoryIdAndStatus(newCategoryId, CriteriaSetStatus.ACTIVE)
+                .orElseThrow(() -> new BusinessException("Thể loại mới chưa có bộ tiêu chí nào ở trạng thái ACTIVE"));
+
+        List<Criteria> newCriteriaList = criteriaRepository
+                .findByCriteriaSetVersionIdOrderBySortOrderAsc(newActiveCriteriaSet.getId());
+        if (newCriteriaList.isEmpty()) {
+            throw new BusinessException("Bộ tiêu chí ACTIVE của thể loại mới chưa có tiêu chí thành phần nào");
+        }
+
+        // Luu log vao category_change_logs
+        CategoryChangeLog log = new CategoryChangeLog();
+        log.setAssignment(assignment);
+        log.setFromCategoryId(currentCategoryId);
+        log.setToCategoryId(newCategoryId);
+        log.setChangedBy(editorId);
+        log.setChangedAt(LocalDateTime.now());
+        categoryChangeLogRepository.save(log);
+
+        // Cap nhat the loai bai viet
+        article.setCategoryId(newCategoryId);
+        articleRepository.save(article);
+
+        // Cap nhat the loai va snapshot bo tieu chi moi cho attempt
+        attempt.setCategoryId(newCategoryId);
+        attempt.setCriteriaSetVersion(newActiveCriteriaSet);
+        scoringAttemptRepository.save(attempt);
+
+        List<ScoringAttemptDetail> oldDetails = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
+        scoringAttemptDetailRepository.deleteAll(oldDetails);
+
+        List<ScoringAttemptDetailResponse> detailResponses = new ArrayList<>();
+        for (Criteria c : newCriteriaList) {
+            ScoringAttemptDetail detail = new ScoringAttemptDetail();
+            detail.setScoringAttempt(attempt);
+            detail.setCriterion(c);
+            detail.setScore(BigDecimal.ZERO);
+            detail.setComment(null);
+            ScoringAttemptDetail savedDetail = scoringAttemptDetailRepository.save(detail);
+            detailResponses.add(ScoringAttemptDetailResponse.from(savedDetail));
+        }
 
         return ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
     }

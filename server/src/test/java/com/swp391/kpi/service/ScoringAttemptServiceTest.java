@@ -47,6 +47,12 @@ class ScoringAttemptServiceTest {
     @Mock
     private ArticleVersionRepository articleVersionRepository;
 
+    @Mock
+    private CategoryChangeLogRepository categoryChangeLogRepository;
+
+    @Mock
+    private GenreRepository genreRepository;
+
     @InjectMocks
     private ScoringAttemptService scoringAttemptService;
 
@@ -182,5 +188,89 @@ class ScoringAttemptServiceTest {
         );
 
         assertTrue(ex.getMessage().contains("chưa có bộ tiêu chí nào ở trạng thái ACTIVE"));
+    }
+
+    @Test
+    @DisplayName("Đổi thể loại thành công: lưu log, cập nhật bài viết và snapshot bộ tiêu chí mới")
+    void testChangeCategory_Success() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+        when(genreRepository.findById(4)).thenReturn(Optional.of(new Genre()));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(501);
+        attempt.setArticleId(10);
+        attempt.setReviewerId(3);
+        attempt.setCategoryId(2);
+        attempt.setAttemptType(AttemptType.INITIAL);
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        CriteriaSetVersion newActiveCriteria = new CriteriaSetVersion();
+        newActiveCriteria.setId(2);
+        newActiveCriteria.setCategoryId(4);
+        newActiveCriteria.setStatus(CriteriaSetStatus.ACTIVE);
+        when(criteriaSetVersionRepository.findByCategoryIdAndStatus(4, CriteriaSetStatus.ACTIVE))
+                .thenReturn(Optional.of(newActiveCriteria));
+
+        Criteria newCriterion = new Criteria();
+        newCriterion.setId(102);
+        newCriterion.setName("Kỹ năng phỏng vấn");
+        newCriterion.setWeight(new BigDecimal("100.00"));
+        when(criteriaRepository.findByCriteriaSetVersionIdOrderBySortOrderAsc(2))
+                .thenReturn(List.of(newCriterion));
+
+        when(scoringAttemptDetailRepository.findByScoringAttemptId(501)).thenReturn(List.of());
+        when(scoringAttemptDetailRepository.save(any(ScoringAttemptDetail.class))).thenAnswer(i -> {
+            ScoringAttemptDetail d = i.getArgument(0);
+            d.setId(701);
+            return d;
+        });
+
+        ScoringAttemptResponse res = scoringAttemptService.changeCategory(10, 4, 3);
+
+        assertNotNull(res);
+        assertEquals(4, res.getCategoryId());
+        assertEquals(1, res.getDetails().size());
+        assertEquals("Kỹ năng phỏng vấn", res.getDetails().get(0).getCriterionName());
+        verify(categoryChangeLogRepository, times(1)).save(any(CategoryChangeLog.class));
+        verify(articleRepository, times(1)).save(article);
+    }
+
+    @Test
+    @DisplayName("Ném BusinessException khi đổi sang thể loại trùng với thể loại hiện tại")
+    void testChangeCategory_SameCategory_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+        when(genreRepository.findById(2)).thenReturn(Optional.of(new Genre()));
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoringAttemptService.changeCategory(10, 2, 3) // Thể loại 2 trùng thể loại hiện tại 2
+        );
+
+        assertTrue(ex.getMessage().contains("phải khác với thể loại hiện tại"));
+    }
+
+
+    @Test
+    @DisplayName("Ném BusinessException khi cố đổi thể loại cho phiếu chấm đã nộp")
+    void testChangeCategory_AlreadySubmitted_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+        when(genreRepository.findById(4)).thenReturn(Optional.of(new Genre()));
+
+        ScoringAttempt submittedAttempt = new ScoringAttempt();
+        submittedAttempt.setId(503);
+        submittedAttempt.setArticleId(10);
+        submittedAttempt.setCategoryId(2);
+        submittedAttempt.setAttemptType(AttemptType.INITIAL);
+        submittedAttempt.setSubmittedAt(LocalDateTime.now()); // Đã nộp
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(submittedAttempt));
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoringAttemptService.changeCategory(10, 4, 3)
+        );
+
+        assertTrue(ex.getMessage().contains("Không thể đổi thể loại cho phiếu chấm đã nộp"));
     }
 }
