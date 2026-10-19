@@ -33,12 +33,16 @@ export async function goiApi(duongDan, tuyChon = {}) {
   if (res.status === 401 && token) {
     xoaPhien()
     window.location.href = '/login'
-    throw new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+    const loi = new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+    loi.status = res.status
+    throw loi
   }
 
   const json = await docJson(res)
   if (!res.ok || json.success === false) {
-    throw new Error(chuLoi(json))
+    const loi = new Error(chuLoi(json))
+    loi.status = res.status
+    throw loi
   }
   return json.data
 }

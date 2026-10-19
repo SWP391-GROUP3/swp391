@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { layNhatKy } from '../../api/auditLogApi.js'
 import { dinhDangThoiGian } from './appealFormat.js'
 import '../../styles/QualityReportPage.css'
 
 export default function AuditLogPage() {
+  const [thamSo] = useSearchParams()
+  const khieuNaiTuUrl = thamSo.get('appealId') || ''
   const [danhSach, setDanhSach] = useState(null)
   const [boLoc, setBoLoc] = useState({
     actorId: '',
     articleId: '',
-    appealId: '',
+    appealId: khieuNaiTuUrl,
     editorId: '',
     actionType: '',
     entityType: '',
@@ -20,11 +23,11 @@ export default function AuditLogPage() {
 
   useEffect(() => {
     let conHienThi = true
-    layNhatKy()
+    layNhatKy({ appealId: khieuNaiTuUrl })
       .then((data) => { if (conHienThi) setDanhSach(data) })
       .catch((error) => { if (conHienThi) setLoi(error.message) })
     return () => { conHienThi = false }
-  }, [])
+  }, [khieuNaiTuUrl])
 
   async function locNhatKy(event) {
     event.preventDefault()

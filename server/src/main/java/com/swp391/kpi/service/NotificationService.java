@@ -14,6 +14,17 @@ public class NotificationService {
     private final UserReadService userReadService;
 
     @Transactional
+    public void notifyUser(Integer userId, Integer articleId, String message) {
+        var notification = new Notification();
+        notification.setUserId(userId);
+        notification.setArticleId(articleId);
+        notification.setMessage(message);
+        notification.setIsRead(false);
+        notification.setCreatedAt(LocalDateTime.now());
+        repository.save(notification);
+    }
+
+    @Transactional
     public void notifyHeads(Integer articleId, Integer sectionId, String message) {
         for (var user : userReadService.getUsers()) {
             if (!"ACTIVE".equals(user.status()) || !"HEAD_OF_DEPARTMENT".equals(user.role())

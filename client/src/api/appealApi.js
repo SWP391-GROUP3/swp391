@@ -15,3 +15,29 @@ export async function layKhieuNaiCuaToi() {
 export async function layBaiCoTheKhieuNai() {
   return goiApi('/api/appeals/eligible-articles')
 }
+
+export function layHangChoKhieuNai(boLoc = {}) {
+  const thamSo = new URLSearchParams()
+  for (const ten of ['status', 'articleId', 'reviewerId', 'fromDate', 'toDate']) {
+    if (boLoc[ten]) thamSo.set(ten, boLoc[ten])
+  }
+  thamSo.set('page', boLoc.page ?? 0)
+  thamSo.set('size', 10)
+  return goiApi(`/api/appeals?${thamSo}`)
+}
+
+export function layChiTietKhieuNai(id) {
+  return goiApi(`/api/appeals/${id}`)
+}
+
+export function layNguoiChamHopLe(id) {
+  return goiApi(`/api/appeals/${id}/reviewer-candidates`)
+}
+
+export function phanCongKhieuNai(id, reviewerId, reason) {
+  return goiApi(`/api/appeals/${id}/assign`, { method: 'POST', body: { reviewerId, reason } })
+}
+
+export function giaoLaiKhieuNai(id, duLieu) {
+  return goiApi(`/api/appeals/${id}/reassign`, { method: 'POST', body: duLieu })
+}
