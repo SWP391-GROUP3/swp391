@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * MUC LUC (so dong)
+ *   24  field                        - repository / service duoc inject
+ *   30  getReport()
+ */
 @Service
 @RequiredArgsConstructor
 public class ReviewerDeviationService {

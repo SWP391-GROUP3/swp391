@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 /**
  * Lịch sử Biên tập viên đổi thể loại bài viết trong lúc xử lý/chấm.
  * Bảng: category_change_logs
+ *
+ * MUC LUC (so dong)
+ *   26  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "category_change_logs")

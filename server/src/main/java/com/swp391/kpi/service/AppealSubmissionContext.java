@@ -7,6 +7,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   18  field                        - repository / service duoc inject
+ */
 @Getter
 @Setter
 public class AppealSubmissionContext {

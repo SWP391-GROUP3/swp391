@@ -34,6 +34,24 @@ import java.util.TreeMap;
 
 /**
  * Ky nhuan but: danh sach ky (UC-49), bang ke 1 ky va Thu ky chot ky (UC-50).
+ *
+ * MUC LUC (so dong)
+ *   60  hang so                      - hang so dung trong file
+ *   62  field                        - repository / service duoc inject
+ *   76  getAllPeriods()              - Cac ky moi nhat len dau, kem tong tien va so bai da cham.
+ *   91  getPeriodDetail()            - UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung ng…
+ *  107  closePeriod()                - UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan,
+ *  134  checkAllArticlesOfMonthGraded() - UC-50 E1 (nhom chot 18/10/2026): con bai da dang tu truoc toi het thang…
+ *  150  createNextPeriodIfMissing()  - Chot ky thang N thi tu tao ky thang N+1 (OPEN) neu chua co, de Thu ky c…
+ *  167  buildArticleRows()           - Moi phieu cham 1 dong: tien bai + tong tien anh cua phieu (cong tu dong…
+ *  188  buildPersonRows()            - Moi nguoi 1 dong: cong cac dong tien cua nguoi do theo loai. TreeMap ->…
+ *  204  addLineAmount()
+ *  215  loadArticleTitles()          - Tieu de bai, lay qua service BF-01 (khong query bang articles)
+ *  224  loadUserNames()              - Ho ten nguoi nhan tien, lay qua service luong admin (khong query bang u…
+ *  232  sumAmount()
+ *  241  countArticles()              - 1 bai cham lai nhieu phien ban van tinh 1 bai
+ *  249  findPeriod()
+ *  255  label()                      - Vd "9/2026"
  */
 @Service
 @RequiredArgsConstructor

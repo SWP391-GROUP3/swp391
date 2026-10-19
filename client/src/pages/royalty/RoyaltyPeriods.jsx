@@ -11,6 +11,10 @@ import '../../styles/Royalty.css'
  * UC-49 - "Ky nhuan but" (Thu ky toa soan va Ke toan dung chung 1 trang).
  * Moi thang 1 ky: trang thai (BR-RY-07), so bai da cham, tong tien cac dong trong ky.
  * Bam "Xem bang ke" -> trang chi tiet ky (UC-50/51, lam o Iter 2).
+ *
+ * MUC LUC (so dong)
+ *   19  RoyaltyPeriods               - UC-49 - "Ky nhuan but" (Thu ky toa soan va Ke toan dung chung 1 trang).
+ *   23    useEffect                  - tai du lieu khi mo trang
  */
 export default function RoyaltyPeriods() {
   const [periods, setPeriods] = useState(null)   // null = dang tai

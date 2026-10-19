@@ -7,6 +7,10 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/**
+ * MUC LUC (so dong)
+ *   20  field                        - cac truong tra ve cho giao dien
+ */
 @Getter
 @Setter
 @NoArgsConstructor

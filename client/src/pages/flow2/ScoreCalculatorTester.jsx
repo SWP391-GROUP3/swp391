@@ -3,6 +3,13 @@ import Icon from '../../components/common/Icon.jsx'
 import { BT_MAY_TINH, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
+/**
+ * MUC LUC (so dong)
+ *   13  ScoreCalculatorTester
+ *   30    handleScoreChange()
+ *   36    handleCommentChange()
+ */
+
 export default function ScoreCalculatorTester() {
   const [items, setItems] = useState([
     { id: 1, name: 'Tính thời sự & thông tin mới', weight: 30, score: 85, comment: 'Bài viết cập nhật số liệu mới nhất trong ngày' },

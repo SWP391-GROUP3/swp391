@@ -100,6 +100,13 @@ function MenuTaiKhoan({ nguoiDung, onDangXuat }) {
  * - nhomMenu: [{ tieuDe, cacMuc: [{ path, nhan, icon }] }]. tieuDe rong = nhom khong co tieu de.
  *             Muc "Trang chủ" luon tu them o dau, khong can khai bao.
  * - phanThem: hien them tren thanh tren, truoc ten nguoi dung (vd chip vi cua Phong vien)
+ *
+ * MUC LUC (so dong)
+ *    8  MUC_TRANG_CHU                - Muc "Trang chủ" - vai tro nao cung co, AppLayout tu them o dau menu.
+ *   15  MucMenu                      - 1 muc menu. NavLink tu them class "active" va aria-current="page" cho t…
+ *   30  MenuTaiKhoan                 - Ten + avatar o goc phai thanh tren. Bam vao -> menu tha: "Hồ sơ của tôi…
+ *   34    useEffect                  - tai du lieu khi mo trang
+ *  111  AppLayout                    - Khung trang dung chung cho moi vai tro: sidebar trai + thanh tren + vun…
  */
 export default function AppLayout({ nguoiDung, onDangXuat, tenMenu, nhomMenu, phanThem, children }) {
   return (

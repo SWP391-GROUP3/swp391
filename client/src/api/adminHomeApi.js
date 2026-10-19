@@ -5,6 +5,9 @@
  * (Rieng quy tac khieu nai da co API that: appealRuleConfigApi.getActiveConfig.)
  * Khi backend luong admin xong chi can doi ruot ham thanh goiApi('/api/...'),
  * component goi ham KHONG phai sua. Trang thai dung chu trong CHECK cua schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   24  layTrangChuAdmin             - So lieu trang chu Admin:
  */
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 

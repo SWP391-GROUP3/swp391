@@ -14,6 +14,13 @@ import java.util.List;
 
 /**
  * REST Controller cho Quản lý bộ tiêu chí chấm (Admin - Luồng BF-02).
+ *
+ * MUC LUC (so dong)
+ *   30  field                        - service duoc inject
+ *   36  getVersionsByCategory()      - Lấy danh sách các phiên bản bộ tiêu chí theo mã thể loại (UC-14).
+ *   46  getActiveVersionByCategory() - Lấy phiên bản bộ tiêu chí đang ACTIVE của thể loại (BR-QA-03).
+ *   56  createDraftVersion()         - Tạo một phiên bản bộ tiêu chí mới ở trạng thái DRAFT (UC-15, UC-16, BR-…
+ *   67  activateVersion()            - Kích hoạt một phiên bản DRAFT thành ACTIVE (UC-17, BR-QA-03).
  */
 @RestController
 @RequestMapping("/api/criteria-sets")

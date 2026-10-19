@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Nationalized;
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   19  field                        - cac cot cua bang (khop schema.sql)
+ */
 @Entity
 @Table(name = "notifications")
 @Getter @Setter @NoArgsConstructor

@@ -5,6 +5,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   13  calculate()
+ */
 public class ReviewerDeviationCalculator {
     public ReviewerDeviationIndex calculate(List<BigDecimal> differences, int appealCount,
                                              int overturnedCount, int workloadCount) {

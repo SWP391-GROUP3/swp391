@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 
 /**
  * Du lieu Admin gui len khi sua he so 1 loai anh/video (UC-56).
+ *
+ * MUC LUC (so dong)
+ *   24  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

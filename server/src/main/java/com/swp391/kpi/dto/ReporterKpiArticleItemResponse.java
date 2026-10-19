@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 
 /**
  * Thong tin chi tiet 1 bai viet xuat ban cua phong vien trong ky KPI (UC-62, UC-60).
+ *
+ * MUC LUC (so dong)
+ *   24  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

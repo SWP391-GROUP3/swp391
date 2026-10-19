@@ -13,6 +13,17 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * MUC LUC (so dong)
+ *   29  field                        - repository / service duoc inject
+ *   39  getLogs()
+ *   70  findArticle()
+ *   85  matchesAppeal()
+ *   98  matchesEditor()
+ *  107  cannotView()
+ *  113  forbidden()
+ *  117  blankToNull()
+ */
 @Service @RequiredArgsConstructor
 public class AppealAuditQueryService {
     private final AuditLogRepository auditLogRepository;

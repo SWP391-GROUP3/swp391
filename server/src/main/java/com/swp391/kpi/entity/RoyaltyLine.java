@@ -24,6 +24,9 @@ import java.time.LocalDateTime;
  *   MEDIA      co mediaItem, khong co sharePercent/originalLine, amount >= 0
  *   ADJUSTMENT co originalLine, amount co the am (BR-RY-06)
  * Tong cac dong ARTICLE cua 1 phieu phai bang DUNG grading.amount (GBR-10).
+ *
+ * MUC LUC (so dong)
+ *   40  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_lines")

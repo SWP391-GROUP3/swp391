@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * MUC LUC (so dong)
+ *   17  findByScoringAttemptId()     - Lấy kết quả duyệt điểm của một lần chấm
+ */
 @Repository
 public interface ScoreApprovalRepository extends JpaRepository<ScoreApproval, Integer> {
 

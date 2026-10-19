@@ -12,6 +12,9 @@ import java.time.LocalDate;
 /**
  * Du lieu Ke toan gui len khi them don gia moi (UC-55).
  * Chi nhap luong co so va ngay hieu luc; don gia do he thong tu tinh.
+ *
+ * MUC LUC (so dong)
+ *   26  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

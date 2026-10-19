@@ -19,6 +19,11 @@ import java.time.temporal.ChronoUnit;
  *   sub  = id user (controller lay ra de biet ai dang thao tac)
  *   role = ma vai tro, vd REPORTER (SecurityConfig doi thanh quyen ROLE_REPORTER)
  *   iat / exp = luc tao / luc het han
+ *
+ * MUC LUC (so dong)
+ *   32  hang so                      - hang so dung trong file
+ *   35  field                        - repository / service duoc inject
+ *   40  createToken()
  */
 @Service
 @RequiredArgsConstructor

@@ -7,6 +7,10 @@ import lombok.Setter;
 /**
  * Tra ve khi dang nhap thanh cong: token + thong tin de frontend hien ten, vai tro.
  * KHONG tra passwordHash.
+ *
+ * MUC LUC (so dong)
+ *   19  field                        - cac truong tra ve cho giao dien
+ *   29  from()                       - Goi trong transaction cua service (role la LAZY, can load truoc khi ra …
  */
 @Getter
 @Setter

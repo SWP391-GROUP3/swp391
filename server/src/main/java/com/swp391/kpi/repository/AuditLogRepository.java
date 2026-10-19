@@ -8,6 +8,17 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   24  save()
+ *   29  WHERE()
+ *   30  AND()
+ *   31  AND()
+ *   32  AND()
+ *   33  AND()
+ *   34  AND()
+ *   37  search()
+ */
 public interface AuditLogRepository extends Repository<AuditLog, Integer> {
 
     AuditLog save(AuditLog auditLog);

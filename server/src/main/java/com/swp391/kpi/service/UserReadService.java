@@ -9,6 +9,12 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   22  field                        - repository / service duoc inject
+ *   24  requireActive()
+ *   38  getUsers()
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

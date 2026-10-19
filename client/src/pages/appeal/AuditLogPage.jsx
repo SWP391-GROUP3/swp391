@@ -3,6 +3,14 @@ import { layNhatKy } from '../../api/auditLogApi.js'
 import { dinhDangThoiGian } from './appealFormat.js'
 import '../../styles/QualityReportPage.css'
 
+/**
+ * MUC LUC (so dong)
+ *   14  AuditLogPage
+ *   29    useEffect                  - tai du lieu khi mo trang
+ *   37    locNhatKy()
+ *   47    doiBoLoc()
+ */
+
 export default function AuditLogPage() {
   const [danhSach, setDanhSach] = useState(null)
   const [boLoc, setBoLoc] = useState({

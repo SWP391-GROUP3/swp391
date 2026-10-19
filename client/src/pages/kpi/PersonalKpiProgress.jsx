@@ -8,6 +8,11 @@ import './PersonalKpiProgress.css'
  * Man hinh KPI Ca nhan & Tien do (UC-60: View Personal KPI & Progress, UC-67: View Final KPI Result).
  * Danh cho Phong vien tu theo doi chi tieu duoc giao, tien do quy doi dong tac gia (0.6 / 0.4),
  * so lieu tuong tac doc gia va ket qua danh gia PASS / NOT_PASS.
+ *
+ * MUC LUC (so dong)
+ *   17  PersonalKpiProgress          - Man hinh KPI Ca nhan & Tien do (UC-60: View Personal KPI & Progress, UC…
+ *   24    useEffect                  - tai du lieu khi mo trang
+ *   30    taiKpiCaNhan()
  */
 export default function PersonalKpiProgress({ nguoiDung }) {
   const [nam, setNam] = useState(2026)

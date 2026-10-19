@@ -1,5 +1,10 @@
 import { goiApi } from './goiApi.js'
 
+/**
+ * MUC LUC (so dong)
+ *    8  layNhatKy
+ */
+
 export async function layNhatKy(boLoc = {}) {
   const query = new URLSearchParams()
   if (boLoc.actorId) query.set('actorId', boLoc.actorId)

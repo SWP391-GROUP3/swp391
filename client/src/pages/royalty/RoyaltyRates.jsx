@@ -8,6 +8,15 @@ import '../../styles/Royalty.css'
  * UC-55 - "Don gia nhuan but" (Ke toan).
  * Tren: form them don gia moi (chi nhap luong co so + ngay hieu luc, server tu tinh don gia).
  * Duoi: lich su don gia, moi nhat truoc. Don gia cu KHONG sua, chi them ban moi (BR-RY-03).
+ *
+ * MUC LUC (so dong)
+ *   21  RoyaltyRates                 - UC-55 - "Don gia nhuan but" (Ke toan).
+ *   31    useEffect                  - tai du lieu khi mo trang
+ *   39    handleSubmit()
+ *  159  RateBadge                    - Nhan tinh trang cua 1 don gia: sap ap dung / dang ap dung / da thay the.
+ *  173  findCurrentRateId            - Don gia dang ap dung hom nay = dong dau tien (danh sach moi nhat truoc)
+ *  183  todayIsoDate                 - Ngay hom nay theo gio may dang "yyyy-MM-dd" (giong dinh dang server tra…
+ *  191  nextIsoDate                  - "2026-01-31" -> "2026-02-01". Tinh theo gio UTC de khong bi lech mui gi…
  */
 export default function RoyaltyRates() {
   const [rates, setRates] = useState(null)        // null = dang tai

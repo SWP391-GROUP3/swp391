@@ -5,6 +5,10 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
+/**
+ * MUC LUC (so dong)
+ *   16  field                        - repository / service duoc inject
+ */
 @Getter
 @AllArgsConstructor
 public class AppealSubmissionCriterion {

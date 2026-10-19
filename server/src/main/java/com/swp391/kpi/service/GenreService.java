@@ -12,6 +12,10 @@ import java.math.BigDecimal;
 /**
  * Doc the loai bai (luong admin). Luong khac goi service nay,
  * khong goi thang GenreRepository (AGENTS.md muc 2).
+ *
+ * MUC LUC (so dong)
+ *   24  field                        - repository / service duoc inject
+ *   29  getBaseFactor()              - He so chuan cua 1 the loai. BF-04 dung khi cham nhuan but:
  */
 @Service
 @RequiredArgsConstructor

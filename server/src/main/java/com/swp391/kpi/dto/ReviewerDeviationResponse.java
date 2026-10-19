@@ -8,6 +8,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   20  field                        - cac truong tra ve cho giao dien
+ *   32  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
+ */
 @Getter
 @Setter
 public class ReviewerDeviationResponse {

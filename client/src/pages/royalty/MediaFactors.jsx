@@ -11,6 +11,14 @@ const FACTOR_PATTERN = /^\d{1,3}(\.\d{1,2})?$/
  * UC-56 - "He so anh/video" (Admin).
  * Moi loai anh/video co 1 he so co dinh (BR-RY-04). Thu ky cham anh se dung he so nay.
  * Bam "Sua" tren 1 dong -> o nhap hien ngay tai dong do, "Luu" de goi API.
+ *
+ * MUC LUC (so dong)
+ *    8  FACTOR_PATTERN               - He so: so duong, toi da 3 chu so phan nguyen va 2 chu so thap phan (cot…
+ *   23  MediaFactors                 - UC-56 - "He so anh/video" (Admin).
+ *   33    useEffect                  - tai du lieu khi mo trang
+ *   41    startEdit()
+ *   48    cancelEdit()
+ *   53    saveEdit()
  */
 export default function MediaFactors() {
   const [factors, setFactors] = useState(null)   // null = dang tai

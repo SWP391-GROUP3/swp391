@@ -9,6 +9,18 @@ import Icon from '../../components/common/Icon.jsx'
 import { BT_TIEU_CHI, BT_DANH_SACH, BT_THEM, BT_THONG_TIN, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
+/**
+ * MUC LUC (so dong)
+ *   24  CriteriaManagement
+ *   45    useEffect                  - tai du lieu khi mo trang
+ *   49    loadCategoryData()
+ *   76    handleAddCriterion()
+ *   83    handleRemoveCriterion()
+ *   91    handleCriterionChange()
+ *   97    handleCreateNewVersion()
+ *  134    handleActivate()
+ */
+
 export default function CriteriaManagement({ nguoiDung }) {
   const [categoryId, setCategoryId] = useState(1)
   const [activeVersion, setActiveVersion] = useState(null)

@@ -8,6 +8,16 @@ import Icon from '../../components/common/Icon.jsx'
 import { BT_PHAN_CONG, BT_THONG_TIN, BT_BIEU_DO } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
+/**
+ * MUC LUC (so dong)
+ *   21  AssignmentQueue
+ *   45    useEffect                  - tai du lieu khi mo trang
+ *   49    useEffect                  - tai du lieu khi mo trang
+ *   53    loadWorkload()
+ *   62    loadCurrentAssignment()
+ *   72    handleAssign()
+ */
+
 export default function AssignmentQueue({ nguoiDung }) {
   // Danh sách bài viết chờ phân công (SUBMITTED) khớp 100% với Database
   const [articles] = useState([

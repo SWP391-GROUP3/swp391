@@ -7,6 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * MUC LUC (so dong)
+ *   19  field                        - repository / service duoc inject
+ *   22  getPublishedByAuthor()
+ *   27  getArticle()
+ */
 @Service
 @RequiredArgsConstructor
 public class ArticleReadService {

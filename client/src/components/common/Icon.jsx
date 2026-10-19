@@ -5,6 +5,9 @@ import '../../styles/Icon.css'
  * Truyen cac hinh <path>/<rect>/<circle> vao children, vd:
  *   <Icon><circle cx="11" cy="11" r="6.5" /></Icon>
  * aria-hidden: icon chi de trang tri, trinh doc man hinh doc chu ben canh.
+ *
+ * MUC LUC (so dong)
+ *   12  Icon                         - Khung icon SVG dung chung (net 1.5px giong Figma), khong cai thu vien i…
  */
 export default function Icon({ children }) {
   return (

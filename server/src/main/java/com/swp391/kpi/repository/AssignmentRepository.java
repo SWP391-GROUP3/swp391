@@ -9,6 +9,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * MUC LUC (so dong)
+ *   22  findByArticleId()            - Tìm lượt phân công theo mã bài viết (quan hệ 1-1)
+ *   25  findByEditorIdOrderByAssignedAtDesc() - Lấy danh sách bài viết được phân công cho một BTV (UC-21)
+ *   29  countAssignedArticlesByEditorId() - Đếm số bài viết mà một BTV đang phụ trách (chưa hoàn thành) để gợi ý BT…
+ */
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Integer> {
 

@@ -13,6 +13,10 @@ import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   30  field                        - cac cot cua bang (khop schema.sql)
+ */
 @Entity
 @org.hibernate.annotations.Immutable
 @Table(name = "audit_logs")

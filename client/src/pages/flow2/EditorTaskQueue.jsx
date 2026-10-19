@@ -4,6 +4,13 @@ import Icon from '../../components/common/Icon.jsx'
 import { BT_BAI_DUOC_GIAO, BT_DAU_TICH } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
+/**
+ * MUC LUC (so dong)
+ *   14  EditorTaskQueue
+ *   21    useEffect                  - tai du lieu khi mo trang
+ *   25    loadEditorTasks()
+ */
+
 export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
   // Lấy ID BTV: Nếu đang đăng nhập thì lấy ID (ví dụ cuong.lh = 3), hoặc mặc định là 3
   const [editorId, setEditorId] = useState(nguoiDung?.id || 3)

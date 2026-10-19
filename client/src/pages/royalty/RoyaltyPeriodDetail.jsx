@@ -12,6 +12,14 @@ import '../../styles/Royalty.css'
  * Tren: tong tien tung nguoi (Ke toan can de lam phieu chi). Duoi: cac bai da cham trong ky.
  * Chi Thu ky thay nut "Chot ky", va chi khi ky dang OPEN (BR-RY-07).
  * Ky bi Ke toan tra ve (UC-52) thi hien ly do de Thu ky sua (UC-50 A1).
+ *
+ * MUC LUC (so dong)
+ *   24  RoyaltyPeriodDetail          - UC-50 - "Bang ke ky nhuan but" (Thu ky va Ke toan dung chung 1 trang).
+ *   32    useEffect                  - tai du lieu khi mo trang
+ *   40    handleClose()
+ *  121  SummaryItem
+ *  131  PeopleCard                   - Tong tien tung nguoi trong ky (UC-50 "total per person").
+ *  167  ArticlesCard                 - Cac bai da cham trong ky: he so, tien bai, tien anh.
  */
 export default function RoyaltyPeriodDetail({ nguoiDung }) {
   const { id } = useParams()

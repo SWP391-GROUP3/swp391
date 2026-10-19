@@ -8,6 +8,12 @@
  *
  * Ten field dat theo DTO tieng Anh ma backend se tra (camelCase), gia tri
  * trang thai dung dung chu trong CHECK cua database/schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   25  layViTien                    - So du vi cua phong vien dang dang nhap.
+ *   33  layThongKeTrangThai          - So bai cua phong vien theo tung trang thai (articles.status).
+ *   56  layViecCanXuLy               - Nhung viec phong vien can lam ngay:
+ *   91  layKpiThangNay               - KPI thang hien tai: chi tieu (kpi_targets) va tien do thuc te.
  */
 import { layBaiCoTheKhieuNai } from './appealApi.js'
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
