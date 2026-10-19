@@ -40,6 +40,12 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     // Bai cua tac gia chinh dang o 1 trang thai (vd bai bi tra ve REVISION_REQUESTED)
     List<Article> findByAuthorIdAndStatusOrderByUpdatedAtDesc(Integer authorId, ArticleStatus status);
 
+    // Tim danh sach bai theo trang thai (BF-02 UC-29)
+    List<Article> findByStatusOrderByUpdatedAtDesc(ArticleStatus status);
+
+    // Tim danh sach bai theo trang thai va ban chuyen mon (BF-02 UC-29)
+    List<Article> findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus status, Integer sectionId);
+
     // Cho BF-04 (UC-46): moi bai PUBLISHED, dang som nhat len dau (gan han chi nhat).
     // SQL thuan (nativeQuery) vi can ten ban, ten the loai ma bang sections, genres chua co
     // entity/service (luong admin) - nhom truong (phu trach admin) dong y join tam o day.

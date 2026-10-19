@@ -32,6 +32,7 @@ public class ScoringAttemptService {
     private final ArticleVersionRepository articleVersionRepository;
     private final CategoryChangeLogRepository categoryChangeLogRepository;
     private final GenreRepository genreRepository;
+    private final ArticleService articleService;
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
     @Transactional
@@ -291,5 +292,66 @@ public class ScoringAttemptService {
         scoringAttemptRepository.save(attempt);
 
         return ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
+    }
+
+    // BTV nop phieu cham voi 1 trong 3 quyet dinh: ACCEPT, REVISION, REJECT (UC-26, UC-27, UC-28)
+    @Transactional
+    public ScoringAttemptResponse submitDecision(Integer articleId, com.swp391.kpi.dto.ScoringSubmitRequest request, Integer editorId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+
+        Assignment assignment = assignmentRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new BusinessException("Bài viết chưa được phân công"));
+
+        if (!assignment.getEditorId().equals(editorId)) {
+            throw new BusinessException("Bạn không được phân công chấm bài viết này!");
+        }
+
+        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+                .orElseThrow(() -> new NotFoundException("Bài viết này chưa mở phiếu chấm điểm"));
+
+        if (attempt.getSubmittedAt() != null) {
+            throw new BusinessException("Phiếu chấm điểm này đã được nộp trước đó!");
+        }
+
+        ScoringDecision decision = request.getDecision();
+        String decisionNote = request.getDecisionNote() != null ? request.getDecisionNote().trim() : null;
+
+        if (decision == ScoringDecision.ACCEPT) {
+            // UC-26: Phai co tong diem hop le
+            if (attempt.getTotalScore() == null) {
+                throw new BusinessException("Vui lòng nhập và lưu điểm các tiêu chí trước khi chọn Đồng ý (ACCEPT)!");
+            }
+            // Chuyen trang thai bai viet sang PENDING_APPROVAL
+            articleService.updateArticleStatus(articleId, ArticleStatus.PENDING_APPROVAL, editorId, "SUBMIT_SCORE", decisionNote);
+        } else if (decision == ScoringDecision.REVISION) {
+            // UC-27: Bat buoc phai co nhan xet sua doi
+            if (decisionNote == null || decisionNote.isEmpty()) {
+                throw new BusinessException("Yêu cầu sửa đổi (REVISION) bắt buộc phải nhập nhận xét lý do!");
+            }
+            // Chuyen trang thai bai viet sang REVISION_REQUESTED
+            articleService.updateArticleStatus(articleId, ArticleStatus.REVISION_REQUESTED, editorId, "RETURN", decisionNote);
+        } else if (decision == ScoringDecision.REJECT) {
+            // UC-28: Bat buoc phai co ly do tu choi
+            if (decisionNote == null || decisionNote.isEmpty()) {
+                throw new BusinessException("Từ chối bài viết (REJECT) bắt buộc phải nhập lý do từ chối!");
+            }
+            // Chuyen trang thai bai viet sang REJECTED
+            articleService.updateArticleStatus(articleId, ArticleStatus.REJECTED, editorId, "REJECT", decisionNote);
+        } else {
+            throw new BusinessException("Quyết định không hợp lệ: " + decision);
+        }
+
+        attempt.setDecision(decision);
+        attempt.setDecisionNote(decisionNote);
+        attempt.setSubmittedAt(LocalDateTime.now());
+        ScoringAttempt savedAttempt = scoringAttemptRepository.save(attempt);
+
+        List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(savedAttempt.getId());
+        List<ScoringAttemptDetailResponse> detailResponses = details.stream()
+                .map(ScoringAttemptDetailResponse::from)
+                .toList();
+
+        return ScoringAttemptResponse.from(savedAttempt, detailResponses, article.getTitle(), article.getContent());
     }
 }

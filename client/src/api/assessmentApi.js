@@ -55,4 +55,36 @@ export function luuDiemTieuChi(articleId, danhSachDiem) {
   })
 }
 
+export function nopPhieuCham(articleId, quyetDinh, ghiChu) {
+  return goiApi(`/api/scoring-attempts/article/${articleId}/submit`, {
+    method: 'POST',
+    body: {
+      decision: quyetDinh,
+      decisionNote: ghiChu
+    }
+  })
+}
+
+// Truong ban: Lay hang cho duyet diem danh gia (UC-29)
+export function layDanhSachChoDuyetDiem(sectionId) {
+  const query = sectionId ? `?sectionId=${sectionId}` : ''
+  return goiApi(`/api/score-approvals${query}`)
+}
+
+// Truong ban: Phe duyet diem danh gia (UC-32)
+export function duyetDiemBaiViet(articleId) {
+  return goiApi(`/api/score-approvals/article/${articleId}/approve`, {
+    method: 'POST'
+  })
+}
+
+// Truong ban: Yeu cau cham lai voi ly do bat buoc (UC-31)
+export function yeuCauChamLai(articleId, reason) {
+  return goiApi(`/api/score-approvals/article/${articleId}/return`, {
+    method: 'POST',
+    body: { reason }
+  })
+}
+
+
 

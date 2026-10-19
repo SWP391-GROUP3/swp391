@@ -53,6 +53,9 @@ class ScoringAttemptServiceTest {
     @Mock
     private GenreRepository genreRepository;
 
+    @Mock
+    private ArticleService articleService;
+
     @InjectMocks
     private ScoringAttemptService scoringAttemptService;
 
@@ -359,5 +362,123 @@ class ScoringAttemptServiceTest {
 
         assertTrue(ex.getMessage().contains("đạt dưới 50 điểm"));
         assertTrue(ex.getMessage().contains("bắt buộc phải nhập nhận xét lý do"));
+    }
+
+    @Test
+    @DisplayName("Nộp phiếu chấm với quyết định ACCEPT thành công (UC-26)")
+    void testSubmitDecision_Accept_Success() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(506);
+        attempt.setArticleId(10);
+        attempt.setReviewerId(3);
+        attempt.setTotalScore(new BigDecimal("75.50"));
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.save(any(ScoringAttempt.class))).thenAnswer(i -> i.getArgument(0));
+
+        com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
+                ScoringDecision.ACCEPT, "Bài viết đạt yêu cầu chất lượng"
+        );
+
+        ScoringAttemptResponse res = scoringAttemptService.submitDecision(10, req, 3);
+
+        assertNotNull(res);
+        assertEquals(ScoringDecision.ACCEPT, res.getDecision());
+        assertEquals("Bài viết đạt yêu cầu chất lượng", res.getDecisionNote());
+        assertNotNull(res.getSubmittedAt());
+        verify(articleService, times(1)).updateArticleStatus(10, ArticleStatus.PENDING_APPROVAL, 3, "SUBMIT_SCORE", "Bài viết đạt yêu cầu chất lượng");
+    }
+
+    @Test
+    @DisplayName("Ném BusinessException khi chọn ACCEPT mà chưa có tổng điểm (UC-26)")
+    void testSubmitDecision_Accept_WithoutTotalScore_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(507);
+        attempt.setTotalScore(null); // Chưa có điểm
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
+                ScoringDecision.ACCEPT, null
+        );
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoringAttemptService.submitDecision(10, req, 3)
+        );
+
+        assertTrue(ex.getMessage().contains("Vui lòng nhập và lưu điểm"));
+    }
+
+    @Test
+    @DisplayName("Nộp phiếu chấm với quyết định REVISION thành công (UC-27)")
+    void testSubmitDecision_Revision_Success() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(508);
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.save(any(ScoringAttempt.class))).thenAnswer(i -> i.getArgument(0));
+
+        com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
+                ScoringDecision.REVISION, "Yêu cầu bổ sung thêm số liệu hiện trường"
+        );
+
+        ScoringAttemptResponse res = scoringAttemptService.submitDecision(10, req, 3);
+
+        assertNotNull(res);
+        assertEquals(ScoringDecision.REVISION, res.getDecision());
+        verify(articleService, times(1)).updateArticleStatus(10, ArticleStatus.REVISION_REQUESTED, 3, "RETURN", "Yêu cầu bổ sung thêm số liệu hiện trường");
+    }
+
+    @Test
+    @DisplayName("Ném BusinessException khi chọn REVISION mà không có ghi chú nhận xét (UC-27)")
+    void testSubmitDecision_Revision_MissingNote_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(509);
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
+                ScoringDecision.REVISION, ""
+        );
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoringAttemptService.submitDecision(10, req, 3)
+        );
+
+        assertTrue(ex.getMessage().contains("Yêu cầu sửa đổi (REVISION) bắt buộc phải nhập nhận xét lý do"));
+    }
+
+    @Test
+    @DisplayName("Ném BusinessException khi chọn REJECT mà không có lý do từ chối (UC-28)")
+    void testSubmitDecision_Reject_MissingNote_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(510);
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
+                ScoringDecision.REJECT, null
+        );
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoringAttemptService.submitDecision(10, req, 3)
+        );
+
+        assertTrue(ex.getMessage().contains("Từ chối bài viết (REJECT) bắt buộc phải nhập lý do"));
     }
 }

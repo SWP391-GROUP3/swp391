@@ -51,6 +51,17 @@ public class ScoringAttemptController {
         return ResponseEntity.ok(ApiResponse.success("Lưu điểm tiêu chí thành công", response));
     }
 
+    // BTV nop phieu cham voi quyet dinh ACCEPT, REVISION hoac REJECT (UC-26, UC-27, UC-28)
+    @PostMapping("/article/{articleId}/submit")
+    public ResponseEntity<ApiResponse<ScoringAttemptResponse>> submitDecision(
+            @PathVariable Integer articleId,
+            @Valid @RequestBody com.swp391.kpi.dto.ScoringSubmitRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer editorId = Integer.valueOf(jwt.getSubject());
+        ScoringAttemptResponse response = scoringAttemptService.submitDecision(articleId, request, editorId);
+        return ResponseEntity.ok(ApiResponse.success("Nộp phiếu chấm điểm thành công", response));
+    }
+
     // Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
     @GetMapping("/article/{articleId}/latest")
     public ResponseEntity<ApiResponse<ScoringAttemptResponse>> getLatestAttempt(
