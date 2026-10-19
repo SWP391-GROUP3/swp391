@@ -25,8 +25,6 @@ public class AppealRuleConfigCreateRequest {
     @NotNull(message = "Ngưỡng chênh lệch điểm không được để trống")
     @DecimalMin(value = "0.00", message = "Ngưỡng chênh lệch điểm phải từ 0 đến 100")
     @DecimalMax(value = "100.00", message = "Ngưỡng chênh lệch điểm phải từ 0 đến 100")
-    @jakarta.validation.constraints.Digits(integer = 3, fraction = 2,
-            message = "Ngưỡng chênh lệch chỉ được có tối đa hai chữ số thập phân")
     private BigDecimal varianceThreshold;
 
     @NotNull(message = "Ngày hiệu lực không được để trống")

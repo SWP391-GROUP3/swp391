@@ -1,4 +1,4 @@
-import '../../styles/Icon.css'
+import './Icon.css'
 
 /**
  * Khung icon SVG dung chung (net 1.5px giong Figma), khong cai thu vien icon.

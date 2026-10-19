@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { Link } from 'react-router-dom'
 import { daysUntil } from '../../utils/formatDate.js'
-import '../../styles/PendingList.css'
+import './PendingList.css'
 
 /** Con <= so ngay nay thi to do han chot cho nguoi dung de y. */
 const NGAY_GAP = 1

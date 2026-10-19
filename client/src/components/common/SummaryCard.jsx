@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import { Link } from 'react-router-dom'
-import '../../styles/SummaryCard.css'
+import './SummaryCard.css'
 
 /**
  * The tom tat o cot trai trang chu: tieu de + nhan trang thai + vai dong "nhan ... so".

@@ -10,14 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-/**
- * MUC LUC (so dong)
- *   26  findMyArticles                 - UC-01 bai cua toi
- *   31  findMyArticlesByStatuses       - UC-01 loc theo trang thai
- *   38  findMyArticleStatuses          - trang chu PV: dem bai theo trang thai
- *   41  findByAuthorIdAndStatus...     - trang chu PV: bai bi tra ve
- *   57  findPublishedRows              - cho BF-04 (UC-46): moi bai da dang + ten ban, the loai
- */
 public interface ArticleRepository extends JpaRepository<Article, Integer> {
 
     // Bai ma nguoi dung la tac gia chinh hoac dong tac gia (UC-01)
@@ -39,20 +31,4 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
 
     // Bai cua tac gia chinh dang o 1 trang thai (vd bai bi tra ve REVISION_REQUESTED)
     List<Article> findByAuthorIdAndStatusOrderByUpdatedAtDesc(Integer authorId, ArticleStatus status);
-
-    // Cho BF-04 (UC-46): moi bai PUBLISHED, dang som nhat len dau (gan han chi nhat).
-    // SQL thuan (nativeQuery) vi can ten ban, ten the loai ma bang sections, genres chua co
-    // entity/service (luong admin) - nhom truong (phu trach admin) dong y join tam o day.
-    // TODO(admin): co SectionService, GenreService thi lay ten qua service thay vi join.
-    @Query(value = "SELECT a.id AS id, a.title AS title, a.declared_nature AS declaredNature,"
-            + " a.published_at AS publishedAt, a.author_id AS authorId,"
-            + " a.section_id AS sectionId, s.name AS sectionName,"
-            + " a.category_id AS categoryId, g.name AS categoryName"
-            + " FROM articles a"
-            + " JOIN sections s ON s.id = a.section_id"
-            + " JOIN genres g ON g.id = a.category_id"
-            + " WHERE a.status = 'PUBLISHED'"
-            + " ORDER BY a.published_at ASC, a.id ASC",
-            nativeQuery = true)
-    List<ArticlePublishedRow> findPublishedRows();
 }

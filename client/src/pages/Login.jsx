@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { dangNhap } from '../api/authApi.js'
-import '../styles/Login.css'
+import './Login.css'
 
 /**
  * Tai khoan mau - chep tu database/data.sql, mat khau chung 123456.

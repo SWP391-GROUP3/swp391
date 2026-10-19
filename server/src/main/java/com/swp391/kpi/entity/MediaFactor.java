@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 /**
  * He so co dinh cua tung loai anh/video (bang media_factors, BR-RY-04, UC-56).
- * Moi loai chi co 1 he so co dinh, khong co khung min/max (cot max_factor da xoa o PR [DB] 18/10/2026).
+ * Cot max_factor trong DB: nhom da bo (khong dung), cho PR [DB] xoa cot va CHECK di kem.
  */
 @Entity
 @Table(name = "media_factors")
