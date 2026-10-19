@@ -22,6 +22,9 @@ public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, In
     // vao ky dang mo (BR-RY-05). Binh thuong chi co 1 ky OPEN.
     Optional<RoyaltyPeriod> findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc(RoyaltyPeriodStatus status);
 
+    // Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi tu tao ky thang sau
+    boolean existsByPeriodYearAndPeriodMonth(Short periodYear, Byte periodMonth);
+
     // Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines.
     // Dung SQL thuong (nativeQuery) vi entity RoyaltyLine chua co, Iter2 moi lam.
     @Query(value = "SELECT COALESCE(SUM(amount), 0) FROM royalty_lines WHERE period_id = :periodId",

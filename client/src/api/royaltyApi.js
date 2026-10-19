@@ -38,3 +38,47 @@ export async function updateMediaFactor(id, factor) {
 export async function getRoyaltyPeriods() {
   return goiApi('/api/royalty-periods')
 }
+
+/**
+ * UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han chi) truoc.
+ * Moi dong: { articleId, title, authorName, sectionId, sectionName, categoryId, categoryName,
+ *             declaredNature, publishedAt, paymentDeadline: "2026-10-22", daysLeft, nearDeadline }.
+ * daysLeft am = da qua han chi.
+ */
+export async function getPendingGradings() {
+  return goiApi('/api/royalty-gradings/pending')
+}
+
+/**
+ * UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu.
+ * @param {number|string} articleId
+ * @param {string} [nature] ORIGINAL / TRANSLATION / COMPILATION / REPOST; bo trong = tinh chat PV khai
+ */
+export async function previewRoyaltyGrading(articleId, nature) {
+  const natureParam = nature ? `&nature=${encodeURIComponent(nature)}` : ''
+  return goiApi(`/api/royalty-gradings/preview?articleId=${encodeURIComponent(articleId)}${natureParam}`)
+}
+
+/**
+ * UC-47 buoc 5: Thu ky bam Hoan tat -> luu phieu, anh/video, dong tien vao ky dang mo.
+ * Tra ve phieu da luu (cung dang voi previewRoyaltyGrading, co them gradingId).
+ * @param {{ articleId: number, nature: string }} grading
+ */
+export async function completeRoyaltyGrading(grading) {
+  return goiApi('/api/royalty-gradings', { method: 'POST', body: grading })
+}
+
+/**
+ * UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNote, totalAmount,
+ *   gradedArticleCount, articles: [{ gradingId, articleId, title, scoreUsed, nature,
+ *   finalFactor, articleAmount, mediaAmount, totalAmount, gradedAt }],
+ *   people: [{ userId, fullName, articleAmount, mediaAmount, adjustmentAmount, totalAmount }] }.
+ */
+export async function getRoyaltyPeriodDetail(periodId) {
+  return goiApi(`/api/royalty-periods/${periodId}`)
+}
+
+/** UC-50: Thu ky chot ky OPEN -> CLOSED. Tra ve ky da chot (cung dang voi getRoyaltyPeriods). */
+export async function closeRoyaltyPeriod(periodId) {
+  return goiApi(`/api/royalty-periods/${periodId}/close`, { method: 'POST' })
+}
