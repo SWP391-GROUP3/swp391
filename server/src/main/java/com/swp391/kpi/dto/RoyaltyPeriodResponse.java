@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 
 /**
  * 1 ky nhuan but tra ve cho man Royalty Period List (UC-49).
+ *
+ * MUC LUC (so dong)
+ *   22  field                        - cac truong tra ve cho giao dien
+ *   33  from()                       - Map tay entity -> DTO (AGENTS.md muc 3.4), them 2 so lieu tong hop tinh…
  */
 @Getter
 @Setter

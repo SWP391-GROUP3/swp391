@@ -10,6 +10,9 @@ import '../../styles/SummaryCard.css'
  * - cacDong:  [{ nhan, giaTri, canhBao }]; canhBao = true thi to do giaTri
  * - lienKet:  { to, chu } hoac null - link "Xem chi tiết →" o cuoi the
  * - dangTai, loi: trang thai tai du lieu
+ *
+ * MUC LUC (so dong)
+ *   17  SummaryCard                  - The tom tat o cot trai trang chu: tieu de + nhan trang thai + vai dong …
  */
 export default function SummaryCard({ tieuDe, nhan, cacDong, lienKet, dangTai, loi }) {
   const idTieuDe = useId()

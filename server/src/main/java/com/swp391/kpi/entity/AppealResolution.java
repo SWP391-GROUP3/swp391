@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   17  field                        - cac cot cua bang (khop schema.sql)
+ */
 @Entity @Table(name = "appeal_resolutions")
 @Getter @Setter @NoArgsConstructor
 public class AppealResolution {

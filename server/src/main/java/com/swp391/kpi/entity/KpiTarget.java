@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 /**
  * Ánh xạ bảng kpi_targets trong database/schema.sql.
  * Lưu chỉ tiêu tháng của từng phóng viên do Trưởng ban thiết lập.
+ *
+ * MUC LUC (so dong)
+ *   30  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "kpi_targets")

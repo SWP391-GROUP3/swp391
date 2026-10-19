@@ -10,6 +10,9 @@ import lombok.Setter;
  * Nguoi dung tu sua ho so: chi ho ten va email.
  * Vai tro, ban, trang thai, username do Admin quan ly -> khong nhan o day.
  * Do dai lay theo schema.sql: full_name NVARCHAR(100), email VARCHAR(150).
+ *
+ * MUC LUC (so dong)
+ *   23  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

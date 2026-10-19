@@ -108,6 +108,16 @@ const KHUNG_THEO_VAI_TRO = {
  * Moi vai tro co 1 NHOM route rieng. Nguoi dang nhap la vai tro nao thi
  * chi nhom do ton tai, nen cung la "/main" nhung moi vai tro thay trang chu
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
+ *
+ * MUC LUC (so dong)
+ *   48  TRANG_PV_CHUA_LAM            - Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
+ *   53  TRANG_BTV_CHUA_LAM
+ *   61  TRANG_TK_CHUA_LAM            - Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
+ *   63  TRANG_TB_CHUA_LAM
+ *   77  TRANG_KT_CHUA_LAM
+ *   81  TRANG_ADMIN_CHUA_LAM
+ *   96  KHUNG_THEO_VAI_TRO           - Moi vai tro co khung trang (menu) rieng, khai bao o day:
+ *  122  AppRoutes                    - Khai bao toan bo route cua app (AGENTS.md muc 4: route moi them o day).
  */
 export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)

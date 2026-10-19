@@ -1,6 +1,11 @@
 /**
  * API client cho module cau hinh luat khieu nai (UC-44).
  * Goi qua goiApi(): tu gan token dang nhap, tu bao loi tieng Viet (AGENTS.md muc 4).
+ *
+ * MUC LUC (so dong)
+ *   12  getActiveConfig
+ *   16  getAllConfigs
+ *   22  createConfig                 - Nguoi tao (updated_by) server tu lay tu token, khong can gui kem
  */
 import { goiApi } from './goiApi.js'
 

@@ -8,6 +8,10 @@ import java.math.BigDecimal;
 
 /**
  * 1 loai anh/video va he so cua no, tra ve cho man Media Factor (UC-56).
+ *
+ * MUC LUC (so dong)
+ *   20  field                        - cac truong tra ve cho giao dien
+ *   25  from()                       - Map tay entity -> DTO (AGENTS.md muc 3.4)
  */
 @Getter
 @Setter

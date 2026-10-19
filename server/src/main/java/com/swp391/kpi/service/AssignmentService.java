@@ -15,6 +15,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * MUC LUC (so dong)
+ *   30  field                        - repository / service duoc inject
+ *   38  assignArticle()              - Trưởng ban phân công một bài viết cho một BTV chấm chất lượng (UC-18, U…
+ *   67  getAssignmentByArticleId()   - Lấy thông tin phân công hiện tại của bài viết.
+ *   76  getAssignmentsByEditorId()   - Lấy danh sách các bài viết được phân công cho 1 BTV (Hàng việc của BTV …
+ *   87  getEditorWorkload()          - Thống kê khối lượng công việc hiện tại của một BTV để phục vụ gợi ý phâ…
+ */
 @Service
 @RequiredArgsConstructor
 public class AssignmentService {

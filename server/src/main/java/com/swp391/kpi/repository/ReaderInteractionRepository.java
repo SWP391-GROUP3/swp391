@@ -9,6 +9,11 @@ import java.util.List;
 
 /**
  * Repository thao tac voi bang reader_interactions (BF-05).
+ *
+ * MUC LUC (so dong)
+ *   20  findByArticleId()
+ *   22  findByArticleIdIn()
+ *   25  sumPageViewsByArticleIds()
  */
 public interface ReaderInteractionRepository extends JpaRepository<ReaderInteraction, Integer> {
 

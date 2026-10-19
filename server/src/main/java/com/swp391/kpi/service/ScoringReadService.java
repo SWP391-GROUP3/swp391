@@ -9,6 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   24  field                        - repository / service duoc inject
+ *   26  getSubmittedAttempts()
+ *   28  getAttempt()
+ *   35  getPublishedAttempt()
+ *   45  getCriteria()
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

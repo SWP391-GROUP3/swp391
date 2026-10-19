@@ -9,6 +9,14 @@ import './ReporterKpiDetails.css'
  * Man hinh Chi tiet KPI cua mot phong vien (UC-62: View Reporter KPI Details).
  * Danh cho Truong ban bien tap theo doi cac bai viet da xuat ban, ty le quy doi
  * dong tac gia (0.6 / 0.4), diem chat luong va luot xem tich luy.
+ *
+ * MUC LUC (so dong)
+ *   21  ReporterKpiDetails           - Man hinh Chi tiet KPI cua mot phong vien (UC-62: View Reporter KPI Deta…
+ *   33    useEffect                  - tai du lieu khi mo trang
+ *   39    taiChiTietKpi()
+ *   53    doiNam()
+ *   57    doiThang()
+ *   61    quayLaiBangChung()
  */
 export default function ReporterKpiDetails({ nguoiDung }) {
   const { reporterId } = useParams()

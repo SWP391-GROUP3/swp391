@@ -3,6 +3,20 @@
 // Icon nao co trong menu thi lay DUNG hinh cua menu de tab va sidebar giong nhau.
 
 // Giong menu "Bo tieu chi" (AdminLayout)
+/**
+ * MUC LUC (so dong)
+ *   20  BT_TIEU_CHI                  - Giong menu "Bo tieu chi" (AdminLayout)
+ *   23  BT_PHAN_CONG                 - Giong menu "Phan cong cham" (HeadLayout)
+ *   26  BT_BAI_DUOC_GIAO             - Giong menu "Bai duoc giao" (EditorLayout)
+ *   29  BT_MAY_TINH                  - May tinh (mo phong tinh diem)
+ *   32  BT_DANH_SACH                 - Danh sach (giong menu "The loai" cua AdminLayout)
+ *   35  BT_BIEU_DO                   - Bieu do cot (giong menu "Bang KPI cua ban" cua HeadLayout)
+ *   37  BT_THEM
+ *   38  BT_THONG_TIN
+ *   39  BT_DAU_TICH
+ *   40  BT_DAU_X
+ */
+
 export const BT_TIEU_CHI = <><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9Z" /><path d="M9 12h6M9 16h4" /></>
 
 // Giong menu "Phan cong cham" (HeadLayout)

@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react'
 import { getActiveConfig, getAllConfigs, createConfig } from '../../api/appealRuleConfigApi.js'
 import '../../styles/AppealRuleConfig.css'
 
+/**
+ * MUC LUC (so dong)
+ *   14  AppealRuleConfigPage
+ *   32    useEffect                  - tai du lieu khi mo trang
+ *   36    taiDuLieu()
+ *   56    handleOpenModal()
+ *   72    handleFormSubmit()
+ */
+
 export default function AppealRuleConfigPage() {
   const [activeConfig, setActiveConfig] = useState(null)
   const [historyList, setHistoryList] = useState([])

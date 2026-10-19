@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 
 /**
  * DTO nhận dữ liệu khi Trưởng ban giao chỉ tiêu mới cho phóng viên (UC-59).
+ *
+ * MUC LUC (so dong)
+ *   24  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

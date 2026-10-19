@@ -1,3 +1,9 @@
+/**
+ * MUC LUC (so dong)
+ *    7  dinhDangThoiGian
+ *   14  thoiGianConLai
+ */
+
 export function dinhDangThoiGian(giaTri) {
   if (!giaTri) return '—'
   const ngay = new Date(giaTri)

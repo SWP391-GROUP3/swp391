@@ -10,6 +10,9 @@ import '../../styles/Flow2.css'
 /**
  * Dashboard tong hop cho Luong BF-02 (Phan cong, Danh gia chat luong & Duyet dang).
  * Co the nhung truc tiep vao Main.jsx ma khong lam vo bat ky giao dien chung nao.
+ *
+ * MUC LUC (so dong)
+ *   17  Flow2Dashboard               - Dashboard tong hop cho Luong BF-02 (Phan cong, Danh gia chat luong & Du…
  */
 export default function Flow2Dashboard({ nguoiDung }) {
   // Tu dong chon Tab phu hop voi vai tro dang nhap

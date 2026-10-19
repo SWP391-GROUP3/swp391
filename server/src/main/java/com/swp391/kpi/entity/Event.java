@@ -19,6 +19,9 @@ import java.time.LocalDate;
  * he so bao hoa, tru bai co diem >= exemptScore (GBR-09).
  * Ty le bao hoa cua tung bai da khoa luc nop (articles.saturation_rate, BR-IN-03),
  * nen khi cham nhuan but BF-04 chi can exemptScore de biet bai co duoc mien giam khong.
+ *
+ * MUC LUC (so dong)
+ *   35  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "events")

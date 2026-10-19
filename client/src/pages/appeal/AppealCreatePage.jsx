@@ -5,6 +5,16 @@ import { dinhDangThoiGian, thoiGianConLai } from './appealFormat.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/AppealPage.css'
 
+/**
+ * MUC LUC (so dong)
+ *   18  AppealCreatePage
+ *   31    useEffect                  - tai du lieu khi mo trang
+ *   39    useEffect                  - tai du lieu khi mo trang
+ *   60    doiLuaChon()
+ *   72    doiLyDo()
+ *   76    guiForm()
+ */
+
 export default function AppealCreatePage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()

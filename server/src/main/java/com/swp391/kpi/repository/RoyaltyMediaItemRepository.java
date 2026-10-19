@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Doc/ghi bang royalty_media_items (tien tung anh/video, UC-48).
+ *
+ * MUC LUC (so dong)
+ *   16  existsByAttachmentId()       - Anh nay DA TUNG duoc tra nhuan but chua (co dong trong royalty_media_it…
  */
 public interface RoyaltyMediaItemRepository extends JpaRepository<RoyaltyMediaItem, Integer> {
 

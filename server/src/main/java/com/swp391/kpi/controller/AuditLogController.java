@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   29  field                        - service duoc inject
+ *   32  getLogs()
+ */
 @RestController
 @RequestMapping("/api/audit-logs")
 @RequiredArgsConstructor

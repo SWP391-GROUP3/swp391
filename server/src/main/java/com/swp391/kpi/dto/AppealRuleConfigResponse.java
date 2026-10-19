@@ -7,6 +7,11 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * MUC LUC (so dong)
+ *   19  field                        - cac truong tra ve cho giao dien
+ *   28  from()                       - Map thu cong bang static method theo quy uoc AGENTS.md muc 3.4
+ */
 @Getter
 @Setter
 public class AppealRuleConfigResponse {

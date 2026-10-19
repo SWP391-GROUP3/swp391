@@ -24,6 +24,14 @@ import java.nio.charset.StandardCharsets;
  *
  * Token ky bang HS256: 1 khoa bi mat dung chung cho ca ky va kiem.
  * Khoa nam trong application-local.properties (app.jwt.secret), KHONG commit.
+ *
+ * MUC LUC (so dong)
+ *   40  hang so                      - HS256 can khoa toi thieu 256 bit = 32 byte
+ *   43  field                        - cac truong du lieu
+ *   47  secretKey()                  - Doi chuoi bi mat thanh khoa HMAC. Thieu / qua ngan -> dung app ngay luc…
+ *   58  jwtEncoder()
+ *   63  jwtDecoder()
+ *   70  passwordEncoder()
  */
 @Configuration
 public class JwtConfig {

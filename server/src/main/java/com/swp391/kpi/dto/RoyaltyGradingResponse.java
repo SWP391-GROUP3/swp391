@@ -12,6 +12,9 @@ import java.util.List;
  * Phieu cham nhuan but 1 bai (UC-47, UC-48), du tung buoc cong thuc de Thu ky xem.
  * Dung cho ca XEM TRUOC (gradingId = null, chua luu) va sau khi HOAN TAT (co gradingId).
  * Service tu gan tung truong (khong co from() vi so lieu tinh tu nhieu nguon).
+ *
+ * MUC LUC (so dong)
+ *   23  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

@@ -9,6 +9,9 @@ import { Navigate } from 'react-router-dom'
  * Chi la chan o giao dien cho dung luong. Backend van PHAI tu kiem tra quyen,
  * vi ai cung goi thang API duoc ma khong qua man hinh.
  * replace: khong luu vao lich su, bam Back khong quay lai trang bi chan.
+ *
+ * MUC LUC (so dong)
+ *   16  RequireRole                  - Chan route o phia giao dien:
  */
 export default function RequireRole({ nguoiDung, vaiTro, children }) {
   if (!nguoiDung) {

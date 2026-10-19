@@ -1,5 +1,13 @@
 import { goiApi } from './goiApi.js'
 
+/**
+ * MUC LUC (so dong)
+ *   11  layDieuKienKhieuNai
+ *   15  guiKhieuNai
+ *   19  layKhieuNaiCuaToi
+ *   23  layBaiCoTheKhieuNai
+ */
+
 export async function layDieuKienKhieuNai(articleId) {
   return goiApi(`/api/articles/${articleId}/appeal-eligibility`)
 }

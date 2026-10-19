@@ -9,6 +9,12 @@ import java.util.Optional;
 /**
  * Repository thao tac du lieu voi bang kpi_snapshots.
  * Phuc vu Job tong hop KPI tu dong va Dashboard ban bien tap (BF-05).
+ *
+ * MUC LUC (so dong)
+ *   22  findByReporterIdAndPeriodYearAndPeriodMonth() - Lay snapshot cua 1 phong vien trong 1 ky (nam, thang)
+ *   25  existsByReporterIdAndPeriodYearAndPeriodMonth() - Kiem tra da co ban ghi snapshot trong ky chua
+ *   28  findByPeriodYearAndPeriodMonth() - Lay danh sach snapshot cua ca ban trong 1 ky (nam, thang) cho Dashboard…
+ *   31  findByReporterIdOrderByPeriodYearDescPeriodMonthDesc() - Lay lich su snapshot cua 1 phong vien sap xep moi nhat truoc
  */
 public interface KpiSnapshotRepository extends JpaRepository<KpiSnapshot, Integer> {
 

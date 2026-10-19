@@ -13,6 +13,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   29  field                        - cac cot cua bang (khop schema.sql)
+ */
 @Entity
 @Table(name = "reviewer_deviation_indices")
 @Getter
