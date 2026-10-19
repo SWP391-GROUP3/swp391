@@ -1,0 +1,13 @@
+/* pages/ComingSoon.jsx - trang tam cho chuc nang chua lam */
+
+.dang-xay-dung__tieu-de {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.dang-xay-dung__mo-ta {
+  margin: 8px 0 20px;
+  font-size: 14px;
+  color: var(--fm-chu-nhat);
+}

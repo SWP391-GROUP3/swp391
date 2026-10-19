@@ -1,0 +1,295 @@
+/* ===========================================================================
+   pages/royalty/*.jsx - 3 man BF-04 Iter 1: don gia (UC-55), he so anh/video (UC-56),
+   ky nhuan but (UC-49). Dung chung 1 file vi 3 man cung bo cuc:
+   tieu de + the trang chua form/bang (giong "Bai cua toi").
+   Tien to class: .royalty__ . Mau chi dung bien --fm-* (lay tu file Figma).
+   =========================================================================== */
+
+.royalty__header { margin-bottom: 20px; }
+
+.royalty__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.royalty__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+/* ---- The trang trang (Figma: nen trang, vien nhat, bo goc) ---- */
+.royalty__card {
+  margin-bottom: 16px;
+  padding: 8px 0;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.royalty__card-title {
+  margin: 8px 16px 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.royalty__card .thong-bao-loi,
+.royalty__card .thong-bao-thanh-cong { margin: 0 16px 12px; }
+
+.royalty__empty {
+  margin: 0;
+  padding: 32px 16px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--fm-chu-nhat);
+}
+
+/* ---- Form them don gia: cac o nam ngang, man hep thi xuong dong ---- */
+.royalty__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+  padding: 0 16px 12px;
+}
+
+.royalty__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.royalty__input {
+  width: 200px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--fm-chu);
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+}
+
+.royalty__input--small { width: 96px; }
+
+.royalty__input:focus {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 1px;
+  border-color: var(--fm-xanh-duong);
+}
+
+.royalty__hint {
+  margin: 0;
+  padding: 0 16px 8px;
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+/* Nut chinh dung class chung .nut-chinh-fm (index.css) */
+
+/* ---- Bang ---- */
+.royalty__scroll { overflow-x: auto; }
+
+/* Bang dung class chung .bang-fm (index.css) */
+
+/* Cot so (tien, he so, so bai): can phai, chu so thang hang */
+.bang-fm .royalty__number {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.royalty__date {
+  white-space: nowrap;
+  color: var(--fm-chu-nhat);
+  font-variant-numeric: tabular-nums;
+}
+
+.royalty__strong { font-weight: 500; }
+.royalty__nowrap { white-space: nowrap; }
+
+.royalty__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Ghi chu Ke toan khi tra ky (UC-52): chu nho mau hong duoi trang thai */
+.royalty__note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--fm-hong);
+}
+
+/* Nhan "Dang ap dung" / "Sap ap dung" cua don gia */
+.royalty__badge {
+  display: inline-block;
+  padding: 2px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--fm-chu-nhat);
+  background: var(--fm-nen);
+  border-radius: 999px;
+}
+
+.royalty__badge--current { color: var(--fm-chu); font-weight: 500; background: var(--fm-chon); }
+.royalty__badge--future  { color: var(--fm-chu); background: var(--fm-chu-y-nen); }
+
+.royalty__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.royalty__link {
+  font-weight: 500;
+  color: var(--fm-chu);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.royalty__link:hover { color: var(--fm-xanh-duong); text-decoration: underline; }
+
+/* ===========================================================================
+   Iter 2: bai cho cham (UC-46), cham nhuan but (UC-47, 48), bang ke ky (UC-50)
+   =========================================================================== */
+
+/* Link quay lai o tren tieu de */
+.royalty__back {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+  text-decoration: none;
+}
+.royalty__back:hover { color: var(--fm-xanh-duong); }
+
+/* Chu phu nho (ten tac gia duoi tieu de bai, ly do khong tinh tien...) */
+.royalty__muted {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+/* ---- Bo loc danh sach bai cho cham ---- */
+.royalty__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+  padding: 8px 16px 12px;
+}
+
+.royalty__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  font-size: 13px;
+}
+
+/* ---- Nhan han chi: qua han do, sap toi han cam, con lai xam ---- */
+.royalty__deadline {
+  display: inline-block;
+  padding: 2px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--fm-chu-nhat);
+  background: var(--fm-nen);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.royalty__deadline--soon { color: var(--fm-chu-y);     background: var(--fm-chu-y-nen); }
+.royalty__deadline--late { color: var(--fm-canh-bao);  background: var(--fm-loi-nen); font-weight: 500; }
+
+/* ---- Man cham: 2 cot (cong thuc ben trai, tong tien ben phai), man hep thi 1 cot ---- */
+.royalty__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .royalty__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.royalty__total {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.royalty__total-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fm-chu-nhat);
+}
+
+.royalty__total-amount {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--fm-thong-tin);
+  font-variant-numeric: tabular-nums;
+}
+
+.royalty__total-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.royalty__total-field { margin-top: 8px; }
+
+.royalty__total-links {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.royalty__total .thong-bao-loi,
+.royalty__total .thong-bao-thanh-cong { margin: 0; }
+
+.royalty__input--full { width: 100%; }
+
+/* Dong tong / dong ket qua trong bang cong thuc */
+.bang-fm .royalty__row-total td {
+  font-weight: 600;
+  background: var(--fm-nen);
+}
+
+.royalty__badge-gap { margin-left: 8px; }
+
+/* O ten bai: cac cot khac khong xuong dong nen cot nay bi ep hep -> dat do rong toi thieu.
+   Bang nam trong .royalty__scroll nen man hep van keo ngang duoc. */
+.royalty__title-cell { min-width: 240px; }
+
+/* ---- Bang ke ky: 3 so tong o tren ---- */
+.royalty__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 40px;
+  padding: 16px;
+}
+
+.royalty__summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.royalty__summary-value {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}

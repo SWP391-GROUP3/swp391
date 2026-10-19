@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { layKpiThangNay } from '../../api/reporterHomeApi.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import './KpiProgressCard.css'
+import '../../styles/KpiProgressCard.css'
 
 /** Phan tram do dai thanh tien do, toi da 100 (vuot chi tieu van chi day thanh). */
 function tinhPhanTram(thucTe, chiTieu) {
