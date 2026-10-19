@@ -68,6 +68,9 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
+  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
+  { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
+  { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
   { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
 
