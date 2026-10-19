@@ -27,4 +27,19 @@ public class NotificationService {
             repository.save(notification);
         }
     }
+
+    // Bao cho moi nguoi dang ACTIVE cua 1 vai tro (roles.code, vd "ACCOUNTANT").
+    // Thong bao khong gan bai nao (articleId = null). BF-04 dung khi Thu ky chot ky (UC-50).
+    @Transactional
+    public void notifyRole(String roleCode, String message) {
+        for (var user : userReadService.getUsers()) {
+            if (!"ACTIVE".equals(user.status()) || !roleCode.equals(user.role())) continue;
+            var notification = new Notification();
+            notification.setUserId(user.id());
+            notification.setMessage(message);
+            notification.setIsRead(false);
+            notification.setCreatedAt(LocalDateTime.now());
+            repository.save(notification);
+        }
+    }
 }
