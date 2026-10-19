@@ -29,6 +29,22 @@ export const MEDIA_KIND_LABELS = {
   VIDEO:   'Video',
 }
 
+/**
+ * Tinh chat bai (articles.declared_nature, royalty_gradings.nature) -> chu hien thi.
+ * Ty le % cua tung loai lay tu system_parameters (NATURE_RATE_*), server tra kem khi tinh.
+ * Thu tu khai bao = thu tu hien trong o chon cua man cham nhuan but.
+ */
+export const NATURE_LABELS = {
+  ORIGINAL:    'Bài gốc',
+  TRANSLATION: 'Bài dịch',
+  COMPILATION: 'Bài tổng hợp',
+  REPOST:      'Bài đăng lại',
+}
+
+export function natureLabel(nature) {
+  return NATURE_LABELS[nature] || nature
+}
+
 /** Ma la (chua co trong bang tren) thi hien nguyen ma, khong de trong. */
 export function periodStatusLabel(status) {
   return PERIOD_STATUS_LABELS[status] || status
