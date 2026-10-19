@@ -1,5 +1,4 @@
 package com.swp391.kpi.service;
-
 import com.swp391.kpi.dto.DepartmentKpiDashboardResponse;
 import com.swp391.kpi.dto.DepartmentKpiItemResponse;
 import com.swp391.kpi.dto.ReporterKpiArticleItemResponse;
@@ -22,7 +21,7 @@ import com.swp391.kpi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.swp391.kpi.entity.RoleCode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -42,7 +41,6 @@ import java.util.Optional;
 public class KpiAggregationService {
 
     private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
-
     private final KpiSnapshotRepository kpiSnapshotRepository;
     private final KpiTargetRepository kpiTargetRepository;
     private final ArticleRepository articleRepository;
@@ -73,7 +71,7 @@ public class KpiAggregationService {
         List<User> allUsers = userRepository.findAll();
         List<User> reporters = new ArrayList<>();
         for (User u : allUsers) {
-            if (u.getRole() != null && "REPORTER".equals(u.getRole().getCode())) {
+            if (u.getRole() != null && (u.getRole().getCode() == RoleCode.REPORTER || "REPORTER".equals(String.valueOf(u.getRole().getCode())))) {
                 reporters.add(u);
             }
         }
@@ -149,7 +147,7 @@ public class KpiAggregationService {
         List<User> allUsers = userRepository.findAll();
         Map<Integer, User> reporterUserMap = new HashMap<>();
         for (User u : allUsers) {
-            if (u.getRole() != null && "REPORTER".equals(u.getRole().getCode())) {
+            if (u.getRole() != null && (u.getRole().getCode() == RoleCode.REPORTER || "REPORTER".equals(String.valueOf(u.getRole().getCode())))) {
                 reporterUserMap.put(u.getId(), u);
             }
         }
