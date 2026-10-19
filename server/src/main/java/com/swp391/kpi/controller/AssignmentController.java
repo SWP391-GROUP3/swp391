@@ -6,6 +6,7 @@ import com.swp391.kpi.dto.AssignmentResponse;
 import com.swp391.kpi.dto.EditorWorkloadDTO;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.service.AssignmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class AssignmentController {
      * Trưởng ban giao bài viết cho BTV chấm chất lượng (UC-18, UC-20).
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<AssignmentResponse>> assignArticle(@RequestBody AssignmentCreateRequest request) {
+    public ResponseEntity<ApiResponse<AssignmentResponse>> assignArticle(@Valid @RequestBody AssignmentCreateRequest request) {
         AssignmentResponse response = assignmentService.assignArticle(request);
         return ResponseEntity.ok(ApiResponse.success("Phân công bài viết thành công", response));
     }
