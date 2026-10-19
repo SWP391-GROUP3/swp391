@@ -48,4 +48,11 @@ export function doiTheLoaiBaiViet(articleId, newCategoryId) {
   })
 }
 
+export function luuDiemTieuChi(articleId, danhSachDiem) {
+  return goiApi(`/api/scoring-attempts/article/${articleId}/scores`, {
+    method: 'PUT',
+    body: { scores: danhSachDiem }
+  })
+}
+
 

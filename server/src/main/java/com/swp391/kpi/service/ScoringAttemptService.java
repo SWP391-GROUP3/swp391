@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.swp391.kpi.dto.*;
+import java.math.RoundingMode;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -208,6 +210,85 @@ public class ScoringAttemptService {
             ScoringAttemptDetail savedDetail = scoringAttemptDetailRepository.save(detail);
             detailResponses.add(ScoringAttemptDetailResponse.from(savedDetail));
         }
+
+        return ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
+    }
+
+    // BTV luu diem tung tieu chi va tinh tong diem theo trong so (UC-24, UC-25, BR-SC-06, BR-SC-07)
+    @Transactional
+    public ScoringAttemptResponse saveDraftScores(Integer articleId, ScoringSaveRequest request, Integer editorId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+
+        Assignment assignment = assignmentRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new BusinessException("Bài viết chưa được phân công"));
+
+        if (!assignment.getEditorId().equals(editorId)) {
+            throw new BusinessException("Bạn không được phân công chấm bài viết này!");
+        }
+
+        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+                .orElseThrow(() -> new NotFoundException("Bài viết này chưa mở phiếu chấm điểm"));
+
+        if (attempt.getSubmittedAt() != null) {
+            throw new BusinessException("Không thể chỉnh sửa điểm cho phiếu chấm đã nộp!");
+        }
+
+        List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
+        if (details.isEmpty()) {
+            throw new BusinessException("Phiếu chấm chưa có danh sách tiêu chí nào!");
+        }
+
+        // Kiem tra moi criterionId trong request phai thuoc phieu cham nay
+        for (CriteriaScoreItemRequest item : request.getScores()) {
+            boolean exists = details.stream().anyMatch(d -> d.getCriterion().getId().equals(item.getCriterionId()));
+            if (!exists) {
+                throw new BusinessException("Tiêu chí ID " + item.getCriterionId() + " không thuộc phiếu chấm của bài viết này!");
+            }
+        }
+
+        // Cap nhat diem va nhan xet
+        List<CriteriaScoreInput> calcInputs = new ArrayList<>();
+        List<ScoringAttemptDetailResponse> detailResponses = new ArrayList<>();
+
+        for (ScoringAttemptDetail detail : details) {
+            Integer cId = detail.getCriterion().getId();
+            CriteriaScoreItemRequest inputItem = request.getScores().stream()
+                    .filter(s -> s.getCriterionId().equals(cId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (inputItem != null) {
+                BigDecimal score = inputItem.getScore().setScale(2, RoundingMode.HALF_UP);
+                String comment = inputItem.getComment() != null ? inputItem.getComment().trim() : null;
+
+                // BR-SC-06: neu diem < 50 bat buoc phai co nhan xet
+                if (score.compareTo(BigDecimal.valueOf(50)) < 0) {
+                    if (comment == null || comment.isEmpty()) {
+                        throw new BusinessException("Tiêu chí '" + detail.getCriterion().getName() + "' đạt dưới 50 điểm (" + score + ") bắt buộc phải nhập nhận xét lý do!");
+                    }
+                }
+
+                detail.setScore(score);
+                detail.setComment(comment);
+                scoringAttemptDetailRepository.save(detail);
+            }
+
+            calcInputs.add(new CriteriaScoreInput(
+                    detail.getCriterion().getId(),
+                    detail.getCriterion().getName(),
+                    detail.getCriterion().getWeight(),
+                    detail.getScore(),
+                    detail.getComment()
+            ));
+            detailResponses.add(ScoringAttemptDetailResponse.from(detail));
+        }
+
+        // Tinh tong diem theo cong thuc BR-SC-07
+        ScoreCalculator calculator = new ScoreCalculator();
+        BigDecimal totalScore = calculator.calculateTotalScore(calcInputs);
+        attempt.setTotalScore(totalScore);
+        scoringAttemptRepository.save(attempt);
 
         return ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
     }

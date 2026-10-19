@@ -40,6 +40,17 @@ public class ScoringAttemptController {
         return ResponseEntity.ok(ApiResponse.success("Đổi thể loại bài viết thành công", response));
     }
 
+    // BTV luu diem tung tieu chi va tinh tong diem theo trong so (UC-24, UC-25, BR-SC-06, BR-SC-07)
+    @PutMapping("/article/{articleId}/scores")
+    public ResponseEntity<ApiResponse<ScoringAttemptResponse>> saveScores(
+            @PathVariable Integer articleId,
+            @Valid @RequestBody com.swp391.kpi.dto.ScoringSaveRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer editorId = Integer.valueOf(jwt.getSubject());
+        ScoringAttemptResponse response = scoringAttemptService.saveDraftScores(articleId, request, editorId);
+        return ResponseEntity.ok(ApiResponse.success("Lưu điểm tiêu chí thành công", response));
+    }
+
     // Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
     @GetMapping("/article/{articleId}/latest")
     public ResponseEntity<ApiResponse<ScoringAttemptResponse>> getLatestAttempt(

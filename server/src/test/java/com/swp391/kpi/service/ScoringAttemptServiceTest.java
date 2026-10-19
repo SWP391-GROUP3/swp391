@@ -273,4 +273,91 @@ class ScoringAttemptServiceTest {
 
         assertTrue(ex.getMessage().contains("Không thể đổi thể loại cho phiếu chấm đã nộp"));
     }
+
+    @Test
+    @DisplayName("Lưu điểm tiêu chí thành công và tính tổng điểm có trọng số (UC-24, UC-25)")
+    void testSaveDraftScores_Success() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(504);
+        attempt.setArticleId(10);
+        attempt.setReviewerId(3);
+        attempt.setAttemptNo(1);
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        Criteria c1 = new Criteria();
+        c1.setId(1);
+        c1.setName("Tiêu chí 1");
+        c1.setWeight(new BigDecimal("60.00"));
+
+        Criteria c2 = new Criteria();
+        c2.setId(2);
+        c2.setName("Tiêu chí 2");
+        c2.setWeight(new BigDecimal("40.00"));
+
+        ScoringAttemptDetail d1 = new ScoringAttemptDetail();
+        d1.setId(11);
+        d1.setScoringAttempt(attempt);
+        d1.setCriterion(c1);
+        d1.setScore(BigDecimal.ZERO);
+
+        ScoringAttemptDetail d2 = new ScoringAttemptDetail();
+        d2.setId(12);
+        d2.setScoringAttempt(attempt);
+        d2.setCriterion(c2);
+        d2.setScore(BigDecimal.ZERO);
+
+        when(scoringAttemptDetailRepository.findByScoringAttemptId(504)).thenReturn(List.of(d1, d2));
+
+        com.swp391.kpi.dto.ScoringSaveRequest req = new com.swp391.kpi.dto.ScoringSaveRequest(List.of(
+                new com.swp391.kpi.dto.CriteriaScoreItemRequest(1, new BigDecimal("80.00"), null),
+                new com.swp391.kpi.dto.CriteriaScoreItemRequest(2, new BigDecimal("70.00"), null)
+        ));
+
+        ScoringAttemptResponse res = scoringAttemptService.saveDraftScores(10, req, 3);
+
+        assertNotNull(res);
+        // 80*60% + 70*40% = 48 + 28 = 76.00
+        assertEquals(new BigDecimal("76.00"), res.getTotalScore());
+        verify(scoringAttemptDetailRepository, times(2)).save(any(ScoringAttemptDetail.class));
+        verify(scoringAttemptRepository, times(1)).save(attempt);
+    }
+
+    @Test
+    @DisplayName("Ném BusinessException khi điểm dưới 50 mà không có nhận xét (BR-SC-06)")
+    void testSaveDraftScores_Below50WithoutComment_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(505);
+        attempt.setSubmittedAt(null);
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        Criteria c1 = new Criteria();
+        c1.setId(1);
+        c1.setName("Tính thời sự");
+        c1.setWeight(new BigDecimal("100.00"));
+
+        ScoringAttemptDetail d1 = new ScoringAttemptDetail();
+        d1.setId(11);
+        d1.setCriterion(c1);
+        d1.setScore(BigDecimal.ZERO);
+
+        when(scoringAttemptDetailRepository.findByScoringAttemptId(505)).thenReturn(List.of(d1));
+
+        com.swp391.kpi.dto.ScoringSaveRequest req = new com.swp391.kpi.dto.ScoringSaveRequest(List.of(
+                new com.swp391.kpi.dto.CriteriaScoreItemRequest(1, new BigDecimal("45.00"), "   ") // Rỗng
+        ));
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoringAttemptService.saveDraftScores(10, req, 3)
+        );
+
+        assertTrue(ex.getMessage().contains("đạt dưới 50 điểm"));
+        assertTrue(ex.getMessage().contains("bắt buộc phải nhập nhận xét lý do"));
+    }
 }
