@@ -24,6 +24,9 @@ import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
+import RoyaltyPeriodDetail from '../pages/royalty/RoyaltyPeriodDetail.jsx'
+import RoyaltyPendingList from '../pages/royalty/RoyaltyPendingList.jsx'
+import RoyaltyGrading from '../pages/royalty/RoyaltyGrading.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
@@ -52,11 +55,8 @@ const TRANG_BTV_CHUA_LAM = [
   { path: '/my-scorings',           ten: 'Lịch sử chấm' },           // UC-21
 ]
 
-const TRANG_TK_CHUA_LAM = [
-  { path: '/royalty-grading',            ten: 'Bài chờ chấm nhuận bút' },  // UC-46
-  { path: '/royalty-grading/:articleId', ten: 'Chấm nhuận bút' },          // UC-47, UC-48
-  { path: '/royalty-periods/:id',        ten: 'Bảng kê kỳ nhuận bút' },    // UC-50
-]
+// Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
+const TRANG_TK_CHUA_LAM = []
 
 const TRANG_TB_CHUA_LAM = [
   { path: '/score-approvals',       ten: 'Duyệt điểm' },              // UC-29
@@ -72,7 +72,6 @@ const TRANG_TB_CHUA_LAM = [
 ]
 
 const TRANG_KT_CHUA_LAM = [
-  { path: '/royalty-periods/:id', ten: 'Bảng kê kỳ nhuận bút' },    // UC-51, 52, 53
   { path: '/royalty-payments',    ten: 'Chi trả nhuận bút' },       // UC-54
 ]
 
@@ -177,14 +176,19 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           )}
           {vaiTro === 'EDITORIAL_SECRETARY' && (
             <>
-              {/* BF-04 (Quang): UC-49 ky nhuan but */}
+              {/* BF-04 (Quang): UC-46 bai cho cham, UC-47/48 cham nhuan but, UC-49 ky, UC-50 bang ke + chot ky */}
+              <Route path="/royalty-grading" element={<RoyaltyPendingList />} />
+              <Route path="/royalty-grading/:articleId" element={<RoyaltyGrading />} />
               <Route path="/royalty-periods" element={<RoyaltyPeriods />} />
+              <Route path="/royalty-periods/:id" element={<RoyaltyPeriodDetail nguoiDung={nguoiDung} />} />
             </>
           )}
           {vaiTro === 'ACCOUNTANT' && (
             <>
-              {/* BF-04 (Quang): UC-49 ky nhuan but, UC-55 don gia */}
+              {/* BF-04 (Quang): UC-49 ky nhuan but, UC-55 don gia. Bang ke ky: Ke toan chi xem
+                  (khoa ky / tra ky UC-52, 53 lam o Iter 3) */}
               <Route path="/royalty-periods" element={<RoyaltyPeriods />} />
+              <Route path="/royalty-periods/:id" element={<RoyaltyPeriodDetail nguoiDung={nguoiDung} />} />
               <Route path="/royalty-rates" element={<RoyaltyRates />} />
             </>
           )}

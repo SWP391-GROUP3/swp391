@@ -18,4 +18,8 @@ public interface RoyaltyGradingRepository extends JpaRepository<RoyaltyGrading, 
 
     // Bai da co phieu cham chua (UC-47: Iter 2 moi bai chi cham 1 lan, cham lai la Iter 3)
     boolean existsByArticleId(Integer articleId);
+
+    // Cac phieu cham thuoc 1 ky, cham truoc len dau (bang ke ky, UC-50).
+    // "PeriodId" = truong period -> id: Spring tu di qua quan he @ManyToOne.
+    List<RoyaltyGrading> findByPeriodIdOrderByGradedAtAsc(Integer periodId);
 }
