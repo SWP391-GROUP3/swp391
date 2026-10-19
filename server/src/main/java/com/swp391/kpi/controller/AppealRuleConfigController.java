@@ -25,8 +25,10 @@ public class AppealRuleConfigController {
      * Lay cau hinh dang ap dung hien tai.
      */
     @GetMapping("/active")
-    public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> getActiveConfig() {
-        AppealRuleConfigResponse data = appealRuleConfigService.getActiveConfig();
+    public ResponseEntity<ApiResponse<AppealRuleConfigResponse>> getActiveConfig(
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        AppealRuleConfigResponse data = appealRuleConfigService.getActiveConfig(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy cấu hình khiếu nại đang áp dụng thành công", data));
     }
 
@@ -34,8 +36,10 @@ public class AppealRuleConfigController {
      * Lay toan bo lich su cac phien ban cau hinh (Admin xem).
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AppealRuleConfigResponse>>> getAllConfigs() {
-        List<AppealRuleConfigResponse> data = appealRuleConfigService.getAllConfigs();
+    public ResponseEntity<ApiResponse<List<AppealRuleConfigResponse>>> getAllConfigs(
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        List<AppealRuleConfigResponse> data = appealRuleConfigService.getAllConfigs(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách cấu hình khiếu nại thành công", data));
     }
 

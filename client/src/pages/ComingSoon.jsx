@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import './ComingSoon.css'
+import '../styles/ComingSoon.css'
 
 /**
  * Trang tam cho chuc nang chua lam, de bam menu khong bi day ve trang chu.

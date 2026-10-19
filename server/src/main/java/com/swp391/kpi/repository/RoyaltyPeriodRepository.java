@@ -1,12 +1,14 @@
 package com.swp391.kpi.repository;
 
 import com.swp391.kpi.entity.RoyaltyPeriod;
+import com.swp391.kpi.entity.RoyaltyPeriodStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Doc bang royalty_periods (ky nhuan but, UC-49).
@@ -15,6 +17,10 @@ public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, In
 
     // Cac ky, thang moi nhat len dau
     List<RoyaltyPeriod> findAllByOrderByPeriodYearDescPeriodMonthDesc();
+
+    // Ky dang o 1 trang thai, ky cu nhat len dau. UC-47 dung voi OPEN: bai cham xong
+    // vao ky dang mo (BR-RY-05). Binh thuong chi co 1 ky OPEN.
+    Optional<RoyaltyPeriod> findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc(RoyaltyPeriodStatus status);
 
     // Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines.
     // Dung SQL thuong (nativeQuery) vi entity RoyaltyLine chua co, Iter2 moi lam.
