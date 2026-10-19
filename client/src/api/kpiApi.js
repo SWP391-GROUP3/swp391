@@ -46,3 +46,25 @@ export async function capNhatChiTieu(id, duLieu) {
 export async function xoaChiTieu(id) {
   return goiApi(`/api/kpi-targets/${id}`, { method: 'DELETE' })
 }
+
+/**
+ * Lấy dữ liệu bảng KPI toàn ban theo năm và tháng (UC-61).
+ */
+export async function layBangKpiBan(nam, thang) {
+  return goiApi(`/api/kpi-snapshots/dashboard?year=${nam}&month=${thang}`)
+}
+
+/**
+ * Kích hoạt job tổng hợp số liệu KPI tự động cho kỳ (Automated Aggregation Job).
+ */
+export async function tongHopKpiThang(nam, thang) {
+  return goiApi(`/api/kpi-snapshots/aggregate?year=${nam}&month=${thang}`, { method: 'POST' })
+}
+
+/**
+ * Lấy chi tiết KPI của một phóng viên theo chu kỳ tháng (UC-62, UC-60).
+ */
+export async function layChiTietKpiPhongVien(reporterId, nam, thang) {
+  return goiApi(`/api/kpi-snapshots/reporters/${reporterId}/details?year=${nam}&month=${thang}`)
+}
+

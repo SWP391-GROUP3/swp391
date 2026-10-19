@@ -1,0 +1,255 @@
+.bang-kpi-ban {
+  padding: 24px;
+}
+
+.bang-kpi-ban__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.bang-kpi-ban__tieu-de {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fm-text-primary, #1e293b);
+  margin-bottom: 6px;
+}
+
+.bang-kpi-ban__mo-ta {
+  font-size: 13px;
+  color: var(--fm-text-secondary, #64748b);
+}
+
+.bang-kpi-ban__bo-loc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bang-kpi-ban__select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--fm-border, #cbd5e1);
+  background-color: #fff;
+  font-size: 14px;
+  color: var(--fm-text-primary, #1e293b);
+  outline: none;
+}
+
+.bang-kpi-ban__btn-tong-hop {
+  padding: 8px 16px;
+  background-color: var(--fm-primary, #3b82f6);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.bang-kpi-ban__btn-tong-hop:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.bang-kpi-ban__btn-tong-hop:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bang-kpi-ban__thong-ke {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.bang-kpi-ban__the-thong-ke {
+  background-color: #fff;
+  border: 1px solid var(--fm-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bang-kpi-ban__the-nhan {
+  font-size: 13px;
+  color: var(--fm-text-secondary, #64748b);
+  font-weight: 500;
+}
+
+.bang-kpi-ban__the-so {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fm-text-primary, #1e293b);
+}
+
+.bang-kpi-ban__the-so--dat {
+  color: #16a34a;
+}
+
+.bang-kpi-ban__the-so--chua-dat {
+  color: #dc2626;
+}
+
+.bang-kpi-ban__the-so--ty-le {
+  color: #2563eb;
+}
+
+.bang-kpi-ban__bang-khung {
+  background-color: #fff;
+  border: 1px solid var(--fm-border, #e2e8f0);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.bang-kpi-ban__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.bang-kpi-ban__table th {
+  background-color: #f8fafc;
+  color: var(--fm-text-secondary, #64748b);
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--fm-border, #e2e8f0);
+}
+
+.bang-kpi-ban__table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--fm-text-primary, #1e293b);
+}
+
+.bang-kpi-ban__table tr:last-child td {
+  border-bottom: none;
+}
+
+.bang-kpi-ban__phong-vien-ten {
+  font-weight: 600;
+  color: var(--fm-text-primary, #0f172a);
+}
+
+.bang-kpi-ban__phong-vien-email {
+  font-size: 12px;
+  color: var(--fm-text-secondary, #64748b);
+}
+
+.bang-kpi-ban__tien-do-khung {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bang-kpi-ban__thanh-tien-do {
+  flex: 1;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.bang-kpi-ban__thanh-tien-do-ruot {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 9999px;
+}
+
+.bang-kpi-ban__thanh-tien-do-ruot--day {
+  background-color: #16a34a;
+}
+
+.bang-kpi-ban__tien-do-so {
+  font-size: 13px;
+  font-weight: 600;
+  width: 45px;
+}
+
+.bang-kpi-ban__badge-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bang-kpi-ban__badge-status--pass {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.bang-kpi-ban__badge-status--not-pass {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.bang-kpi-ban__badge-snapshot {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bang-kpi-ban__badge-snapshot--draft {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.bang-kpi-ban__badge-snapshot--finalized {
+  background-color: #e0e7ff;
+  color: #4338ca;
+}
+
+.bang-kpi-ban__trang-thai-rong {
+  padding: 40px;
+  text-align: center;
+  color: var(--fm-text-secondary, #64748b);
+}
+
+.bang-kpi-ban__thong-bao-thanh-cong {
+  padding: 12px 16px;
+  background-color: #dcfce7;
+  color: #15803d;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.bang-kpi-ban__thong-bao-loi {
+  padding: 12px 16px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.bang-kpi-ban__link-chi-tiet {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fm-primary, #3b82f6);
+  text-decoration: none;
+  background-color: #eff6ff;
+  transition: all 0.2s;
+}
+
+.bang-kpi-ban__link-chi-tiet:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+

@@ -27,7 +27,8 @@ import java.nio.charset.StandardCharsets;
  *
  * Luat hien tai:
  * - POST /api/auth/login: ai cung goi duoc (chua co token thi moi can dang nhap)
- * - BF-04: them don gia = Ke toan, sua he so anh/video = Admin, xem ky nhuan but = Thu ky + Ke toan
+ * - BF-04: them don gia = Ke toan, sua he so anh/video = Admin, xem ky nhuan but = Thu ky + Ke toan,
+ *   cham nhuan but = Thu ky
  * - moi API con lai: phai gui header "Authorization: Bearer <token>" hop le
  * Chan theo vai tro (vd chi Ke toan them don gia) -> them .requestMatchers(...).hasRole(...)
  */
@@ -54,8 +55,13 @@ public class SecurityConfig {
                         // BF-04: chi Ke toan them don gia (UC-55), chi Admin sua he so anh/video (UC-56)
                         .requestMatchers(HttpMethod.POST, "/api/royalty-rates").hasRole("ACCOUNTANT")
                         .requestMatchers(HttpMethod.PUT, "/api/media-factors/**").hasRole("ADMIN")
-                        // BF-04: ky nhuan but co tong tien, chi Thu ky va Ke toan xem (UC-49)
+                        // BF-04: chi Thu ky chot ky (UC-50). Phai dat TRUOC luat /api/royalty-periods/**
+                        // vi Spring xet tu tren xuong, gap luat khop dau tien la dung.
+                        .requestMatchers(HttpMethod.POST, "/api/royalty-periods/*/close").hasRole("EDITORIAL_SECRETARY")
+                        // BF-04: ky nhuan but co tong tien, chi Thu ky va Ke toan xem (UC-49, UC-50)
                         .requestMatchers("/api/royalty-periods/**").hasAnyRole("EDITORIAL_SECRETARY", "ACCOUNTANT")
+                        // BF-04: cham nhuan but chi Thu ky toa soan (UC-46, 47, 48)
+                        .requestMatchers("/api/royalty-gradings/**").hasRole("EDITORIAL_SECRETARY")
                         .anyRequest().authenticated())
                 // Bat che do kiem JWT: doc header Authorization, kiem chu ky + han dung bang JwtDecoder
                 .oauth2ResourceServer(oauth2 -> oauth2
