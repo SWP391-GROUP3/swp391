@@ -67,3 +67,4 @@ export async function tongHopKpiThang(nam, thang) {
 export async function layChiTietKpiPhongVien(reporterId, nam, thang) {
   return goiApi(`/api/kpi-snapshots/reporters/${reporterId}/details?year=${nam}&month=${thang}`)
 }
+

@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import { Link } from 'react-router-dom'
-import '../../styles/StatusCounter.css'
+import './StatusCounter.css'
 
 /**
  * Cot dem so luong ben phai trang chu (kieu cot "To do" cua Figma):

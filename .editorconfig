@@ -1,4 +1,0 @@
-# Preserve Vietnamese SQL text in Windows editors and SQL tools.
-[*.sql]
-# noinspection EditorConfigDeprecatedDescriptor
-charset = utf-8-bom

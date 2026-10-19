@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { createRoyaltyRate, getRoyaltyRates } from '../../api/royaltyApi.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import { formatDate } from '../../utils/formatDate.js'
-import '../../styles/Royalty.css'
+import './Royalty.css'
 
 /**
  * UC-55 - "Don gia nhuan but" (Ke toan).
@@ -101,7 +101,7 @@ export default function RoyaltyRates() {
               required
             />
           </label>
-          <button type="submit" className="nut-chinh-fm" disabled={isSaving}>
+          <button type="submit" className="royalty__primary-button" disabled={isSaving}>
             {isSaving ? 'Đang lưu…' : 'Thêm đơn giá'}
           </button>
         </form>
@@ -119,7 +119,7 @@ export default function RoyaltyRates() {
 
         {rates && rates.length > 0 && (
           <div className="royalty__scroll">
-            <table className="bang-fm">
+            <table className="royalty__table">
               <thead>
                 <tr>
                   <th>Áp dụng từ</th>

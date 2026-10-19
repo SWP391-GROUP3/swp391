@@ -3,7 +3,6 @@ package com.swp391.kpi.repository;
 import com.swp391.kpi.entity.RoyaltyRate;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +16,4 @@ public interface RoyaltyRateRepository extends JpaRepository<RoyaltyRate, Intege
 
     // Don gia co ngay hieu luc moi nhat: de kiem ngay hieu luc cua don gia sap them
     Optional<RoyaltyRate> findFirstByOrderByEffectiveFromDesc();
-
-    // Don gia hieu luc tai 1 ngay = dong co effective_from lon nhat ma <= ngay do (GBR-08, BR-RY-03).
-    // UC-47 dung voi ngay dang bai.
-    Optional<RoyaltyRate> findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate date);
 }

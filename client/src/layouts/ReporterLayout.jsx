@@ -4,7 +4,7 @@ import { layViTien } from '../api/reporterHomeApi.js'
 import { formatMoney } from '../utils/formatMoney.js'
 import Icon from '../components/common/Icon.jsx'
 import AppLayout from './AppLayout.jsx'
-import '../styles/ReporterLayout.css'
+import './ReporterLayout.css'
 
 /**
  * Menu cua Phong vien. Moi muc ghi UC tuong ung trong SRS.

@@ -25,45 +25,25 @@
   --fm-tim:        #8a6cf0;   /* them: Figma chi co 4 mau cham, can them cho du 7 nhom */
   --fm-xam:        #b8bec6;
 
-  /* Nut chinh: dung mau xanh duong Figma (nhom da chot) */
-  --fm-chinh:      #18b0ff;
-  --fm-chinh-dam:  #0d9be3;   /* khi re chuot len nut chinh */
-  --fm-chon-dam:   #dcebfb;   /* khi re chuot len nut nen --fm-chon */
-
-  /* Mau trang thai: chu dam tren nen nhat, du tuong phan cho chu nho */
-  --fm-tot:          #1f6f1a;   /* dat, thanh cong */
-  --fm-tot-nen:      #e8f6e6;
-  --fm-tot-vien:     #b9e2b4;
-  --fm-chu-y:        #9a5b00;   /* sap toi han, can de y */
-  --fm-chu-y-nen:    #fff4e0;
-  --fm-canh-bao:     #c4004d;   /* qua han, gap */
-  --fm-thong-tin:    #0b6fb0;   /* link, so lieu, chu xanh tren nen nhat */
-  --fm-loi:          #b42318;   /* thong bao loi, nut xoa */
-  --fm-loi-nen:      #fef3f2;
-  --fm-loi-vien:     #fecdca;
-
-  /* Bien cu (truoc khi co Figma). Giu ten de man cu khong vo,
-     nhung tro sang mau Figma de ca he thong cung 1 bo mau.
-     Code moi dung thang --fm-*, khong dung bien duoi day. */
-  --muc:       var(--fm-chu);
-  --muc-nhat:  var(--fm-chu-nhat);
-  --vien:      var(--fm-vien);
-  --nen:       var(--fm-nen);
-  --nen-the:   var(--fm-the);
-  --chinh:     var(--fm-chinh);
-  --chinh-dam: var(--fm-chinh-dam);
-  --do:        var(--fm-loi);
+  --muc:       #1b2430;   /* chu chinh */
+  --muc-nhat:  #64748b;   /* chu phu */
+  --vien:      #dfe3e8;
+  --nen:       #f4f6f8;
+  --nen-the:   #ffffff;
+  --chinh:     #14532d;   /* xanh la dam - mau nhan dien */
+  --chinh-dam: #0f3d21;
+  --do:        #b42318;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: var(--fm-font);
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
   line-height: 1.55;
-  color: var(--fm-chu);
-  background: var(--fm-nen);
+  color: var(--muc);
+  background: var(--nen);
 }
 
 /* ------------------------------------------------------------------ LOGIN */
@@ -80,14 +60,14 @@ body {
   width: 100%;
   max-width: 380px;
   padding: 32px;
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(16, 24, 40, .06);
 }
 
 .the-login__tieu-de { margin: 0; font-size: 19px; font-weight: 600; }
-.the-login__phu-de  { margin: 4px 0 24px; color: var(--fm-chu-nhat); font-size: 14px; }
+.the-login__phu-de  { margin: 4px 0 24px; color: var(--muc-nhat); font-size: 14px; }
 
 .nhan {
   display: block;
@@ -102,16 +82,16 @@ body {
   padding: 9px 11px;
   font-size: 14px;
   font-family: inherit;
-  color: var(--fm-chu);
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  color: var(--muc);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 6px;
 }
 
 .o-nhap:focus {
-  outline: 2px solid var(--fm-chinh);
+  outline: 2px solid var(--chinh);
   outline-offset: 1px;
-  border-color: var(--fm-chinh);
+  border-color: var(--chinh);
 }
 
 .nut-chinh {
@@ -120,14 +100,14 @@ body {
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
-  color: var(--fm-the);
-  background: var(--fm-chinh);
+  color: #fff;
+  background: var(--chinh);
   border: 0;
   border-radius: 6px;
   cursor: pointer;
 }
 
-.nut-chinh:hover:not(:disabled)  { background: var(--fm-chinh-dam); }
+.nut-chinh:hover:not(:disabled)  { background: var(--chinh-dam); }
 .nut-chinh:active:not(:disabled) { transform: translateY(1px); }
 .nut-chinh:disabled              { opacity: .6; cursor: not-allowed; }
 
@@ -135,9 +115,9 @@ body {
   margin: 0 0 16px;
   padding: 9px 11px;
   font-size: 13px;
-  color: var(--fm-loi);
-  background: var(--fm-loi-nen);
-  border: 1px solid var(--fm-loi-vien);
+  color: var(--do);
+  background: #fef3f2;
+  border: 1px solid #fecdca;
   border-radius: 6px;
 }
 
@@ -150,8 +130,8 @@ body {
   gap: 16px;
   height: 56px;
   padding: 0 22px;
-  background: var(--fm-the);
-  border-bottom: 1px solid var(--fm-vien);
+  background: var(--nen-the);
+  border-bottom: 1px solid var(--vien);
 }
 
 .thanh-tren__ten { font-weight: 600; }
@@ -168,8 +148,8 @@ body {
 .vai-tro {
   padding: 2px 9px;
   font-size: 12px;
-  color: var(--fm-thong-tin);
-  background: var(--fm-chon);
+  color: var(--chinh);
+  background: #e7f3ec;
   border-radius: 999px;
 }
 
@@ -177,14 +157,14 @@ body {
   padding: 6px 13px;
   font-size: 13px;
   font-family: inherit;
-  color: var(--fm-chu);
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  color: var(--muc);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 6px;
   cursor: pointer;
 }
 
-.nut-thoat:hover { background: var(--fm-nen); }
+.nut-thoat:hover { background: var(--nen); }
 
 /* Vung noi dung - dang de trong, cho cac chuc nang duoc chen vao*/
 .vung-noi-dung {
@@ -198,7 +178,7 @@ body {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
-  border-bottom: 2px solid var(--fm-vien);
+  border-bottom: 2px solid var(--vien);
 }
 
 .nut-tab {
@@ -206,7 +186,7 @@ body {
   font-size: 14.5px;
   font-weight: 500;
   font-family: inherit;
-  color: var(--fm-chu-nhat);
+  color: var(--muc-nhat);
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
@@ -215,14 +195,14 @@ body {
 }
 
 .nut-tab:hover {
-  color: var(--fm-chu);
+  color: var(--muc);
 }
 
 .nut-tab.dang-chon {
-  color: var(--fm-thong-tin);
+  color: var(--chinh);
   font-weight: 600;
-  border-bottom-color: var(--fm-chinh);
-  background: var(--fm-chon);
+  border-bottom-color: var(--chinh);
+  background: #e7f3ec;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
 }
@@ -247,18 +227,18 @@ body {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: var(--fm-chu);
+  color: var(--muc);
 }
 
 .kpi-phu-de {
   margin: 4px 0 0;
   font-size: 13.5px;
-  color: var(--fm-chu-nhat);
+  color: var(--muc-nhat);
 }
 
 .the-khung {
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(16, 24, 40, .04);
@@ -273,7 +253,7 @@ body {
 .the-khung__mo-ta {
   margin: 0 0 16px;
   font-size: 13.5px;
-  color: var(--fm-chu-nhat);
+  color: var(--muc-nhat);
 }
 
 .danh-sach-dinh-muc {
@@ -284,8 +264,8 @@ body {
 
 .the-dinh-muc {
   padding: 14px;
-  background: var(--fm-nen);
-  border: 1px solid var(--fm-vien);
+  background: var(--nen);
+  border: 1px solid var(--vien);
   border-radius: 6px;
 }
 
@@ -293,13 +273,13 @@ body {
   display: inline-block;
   font-weight: 600;
   font-size: 14px;
-  color: var(--fm-thong-tin);
+  color: var(--chinh);
   margin-bottom: 8px;
 }
 
 .chi-tiet-ngach {
   font-size: 13px;
-  color: var(--fm-chu);
+  color: var(--muc);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -323,15 +303,15 @@ body {
   padding: 7px 10px;
   font-size: 14px;
   font-family: inherit;
-  color: var(--fm-chu);
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  color: var(--muc);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 6px;
 }
 
 .o-nhap-ngan:focus {
-  outline: 2px solid var(--fm-chinh);
-  border-color: var(--fm-chinh);
+  outline: 2px solid var(--chinh);
+  border-color: var(--chinh);
 }
 
 .nut-phu {
@@ -339,15 +319,15 @@ body {
   font-size: 13.5px;
   font-weight: 500;
   font-family: inherit;
-  color: var(--fm-chu);
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  color: var(--muc);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 6px;
   cursor: pointer;
 }
 
 .nut-phu:hover {
-  background: var(--fm-nen);
+  background: var(--nen);
 }
 
 .vung-bang {
@@ -363,15 +343,15 @@ body {
 
 .bang-kpi th {
   padding: 10px 12px;
-  background: var(--fm-nen);
-  color: var(--fm-chu);
+  background: var(--nen);
+  color: var(--muc);
   font-weight: 600;
-  border-bottom: 1px solid var(--fm-vien);
+  border-bottom: 1px solid var(--vien);
 }
 
 .bang-kpi td {
   padding: 11px 12px;
-  border-bottom: 1px solid var(--fm-vien);
+  border-bottom: 1px solid var(--vien);
 }
 
 .the-so {
@@ -379,8 +359,8 @@ body {
   padding: 2px 8px;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--fm-thong-tin);
-  background: var(--fm-chon);
+  color: #1e40af;
+  background: #eff6ff;
   border-radius: 4px;
 }
 
@@ -389,8 +369,8 @@ body {
   padding: 2px 8px;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--fm-tot);
-  background: var(--fm-tot-nen);
+  color: var(--chinh);
+  background: #e7f3ec;
   border-radius: 4px;
 }
 
@@ -405,36 +385,36 @@ body {
 }
 
 .nut-sua {
-  color: var(--fm-thong-tin);
-  background: var(--fm-chon);
+  color: var(--chinh);
+  background: #e7f3ec;
 }
 
 .nut-sua:hover {
-  background: var(--fm-chon-dam);
+  background: #d1eadb;
 }
 
 .nut-xoa {
-  color: var(--fm-loi);
-  background: var(--fm-loi-nen);
+  color: var(--do);
+  background: #fef3f2;
 }
 
 .nut-xoa:hover {
-  background: var(--fm-loi-vien);
+  background: #fee4e2;
 }
 
 .thong-bao-thanh-cong {
   padding: 10px 14px;
   font-size: 13.5px;
-  color: var(--fm-tot);
-  background: var(--fm-tot-nen);
-  border: 1px solid var(--fm-tot-vien);
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
   border-radius: 6px;
 }
 
 .dang-tai, .trong-rong {
   text-align: center;
   padding: 32px 16px;
-  color: var(--fm-chu-nhat);
+  color: var(--muc-nhat);
   font-size: 14px;
 }
 
@@ -453,7 +433,7 @@ body {
 .hop-modal {
   width: 100%;
   max-width: 480px;
-  background: var(--fm-the);
+  background: var(--nen-the);
   border-radius: 8px;
   padding: 24px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
@@ -477,20 +457,20 @@ body {
   border: none;
   font-size: 18px;
   cursor: pointer;
-  color: var(--fm-chu-nhat);
+  color: var(--muc-nhat);
 }
 
 .vung-ap-dung-nhanh {
   margin-bottom: 16px;
   padding: 10px;
-  background: var(--fm-nen);
+  background: var(--nen);
   border-radius: 6px;
 }
 
 .nhan-nho {
   display: block;
   font-size: 12px;
-  color: var(--fm-chu-nhat);
+  color: var(--muc-nhat);
   margin-bottom: 6px;
 }
 
@@ -505,15 +485,15 @@ body {
   padding: 6px 9px;
   font-size: 12px;
   font-family: inherit;
-  background: var(--fm-the);
-  border: 1px solid var(--fm-vien);
+  background: var(--nen-the);
+  border: 1px solid var(--vien);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .nut-nhanh:hover {
-  border-color: var(--fm-chinh);
-  color: var(--fm-thong-tin);
+  border-color: var(--chinh);
+  color: var(--chinh);
 }
 
 .modal-footer {
@@ -573,83 +553,9 @@ body {
   transition: background-color .15s;
 }
 
-.nut-nhe:hover { background: var(--fm-chon-dam); }
+.nut-nhe:hover { background: #dcebfb; }
 
 .nut-nhe:focus-visible {
   outline: 2px solid var(--fm-xanh-duong);
   outline-offset: 2px;
 }
-
-/* Nut chinh nen xanh duong Figma ("Soan bai moi", "Them don gia", "Luu"...).
-   Dung cho ca <a> va <button>. Khac .nut-chinh (rong 100%, chi dung o form dang nhap). */
-.nut-chinh-fm {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  padding: 9px 16px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--fm-the);
-  text-decoration: none;
-  white-space: nowrap;
-  background: var(--fm-chinh);
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color .15s;
-}
-
-.nut-chinh-fm:hover:not(:disabled) { background: var(--fm-chinh-dam); }
-.nut-chinh-fm:disabled             { opacity: .6; cursor: not-allowed; }
-
-.nut-chinh-fm:focus-visible {
-  outline: 2px solid var(--fm-chinh);
-  outline-offset: 2px;
-}
-
-/* Bang du lieu kieu Figma: dau cot chu xam nho, chi ke ngang, re chuot thi to nen.
-   Bang rong hon man hinh thi boc trong 1 the co overflow-x: auto. */
-.bang-fm {
-  width: 100%;
-  font-size: 13px;
-  border-collapse: collapse;
-}
-
-.bang-fm th {
-  padding: 10px 16px;
-  font-size: 12px;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  color: var(--fm-chu-nhat);
-  border-bottom: 1px solid var(--fm-vien);
-}
-
-.bang-fm td {
-  padding: 12px 16px;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--fm-vien);
-}
-
-.bang-fm tbody tr:last-child td { border-bottom: 0; }
-.bang-fm tbody tr:hover         { background: var(--fm-nen); }
-
-/* Nhan trang thai dang vien thuoc (pill): "Dang ap dung", "DRAFT"...
-   Dung: <span className="nhan-tt nhan-tt--tot">...</span> */
-.nhan-tt {
-  display: inline-block;
-  padding: 2px 10px;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--fm-chu-nhat);
-  background: var(--fm-nen);
-  border-radius: 999px;
-}
-
-.nhan-tt--tot       { color: var(--fm-tot);       background: var(--fm-tot-nen); }
-.nhan-tt--chu-y     { color: var(--fm-chu-y);     background: var(--fm-chu-y-nen); }
-.nhan-tt--thong-tin { color: var(--fm-thong-tin); background: var(--fm-chon); }
-.nhan-tt--loi       { color: var(--fm-loi);       background: var(--fm-loi-nen); }

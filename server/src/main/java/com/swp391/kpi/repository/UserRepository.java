@@ -13,8 +13,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // Dang nhap bang username HOAC email (UC-69 ghi username, man Login dung email -> nhan ca 2).
     // Spring tu sinh: SELECT ... WHERE username = ? OR email = ?
     Optional<User> findByUsernameOrEmail(String username, String email);
-
-    // Sua ho so: email moi da co NGUOI KHAC dung chua (bo qua chinh minh).
-    // Spring tu sinh: SELECT ... WHERE email = ? AND id <> ?
-    boolean existsByEmailAndIdNot(String email, Integer id);
 }

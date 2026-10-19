@@ -9,7 +9,6 @@
  * Ten field dat theo DTO tieng Anh ma backend se tra (camelCase), gia tri
  * trang thai dung dung chu trong CHECK cua database/schema.sql.
  */
-import { layBaiCoTheKhieuNai } from './appealApi.js'
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 
 /**
@@ -48,7 +47,6 @@ export async function layThongKeTrangThai() {
  *   (score_approvals.announced_at + 7 ngay, GBR-06)
  */
 export async function layViecCanXuLy() {
-  const baiCoTheKhieuNai = await layBaiCoTheKhieuNai()
   return giaLapGoiApi({
     revisionRequests: [
       {
@@ -67,13 +65,15 @@ export async function layViecCanXuLy() {
         confirmDeadline: cachHomNay(2),
       },
     ],
-    appealableScores: baiCoTheKhieuNai.map((bai) => ({
-      articleId: bai.articleId,
-      title: bai.articleTitle,
-      totalScore: bai.totalScore,
-      announcedAt: bai.announcedAt,
-      appealDeadline: bai.appealDeadline,
-    })),
+    appealableScores: [
+      {
+        articleId: 9,
+        title: 'Phỏng vấn chuyên gia về chuyển đổi số y tế',
+        totalScore: 72.5,
+        announcedAt: cachHomNay(-2),
+        appealDeadline: cachHomNay(5),
+      },
+    ],
   })
 }
 

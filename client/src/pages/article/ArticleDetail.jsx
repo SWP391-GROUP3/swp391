@@ -4,7 +4,7 @@ import { getArticleDetail, withdrawArticle } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { STATUS_COLORS, statusLabel, natureLabel, confirmLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
-import '../../styles/ArticleDetail.css'
+import './ArticleDetail.css'
 
 /**
  * UC-02 - Chi tiet bai: noi dung, khai bao, tac gia + trang thai xac nhan,
