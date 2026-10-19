@@ -4,7 +4,7 @@ import { getMyArticles } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { STATUS_GROUPS, STATUS_COLORS, statusLabel, natureLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
-import './MyArticles.css'
+import '../../styles/MyArticles.css'
 
 /** So bai moi trang (AGENTS.md 3.7: ?page=0&size=10) */
 const PAGE_SIZE = 10
@@ -63,7 +63,7 @@ export default function MyArticles() {
           <p className="my-articles__subtitle">Bài bạn là tác giả chính hoặc đồng tác giả, sửa gần nhất xếp trước.</p>
         </div>
         {/* UC-03 lam o Iter 2, route /my-articles/new dang la trang "sap co" */}
-        <Link to="/my-articles/new" className="my-articles__primary-button">
+        <Link to="/my-articles/new" className="nut-chinh-fm">
           <Icon><path d="M12 5v14M5 12h14" /></Icon>
           <span>Soạn bài mới</span>
         </Link>
@@ -104,7 +104,7 @@ export default function MyArticles() {
 
         {result && result.items.length > 0 && (
           <div className="my-articles__scroll">
-            <table className="my-articles__table">
+            <table className="bang-fm">
               <thead>
                 <tr>
                   <th>Tác phẩm</th>

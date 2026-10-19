@@ -1,0 +1,152 @@
+/* ===========================================================================
+   pages/profile/*.jsx - trang "Ho so cua toi" (moi vai tro).
+   Figma khong co man nay -> ghep tu kieu co san: tieu de + the trang (giong
+   cac man BF-04), nut xanh duong Figma, nut phu .nut-nhe.
+   Tien to class: .ho-so__ . Mau chi dung bien --fm-*.
+   =========================================================================== */
+
+.ho-so__dau { margin-bottom: 20px; }
+
+.ho-so__tieu-de {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.ho-so__phu-de {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.ho-so__trong {
+  padding: 32px 16px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--fm-chu-nhat);
+}
+
+/* 2 the canh nhau, man hep thi xep doc */
+.ho-so__luoi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.ho-so__the {
+  padding: 20px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.ho-so__the .thong-bao-loi,
+.ho-so__the .thong-bao-thanh-cong { margin: 0 0 14px; }
+
+.ho-so__tieu-de-the {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ---- Dau the: avatar lon + ten + vai tro + nut Sua ---- */
+.ho-so__danh-thiep {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.ho-so__avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--fm-the);
+  background: var(--fm-cam);
+  border-radius: 50%;
+}
+
+.ho-so__ten {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ho-so__vai-tro {
+  font-size: 12.5px;
+  color: var(--fm-chu-nhat);
+}
+
+.ho-so__nut-sua { margin-left: auto; }
+
+/* ---- Danh sach thong tin (chi doc) ---- */
+.ho-so__ds { margin: 0; }
+
+.ho-so__dong {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 12px;
+  padding: 11px 0;
+  font-size: 13.5px;
+  border-top: 1px solid var(--fm-vien);
+}
+
+.ho-so__dong dt { color: var(--fm-chu-nhat); }
+.ho-so__dong dd { margin: 0; overflow-wrap: anywhere; }
+
+/* ---- Form ---- */
+.ho-so__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ho-so__truong {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ho-so__o-nhap {
+  width: 100%;
+  padding: 9px 11px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--fm-chu);
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+}
+
+.ho-so__o-nhap:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 1px;
+  border-color: var(--fm-xanh-duong);
+}
+
+.ho-so__goi-y {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fm-chu-nhat);
+}
+
+.ho-so__hang-nut {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Nut chinh dung class chung .nut-chinh-fm (index.css) */
+
+@media (max-width: 600px) {
+  .ho-so__dong { grid-template-columns: 1fr; gap: 2px; }
+}

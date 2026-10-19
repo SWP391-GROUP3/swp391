@@ -5,7 +5,7 @@ import { formatMoney } from '../../utils/formatMoney.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import { PERIOD_STATUS_COLORS, periodStatusLabel } from '../../utils/royaltyLabels.js'
-import './Royalty.css'
+import '../../styles/Royalty.css'
 
 /**
  * UC-49 - "Ky nhuan but" (Thu ky toa soan va Ke toan dung chung 1 trang).
@@ -40,7 +40,7 @@ export default function RoyaltyPeriods() {
 
         {periods && periods.length > 0 && (
           <div className="royalty__scroll">
-            <table className="royalty__table">
+            <table className="bang-fm">
               <thead>
                 <tr>
                   <th>Kỳ</th>

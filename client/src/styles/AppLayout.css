@@ -1,0 +1,309 @@
+/* ===========================================================================
+   layouts/AppLayout.jsx - khung trang dung chung cho moi vai tro, theo Figma:
+   sidebar trang ben trai, thanh tren (tim kiem / chuong / avatar),
+   vung noi dung ben phai. Moi class bat dau bang "khung-app".
+   Style rieng cua 1 vai tro (vd chip vi Phong vien) de trong file layout cua vai tro do.
+   =========================================================================== */
+
+.khung-app {
+  display: flex;
+  min-height: 100vh;
+  font-family: var(--fm-font);
+  color: var(--fm-chu);
+  background: var(--fm-the);
+}
+
+/* Dien thoai: bo do tre ~300ms khi cham vao link/nut */
+.khung-app a,
+.khung-app button { touch-action: manipulation; }
+
+/* Link "Bo qua toi noi dung chinh": an ngoai man hinh, Tab toi thi hien */
+.khung-app__bo-qua {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  color: var(--fm-chu);
+  background: var(--fm-the);
+  border: 2px solid var(--fm-xanh-duong);
+  border-radius: 6px;
+  transform: translateY(-200%);
+}
+
+.khung-app__bo-qua:focus { transform: none; }
+
+/* ---- Sidebar ---- */
+.khung-app__sidebar {
+  position: sticky;           /* cuon noi dung thi sidebar dung yen */
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: 248px;               /* du rong cho "Xac nhan dong tac gia" tren 1 dong */
+  height: 100vh;
+  padding: 28px 0 24px;
+  background: var(--fm-the);
+  border-right: 1px solid var(--fm-vien);
+}
+
+.khung-app__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 28px 32px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.khung-app__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;                    /* day nut Dang xuat xuong day */
+  overflow-y: auto;           /* menu dai (Truong ban ~12 muc) thi cuon trong sidebar */
+}
+
+/* Nhom menu co tieu de (vd "Duyệt bài", "KPI & báo cáo") */
+.khung-app__nhom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.khung-app__nhom-tieu-de {
+  padding: 16px 28px 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--fm-chu-nhat);
+}
+
+/* 1 muc menu (NavLink) va nut Dang xuat */
+.khung-app__muc {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 28px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--fm-chu-nhat);
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+
+.khung-app__muc:hover { color: var(--fm-chu); background: var(--fm-nen); }
+
+/* NavLink tu gan class "active" cho trang dang mo */
+.khung-app__muc.active {
+  color: var(--fm-chu);
+  font-weight: 500;
+  background: var(--fm-chon);
+}
+
+.khung-app__muc:focus-visible,
+.khung-app__nut-icon:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: -2px;
+}
+
+/* ---- Phan ben phai: thanh tren + noi dung ---- */
+.khung-app__phai {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;               /* cho phep bang/the ben trong co lai, khong tran ngang */
+}
+
+.khung-app__thanh-tren {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 72px;
+  padding: 0 32px;
+  background: var(--fm-the);
+}
+
+.khung-app__tim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 360px;
+  color: var(--fm-chu-nhat);
+}
+
+.khung-app__tim input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--fm-chu);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+}
+
+.khung-app__tim input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--fm-xanh-duong);
+}
+
+.khung-app__nguoi-dung {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.khung-app__nut-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--fm-chu);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.khung-app__nut-icon:hover { background: var(--fm-nen); }
+
+.khung-app__ten {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.khung-app__ho-ten { font-weight: 600; font-size: 13.5px; }
+
+.khung-app__vai-tro {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+.khung-app__avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fm-the);
+  background: var(--fm-cam);
+  border-radius: 50%;
+}
+
+/* ---- Menu tai khoan: bam ten/avatar -> menu tha (Ho so cua toi, Dang xuat) ---- */
+.khung-app__tai-khoan { position: relative; }
+
+.khung-app__nut-tai-khoan {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 4px 4px 10px;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color .15s;
+}
+
+.khung-app__nut-tai-khoan:hover,
+.khung-app__nut-tai-khoan[aria-expanded="true"] { background: var(--fm-nen); }
+
+.khung-app__nut-tai-khoan:focus-visible,
+.khung-app__menu-tk-muc:focus-visible {
+  outline: 2px solid var(--fm-xanh-duong);
+  outline-offset: 2px;
+}
+
+.khung-app__menu-tk {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  min-width: 220px;
+  padding: 6px 0;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, .12);
+}
+
+.khung-app__menu-tk-dau {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 10px;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  border-bottom: 1px solid var(--fm-vien);
+}
+
+.khung-app__menu-tk-muc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--fm-chu);
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.khung-app__menu-tk-muc:hover { background: var(--fm-chon); }
+
+.khung-app__noi-dung {
+  flex: 1;
+  padding: 8px 32px 32px;
+}
+
+.khung-app__noi-dung:focus { outline: none; }   /* focus do link "Bo qua" dua toi, khong can vien */
+
+/* Man hinh hep (laptop nho, tablet): sidebar chi con icon */
+@media (max-width: 960px) {
+  .khung-app__sidebar { width: 72px; }
+  .khung-app__logo,
+  .khung-app__muc { justify-content: center; padding-left: 0; padding-right: 0; }
+  /* An chu bang cach cua .an-di (khong dung display:none) de trinh doc
+     man hinh van doc duoc ten muc menu */
+  .khung-app__logo span,
+  .khung-app__muc span,
+  .khung-app__nhom-tieu-de {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* Tieu de nhom bi an -> thay bang 1 duong ke de van thay ranh gioi nhom */
+  .khung-app__nhom + .khung-app__nhom { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--fm-vien); }
+  .khung-app__ten { display: none; }
+}
+
+/* Dien thoai: an o tim kiem, thu hep le */
+@media (max-width: 600px) {
+  .khung-app__thanh-tren,
+  .khung-app__noi-dung { padding-left: 16px; padding-right: 16px; }
+  .khung-app__tim { display: none; }
+  .khung-app__thanh-tren { justify-content: flex-end; }
+  .khung-app__nguoi-dung { gap: 10px; }
+}

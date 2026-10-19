@@ -10,9 +10,11 @@ export async function getActiveConfig() {
 
 export async function getAllConfigs() {
   return goiApi('/api/appeal-rule-configs')
+
 }
 
 // Nguoi tao (updated_by) server tu lay tu token, khong can gui kem
 export async function createConfig(data) {
   return goiApi('/api/appeal-rule-configs', { method: 'POST', body: data })
+
 }
