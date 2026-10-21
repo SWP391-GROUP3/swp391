@@ -6,15 +6,21 @@ import '../../styles/QualityReportPage.css'
 
 /**
  * MUC LUC (so dong)
- *   14  AuditLogPage
- *   29    useEffect                  - tai du lieu khi mo trang
- *   37    locNhatKy()
- *   47    doiBoLoc()
+ *   16  AuditLogPage                 - reset noi dung theo pham vi URL
+ *   23  AuditLogContent
+ *   38    useEffect                  - tai du lieu khi mo trang
+ *   46    locNhatKy()
+ *   56    doiBoLoc()
  */
 
 export default function AuditLogPage() {
   const [thamSo] = useSearchParams()
   const khieuNaiTuUrl = thamSo.get('appealId') || ''
+  // Doi pham vi URL thi reset ca form, du lieu va loi; huy lan tai cu khi unmount.
+  return <AuditLogContent key={thamSo.toString()} khieuNaiTuUrl={khieuNaiTuUrl} />
+}
+
+function AuditLogContent({ khieuNaiTuUrl }) {
   const [danhSach, setDanhSach] = useState(null)
   const [boLoc, setBoLoc] = useState({
     actorId: '',

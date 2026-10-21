@@ -1,6 +1,33 @@
 # Checkpoint BF03 Iter1–Iter2 — 19/10/2026
 
-## CHECKPOINT MỚI NHẤT — dừng theo ngưỡng usage 9%
+## CẬP NHẬT MỚI NHẤT — 21/10/2026: hoàn tất phần còn dở Iter1–2
+
+Mục này thay thế trạng thái dừng 19/10 bên dưới. Tiếp tục trên `VuNQ`, HEAD đầu phiên `551fc8a` (đã merge main), working tree sạch trước sửa. Không làm lại các chức năng đã tồn tại.
+
+- Ba finding còn mở đã xử lý: refresh draft dưới `PESSIMISTIC_WRITE` trước kiểm tra/snapshot; giữ navigation state khi đổi tháng/trang UC42; reset nội dung/form audit theo query key khi chuyển scope URL.
+- RED→GREEN: ca cũ phiếu vừa nộp vẫn bị giao lại; thêm hai ca đổi chủ và nhận xét nháp mới nhất (đều quan sát RED trước sửa). `BF03AppealManagementIT` hiện có 11 ca đạt. Không bỏ/disable test đỏ cũ.
+- Regression browser mới `client/tests/browser/bf03Filters.smoke.js`: 3 ca từng RED vì mất bộ lọc/giữ scope cũ, nay GREEN `{passed:3,writes:0}`. API đọc được giả lập để có hai trang lịch sử; chỉ match `/api/`, không chặn module `/src/api/`. Không cần thêm dependency.
+- Backend compile thành công; full suite `mvn -f server/pom.xml "-Dtest=*Test,BF03Iteration1IT,BF03ReviewerProfileIT,BF03AppealManagementIT" test` đạt **133 test, 0 fail/error/skip**. Log `server/target/bf03-resume-suite.log`; test mới dùng fixture rollback, không thay seed/schema.
+- Node `node --test tests/*.test.js` tại client: **13/13**; frontend build thành công (130 module). Lint exit 0, **8 warning ngoài BF03** ở flow2/KPI sau merge main, không có warning mới trong phần sửa.
+- Browser backend thật: đăng nhập bằng form `duc.vm`, danh sách → chi tiết → audit theo appeal → menu bỏ scope → hồ sơ BTV; 5 GET thật trả 200, không mock login/JWT. Không ghi nghiệp vụ thật. Mật khẩu đã sửa theo yêu cầu riêng trước đó vẫn dùng được; phiên 21/10 không đổi mật khẩu hoặc tài khoản.
+- API ghi phân công/giao lại đã kiểm tra qua integration rollback; browser ghi giả lập của phiên trước không được mô tả thành browser ghi DB thật. Giữ ranh giới này trong nghiệm thu.
+- Không đổi `database/schema.sql`, `database/data.sql`, config, thư viện hoặc source luồng khác ngoài điểm tích hợp BF02 đã cho phép. Chưa commit/push.
+
+### Source thay đổi trong phiên tiếp tục
+
+- `server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java`: inject EntityManager, refresh dưới khóa trong `lockedDraft` — cùng một nơi bảo vệ cả giao lại và kiểm tra người được giao.
+- `server/src/test/java/com/swp391/kpi/BF03AppealManagementIT.java`: hai regression freshness mới; giữ ca đã nộp cũ.
+- `server/src/test/java/com/swp391/kpi/service/ScoringAppealServiceTest.java`: truyền EntityManager mock vào constructor; hành vi DB kiểm tra bằng IT thật.
+- `client/src/pages/appeal/ReviewerProfilePage.jsx`: giữ `location.state` trên cả đổi tháng, trang trước và trang sau.
+- `client/src/pages/appeal/AuditLogPage.jsx`: nội dung có query key; đổi scope reset form/data/error và cleanup request đang tải của scope cũ.
+- `client/tests/browser/bf03Filters.smoke.js`: callback chạy bằng Playwright CLI, không dùng framework hoặc dependency mới.
+- [Tài liệu thiết kế/luồng/source map](../specs/2026-10-19-bf03-iter1-iter2-design.md) đã cập nhật source thực tế UC38 tối thiểu, UC42/43 và bằng chứng; không còn coi các file đó là dự kiến.
+
+### Phạm vi kết thúc
+
+Iter1: UC35/41/44/45. Iter2: UC42/43 và phần phân công tối thiểu UC38 làm phụ thuộc. UC36/37/39/40 và quản lý kết quả đầy đủ UC38 vẫn thuộc Iter3; không tự triển khai placeholder. Các finding review trước đã có regression; không dispatch lại reviewer để đọc lại cùng diff. Không còn lỗi mở từ lượt review 19/10 trong phạm vi này. Những cảnh báo lint và dữ liệu tên user/ban lỗi mã hóa có sẵn ngoài phạm vi không được sửa tiện tay.
+
+## LỊCH SỬ 19/10/2026 — dừng theo ngưỡng usage 9%
 
 Mục này thay thế trạng thái cũ bên dưới. Người dùng đã cho phép tích hợp BF02 và NotificationService. **Không còn chờ quyền. Chưa được đánh dấu Iter2 hoàn tất hoặc triển khai như bản đã nghiệm thu.**
 

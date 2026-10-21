@@ -7,6 +7,8 @@ import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.ScoringAttemptRepository;
 import com.swp391.kpi.repository.ScoringAttemptDetailRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class ScoringAppealService {
     private final AuditService audit;
     private final UserReadService users;
     private final ObjectMapper json;
+    private final EntityManager entityManager;
 
     public List<ScoringAppealAttemptResponse> getArticleAttempts(Integer articleId) {
         return attempts.findByArticleIdOrderByAttemptNoAsc(articleId).stream()
@@ -91,6 +94,8 @@ public class ScoringAppealService {
     private ScoringAttempt lockedDraft(Integer id) {
         var draft = attempts.findLockedById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm."));
+        // Query co khoa khong tu nap lai entity da cache trong cung transaction.
+        entityManager.refresh(draft, LockModeType.PESSIMISTIC_WRITE);
         if (draft.getAttemptType() != AttemptType.APPEAL || draft.getAppealId() == null)
             throw new BusinessException("Đây không phải phiếu chấm khiếu nại.");
         if (draft.getSubmittedAt() != null)

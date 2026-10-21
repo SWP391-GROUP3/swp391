@@ -19,7 +19,7 @@ Người dùng đã cho phép điểm tích hợp BF02 và NotificationService. 
 - Quyền bảo mật kiểm ở service mỗi lần gọi; không sửa SecurityConfig dùng chung khi không cần thiết.
 - Nhật ký thực thi sẽ bổ sung theo kết quả thật. Dừng an toàn khi một cửa sổ usage còn tối đa 10%.
 
-## Ledger cập nhật cuối phiên
+## Ledger phiên 19/10/2026 (lịch sử)
 
 - Bước 1–4 đã có source, DTO/API/UI. Node test 13/13, build 122 module, 4 lint warning ngoài BF03. Suite xanh gần nhất 126 test; fixture ghi đều rollback, không schema/seed/commit/push.
 - Browser đã kiểm tra GET thật và nhánh POST giả lập riêng ID test (không ghi DB thật). Head seed password không BCrypt; dùng JWT với khóa riêng trong tiến trình test, không đổi tài khoản.
@@ -28,3 +28,13 @@ Người dùng đã cho phép điểm tích hợp BF02 và NotificationService. 
 - Ruling: hai finding filter được reviewer xếp Minor nhưng cần hoàn tất trước nghiệm thu vì thiết kế yêu cầu giữ bộ lọc khi quay lại và scope audit phải khớp form. Cần regression browser trước khi sửa: giữ state khi đổi tháng/trang UC42; đồng bộ form audit khi đổi URL/menu.
 - Reviewer declined: UC36 endpoints, Figma/browser, docs đang cập nhật, seed password/mojibake, lint ngoài scope, in-memory aggregation. Giữ ngoài scope; chi phí là login Head mẫu chưa demo được bằng mật khẩu và Iter3 chưa có.
 - Dừng an toàn: usage primary dùng 91%/còn 9%; giữ working tree và test đỏ làm điểm tiếp tục. Browser/session test và backend/Vite đã đóng/dừng. Xem checkpoint cho đúng source, lỗi và lệnh chạy tiếp. Chưa hoàn tất bước 5.
+
+## Ledger tiếp tục 21/10/2026 — hoàn tất bước 5
+
+- HEAD tiếp tục `551fc8a`, nhánh `VuNQ` sau merge main, working tree sạch trước sửa. Phạm vi và quyền BF02/NotificationService từ lần duyệt trước giữ nguyên; không hỏi lại hoặc làm lại các task đã có.
+- Fix review Important: regression đã nộp RED tại phiên mới; thêm 2 regression chủ phiếu mới nhất và nhận xét mới nhất, cả hai RED. Inject EntityManager, refresh draft dưới PESSIMISTIC_WRITE trước kiểm tra/snapshot; nhóm 11 integration quản lý và 4 unit ScoringAppealService GREEN.
+- Fix 2 finding UI: script browser tái hiện mất bộ lọc sau đổi tháng/trang và audit form giữ scope cũ khi về menu. Giữ navigation state cho UC42; reset nội dung audit theo query key. Script 3/3 GREEN, không ghi DB; lưu tại `client/tests/browser/bf03Filters.smoke.js`.
+- Ruling: dùng key của React để reset form/data/error audit khi phạm vi URL thay đổi, không sửa router dùng chung hoặc dựng cơ chế state mới. Giữ scope form khớp dữ liệu; chi phí là form chưa gửi được reset khi chuyển sang scope khác (hành vi mong muốn).
+- Full backend 133 test xanh, compile thành công; Node 13/13, build 130 module; lint 8 warning ngoài BF03, không warning mới. Bản merge main có thêm test/cảnh báo so với phiên 19/10, không dùng số cũ để báo trạng thái hiện tại.
+- Browser thật đăng nhập Head bằng mật khẩu đã sửa ở yêu cầu riêng trước: 5 GET thật đạt, danh sách/chi tiết/audit/profile mở được; không ghi nghiệp vụ thật. Regression browser mới dùng mock đọc để có dữ liệu phân trang, không thay seed.
+- Các finding review 19/10 đều đã có kiểm chứng; không dispatch thêm reviewer theo checkpoint. UC36/37/39/40 tiếp tục ngoài scope. Không đổi schema/data.sql/config/thư viện, không commit/push.

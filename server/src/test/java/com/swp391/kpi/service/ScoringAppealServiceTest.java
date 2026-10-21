@@ -22,7 +22,8 @@ class ScoringAppealServiceTest {
     ScoringAttempt original;
 
     @BeforeEach void setup() {
-        service = new ScoringAppealService(attempts, details, audit, users, new ObjectMapper());
+        service = new ScoringAppealService(attempts, details, audit, users, new ObjectMapper(),
+                mock(jakarta.persistence.EntityManager.class));
         original = new ScoringAttempt(); original.setId(10); original.setArticleId(20);
         original.setVersionId(30); original.setReviewerId(3); original.setAttemptNo(4);
         original.setSubmittedAt(LocalDateTime.now());

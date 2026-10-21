@@ -40,7 +40,7 @@ export default function ReviewerProfilePage() {
       </header>
       <div className="bao-cao-qc__bo-loc">
         <label>Tháng <input type="month" aria-label="Tháng hồ sơ" value={thang}
-          onChange={(e) => doiThamSo({ period: e.target.value, page: '0' })} /></label>
+          onChange={(e) => doiThamSo({ period: e.target.value, page: '0' }, { state: location.state })} /></label>
       </div>
       {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}
       {!duLieu && !loi && <p>Đang tải hồ sơ…</p>}
@@ -71,10 +71,10 @@ export default function ReviewerProfilePage() {
             </tr>)}</tbody>
           </table></div>}
         <nav className="ho-so-btv__phan-trang" aria-label="Phân trang lịch sử chấm">
-          <button type="button" disabled={trang === 0} onClick={() => doiThamSo({ period: thang, page: String(trang - 1) })}>Trang trước</button>
+          <button type="button" disabled={trang === 0} onClick={() => doiThamSo({ period: thang, page: String(trang - 1) }, { state: location.state })}>Trang trước</button>
           <span>Trang {trang + 1} / {Math.max(1, lichSu.totalPages)} · {lichSu.totalElements} lần chấm</span>
           <button type="button" disabled={trang + 1 >= lichSu.totalPages}
-            onClick={() => doiThamSo({ period: thang, page: String(trang + 1) })}>Trang sau</button>
+            onClick={() => doiThamSo({ period: thang, page: String(trang + 1) }, { state: location.state })}>Trang sau</button>
         </nav>
         <h2>Lịch sử chấm chéo đã hoàn thành</h2>
         {hoSo.crossReviews.length === 0 ? <p>Chưa có phiếu chấm chéo hoàn thành trong kỳ.</p> :

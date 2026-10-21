@@ -2,7 +2,7 @@
 
 Ngày: 19/10/2026. Nhánh thực hiện: `VuNQ`.
 
-**Trạng thái cập nhật cuối 19/10/2026:** đã có UC42 và source UC38 tối thiểu/UC43 sau khi người dùng cho phép BF02/NotificationService. Dừng khi usage còn 9%; chưa nghiệm thu toàn bộ Iter2 vì review phát hiện lỗi freshness của khóa (regression hiện đỏ) và hai lỗi bộ lọc UI. Các mục “dự kiến/chưa triển khai” phía dưới là thiết kế gốc; trạng thái/source thực tế mới nhất nằm trong [checkpoint](../checkpoints/2026-10-19-bf03-iter1-iter2-checkpoint.md).
+**Trạng thái 21/10/2026:** hoàn tất phạm vi Iter1 (UC35/41/44/45), Iter2 (UC42/43) và phần phân công tối thiểu UC38 đã thống nhất. Đã xử lý ba finding của lượt review 19/10: refresh phiếu dưới khóa, giữ bộ lọc báo cáo khi đổi tháng/trang, đồng bộ form audit khi đổi URL. Backend 133 test, frontend 13 test và 3 ca browser bộ lọc đạt. Không bao gồm màn chấm mù/chốt điểm/chiến dịch chấm chéo của Iter3. Xem bằng chứng và giới hạn kiểm chứng ở mục 11 và [checkpoint](../checkpoints/2026-10-19-bf03-iter1-iter2-checkpoint.md).
 
 ## 1. Mục tiêu và phạm vi đã thống nhất
 
@@ -21,13 +21,13 @@ Tài liệu bổ sung này không thay thế SRS và không bổ sung một ngu�
 
 | Phần | Hiện trạng source | Việc còn phải xác nhận |
 |---|---|---|
-| UC35 | Có form, danh sách của Reporter, API, kiểm tra thời hạn/tiêu chí/tác giả, lưu cấu hình áp dụng và audit | Kiểm thử hồi quy API/UI với code mới từ các thành viên |
-| UC44 | Có màn Admin, API, phiên bản cấu hình theo ngày hiệu lực và audit | Quyền, ngày trùng, cấu hình tương lai, giữ luật của appeal cũ |
-| UC45 | Có màn nhật ký, API lọc và giới hạn theo ban | Độ đầy đủ của log, bộ lọc, không lộ dữ liệu cho Editor |
-| UC41 | Có màn báo cáo và tính lại chỉ số từ chấm chéo hoàn tất/appeal đã giải quyết | Công thức, dữ liệu rỗng, dữ liệu kiểm thử và phạm vi ban |
-| UC42 | Đã có directory, hồ sơ, lịch sử chấm theo tháng/phân trang; kiểm tra quyền ở backend | Chưa tính phiếu APPEAL đang chờ vì chưa có service BF02 cung cấp dữ liệu này |
-| UC38 tối thiểu | `/appeals`, `/appeals/:id` còn là trang chờ; chưa có luồng phân công chấm mù BF03 | Triển khai phần cần cho UC43 |
-| UC43 | Chưa có API/màn giao lại BF03 | Triển khai sau khi có phân công ban đầu và hợp đồng tích hợp BF02 |
+| UC35 | Form, danh sách Reporter, API, thời hạn/tiêu chí/tác giả, binding luật, audit | Đạt hồi quy; ca ghi kiểm tra bằng transaction rollback |
+| UC44 | Màn Admin, phiên bản luật theo hiệu lực, 404 trạng thái trống, audit | Đạt kiểm chứng quyền, validation, tương lai, binding cũ |
+| UC45 | Nhật ký chỉ đọc, giới hạn ban, lọc người cũ/mới trong phân công | Đạt; link appeal và form đồng bộ với URL |
+| UC41 | Báo cáo theo kỳ từ so sánh hợp lệ, không thay điểm chính thức | Đạt hồi quy công thức/quyền/dữ liệu rỗng |
+| UC42 | Directory, hồ sơ, lịch sử theo tháng/phân trang, ba loại workload | Đạt; giữ bộ lọc báo cáo sau đổi tháng/trang |
+| UC38 tối thiểu | Hàng chờ/chi tiết, ứng viên hợp lệ, phân công lần đầu | Đạt phần phụ thuộc Iter2; quản lý toàn bộ kết quả vẫn thuộc Iter3 |
+| UC43 | Giao lại phiếu chưa nộp, cùng/khác ban, reason, audit/thông báo | Đạt; khóa và refresh trước recheck, test rollback và stale owner |
 
 Khảo sát trước khi viết tài liệu: `mvn -f server/pom.xml test` đạt 96 test, `npm run build` thành công. Đây là baseline unit test/build; không phải xác nhận Iter2 chạy được hoặc toàn bộ luồng đã test bằng trình duyệt. `BF03Iteration1IT` không được Maven chạy mặc định theo tên file; cần gọi riêng khi có DB phù hợp.
 
@@ -88,14 +88,14 @@ UC44 tạo bản mới, không sửa bản cấu hình đã gắn với appeal. 
   → Quay lại báo cáo, giữ bộ lọc
 ```
 
-Hồ sơ gồm tên, trạng thái tài khoản, ban, công việc đang xử lý, các lần chấm đã nộp, appeal liên quan và chấm chéo. Dữ liệu dùng để tham khảo phân công, không tự xếp hạng/phạt BTV.
+Hồ sơ gồm tên, trạng thái tài khoản, ban, công việc đang xử lý, các lần chấm đã nộp, chỉ số khiếu nại và lịch sử chấm chéo. Dữ liệu dùng để tham khảo phân công, không tự xếp hạng/phạt BTV.
 
 - Trưởng ban chỉ xem hồ sơ BTV trong ban mình; Admin được xem các ban.
 - Hồ sơ ngoài phạm vi trả 403, BTV không tồn tại trả 404.
 - Không có lần chấm/so sánh thì hiển thị rỗng rõ ràng, không gán “độ lệch 0” để suy ra người chấm tốt.
 - Danh sách lịch sử cần phân trang và lọc kỳ. Mặc định kỳ là tháng hiện tại, nhận tháng theo dạng ngày đầu tháng ở API.
 
-### 4.4 Trưởng ban — phân công tối thiểu và giao lại (dự kiến)
+### 4.4 Trưởng ban — phân công tối thiểu và giao lại (đã triển khai)
 
 ```text
 Đăng nhập Trưởng ban
@@ -150,7 +150,7 @@ Các link dưới đây trỏ tới file đã tồn tại tại thời điểm t
 
 ### 6.1 Frontend
 
-| File | Trách nhiệm và tác động dự kiến |
+| File | Trách nhiệm và tác động |
 |---|---|
 | [AppRoutes.jsx](../../../client/src/routes/AppRoutes.jsx) | Khai báo route theo role. Khi triển khai mới, thay đúng placeholder bằng trang thật, tránh hai route trùng `/reviewers` của Admin; không thay route BF01/02/04/05 |
 | [ReporterLayout.jsx](../../../client/src/layouts/ReporterLayout.jsx), [HeadLayout.jsx](../../../client/src/layouts/HeadLayout.jsx), [AdminLayout.jsx](../../../client/src/layouts/AdminLayout.jsx) | Menu điều hướng. Tái sử dụng mục đang có; đây là file dùng chung, cần báo trước nếu thực sự phải sửa |
@@ -159,7 +159,7 @@ Các link dưới đây trỏ tới file đã tồn tại tại thời điểm t
 | [AppealRuleConfigPage.jsx](../../../client/src/pages/admin/AppealRuleConfigPage.jsx) | Form/lịch sử UC44; chỉ Admin dùng |
 | [AuditLogPage.jsx](../../../client/src/pages/appeal/AuditLogPage.jsx) | Bộ lọc và chi tiết old/new UC45 |
 | [ReviewerDeviationPage.jsx](../../../client/src/pages/appeal/ReviewerDeviationPage.jsx) | UC41. Bổ sung liên kết mở UC42 và giữ điều kiện lọc khi quay lại |
-| [appealApi.js](../../../client/src/api/appealApi.js) | API UC35 hiện có; dự kiến bổ sung API hàng chờ/chi tiết/phân công/giao lại |
+| [appealApi.js](../../../client/src/api/appealApi.js) | API UC35 và API hàng chờ/chi tiết/ứng viên/phân công/giao lại |
 | [appealRuleConfigApi.js](../../../client/src/api/appealRuleConfigApi.js), [auditLogApi.js](../../../client/src/api/auditLogApi.js), [reviewerDeviationApi.js](../../../client/src/api/reviewerDeviationApi.js) | API cho từng màn Iter1; giữ các hàm đang được trang gọi |
 | [goiApi.js](../../../client/src/api/goiApi.js), [phienDangNhap.js](../../../client/src/auth/phienDangNhap.js), [RequireRole.jsx](../../../client/src/routes/RequireRole.jsx) | Gửi token, quản lý phiên và chặn route. Chỉ tái sử dụng, không viết đăng nhập BF03 riêng |
 
@@ -168,16 +168,17 @@ Frontend UC42 đã tạo:
 - [ReviewerProfilePage.jsx](../../../client/src/pages/appeal/ReviewerProfilePage.jsx) và CSS cạnh trang: hồ sơ UC42, tháng và trang nằm trên URL; quay lại giữ bộ lọc báo cáo.
 - [reviewerProfileApi.js](../../../client/src/api/reviewerProfileApi.js): gọi directory/hồ sơ/lịch sử qua `goiApi`, không đọc DB trực tiếp.
 
-Frontend UC38/43 dự kiến, chưa tạo:
+Frontend UC38/43 đã tạo:
 
-- `client/src/pages/appeal/AppealManagementPage.jsx` và CSS: hàng chờ tối thiểu UC38.
-- `client/src/pages/appeal/AppealDetailPage.jsx` và CSS: chi tiết, form phân công và giao lại.
+- [AppealManagementPage.jsx](../../../client/src/pages/appeal/AppealManagementPage.jsx) và CSS: hàng chờ tối thiểu UC38, lọc trạng thái/bài/người đang chấm/ngày; tham số trên URL, giữ khi quay lại từ chi tiết.
+- [AppealDetailPage.jsx](../../../client/src/pages/appeal/AppealDetailPage.jsx) và CSS: tiêu chí/lý do cho Head, ứng viên, xác nhận phân công/giao lại; gửi `attemptId` và `expectedReviewerId` để phát hiện thao tác cũ. Khi 409, báo lỗi và tải lại, không tự thử ghi lần nữa.
+- `appealApi.js`: `layHangChoKhieuNai`, `layChiTietKhieuNai`, `layNguoiChamHopLe`, `phanCongKhieuNai`, `giaoLaiKhieuNai`; giữ nguyên API Reporter.
 
 Chưa có `docs/ui-images/` trong repo được khảo sát. UC42 dùng các trang BF03 hiện có làm mẫu theo phạm vi giao diện đơn giản đã được người dùng đồng ý; tái dùng `QualityReportPage.css`, CSS mới có tiền tố riêng. Không thay phong cách toàn ứng dụng.
 
 ### 6.2 Backend BF03
 
-| File | Trách nhiệm và tác động dự kiến |
+| File | Trách nhiệm và tác động |
 |---|---|
 | [AppealController.java](../../../server/src/main/java/com/swp391/kpi/controller/AppealController.java) | Các endpoint Reporter hiện có; giữ tương thích |
 | [AppealService.java](../../../server/src/main/java/com/swp391/kpi/service/AppealService.java) | Gửi/xem appeal, thời hạn, tác giả, tiêu chí, lưu cấu hình áp dụng; không nhét toàn bộ Iter2 vào đây |
@@ -193,12 +194,13 @@ Backend UC42 đã tạo:
 
 - [ReviewerProfileController.java](../../../server/src/main/java/com/swp391/kpi/controller/ReviewerProfileController.java) → [ReviewerProfileService.java](../../../server/src/main/java/com/swp391/kpi/service/ReviewerProfileService.java): directory, hồ sơ và lịch sử; lấy actor từ JWT, giới hạn Head theo ban, Admin xem các ban.
 - DTO `ReviewerDirectoryResponse`, `ReviewerProfileResponse`, `ReviewerScoringHistoryResponse`, `ReviewerCrossReviewResponse`: chỉ trả trường cần hiển thị, không trả password/token hay entity trực tiếp.
-- Workload hiện tại: số phân công gốc có bài ở trạng thái `ASSIGNED` và số chấm chéo `PENDING`; không dùng tổng mọi phân công làm số việc đang chờ. Chưa bao gồm phiếu APPEAL đang chờ.
+- Workload hiện tại: số phân công gốc có bài `ASSIGNED`, số chấm chéo `PENDING`, số phiếu APPEAL chưa nộp (`pendingAppealReviewCount`). Không dùng tổng mọi phân công hoặc tổng phiếu đã nộp làm số việc đang chờ.
 - Chỉ số hồ sơ tính từ dữ liệu nguồn qua phép tính thuần UC41, không ghi `reviewer_deviation_indices` khi mở hồ sơ. Không có so sánh thì trả `null`, không tạo độ lệch 0 giả.
 
-Backend UC38/43 dự kiến, chưa tạo:
+Backend UC38/43 đã tạo:
 
-- `AppealManagementController` → `AppealManagementService`: danh sách/chi tiết/phân công/giao lại, tách khỏi service gửi appeal của Reporter.
+- [AppealManagementController.java](../../../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java) → [AppealManagementService.java](../../../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java): danh sách/chi tiết/phân công/giao lại, tách khỏi service gửi appeal của Reporter. Controller nhận JWT/DTO, service kiểm tra Head ACTIVE cùng ban và transaction.
+- [ScoringAppealService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java): điểm tích hợp BF02 đã được cho phép. Tạo phiếu nháp giữ version/assignment/category/criteria-set gốc; giao lại cùng phiếu, audit nháp cũ rồi xóa điểm/nhận xét nháp khỏi phiếu mới giao. `lockedDraft` gọi `EntityManager.refresh(..., PESSIMISTIC_WRITE)` vì query có khóa không tự làm mới entity đã cache; sau đó mới kiểm tra submittedAt/người được giao và chụp audit. `requireOwnedDraft` dùng cùng cơ chế để từ chối BTV cũ.
 - DTO `AppealManagementResponse`, `AppealReviewerCandidateResponse`, `AppealAssignRequest`, `AppealReassignRequest`: dữ liệu màn Trưởng ban. Request giao lại có người mới, lý do và mã phiếu đang giao để phát hiện thao tác cũ.
 - Các class nằm trong thư mục tầng hiện có (`controller`, `service`, `dto`), không tạo package con theo luồng, không tự dựng interface + Impl cho mỗi service.
 
@@ -208,10 +210,11 @@ Backend UC38/43 dự kiến, chưa tạo:
 |---|---|---|
 | [UserReadService.java](../../../server/src/main/java/com/swp391/kpi/service/UserReadService.java) | User, role, status, section; `requireActive` | Tái dùng để kiểm tra quyền và lọc BTV, không gọi repository user trực tiếp |
 | [ArticleReadService.java](../../../server/src/main/java/com/swp391/kpi/service/ArticleReadService.java) | Thông tin bài, tác giả, ban | Tái dùng kiểm tra ban; không đổi trạng thái bài khi giao người chấm appeal |
-| [ScoringReadService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringReadService.java) | Lần chấm đã nộp/công bố và tiêu chí | Chưa trả phiếu nháp hoặc đủ version/category/criteria-set để tạo phiếu APPEAL; cần hợp đồng bổ sung do BF02 quản lý |
+| [ScoringReadService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringReadService.java) | Lần chấm đã nộp/công bố và tiêu chí | Dùng cho dữ liệu đã nộp; nháp đi qua `ScoringAppealService`, không query BF02 trực tiếp từ BF03 |
+| [ScoringAppealService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java) | Snapshot, tạo/giao lại nháp, kiểm tra chủ phiếu, workload APPEAL | Hợp đồng Iter2 đã triển khai; Iter3 phải tái dùng kiểm tra chủ phiếu trong transaction và bổ sung kiểm tra appeal status |
 | [AssignmentService.java](../../../server/src/main/java/com/swp391/kpi/service/AssignmentService.java) | Khối lượng công việc/phân công BF02 | Có thể gọi hàm đọc khối lượng UC42; không gọi `assignArticle` để giao lại appeal vì sẽ sửa phân công gốc |
 | [AuditService.java](../../../server/src/main/java/com/swp391/kpi/service/AuditService.java) | `log(actorId, actionType, entityType, entityId, oldValue, newValue)` | Tái dùng để ghi log; UI đọc qua query service đã kiểm tra phạm vi, không mở đường vòng audit không giới hạn |
-| [NotificationService.java](../../../server/src/main/java/com/swp391/kpi/service/NotificationService.java) | Gửi Trưởng ban/gửi theo role | Cần hàm gửi người cụ thể để thông báo BTV cũ/mới; xin chấp thuận trước khi sửa vì dùng chung |
+| [NotificationService.java](../../../server/src/main/java/com/swp391/kpi/service/NotificationService.java) | Gửi Trưởng ban/theo role/riêng người bằng `notifyUser` | Bổ sung riêng người đã được chấp thuận; cùng transaction, thông báo không chứa điểm/lý do khiếu nại |
 
 ## 7. Hợp đồng API
 
@@ -237,7 +240,7 @@ Backend UC38/43 dự kiến, chưa tạo:
 
 API nhận `period=YYYY-MM-01`; frontend chuyển từ tháng `YYYY-MM`. Lịch sử chỉ lấy phiếu đã nộp, mới nhất trước.
 
-### 7.3 API UC38/43 dự kiến — chưa triển khai
+### 7.3 API UC38/43 đã triển khai
 
 | API | Mục đích và quyền |
 |---|---|
@@ -273,13 +276,13 @@ Việc kiểm tra “chưa nộp” và cập nhật người chấm phải là 
 
 Cập nhật người được giao, dấu khác ban, audit và thông báo cùng transaction. Nếu bất kỳ bước lưu nào lỗi thì rollback toàn bộ. Thông báo không chứa điểm, nhận xét cũ, tiêu chí/lý do khiếu nại hoặc tên người chấm gốc.
 
-Audit lưu appealId, attemptId, người cũ/mới, lý do, dấu khác ban, actor và thời gian. Giữ dữ liệu cũ trong audit, không xóa log. Chuỗi action phải nằm trong giới hạn cột hiện tại; dự kiến dùng `ASSIGN`/`REASSIGN`, entity `appeals` để query phạm vi được xác định từ bài của appeal.
+Audit lưu appealId, attemptId, người cũ/mới, lý do, dấu khác ban, actor và thời gian. Giữ dữ liệu cũ trong audit, không xóa log. Dùng action `ASSIGN`/`REASSIGN`, entity `appeals` để query phạm vi được xác định từ bài của appeal.
 
-### 8.3 Cổng tích hợp phải xử lý trước khi code ghi
+### 8.3 Hợp đồng tích hợp BF02 đã được cho phép
 
 `scoring_attempts` thuộc BF02 và đã có entity `ScoringAttempt`. Không tạo entity BF03 thứ hai ánh xạ cùng bảng hoặc repository BF03 để né ownership.
 
-Hợp đồng cần chủ BF02 cung cấp/chấp thuận:
+Người dùng đã cho phép bổ sung `ScoringAppealService` và các phương thức repository cần thiết cho Iter2. Hợp đồng sử dụng:
 
 1. Đọc snapshot lần gốc: articleId, versionId, assignmentId, categoryId, criteriaSetVersionId, attemptNo, reviewerId.
 2. Đọc danh sách phiếu APPEAL và người đang được giao, gồm phiếu chưa nộp; lịch sử đã tham gia.
@@ -287,7 +290,7 @@ Hợp đồng cần chủ BF02 cung cấp/chấp thuận:
 4. Đổi người chấm có kiểm tra lại phiếu chưa nộp/người hiện tại dưới khóa; đánh dấu khác ban và xử lý dữ liệu nháp không để Editor mới thấy điểm/nhận xét của Editor cũ.
 5. Kiểm tra quyền theo chủ phiếu hiện tại cho các endpoint chấm mù về sau.
 
-Nếu chưa có hợp đồng/authority này: tiếp tục được các bước đọc/kiểm chứng Iter1 và UC42 trong khả năng service sẵn có; test UC43 có thể dùng double ở ranh giới service để kiểm tra luật, nhưng **không đánh dấu UC38/43 hoàn tất tích hợp**. Không tự ghi vào bảng người khác.
+Tích hợp Iter2 đã được kiểm tra bằng service/repository thật trên SQL Server trong các transaction rollback, không chỉ double. Việc nộp điểm UC36 ở Iter3 chưa có trong hợp đồng này; không tự mở rộng quyền sửa BF02/schema chỉ vì phần nháp đã được duyệt.
 
 Schema hiện bắt buộc `assignment_id`, và phiếu đã nộp phải có `decision`. Tạo phiếu chưa nộp có thể giữ FK assignment gốc; không chèn quyết định ACCEPT giả để lách ràng buộc khi nộp. Phần nộp điểm UC36 là cổng phối hợp với BF02/DB của Iter3, không tự sửa schema trong Iter2.
 
@@ -323,9 +326,17 @@ Schema hiện bắt buộc `assignment_id`, và phiếu đã nộp phải có `d
 6. **Vì sao dùng transaction?** Tránh đổi người thành công nhưng thiếu audit/thông báo, hoặc hai Trưởng ban ghi đè nhau.
 7. **Số liệu đến từ đâu?** Database qua API, không đọc trực tiếp data.sql. File SQL chỉ tạo dữ liệu ban đầu; các chỉ số lấy từ bản ghi nghiệp vụ hợp lệ.
 
-## 11. Bước kế tiếp sau khi duyệt tài liệu
+## 11. Nghiệm thu phạm vi Iter1–2 — 21/10/2026
 
-Lập kế hoạch thực thi chi tiết theo các mốc ở mục 3 và kiểm chứng UC44 trước; chỉ sửa khi có test chứng minh thiếu sót. Mỗi bước triển khai cập nhật tình trạng tài liệu, source thực sự đã thay đổi và bằng chứng kiểm thử. Các cổng phối hợp BF02/service dùng chung/UI ở trên vẫn giữ hiệu lực, không được coi việc duyệt thiết kế là cho phép sửa tùy ý phần người khác.
+- Đọc lại checkpoint trên nhánh `VuNQ`, HEAD `551fc8a` sau merge main. Không làm lại code đã có; sửa ba finding còn mở bằng test trước. Không đổi schema/data.sql/dependency, không commit/push.
+- Backend `compile` thành công. `mvn -f server/pom.xml "-Dtest=*Test,BF03Iteration1IT,BF03ReviewerProfileIT,BF03AppealManagementIT" test` đạt **133 test, 0 fail/error/skip**. Nhóm quản lý có 11 integration test, gồm 3 regression freshness: đã nộp, đổi chủ và nhận xét nháp vừa lưu. Các fixture ghi rollback; test khóa dùng hai transaction, không sửa bản ghi thật.
+- Frontend `node --test tests/*.test.js`: **13/13**; `npm run build`: thành công, 130 module; lint exit 0 với **8 warning ngoài BF03** sau merge main. Không tiện sửa BF02/KPI.
+- [bf03Filters.smoke.js](../../../client/tests/browser/bf03Filters.smoke.js) chạy qua Playwright CLI: **3 ca RED→GREEN**, đổi tháng/đổi trang giữ bộ lọc và audit chuyển từ URL có appealId về menu không còn form cũ. API giả lập riêng đường dẫn `/api/`, không chặn module `/src/api/`, không ghi DB. Ví dụ chạy khi Vite đang mở: `npx --yes --package @playwright/cli playwright-cli --session bf03-resume run-code --filename C:/Users/Admin/IdeaProjects/swp391/client/tests/browser/bf03Filters.smoke.js` sau lệnh `open http://127.0.0.1:5173`.
+- Browser với backend thật: đăng nhập `duc.vm`, danh sách → chi tiết appeal → audit đúng mã → menu nhật ký bỏ scope → hồ sơ BTV; 5 endpoint GET thật trả 200. Không dùng khóa/JWT giả cho lượt này. Mật khẩu Trưởng ban đã được đặt lại ở yêu cầu riêng trước đó; phiên này không đổi tài khoản.
+- Nhánh ghi phân công/giao lại kiểm tra bằng integration rollback; browser ghi thành công/409 từng được kiểm tra bằng response giả cho ID test, **không tuyên bố đã ghi appeal thật bằng browser**.
+- Source/UI Iter3 vẫn để ngoài phạm vi: UC36/37 nộp chấm mù, UC39 chốt điểm, UC40 chiến dịch chấm chéo. Không tự triển khai để lấp placeholder.
+
+### Nhật ký cũ — kết quả dưới đây là tại thời điểm từng bước 19/10/2026
 
 ### Cập nhật thực thi 19/10/2026 — lỗi status của UC44
 

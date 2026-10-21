@@ -247,6 +247,26 @@ class BF03AppealManagementIT {
         assertEquals("Latest committed note", jdbc.queryForObject("SELECT decision_note FROM scoring_attempts WHERE id=?", String.class, draft));
     }
 
+    @Test void lockingReloadsCurrentOwnerBeforeCheckingOldReviewerAccess() throws Exception {
+        var f = fixture(1); int old = editor(1); int next = editor(1);
+        int draft = assign(f, old);
+        scoring.getArticleAttempts(f.article);
+        jdbc.update("UPDATE scoring_attempts SET reviewer_id=? WHERE id=?", next, draft);
+        var error = assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> scoring.requireOwnedDraft(draft, old));
+        assertEquals(403, error.getStatusCode().value());
+    }
+
+    @Test void reassignmentAuditsLatestDatabaseNoteInsteadOfCachedDraftNote() throws Exception {
+        var f = fixture(1); int old = editor(1); int next = editor(1);
+        int draft = assign(f, old);
+        scoring.getArticleAttempts(f.article);
+        jdbc.update("UPDATE scoring_attempts SET decision_note=N'Latest draft note' WHERE id=?", draft);
+        scoring.reassignDraft(f.appeal, f.article, draft, old, next, false, "handover", 5);
+        String snapshot = jdbc.queryForObject("SELECT old_value FROM audit_logs WHERE entity_type='appeals' AND entity_id=? AND action_type='REASSIGN'", String.class, f.appeal);
+        assertEquals("Latest draft note", json.readTree(snapshot).path("decisionNote").asText());
+    }
+
     private int assign(Fixture f, int editor) throws Exception {
         var result = mvc.perform(post("/api/appeals/"+f.appeal+"/assign").header("Authorization", bearer(5))
                 .contentType("application/json").content("{\"reviewerId\":"+editor+"}"))
