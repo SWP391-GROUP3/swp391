@@ -101,7 +101,11 @@ INSERT INTO royalty_periods (period_year, period_month, status) VALUES
             -> hạn chi 22/10, gần hạn nên có cảnh báo.
      Bài 5: 2 tác giả 60/40, Bài phản ánh, điểm 82.50, đăng 12/10, có 3 ảnh:
             1 ảnh mới (được tính tiền), 1 ảnh nguồn ngoài và 1 ảnh trùng ảnh
-            bài 1 đã trả nhuận bút (2 ảnh này không tính tiền, BR-RY-04). */
+            bài 1 đã trả nhuận bút (2 ảnh này không tính tiền, BR-RY-04).
+     Bài 6: 1 tác giả, Tin sâu, bài GỐC, điểm 75.00, đăng 08/09
+            -> hạn chi 08/10, ĐÃ QUÁ HẠN (nhãn đỏ ở UC-46).
+            Hệ số 2.00 x 75 / 100 = 1.50 -> 1.50 x 234.000 = 351.000đ.
+            Đăng trong tháng 9 nên phải chấm xong mới chốt được kỳ 9 (UC-50 E1). */
 INSERT INTO articles (author_id, section_id, declared_category_id, category_id, event_id, approved_by,
                       title, content, declared_nature, status, saturation_rank, saturation_rate,
                       created_at, updated_at, submitted_at, published_at) VALUES
@@ -119,7 +123,10 @@ INSERT INTO articles (author_id, section_id, declared_category_id, category_id, 
         '2026-09-17 08:00', '2026-09-22 09:00', '2026-09-17 10:00', '2026-09-22 09:00'),
     (1, 1, 3, 3, NULL, 5, N'Đường dân sinh xuống cấp sau mùa mưa ở xã ven đô',
         N'Nội dung bản đã biên tập...', 'ORIGINAL', 'PUBLISHED', NULL, NULL,
-        '2026-10-05 08:00', '2026-10-12 09:00', '2026-10-05 10:00', '2026-10-12 09:00');
+        '2026-10-05 08:00', '2026-10-12 09:00', '2026-10-05 10:00', '2026-10-12 09:00'),
+    (1, 1, 2, 2, NULL, 5, N'Hà Nội mở thêm 3 tuyến xe buýt điện từ đầu tháng 9',
+        N'Nội dung bản nộp...', 'ORIGINAL', 'PUBLISHED', NULL, NULL,
+        '2026-09-01 08:00', '2026-09-08 09:00', '2026-09-01 10:00', '2026-09-08 09:00');
 
 /* Tác giả chính ACCEPTED ngay; đồng tác giả đã xác nhận trong hạn 3 ngày. */
 INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, confirm_deadline, responded_at) VALUES
@@ -129,7 +136,8 @@ INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status,
     (3, 1, 100.00, 'ACCEPTED', NULL,               '2026-09-27 08:00'),
     (4, 2, 100.00, 'ACCEPTED', NULL,               '2026-09-17 10:00'),
     (5, 1,  60.00, 'ACCEPTED', NULL,               '2026-10-05 10:00'),
-    (5, 2,  40.00, 'ACCEPTED', '2026-10-08 10:00', '2026-10-05 15:00');
+    (5, 2,  40.00, 'ACCEPTED', '2026-10-08 10:00', '2026-10-05 15:00'),
+    (6, 1, 100.00, 'ACCEPTED', NULL,               '2026-09-01 10:00');
 
 INSERT INTO article_versions (article_id, version_no, kind, title, content, change_type, created_by, created_at) VALUES
     (1, 1, 'SUBMISSION', N'Người dân khu Bắc Hà khốn khổ vì ngập sau bão',
@@ -143,7 +151,9 @@ INSERT INTO article_versions (article_id, version_no, kind, title, content, chan
     (5, 1, 'SUBMISSION', N'Đường dân sinh xuống cấp sau mùa mưa ở xã ven đô',
         N'Nội dung bản PV nộp...', 'INITIAL', 1, '2026-10-05 10:00'),           -- 5
     (5, 2, 'EDITED',     N'Đường dân sinh xuống cấp sau mùa mưa ở xã ven đô',
-        N'Nội dung bản đã biên tập...', 'MINOR', 3, '2026-10-07 16:00');        -- 6
+        N'Nội dung bản đã biên tập...', 'MINOR', 3, '2026-10-07 16:00'),        -- 6
+    (6, 1, 'SUBMISSION', N'Hà Nội mở thêm 3 tuyến xe buýt điện từ đầu tháng 9',
+        N'Nội dung bản nộp...', 'INITIAL', 1, '2026-09-01 10:00');              -- 7
 
 /* Ảnh của PV Bình (đồng tác giả) chụp, không trùng ảnh nào. */
 INSERT INTO article_attachments (article_id, version_id, author_id, media_type, media_kind, url,
@@ -180,7 +190,8 @@ INSERT INTO duplication_matches (check_id, matched_article_id, overlap_percent, 
 INSERT INTO assignments (article_id, editor_id, assigned_by, assigned_at, was_suggested) VALUES
     (1, 3, 5, '2026-09-10 14:00', 1),   -- 1
     (4, 3, 5, '2026-09-17 14:00', 1),   -- 2
-    (5, 3, 5, '2026-10-06 09:00', 1);   -- 3
+    (5, 3, 5, '2026-10-06 09:00', 1),   -- 3
+    (6, 3, 5, '2026-09-01 14:00', 1);   -- 4
 
 /* Mỗi thể loại có 1 bộ tiêu chí ACTIVE, tổng trọng số = 100. */
 INSERT INTO criteria_set_versions (category_id, version_no, status, created_by, created_at, activated_by, activated_at) VALUES
@@ -208,7 +219,10 @@ INSERT INTO scoring_attempts (article_id, version_id, assignment_id, reviewer_id
         N'Bản dịch chính xác, trình bày tốt.', '2026-09-18 08:30', '2026-09-18 09:00'),               -- 2
     -- Bài 5 (Bài phản ánh, bộ tiêu chí 1): 90*30% + 80*20% + 85*30% + 70*20% = 27 + 16 + 25.5 + 14 = 82.50
     (5, 5, 3, 3, 1, 'INITIAL', 1, 3, 82.50, 'ACCEPT',
-        N'Phát hiện vấn đề dân sinh, có số liệu.', '2026-10-07 08:30', '2026-10-07 09:00');           -- 3
+        N'Phát hiện vấn đề dân sinh, có số liệu.', '2026-10-07 08:30', '2026-10-07 09:00'),           -- 3
+    -- Bài 6 (Tin sâu, bộ tiêu chí 2): 80*40% + 70*35% + 74*25% = 32 + 24.5 + 18.5 = 75.00
+    (6, 7, 4, 3, 1, 'INITIAL', 2, 2, 75.00, 'ACCEPT',
+        N'Thông tin đầy đủ, cần cập nhật số liệu hành khách.', '2026-09-02 08:30', '2026-09-02 09:00'); -- 4
 
 INSERT INTO scoring_attempt_details (scoring_attempt_id, criterion_id, score, comment) VALUES
     (1, 1, 80.00, NULL),
@@ -221,12 +235,16 @@ INSERT INTO scoring_attempt_details (scoring_attempt_id, criterion_id, score, co
     (3, 1, 90.00, NULL),
     (3, 2, 80.00, NULL),
     (3, 3, 85.00, NULL),
-    (3, 4, 70.00, NULL);
+    (3, 4, 70.00, NULL),
+    (4, 5, 80.00, NULL),
+    (4, 6, 70.00, NULL),
+    (4, 7, 74.00, NULL);
 
 INSERT INTO score_approvals (scoring_attempt_id, decision, decided_by, decided_at, announced_at) VALUES
     (1, 'APPROVED', 5, '2026-09-12 08:00', '2026-09-12 08:05'),
     (2, 'APPROVED', 5, '2026-09-19 08:00', '2026-09-19 08:05'),
-    (3, 'APPROVED', 5, '2026-10-08 08:00', '2026-10-08 08:05');
+    (3, 'APPROVED', 5, '2026-10-08 08:00', '2026-10-08 08:05'),
+    (4, 'APPROVED', 5, '2026-09-03 08:00', '2026-09-03 08:05');
 
 /* ---------- APPEAL ---------- */
 
@@ -327,7 +345,13 @@ INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_s
     (5, 5, 'ASSIGN',        'SUBMITTED',            'ASSIGNED',             N'Giao BTV Cường', '2026-10-06 09:00'),
     (5, 3, 'SUBMIT_SCORE',  'ASSIGNED',             'PENDING_APPROVAL',     NULL,              '2026-10-07 09:00'),
     (5, 5, 'APPROVE_SCORE', 'PENDING_APPROVAL',     'SCORE_PUBLISHED',      NULL,              '2026-10-08 08:05'),
-    (5, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-10-12 09:00');
+    (5, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-10-12 09:00'),
+    (6, 1, 'CREATE',        NULL,                   'DRAFT',                NULL,              '2026-09-01 08:00'),
+    (6, 1, 'SUBMIT',        'DRAFT',                'SUBMITTED',            NULL,              '2026-09-01 10:00'),
+    (6, 5, 'ASSIGN',        'SUBMITTED',            'ASSIGNED',             N'Giao BTV Cường', '2026-09-01 14:00'),
+    (6, 3, 'SUBMIT_SCORE',  'ASSIGNED',             'PENDING_APPROVAL',     NULL,              '2026-09-02 09:00'),
+    (6, 5, 'APPROVE_SCORE', 'PENDING_APPROVAL',     'SCORE_PUBLISHED',      NULL,              '2026-09-03 08:05'),
+    (6, 5, 'PUBLISH',       'SCORE_PUBLISHED',      'PUBLISHED',            NULL,              '2026-09-08 09:00');
 GO
 
 /* ---------- BF-03: ba bai mau de gui khieu nai (UC-35) ----------
