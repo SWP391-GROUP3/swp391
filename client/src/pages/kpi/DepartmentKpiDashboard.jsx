@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { layBangKpiBan, tongHopKpiThang } from '../../api/kpiApi.js'
-import './DepartmentKpiDashboard.css'
+import '../../styles/DepartmentKpiDashboard.css'
 
 /**
  * Man hinh Bang theo doi KPI toan ban bien tap (UC-61: View Department KPI Board).
