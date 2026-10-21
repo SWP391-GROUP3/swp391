@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * MUC LUC (so dong)
@@ -16,6 +20,13 @@ import java.util.Optional;
  */
 @Repository
 public interface ScoringAttemptRepository extends JpaRepository<ScoringAttempt, Integer> {
+
+    long countByReviewerIdAndAttemptTypeAndSubmittedAtIsNull(Integer reviewerId,
+            com.swp391.kpi.entity.AttemptType attemptType);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select s from ScoringAttempt s where s.id = :id")
+    Optional<ScoringAttempt> findLockedById(@Param("id") Integer id);
 
     // Lấy toàn bộ lịch sử các lần chấm của một bài viết sắp xếp theo attempt_no
     List<ScoringAttempt> findByArticleIdOrderByAttemptNoAsc(Integer articleId);

@@ -28,6 +28,7 @@ bin/
 # VS Code
 .vscode/
 .run/
+
 # NetBeans
 nbproject/private/
 nbbuild/
@@ -49,3 +50,4 @@ Claude outputs/
 docs/review/
 # File tam cua Word khi dang mo .docx
 ~$*
+
