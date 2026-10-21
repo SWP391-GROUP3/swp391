@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { layBaoCaoDoLech } from '../../api/reviewerDeviationApi.js'
+import { layDanhSachBienTapVien } from '../../api/reviewerProfileApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/QualityReportPage.css'
@@ -13,17 +15,28 @@ import '../../styles/QualityReportPage.css'
  */
 
 export default function ReviewerDeviationPage() {
+  const location = useLocation()
   const [danhSach, setDanhSach] = useState(null)
-  const [boLoc, setBoLoc] = useState({ period: '', editorId: '', sectionId: '' })
+  const [boLoc, setBoLoc] = useState(location.state?.boLoc ?? { period: '', editorId: '', sectionId: '' })
   const [loi, setLoi] = useState('')
+  const [bienTapVien, setBienTapVien] = useState(null)
+  const [loiDanhBa, setLoiDanhBa] = useState('')
 
   useEffect(() => {
     let conHienThi = true
-    layBaoCaoDoLech()
+    layDanhSachBienTapVien()
+      .then((data) => { if (conHienThi) setBienTapVien(data) })
+      .catch((error) => { if (conHienThi) setLoiDanhBa(error.message) })
+    return () => { conHienThi = false }
+  }, [])
+
+  useEffect(() => {
+    let conHienThi = true
+    layBaoCaoDoLech(location.state?.boLoc ?? {})
       .then((data) => { if (conHienThi) setDanhSach(data) })
       .catch((error) => { if (conHienThi) setLoi(error.message) })
     return () => { conHienThi = false }
-  }, [])
+  }, [location.state])
 
   async function locBaoCao(event) {
     event.preventDefault()
@@ -92,7 +105,7 @@ export default function ReviewerDeviationPage() {
               {danhSach.map((item) => (
                 <tr key={item.id}>
                   <td>{item.period.slice(0, 7)}</td>
-                  <td>{item.editorName}</td>
+                  <td><Link to={`/reviewers/${item.editorId}?period=${item.period.slice(0, 7)}`} state={{ boLoc }}>{item.editorName}</Link></td>
                   <td>{item.sectionName}</td>
                   <td>{formatNumber(item.avgDeviation)}</td>
                   <td>{item.appealCount}</td>
@@ -105,6 +118,19 @@ export default function ReviewerDeviationPage() {
           </table>
         </div>
       )}
+      <h2>Hồ sơ biên tập viên</h2>
+      <p>Có thể xem hồ sơ ngay cả khi chưa có dữ liệu so sánh điểm.</p>
+      {loiDanhBa && <p role="alert" className="thong-bao-loi">{loiDanhBa}</p>}
+      {!bienTapVien && !loiDanhBa && <p>Đang tải danh sách biên tập viên…</p>}
+      {bienTapVien?.length === 0 && <p>Chưa có biên tập viên trong phạm vi được xem.</p>}
+      {bienTapVien?.length > 0 && <div className="bao-cao-qc__bang-boc"><table className="bao-cao-qc__bang">
+        <thead><tr><th>Biên tập viên</th><th>Ban</th><th>Tài khoản</th></tr></thead>
+        <tbody>{bienTapVien.map((btv) => <tr key={btv.editorId}>
+          <td><Link to={`/reviewers/${btv.editorId}${boLoc.period ? `?period=${boLoc.period}` : ''}`} state={{ boLoc }}>{btv.editorName}</Link></td>
+          <td>{btv.sectionName || 'Chưa có ban'}</td>
+          <td>{btv.status === 'ACTIVE' ? 'Đang hoạt động' : 'Đã khóa'}</td>
+        </tr>)}</tbody>
+      </table></div>}
     </section>
   )
 }

@@ -34,6 +34,7 @@ public class AppealAuditQueryService {
     private final AppealCriterionRepository criterionRepository;
     private final AppealResolutionRepository resolutionRepository;
     private final CrossReviewTaskRepository crossReviewTaskRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper json;
 
     @Transactional(readOnly = true)
     public List<AuditLogResponse> getLogs(Integer currentUserId, Integer actorId, String actionType,
@@ -97,11 +98,23 @@ public class AppealAuditQueryService {
 
     private boolean matchesEditor(AuditLog log, Integer articleId, Integer editorId) {
         if (editorId.equals(log.getActorId())) return true;
+        if ("appeals".equals(log.getEntityType()) && ("ASSIGN".equals(log.getActionType())
+                || "REASSIGN".equals(log.getActionType()))) {
+            if (hasReviewer(log.getOldValue(), editorId) || hasReviewer(log.getNewValue(), editorId)) return true;
+        }
         if (articleId == null) return false;
         for (var attempt : scoringReadService.getSubmittedAttempts()) {
             if (articleId.equals(attempt.articleId()) && editorId.equals(attempt.reviewerId())) return true;
         }
         return false;
+    }
+
+    private boolean hasReviewer(String value, Integer editorId) {
+        if (value == null) return false;
+        try {
+            var reviewer = json.readTree(value).get("reviewerId");
+            return reviewer != null && reviewer.isIntegralNumber() && reviewer.intValue() == editorId;
+        } catch (com.fasterxml.jackson.core.JsonProcessingException ex) { return false; }
     }
 
     private boolean cannotView(String role, Integer sectionId, Integer articleId) {

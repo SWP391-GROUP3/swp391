@@ -11,6 +11,9 @@ import AdminLayout from '../layouts/AdminLayout.jsx'
 import AppealCreatePage from '../pages/appeal/AppealCreatePage.jsx'
 import MyAppealsPage from '../pages/appeal/MyAppealsPage.jsx'
 import ReviewerDeviationPage from '../pages/appeal/ReviewerDeviationPage.jsx'
+import ReviewerProfilePage from '../pages/appeal/ReviewerProfilePage.jsx'
+import AppealManagementPage from '../pages/appeal/AppealManagementPage.jsx'
+import AppealDetailPage from '../pages/appeal/AppealDetailPage.jsx'
 import AuditLogPage from '../pages/appeal/AuditLogPage.jsx'
 import ReporterHome from '../pages/home/ReporterHome.jsx'
 import EditorHome from '../pages/home/EditorHome.jsx'
@@ -64,8 +67,6 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/score-approvals',       ten: 'Duyệt điểm' },              // UC-29
   { path: '/score-approvals/:id',   ten: 'Chi tiết kết quả chấm' },   // UC-30, 31, 32
   { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
-  { path: '/appeals',               ten: 'Khiếu nại' },               // UC-38
-  { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
   { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
@@ -82,10 +83,8 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/users',              ten: 'Tài khoản' },
   { path: '/genres',             ten: 'Thể loại' },
   { path: '/system-parameters',  ten: 'Tham số hệ thống' },        // UC-13
-  { path: '/reviewers',          ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/criteria-sets',      ten: 'Bộ tiêu chí' },             // UC-14, 15
   { path: '/criteria-sets/:id',  ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-  { path: '/reviewers/:id',      ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/reader-imports',     ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
@@ -185,6 +184,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
             <>
               {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm */}
               <Route path="/assignments" element={<AssignmentQueue nguoiDung={nguoiDung} />} />
+              <Route path="/appeals" element={<AppealManagementPage />} />
+              <Route path="/appeals/:id" element={<AppealDetailPage />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
               <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
@@ -227,6 +228,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           {['HEAD_OF_DEPARTMENT', 'ADMIN'].includes(vaiTro) && (
             <>
               <Route path="/reviewers" element={<ReviewerDeviationPage />} />
+              <Route path="/reviewers/:id" element={<ReviewerProfilePage />} />
               <Route path="/reviewer-deviations" element={<ReviewerDeviationPage />} />
               <Route path="/audit-logs" element={<AuditLogPage />} />
             </>
