@@ -68,7 +68,7 @@ public class RoyaltyGrading {
     private BigDecimal saturationRate;  // % bao hoa su kien, 100 neu khong giam
 
     @Enumerated(EnumType.STRING)        // luu chu "ORIGINAL"... xuong DB
-    private RoyaltyNature nature;       // tinh chat bai Thu ky xac nhan
+    private RoyaltyNature nature;       // tinh chat bai PV khai, chep lai luc cham de giai trinh
 
     private BigDecimal natureRate;      // % theo tinh chat
     private BigDecimal finalFactor;     // he so cuoi, toi thieu 1
