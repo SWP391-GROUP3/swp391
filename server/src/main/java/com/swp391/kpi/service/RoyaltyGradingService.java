@@ -55,23 +55,23 @@ import java.util.Set;
  *   80  hang so                      - hang so dung trong file
  *   86  field                        - repository / service duoc inject
  *  104  getPendingArticles()         - UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap t…
- *  131  previewGrading()             - UC-47 buoc 1-4: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
- *  151  completeGrading()            - UC-47 buoc 5 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va ca…
- *  176  calculate()                  - Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan …
- *  213  findSaturationRate()         - Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 10…
- *  225  splitArticleAmount()         - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.0…
- *  244  gradeMedia()                 - UC-48: cham tung anh/video. Anh duoc tinh tien = he so co dinh cua loai…
- *  264  findNoRoyaltyReason()        - Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN…
- *  277  findMediaFactor()            - He so co dinh cua loai anh/video (bang media_factors, UC-56)
- *  283  sumMediaAmount()
- *  292  findRateOnPublishDate()      - UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi kho…
- *  299  findOpenPeriod()
- *  303  fillPeriod()
- *  312  saveGrading()                - Phieu cham phien ban 1. tier_rate luu bang diem, applied = suggested (B…
- *  338  saveArticleLines()           - Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GB…
- *  349  saveMediaItemsAndLines()     - Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA…
- *  369  newLine()
- *  385  readInt()                    - Lay 1 tham so so nguyen. Thieu hoac sai dinh dang thi bao loi ro rang,
+ *  130  previewGrading()             - UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
+ *  146  completeGrading()            - UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va ca…
+ *  171  calculate()                  - Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan …
+ *  209  findSaturationRate()         - Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 10…
+ *  221  splitArticleAmount()         - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.0…
+ *  240  gradeMedia()                 - UC-48: cham tung anh/video. Anh duoc tinh tien = he so co dinh cua loai…
+ *  260  findNoRoyaltyReason()        - Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN…
+ *  273  findMediaFactor()            - He so co dinh cua loai anh/video (bang media_factors, UC-56)
+ *  279  sumMediaAmount()
+ *  288  findRateOnPublishDate()      - UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi kho…
+ *  295  findOpenPeriod()
+ *  299  fillPeriod()
+ *  308  saveGrading()                - Phieu cham phien ban 1. tier_rate luu bang diem, applied = suggested (B…
+ *  334  saveArticleLines()           - Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GB…
+ *  345  saveMediaItemsAndLines()     - Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA…
+ *  365  newLine()
+ *  381  readInt()                    - Lay 1 tham so so nguyen. Thieu hoac sai dinh dang thi bao loi ro rang,
  */
 @Service
 @RequiredArgsConstructor
@@ -125,17 +125,12 @@ public class RoyaltyGradingService {
 
     // ------------------------------------------------------------- UC-47, 48
 
-    // UC-47 buoc 1-4: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
-    // nature = tinh chat Thu ky dang chon; null thi lay tinh chat PV da khai.
+    // UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
     @Transactional(readOnly = true)
-    public RoyaltyGradingResponse previewGrading(Integer articleId, RoyaltyNature nature) {
+    public RoyaltyGradingResponse previewGrading(Integer articleId) {
         ArticleRoyaltyInfoResponse article = articlePublishedService.getArticleForRoyalty(articleId);
-        RoyaltyNature confirmedNature = nature;
-        if (confirmedNature == null) {
-            confirmedNature = RoyaltyNature.valueOf(article.getDeclaredNature());
-        }
         RoyaltyRate rate = findRateOnPublishDate(article);
-        RoyaltyGradingResponse preview = calculate(article, confirmedNature, rate);
+        RoyaltyGradingResponse preview = calculate(article, rate);
 
         // Cho Thu ky biet bai se vao ky nao. Chua co ky OPEN thi de trong, luc Hoan tat moi bao loi.
         Optional<RoyaltyPeriod> openPeriod = findOpenPeriod();
@@ -145,7 +140,7 @@ public class RoyaltyGradingService {
         return preview;
     }
 
-    // UC-47 buoc 5 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien
+    // UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien
     // cua tung nguoi vao ky dang OPEN (BR-RY-05). Tat ca trong 1 transaction: loi la khong luu gi.
     @Transactional
     public RoyaltyGradingResponse completeGrading(RoyaltyGradingCreateRequest request, Integer currentUserId) {
@@ -157,7 +152,7 @@ public class RoyaltyGradingService {
         RoyaltyPeriod period = findOpenPeriod().orElseThrow(() -> new BusinessException(
                 "Chưa có kỳ nhuận bút đang mở, chưa thể hoàn tất chấm nhuận bút."));
         RoyaltyRate rate = findRateOnPublishDate(article);
-        RoyaltyGradingResponse result = calculate(article, request.getNature(), rate);
+        RoyaltyGradingResponse result = calculate(article, rate);
 
         RoyaltyGrading grading = saveGrading(result, period, rate, currentUserId);
         saveArticleLines(grading, period, result.getAuthors());
@@ -173,13 +168,14 @@ public class RoyaltyGradingService {
     // ------------------------------------------------------------ tinh toan
 
     // Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
-    private RoyaltyGradingResponse calculate(ArticleRoyaltyInfoResponse article, RoyaltyNature nature,
-                                             RoyaltyRate rate) {
+    private RoyaltyGradingResponse calculate(ArticleRoyaltyInfoResponse article, RoyaltyRate rate) {
         ScoringReadResponse attempt = scoringReadService.getPublishedAttempt(article.getId());  // diem da duyet
         BigDecimal score = attempt.totalScore();
         BigDecimal baseFactor = genreService.getBaseFactor(article.getCategoryId());
         RoyaltyCalculator calculator = new RoyaltyCalculator(systemParameterService.getValuesByFlow(ROYALTY_FLOW));
         BigDecimal unitPrice = rate.getAmount();
+        // Tinh chat bai = tinh chat PV khai, da khoa luc nop bai (BR-IN-03). Thu ky khong doi duoc.
+        RoyaltyNature nature = RoyaltyNature.valueOf(article.getDeclaredNature());
 
         BigDecimal suggestedFactor = calculator.suggestedFactor(baseFactor, score);                // BR-RY-01
         BigDecimal saturationRate = findSaturationRate(article, score, calculator);               // GBR-09

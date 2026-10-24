@@ -4,7 +4,6 @@ import com.swp391.kpi.dto.ApiResponse;
 import com.swp391.kpi.dto.RoyaltyGradingCreateRequest;
 import com.swp391.kpi.dto.RoyaltyGradingResponse;
 import com.swp391.kpi.dto.RoyaltyPendingArticleResponse;
-import com.swp391.kpi.entity.RoyaltyNature;
 import com.swp391.kpi.service.RoyaltyGradingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +25,10 @@ import java.util.List;
  * SecurityConfig chi cho vai tro EDITORIAL_SECRETARY goi /api/royalty-gradings/**.
  *
  * MUC LUC (so dong)
- *   39  field                        - service duoc inject
- *   43  getPendingArticles()         - GET /api/royalty-gradings/pending: bai da dang chua cham, kem han chi v…
- *   51  previewGrading()             - GET /api/royalty-gradings/preview?articleId=5&nature=TRANSLATION
- *   61  completeGrading()            - POST /api/royalty-gradings body { "articleId": 5, "nature": "ORIGINAL" }
+ *   38  field                        - service duoc inject
+ *   42  getPendingArticles()         - GET /api/royalty-gradings/pending: bai da dang chua cham, kem han chi v…
+ *   50  previewGrading()             - GET /api/royalty-gradings/preview?articleId=5
+ *   58  completeGrading()            - POST /api/royalty-gradings body { "articleId": 5 }
  */
 @RestController
 @RequestMapping("/api/royalty-gradings")
@@ -45,18 +44,16 @@ public class RoyaltyGradingController {
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách bài chờ chấm nhuận bút thành công", data));
     }
 
-    // GET /api/royalty-gradings/preview?articleId=5&nature=TRANSLATION
-    // Xem truoc he so va tien, chua luu (UC-47 buoc 1-4). Khong gui nature thi dung tinh chat PV khai.
+    // GET /api/royalty-gradings/preview?articleId=5
+    // Xem truoc he so va tien, chua luu (UC-47 buoc 1-3). Tinh chat bai lay theo PV khai.
     @GetMapping("/preview")
-    public ResponseEntity<ApiResponse<RoyaltyGradingResponse>> previewGrading(
-            @RequestParam Integer articleId,
-            @RequestParam(required = false) RoyaltyNature nature) {
-        RoyaltyGradingResponse data = royaltyGradingService.previewGrading(articleId, nature);
+    public ResponseEntity<ApiResponse<RoyaltyGradingResponse>> previewGrading(@RequestParam Integer articleId) {
+        RoyaltyGradingResponse data = royaltyGradingService.previewGrading(articleId);
         return ResponseEntity.ok(ApiResponse.success("Tính nhuận bút xem trước thành công", data));
     }
 
-    // POST /api/royalty-gradings  body { "articleId": 5, "nature": "ORIGINAL" }
-    // Hoan tat cham: luu phieu, anh/video, dong tien vao ky dang OPEN (UC-47 buoc 5, UC-48)
+    // POST /api/royalty-gradings  body { "articleId": 5 }
+    // Hoan tat cham: luu phieu, anh/video, dong tien vao ky dang OPEN (UC-47 buoc 4, UC-48)
     @PostMapping
     public ResponseEntity<ApiResponse<RoyaltyGradingResponse>> completeGrading(
             @Valid @RequestBody RoyaltyGradingCreateRequest request,
