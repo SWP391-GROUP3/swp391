@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 /**
  * 1 tac gia trong man chi tiet bai (UC-02): ty le va trang thai xac nhan.
  *
- * MUC LUC (so dong)
- *   21  field                        - cac truong tra ve cho giao dien
- *   30  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong tra ve cho giao dien
+ *   30  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter
