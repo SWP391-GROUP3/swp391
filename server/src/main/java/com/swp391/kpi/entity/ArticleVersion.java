@@ -18,13 +18,8 @@ import java.time.LocalDateTime;
  * Ban chup noi dung bai (bang article_versions). Chi INSERT, khong sua, khong xoa.
  * Moi lan PV nop / nop lai -> 1 ban SUBMISSION; BTV bien tap -> 1 ban EDITED.
  *
- * MUC LUC (so dong)
- *   38  id
- *   40  articleId, versionNo   - (article_id, version_no) la UNIQUE
- *   45  kind                   - SUBMISSION / EDITED
- *   48  title, content         - noi dung tai luc chup
- *   54  changeType             - INITIAL / MINOR / MAJOR
- *   57  createdBy, createdAt
+ * MUC LUC (so dong - ten - tac dung)
+ *   33  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "article_versions")

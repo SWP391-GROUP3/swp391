@@ -13,8 +13,8 @@ import java.io.Serializable;
  * JPA yeu cau class khoa nhieu cot phai Serializable va co equals/hashCode
  * de so sanh 2 khoa voi nhau.
  *
- * MUC LUC (so dong)
- *   26  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  field                           cac cot cua bang (khop schema.sql)
  */
 @Getter
 @Setter

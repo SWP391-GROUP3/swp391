@@ -24,6 +24,7 @@ import AdminHome from '../pages/home/AdminHome.jsx'
 import MyArticles from '../pages/article/MyArticles.jsx'
 import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import CoAuthorInvites from '../pages/article/CoAuthorInvites.jsx'
+import ArticleEditor from '../pages/article/ArticleEditor.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
@@ -49,7 +50,6 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
 const TRANG_PV_CHUA_LAM = [
-  { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
   { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
 ]
 
@@ -167,6 +167,9 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
+              {/* BF-01 (Minh) Iter 2: UC-03, 04, 05 soan / sua / nop bai, UC-10 sua va nop lai */}
+              <Route path="/my-articles/new" element={<ArticleEditor nguoiDung={nguoiDung} />} />
+              <Route path="/my-articles/:id/edit" element={<ArticleEditor nguoiDung={nguoiDung} />} />
               {/* BF-01 (Minh): UC-12 danh sach loi moi dong tac gia */}
               <Route path="/co-author-invites" element={<CoAuthorInvites />} />
               {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
