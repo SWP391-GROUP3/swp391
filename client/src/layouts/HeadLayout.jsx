@@ -3,6 +3,10 @@ import AppLayout from './AppLayout.jsx'
 /**
  * Menu cua Truong ban bien tap. Nhieu viec nhat nen chia 3 nhom co tieu de.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
+ *
+ * MUC LUC (so dong)
+ *   11  MENU_TRUONG_BAN              - Menu cua Truong ban bien tap. Nhieu viec nhat nen chia 3 nhom co tieu d…
+ *   52  HeadLayout                   - Khung trang cua Truong ban bien tap.
  */
 const MENU_TRUONG_BAN = [
   {

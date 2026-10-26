@@ -16,7 +16,7 @@ class AppealAuditQueryServiceTest {
     private final AppealRepository appeals = mock(AppealRepository.class);
     private final AppealAuditQueryService service = new AppealAuditQueryService(logs, users, articles, scores,
             appeals, mock(AppealCriterionRepository.class), mock(AppealResolutionRepository.class),
-            mock(CrossReviewTaskRepository.class));
+            mock(CrossReviewTaskRepository.class), new com.fasterxml.jackson.databind.ObjectMapper());
 
     @Test void headCannotSeeOtherSectionOrGlobalConfigurationEvents() {
         when(users.requireActive(5, "ADMIN", "HEAD_OF_DEPARTMENT")).thenReturn(

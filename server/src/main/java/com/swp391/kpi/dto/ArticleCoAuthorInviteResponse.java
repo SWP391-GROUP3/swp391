@@ -10,8 +10,12 @@ import java.time.LocalDateTime;
 
 /**
  * Loi moi dong tac gia dang cho nguoi dung tra loi (trang chu Phong vien, UC-12).
- * Gan khop client/src/api/reporterHomeApi.js: { articleId, title, mainAuthorName,
- * sharePercent, confirmDeadline } - tam tra mainAuthorId vi chua co entity User.
+ * Khop dang du lieu client/src/api/reporterHomeApi.js: { articleId, title, mainAuthorName,
+ * sharePercent, confirmDeadline }. Giu them mainAuthorId cho ai can tra theo ma.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           cac truong tra ve cho giao dien
+ *   31  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter
@@ -19,15 +23,18 @@ public class ArticleCoAuthorInviteResponse {
 
     private Integer articleId;
     private String title;
-    private Integer mainAuthorId;          // TODO(admin): doi thanh mainAuthorName khi co User
+    private Integer mainAuthorId;
+    private String mainAuthorName;         // ho ten tac gia chinh, lay qua UserReadService
     private BigDecimal sharePercent;       // ty le de nghi cho nguoi dung
     private LocalDateTime confirmDeadline; // phai tra loi truoc han nay (BR-IN-06)
 
-    public static ArticleCoAuthorInviteResponse from(Article article, ArticleAuthor myAuthorRow) {
+    public static ArticleCoAuthorInviteResponse from(Article article, ArticleAuthor myAuthorRow,
+                                                     String mainAuthorName) {
         ArticleCoAuthorInviteResponse dto = new ArticleCoAuthorInviteResponse();
         dto.setArticleId(article.getId());
         dto.setTitle(article.getTitle());
         dto.setMainAuthorId(article.getAuthorId());
+        dto.setMainAuthorName(mainAuthorName);
         dto.setSharePercent(myAuthorRow.getSharePercent());
         dto.setConfirmDeadline(myAuthorRow.getConfirmDeadline());
         return dto;

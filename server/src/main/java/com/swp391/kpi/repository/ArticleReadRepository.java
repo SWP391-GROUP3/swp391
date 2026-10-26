@@ -6,6 +6,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   18  field                        - cac truong du lieu
+ *   20  findPublishedByAuthorId()
+ *   28  findById()
+ */
 @Repository
 @RequiredArgsConstructor
 public class ArticleReadRepository {

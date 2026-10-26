@@ -3,6 +3,9 @@ package com.swp391.kpi.entity;
 /**
  * Loai dong tien nhuan but (cot royalty_lines.line_type).
  * Ten hang trung dung gia tri trong CHECK ck_royalty_lines_type cua schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   11  gia tri                      - ARTICLE, MEDIA, ADJUSTMENT
  */
 public enum RoyaltyLineType {
     ARTICLE,     // tien phan bai viet, chia theo ty le tac gia (BR-RY-03)

@@ -1,2 +1,7 @@
 /* components/common/Icon.jsx - khong cho icon bi bop nho khi nam trong flex */
+/* ===========================================================================
+   MUC LUC (so dong)
+      7  tieu de, bo cuc dau trang
+   =========================================================================== */
+
 .icon { flex-shrink: 0; }

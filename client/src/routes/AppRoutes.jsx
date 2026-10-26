@@ -11,6 +11,9 @@ import AdminLayout from '../layouts/AdminLayout.jsx'
 import AppealCreatePage from '../pages/appeal/AppealCreatePage.jsx'
 import MyAppealsPage from '../pages/appeal/MyAppealsPage.jsx'
 import ReviewerDeviationPage from '../pages/appeal/ReviewerDeviationPage.jsx'
+import ReviewerProfilePage from '../pages/appeal/ReviewerProfilePage.jsx'
+import AppealManagementPage from '../pages/appeal/AppealManagementPage.jsx'
+import AppealDetailPage from '../pages/appeal/AppealDetailPage.jsx'
 import AuditLogPage from '../pages/appeal/AuditLogPage.jsx'
 import ReporterHome from '../pages/home/ReporterHome.jsx'
 import EditorHome from '../pages/home/EditorHome.jsx'
@@ -20,6 +23,8 @@ import AccountantHome from '../pages/home/AccountantHome.jsx'
 import AdminHome from '../pages/home/AdminHome.jsx'
 import MyArticles from '../pages/article/MyArticles.jsx'
 import ArticleDetail from '../pages/article/ArticleDetail.jsx'
+import CoAuthorInvites from '../pages/article/CoAuthorInvites.jsx'
+import ArticleEditor from '../pages/article/ArticleEditor.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
@@ -47,42 +52,39 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
 const TRANG_PV_CHUA_LAM = [
-  { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
-  { path: '/co-author-invites', ten: 'Xác nhận đồng tác giả' },  // UC-12
-  { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
+  { path: '/my-royalties', ten: 'Nhuận bút' },              // UC-57
 ]
 
 const TRANG_BTV_CHUA_LAM = [
-  { path: '/re-reviews',            ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
-  { path: '/re-reviews/:id',        ten: 'Phiếu chấm lại' },         // UC-36, UC-37
-  { path: '/my-scorings',           ten: 'Lịch sử chấm' },           // UC-21
+  { path: '/re-reviews', ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
+  { path: '/re-reviews/:id', ten: 'Phiếu chấm lại' },         // UC-36, UC-37
+  { path: '/my-scorings', ten: 'Lịch sử chấm' },           // UC-21
 ]
 
 // Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
 const TRANG_TK_CHUA_LAM = []
 
 const TRANG_TB_CHUA_LAM = [
-  { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
-  { path: '/appeals',               ten: 'Khiếu nại' },               // UC-38
-  { path: '/appeals/:id',           ten: 'Chi tiết khiếu nại' },      // UC-39, 37, 43
-  { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
-  { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
+  { path: '/publishing', ten: 'Duyệt đăng' },              // UC-33
+  { path: '/cross-reviews', ten: 'Đợt chấm chéo' },           // UC-40
+  { path: '/reviewers/:id', ten: 'Hồ sơ biên tập viên' },     // UC-42
+  { path: '/audit-logs', ten: 'Nhật ký chấm' },            // UC-45
+  { path: '/kpi-board', ten: 'Bảng KPI của ban' },        // UC-61, 66
+  { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
+  { path: '/kpi-reports', ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
 
 const TRANG_KT_CHUA_LAM = [
-  { path: '/royalty-payments',    ten: 'Chi trả nhuận bút' },       // UC-54
+  { path: '/royalty-payments', ten: 'Chi trả nhuận bút' },       // UC-54
 ]
 
 const TRANG_ADMIN_CHUA_LAM = [
-  { path: '/users',              ten: 'Tài khoản' },
-  { path: '/genres',             ten: 'Thể loại' },
-  { path: '/system-parameters',  ten: 'Tham số hệ thống' },        // UC-13
-  { path: '/reviewers',          ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/criteria-sets',      ten: 'Bộ tiêu chí' },             // UC-14, 15
-  { path: '/criteria-sets/:id',  ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-  { path: '/reviewers/:id',      ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/reader-imports',     ten: 'Nhập số liệu độc giả' },    // UC-63
+  { path: '/users', ten: 'Tài khoản' },
+  { path: '/genres', ten: 'Thể loại' },
+  { path: '/system-parameters', ten: 'Tham số hệ thống' },        // UC-13
+  { path: '/criteria-sets', ten: 'Bộ tiêu chí' },             // UC-14, 15
+  { path: '/criteria-sets/:id', ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
+  { path: '/reader-imports', ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
 /**
@@ -90,12 +92,12 @@ const TRANG_ADMIN_CHUA_LAM = [
  * Layout = khung + menu, TrangChu = trang hien o /main, trangChuaLam = danh sach o tren.
  */
 const KHUNG_THEO_VAI_TRO = {
-  REPORTER:            { Layout: ReporterLayout,   TrangChu: ReporterHome,   trangChuaLam: TRANG_PV_CHUA_LAM },
-  EDITOR:              { Layout: EditorLayout,     TrangChu: EditorHome,     trangChuaLam: TRANG_BTV_CHUA_LAM },
-  EDITORIAL_SECRETARY: { Layout: SecretaryLayout,  TrangChu: SecretaryHome,  trangChuaLam: TRANG_TK_CHUA_LAM },
-  HEAD_OF_DEPARTMENT:  { Layout: HeadLayout,       TrangChu: HeadHome,       trangChuaLam: TRANG_TB_CHUA_LAM },
-  ACCOUNTANT:          { Layout: AccountantLayout, TrangChu: AccountantHome, trangChuaLam: TRANG_KT_CHUA_LAM },
-  ADMIN:               { Layout: AdminLayout,      TrangChu: AdminHome,      trangChuaLam: TRANG_ADMIN_CHUA_LAM },
+  REPORTER: { Layout: ReporterLayout, TrangChu: ReporterHome, trangChuaLam: TRANG_PV_CHUA_LAM },
+  EDITOR: { Layout: EditorLayout, TrangChu: EditorHome, trangChuaLam: TRANG_BTV_CHUA_LAM },
+  EDITORIAL_SECRETARY: { Layout: SecretaryLayout, TrangChu: SecretaryHome, trangChuaLam: TRANG_TK_CHUA_LAM },
+  HEAD_OF_DEPARTMENT: { Layout: HeadLayout, TrangChu: HeadHome, trangChuaLam: TRANG_TB_CHUA_LAM },
+  ACCOUNTANT: { Layout: AccountantLayout, TrangChu: AccountantHome, trangChuaLam: TRANG_KT_CHUA_LAM },
+  ADMIN: { Layout: AdminLayout, TrangChu: AdminHome, trangChuaLam: TRANG_ADMIN_CHUA_LAM },
 }
 
 /**
@@ -104,6 +106,16 @@ const KHUNG_THEO_VAI_TRO = {
  * Moi vai tro co 1 NHOM route rieng. Nguoi dang nhap la vai tro nao thi
  * chi nhom do ton tai, nen cung la "/main" nhung moi vai tro thay trang chu
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
+ *
+ * MUC LUC (so dong)
+ *   48  TRANG_PV_CHUA_LAM            - Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
+ *   53  TRANG_BTV_CHUA_LAM
+ *   61  TRANG_TK_CHUA_LAM            - Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
+ *   63  TRANG_TB_CHUA_LAM
+ *   77  TRANG_KT_CHUA_LAM
+ *   81  TRANG_ADMIN_CHUA_LAM
+ *   96  KHUNG_THEO_VAI_TRO           - Moi vai tro co khung trang (menu) rieng, khai bao o day:
+ *  122  AppRoutes                    - Khai bao toan bo route cua app (AGENTS.md muc 4: route moi them o day).
  */
 export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)
@@ -154,6 +166,11 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
+              {/* BF-01 (Minh) Iter 2: UC-03, 04, 05 soan / sua / nop bai, UC-10 sua va nop lai */}
+              <Route path="/my-articles/new" element={<ArticleEditor nguoiDung={nguoiDung} />} />
+              <Route path="/my-articles/:id/edit" element={<ArticleEditor nguoiDung={nguoiDung} />} />
+              {/* BF-01 (Minh): UC-12 danh sach loi moi dong tac gia */}
+              <Route path="/co-author-invites" element={<CoAuthorInvites />} />
               {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
               <Route path="/my-kpi" element={<PersonalKpiProgress nguoiDung={nguoiDung} />} />
             </>
@@ -170,8 +187,13 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
             <>
               {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm & UC-29..32 Duyệt điểm */}
               <Route path="/assignments" element={<AssignmentQueue nguoiDung={nguoiDung} />} />
+
               <Route path="/score-approvals" element={<ScoreApprovalQueue nguoiDung={nguoiDung} />} />
               <Route path="/score-approvals/:id" element={<ScoreApprovalQueue nguoiDung={nguoiDung} />} />
+
+              <Route path="/appeals" element={<AppealManagementPage />} />
+              <Route path="/appeals/:id" element={<AppealDetailPage />} />
+
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
               <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
@@ -214,6 +236,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           {['HEAD_OF_DEPARTMENT', 'ADMIN'].includes(vaiTro) && (
             <>
               <Route path="/reviewers" element={<ReviewerDeviationPage />} />
+              <Route path="/reviewers/:id" element={<ReviewerProfilePage />} />
               <Route path="/reviewer-deviations" element={<ReviewerDeviationPage />} />
               <Route path="/audit-logs" element={<AuditLogPage />} />
             </>

@@ -1,0 +1,14 @@
+.quan-ly-kn button,
+.chi-tiet-kn button {
+  padding: 8px 12px;
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  background: var(--fm-the);
+  color: var(--fm-chu);
+  font: inherit;
+  cursor: pointer;
+}
+.quan-ly-kn button:disabled,
+.chi-tiet-kn button:disabled { opacity: .5; cursor: not-allowed; }
+.quan-ly-kn__phan-trang { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.quan-ly-kn a { color: var(--fm-chu); }

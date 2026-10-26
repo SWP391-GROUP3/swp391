@@ -1,6 +1,15 @@
 /**
  * Chu hien thi cho cac ma cua luong nhuan but (BF-04), dung chung cho moi man
  * de cung 1 ma luon hien cung 1 chu. Ma (key) giu dung gia tri trong database/schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   16  PERIOD_STATUS_LABELS         - royalty_periods.status -> chu hien thi (BR-RY-07: OPEN -> CLOSED -> LOC…
+ *   27  PERIOD_STATUS_COLORS         - royalty_periods.status -> mau cham nhan, giong trang chu Ke toan.
+ *   35  MEDIA_KIND_LABELS            - media_factors.media_kind -> chu hien thi (xem comment bang media_factor…
+ *   46  NATURE_LABELS                - Tinh chat bai (articles.declared_nature, royalty_gradings.nature) -> ch…
+ *   53  natureLabel
+ *   58  periodStatusLabel            - Ma la (chua co trong bang tren) thi hien nguyen ma, khong de trong.
+ *   62  mediaKindLabel
  */
 
 /** royalty_periods.status -> chu hien thi (BR-RY-07: OPEN -> CLOSED -> LOCKED -> PAID) */

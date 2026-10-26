@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   15  findByVersionIdOrderByIdAsc - anh/video gan voi 1 ban nop
+ * MUC LUC (so dong - ten - tac dung)
+ *   15  findByVersionIdOrderByIdAsc()   Anh/video da gan vao 1 ban (article_versions.id), anh them truoc xep truoc
  */
 public interface ArticleAttachmentRepository extends JpaRepository<ArticleAttachment, Integer> {
 

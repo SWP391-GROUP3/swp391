@@ -1,0 +1,58 @@
+/* ===========================================================================
+   pages/article/CoAuthorInvites.jsx - "Xac nhan dong tac gia" (UC-12, phan xem).
+   Tien to class: .co-author-invites__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+   Bo cuc giong "Bai cua toi": tieu de, bang trong the trang (class chung .bang-fm).
+
+   MUC LUC (so dong - khoi CSS)
+     12  tieu de, bo cuc dau trang
+     26  The trang chua bang
+     46  O trong bang
+   =========================================================================== */
+
+.co-author-invites__header { margin-bottom: 20px; }
+
+.co-author-invites__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.co-author-invites__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+/* ---- The trang chua bang ---- */
+.co-author-invites__card {
+  padding: 8px 0;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.co-author-invites__card .thong-bao-loi { margin: 12px 16px; }
+
+.co-author-invites__empty {
+  margin: 0;
+  padding: 32px 16px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--fm-chu-nhat);
+}
+
+.co-author-invites__scroll { overflow-x: auto; }
+
+/* ---- O trong bang ---- */
+.co-author-invites__article-title {
+  font-weight: 500;
+  color: var(--fm-chu);
+  text-decoration: none;
+}
+
+.co-author-invites__article-title:hover { color: var(--fm-xanh-duong); text-decoration: underline; }
+
+.co-author-invites__nowrap {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

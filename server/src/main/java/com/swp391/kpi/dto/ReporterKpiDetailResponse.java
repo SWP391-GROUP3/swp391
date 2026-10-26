@@ -11,6 +11,9 @@ import java.util.List;
 
 /**
  * Thong tin chi tiet ket qua va tien do KPI cua 1 phong vien (UC-62, UC-60).
+ *
+ * MUC LUC (so dong)
+ *   24  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

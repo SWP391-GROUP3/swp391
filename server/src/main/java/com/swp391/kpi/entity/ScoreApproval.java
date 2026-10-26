@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 /**
  * Quyết định duyệt điểm của Trưởng ban biên tập cho một lần chấm.
  * Bảng: score_approvals
+ *
+ * MUC LUC (so dong)
+ *   26  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "score_approvals")

@@ -1,0 +1,14 @@
+.chi-tiet-kn h2 { font-size: 17px; color: var(--fm-chu); margin-bottom: 0; }
+.chi-tiet-kn p { overflow-wrap: anywhere; }
+.chi-tiet-kn__ly-do p { white-space: pre-wrap; }
+.chi-tiet-kn__form {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px;
+  background: var(--fm-the); border: 1px solid var(--fm-vien); border-radius: 8px;
+}
+.chi-tiet-kn__form label { display: flex; flex-direction: column; gap: 6px; }
+.chi-tiet-kn__form select,
+.chi-tiet-kn__form textarea {
+  padding: 8px 10px; border: 1px solid var(--fm-vien); border-radius: 6px;
+  color: var(--fm-chu); background: var(--fm-the); font: inherit;
+}
+.chi-tiet-kn__form button { align-self: flex-start; }

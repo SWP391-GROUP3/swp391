@@ -1,6 +1,6 @@
 # SRS — BF-01 Viết và nộp bài (Work Intake and Declaration Verification)
 
-> Chuyển từ `SRS.pdf`, đồng bộ lại theo bản SRS trên Google Docs ngày 2026-10-12. Luồng `article` (tiền tố class `Article`, `Duplication`). Đọc kèm `docs/SRS_Overview.md` (mục **Vấn đề đã biết**, GBR, Constraints) và `database/schema.sql`.
+> Chuyển từ `SRS.pdf`, đồng bộ lại theo bản SRS trên Google Docs ngày 2026-10-21 (swimlane thêm nhánh "Resubmission?", hình Use case xuất lại, UC-01 và UC-12 sửa chữ). Luồng `article` (tiền tố class `Article`, `Duplication`). Đọc kèm `docs/SRS_Overview.md` (mục **Vấn đề đã biết**, GBR, Constraints) và `database/schema.sql`.
 
 - **Trigger (mục 2.1):** Phóng viên tạo bài mới.
 - **End condition (mục 2.1):** Bài ở trạng thái SUBMITTED và vào hàng chờ phân công của Flow 02; hoặc tác giả chính rút bài về DRAFT; hoặc bài bị từ chối ở Flow 02.
@@ -17,19 +17,22 @@ Mô tả sơ đồ (3 làn: Reporter – Main Author | Reporter – Co-author | 
 1. Main Author: Open My Works screen → Create or edit work content → Declare category, nature, co-authors and shares, author / source of each media → Save draft → Submit work → View duplication check result (content and media).
 2. Quyết định **Content overlap?**
    - `> 50% and Original` → Submission blocked → quay lại Create or edit work content.
-   - `20–50%` → Enter explanation → sang bước 3.
+   - `20–50%, or > 50% and not Original` → Enter explanation → sang bước 3 (UC-05 A1).
    - `< 20%` → sang bước 3.
 3. Quyết định **Co-author confirmation needed?**
    - Yes → Co-author: Receive confirmation request → Review work and own share → **Response?**
      - Rejected, or no reply within 3 days → quay lại Create or edit work content (bài về Draft).
      - All accepted → sang bước 4.
    - No (no co-authors, or unchanged on resubmit) → sang bước 4.
-4. Quyết định **Withdraw before assignment?**
+4. Quyết định **Resubmission?**
+   - Yes (resubmitted after the Editor returned it) → Head of Department / Editor: Work returns to the same Editor (ASSIGNED) → End: back to the same Editor, handed over to Flow 02 (BR-IN-07).
+   - No (first submission) → sang bước 5.
+5. Quyết định **Withdraw before assignment?**
    - Yes → End: withdrawn, back to Draft.
    - No → Work enters assignment queue (Flow 02) → End: work SUBMITTED, handed over to Flow 02.
-5. Start: from Flow 02 → **Grading result?**
+6. Start: from Flow 02 → **Grading result?**
    - Rejected → End: rejected.
-   - Returned → Editor returns work with comments → Main Author: Open Work Details, read editor's comments → Revise and resubmit → quay lại Submit work.
+   - Returned → Editor returns work with comments → Main Author: Open Work Details, read editor's comments → Revise and resubmit → quay lại Submit work (rồi tới bước 4: Resubmission? → Yes).
 
 ## Use Case Diagram
 
@@ -49,7 +52,7 @@ Primary Actor: Reporter, Admin · 13 use cases · ID 01–13
 
 | ID | Use Case | Feature | Use Case Description |
 |---|---|---|---|
-| 01 | View My Works | Work Management | The Reporter views all works where they are the main author or a co-author, filters by status, and sees works waiting for their confirmation. |
+| 01 | View My Works | Work Management | The Reporter views all works where they are the main author or a co-author and filters by status; works waiting for their confirmation as a co-author are listed on the Co-authorship Confirmation screen (UC-12). |
 | 02 | View Work Details | Work Management | The Reporter views the content, the locked declarations, each co-author's confirmation status and the status history of a work. |
 | 03 | Create and Edit Work | Work Management | The Reporter creates or edits a work in DRAFT status and declares its category, its nature (original / translation / compilation / repost) and the author or source of each image/video. |
 | 04 | Declare Co-authors and Shares | Co-authorship | The main author adds up to 5 authors and sets each share; every share must be above 0% and the total must be 100%. |
@@ -140,8 +143,8 @@ Primary Actor: Reporter, Admin · 13 use cases · ID 01–13
 
 | Field | Value |
 |---|---|
-| Actor | Reporter (co-author) · System (Timer) |
-| Trigger | The co-author opens a work from "Waiting for my confirmation" or from the notification. |
+| Actor | Reporter (co-author) |
+| Trigger | The co-author opens a work from "Co-authorship Confirmation" or from the notification. |
 | Preconditions | The work is PENDING_CONFIRMATION; the user is a co-author of the work with confirmation status PENDING; the 3-day confirmation deadline has not passed. |
 | Postconditions | The answer is recorded. All accepted: the work is SUBMITTED. One rejected or deadline passed: the work returns to DRAFT. |
 | Business Rules | BR-IN-06 |

@@ -6,6 +6,12 @@ import './DepartmentKpiDashboard.css'
 /**
  * Man hinh Bang theo doi KPI toan ban bien tap (UC-61: View Department KPI Board).
  * Hien thi tien do thuc te, chi tieu, xet PASS/NOT_PASS theo BR-KPI-05 va cho phep chay job tong hop.
+ *
+ * MUC LUC (so dong)
+ *   16  DepartmentKpiDashboard       - Man hinh Bang theo doi KPI toan ban bien tap (UC-61: View Department KP…
+ *   25    useEffect                  - tai du lieu khi mo trang
+ *   29    taiDuLieuDashboard()
+ *   43    xuLyChayTongHop()
  */
 export default function DepartmentKpiDashboard({ nguoiDung }) {
   const [nam, setNam] = useState(2026)

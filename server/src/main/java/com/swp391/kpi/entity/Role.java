@@ -14,6 +14,9 @@ import org.hibernate.annotations.Nationalized;
 
 /**
  * Vai tro co dinh (bang roles). Chi doc, khong co man hinh them/sua vai tro.
+ *
+ * MUC LUC (so dong)
+ *   30  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "roles")

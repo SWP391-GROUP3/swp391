@@ -163,6 +163,46 @@ class BF03Iteration1IT {
                 List.of(Map.of("criterionId", criterionId, "reason", "Lý do thử nghiệm có dấu."))));
     }
 
+    @Test void futureConfigurationDoesNotReplaceActiveRulesOrRebindExistingAppeals() throws Exception {
+        Fixture fixture = fixture(1, 1);
+        mvc.perform(post("/api/appeals").header("Authorization", bearer(1))
+                .contentType("application/json").content(payload(fixture.articleId, fixture.criterionId)))
+                .andExpect(status().isCreated());
+        Integer boundConfig = jdbc.queryForObject("SELECT rule_config_id FROM appeals WHERE article_id=?",
+                Integer.class, fixture.articleId);
+        String activeBefore = mvc.perform(get("/api/appeal-rule-configs/active")
+                .header("Authorization", bearer(8))).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        int activeId = json.readTree(activeBefore).path("data").path("id").asInt();
+        String future = "{\"appealWindowDays\":3,\"maxAppealsPerArticle\":1,\"varianceThreshold\":9.25,\"effectiveFrom\":\"2099-11-29\"}";
+        mvc.perform(post("/api/appeal-rule-configs").header("Authorization", bearer(8))
+                .contentType("application/json").content(future)).andExpect(status().isCreated());
+        mvc.perform(get("/api/appeal-rule-configs/active").header("Authorization", bearer(8)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(activeId));
+        assertEquals(boundConfig, jdbc.queryForObject("SELECT rule_config_id FROM appeals WHERE article_id=?",
+                Integer.class, fixture.articleId));
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM audit_logs WHERE entity_type='appeal_rule_configs'"
+                + " AND entity_id=(SELECT id FROM appeal_rule_configs WHERE effective_from='2099-11-29')"
+                + " AND old_value IS NOT NULL AND new_value IS NOT NULL", Integer.class));
+    }
+
+    @Test void invalidConfigurationValuesAndAuditDateRangeAreRejected() throws Exception {
+        String valid = "{\"appealWindowDays\":7,\"maxAppealsPerArticle\":1,\"varianceThreshold\":5,\"effectiveFrom\":\"2099-11-28\"}";
+        for (String invalid : List.of(
+                valid.replace("\"appealWindowDays\":7", "\"appealWindowDays\":0"),
+                valid.replace("\"maxAppealsPerArticle\":1", "\"maxAppealsPerArticle\":0"),
+                valid.replace("\"varianceThreshold\":5", "\"varianceThreshold\":-1"),
+                valid.replace("\"varianceThreshold\":5", "\"varianceThreshold\":1.234"))) {
+            mvc.perform(post("/api/appeal-rule-configs").header("Authorization", bearer(8))
+                    .contentType("application/json").content(invalid)).andExpect(status().isBadRequest());
+        }
+        mvc.perform(get("/api/audit-logs").header("Authorization", bearer(8))
+                .param("fromTime", "2026-10-20T00:00:00").param("toTime", "2026-10-19T00:00:00"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(get("/api/reports/reviewer-deviations").header("Authorization", bearer(8))
+                .param("period", "2026-10-02")).andExpect(status().isBadRequest());
+    }
+
     private Fixture fixture(int authorId, int sectionId) {
         Integer articleId = jdbc.queryForObject("""
                 INSERT INTO articles(author_id, section_id, declared_category_id, category_id, title, status)

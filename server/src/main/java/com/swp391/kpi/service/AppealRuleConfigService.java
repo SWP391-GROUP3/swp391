@@ -14,6 +14,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   30  field                        - repository / service duoc inject
+ *   38  getActiveConfig()            - Lay cau hinh khiieu nai dang co hieu luc tinh den ngay hom nay.
+ *   48  getActiveConfigEntity()      - Ham noi bo de cac service khac trong luong appeal lay entity cau hinh d…
+ *   58  getAllConfigs()              - Lay danh sach tat ca cac phien ban cau hinh de Admin theo doi lich su (…
+ *   73  createConfig()               - Tao phien ban cau hinh moi theo ngay hieu luc (UC-44).
+ *  105  toAuditValue()
+ */
 @Service
 @RequiredArgsConstructor
 public class AppealRuleConfigService {

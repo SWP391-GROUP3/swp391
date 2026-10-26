@@ -5,6 +5,10 @@ import AppLayout from './AppLayout.jsx'
  * "Tài khoản", "Thể loại" chua co UC rieng trong SRS: lay theo mo ta Actor 1
  * (SRS_Overview 4.1: quan ly tai khoan, the loai) va bang ma luong admin so huu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
+ *
+ * MUC LUC (so dong)
+ *   13  MENU_ADMIN                   - Menu cua Quan tri he thong (Admin). Chia 3 nhom co tieu de.
+ *   52  AdminLayout                  - Khung trang cua Admin.
  */
 const MENU_ADMIN = [
   {

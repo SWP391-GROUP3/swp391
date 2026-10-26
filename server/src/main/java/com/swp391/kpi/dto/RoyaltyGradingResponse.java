@@ -12,6 +12,9 @@ import java.util.List;
  * Phieu cham nhuan but 1 bai (UC-47, UC-48), du tung buoc cong thuc de Thu ky xem.
  * Dung cho ca XEM TRUOC (gradingId = null, chua luu) va sau khi HOAN TAT (co gradingId).
  * Service tu gan tung truong (khong co from() vi so lieu tinh tu nhieu nguon).
+ *
+ * MUC LUC (so dong)
+ *   23  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter
@@ -29,7 +32,7 @@ public class RoyaltyGradingResponse {
     private BigDecimal baseFactor;      // he so chuan the loai
     private BigDecimal suggestedFactor; // = baseFactor x diem / 100
     private BigDecimal saturationRate;  // % bao hoa su kien
-    private RoyaltyNature nature;       // tinh chat Thu ky xac nhan
+    private RoyaltyNature nature;       // tinh chat bai PV khai (BR-IN-03)
     private BigDecimal natureRate;      // % theo tinh chat
     private BigDecimal finalFactor;     // he so cuoi, toi thieu 1
     private BigDecimal unitPrice;       // don gia hieu luc tai ngay dang

@@ -14,6 +14,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   29  field                        - service duoc inject
+ *   35  getActiveConfig()            - Lay cau hinh dang ap dung hien tai.
+ *   46  getAllConfigs()              - Lay toan bo lich su cac phien ban cau hinh (Admin xem).
+ *   57  createConfig()               - Tao phien ban cau hinh khiieu nai moi co hieu luc theo ngay (UC-44).
+ */
 @RestController
 @RequestMapping("/api/appeal-rule-configs")
 @RequiredArgsConstructor

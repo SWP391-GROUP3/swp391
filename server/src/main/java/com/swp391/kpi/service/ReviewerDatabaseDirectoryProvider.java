@@ -3,6 +3,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
+/**
+ * MUC LUC (so dong)
+ *   13  field                        - repository / service duoc inject
+ *   15  findEditor()
+ */
 @Service @RequiredArgsConstructor
 public class ReviewerDatabaseDirectoryProvider implements ReviewerDirectoryProvider {
     private final UserReadService userReadService;

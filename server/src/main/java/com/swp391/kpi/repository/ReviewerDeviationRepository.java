@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   16  findAllByOrderByPeriodDescEditorIdAsc()
+ */
 @Repository
 public interface ReviewerDeviationRepository extends JpaRepository<ReviewerDeviationIndex, Integer> {
 

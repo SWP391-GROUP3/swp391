@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 /**
  * Điểm chi tiết cho từng tiêu chí trong một lần chấm.
  * Bảng: scoring_attempt_details
+ *
+ * MUC LUC (so dong)
+ *   26  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "scoring_attempt_details")

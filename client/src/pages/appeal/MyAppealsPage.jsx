@@ -4,6 +4,13 @@ import { layKhieuNaiCuaToi } from '../../api/appealApi.js'
 import { dinhDangThoiGian } from './appealFormat.js'
 import '../../styles/AppealPage.css'
 
+/**
+ * MUC LUC (so dong)
+ *   14  TEN_TRANG_THAI
+ *   20  MyAppealsPage
+ *   25    useEffect                  - tai du lieu khi mo trang
+ */
+
 const TEN_TRANG_THAI = {
   SUBMITTED: 'Đã gửi',
   IN_REVIEW: 'Đang xử lý',

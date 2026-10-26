@@ -16,6 +16,9 @@ import java.math.BigDecimal;
  * The loai bai (bang genres, luong admin).
  * Luong admin chua co nguoi phu trach nen BF-04 tao ban CHI DOC nay de lay he so chuan
  * (BR-RY-01: he so nhuan but = baseFactor x diem / 100). Man them/sua the loai lam sau.
+ *
+ * MUC LUC (so dong)
+ *   32  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "genres")

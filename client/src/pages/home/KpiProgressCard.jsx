@@ -63,6 +63,12 @@ function DongTienDo({ nhan, thucTe, chiTieu, donVi }) {
  * Truong ban giao. So bai cong theo ty le dong tac gia nen co the le (BR-KPI-02).
  * Dat khi dat CA HAI chi tieu (BR-KPI-05). Trong thang chi la ket qua DU KIEN,
  * ket qua chinh thuc chi co khi Truong ban chot ky (UC-66, UC-67).
+ *
+ * MUC LUC (so dong)
+ *    8  tinhPhanTram                 - Phan tram do dai thanh tien do, toi da 100 (vuot chi tieu van chi day t…
+ *   19  DongTienDo                   - 1 dong tien do: nhan, "4 / 6 bai", thanh ngang, dong goi y con thieu ba…
+ *   73  KpiProgressCard              - Khoi "KPI thang nay" (UC-60): so bai da dang va diem TB so voi chi tieu
+ *   77    useEffect                  - tai du lieu khi mo trang
  */
 export default function KpiProgressCard() {
   const [kpi, setKpi] = useState(undefined)   // undefined = dang tai, null = chua giao chi tieu

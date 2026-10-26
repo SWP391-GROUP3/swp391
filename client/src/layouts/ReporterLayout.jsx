@@ -9,6 +9,12 @@ import '../styles/ReporterLayout.css'
 /**
  * Menu cua Phong vien. Moi muc ghi UC tuong ung trong SRS.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
+ *
+ * MUC LUC (so dong)
+ *   19  MENU_PHONG_VIEN              - Menu cua Phong vien. Moi muc ghi UC tuong ung trong SRS.
+ *   40  ChipViTien                   - Chip vi tien canh ten, bam vao mo trang Nhuan but (UC-57). Chi Phong vi…
+ *   46    useEffect                  - Tai so du vi 1 lan khi khung trang hien ra
+ *   67  ReporterLayout               - Khung trang cua Phong vien = khung chung + menu Phong vien + chip vi.
  */
 const MENU_PHONG_VIEN = [
   {

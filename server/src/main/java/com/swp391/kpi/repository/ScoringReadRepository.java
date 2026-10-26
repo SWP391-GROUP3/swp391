@@ -7,6 +7,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   19  field                        - cac truong du lieu
+ *   21  findSubmitted()
+ *   34  findCriteria()
+ */
 @Repository
 @RequiredArgsConstructor
 public class ScoringReadRepository {

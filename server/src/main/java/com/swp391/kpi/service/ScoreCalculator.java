@@ -5,7 +5,21 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+
 // Tinh diem chat luong DECIMAL(5,2), lam tron HALF_UP theo BR-SC-07
+
+/**
+ * Engine tính điểm chất lượng bài viết (Quality Scoring Calculator).
+ * Tuân thủ quy tắc làm tròn DECIMAL(5,2), RoundingMode.HALF_UP theo AGENTS.md và GBR-08.
+ *
+ * MUC LUC (so dong)
+ *   23  hang so                      - hang so dung trong file
+ *   32  calculateTotalScore()        - Tính tổng điểm có trọng số từ danh sách điểm thành phần.
+ *   56  validateItem()               - Kiểm tra tính hợp lệ của điểm thành phần (0 - 100).
+ *   78  isCommentRequired()          - Kiểm tra tiêu chí có bắt buộc nhập nhận xét hay không (BR-QA-08: score …
+ */
+@Component
+
 public class ScoreCalculator {
 
     public static final BigDecimal MIN_SCORE = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);

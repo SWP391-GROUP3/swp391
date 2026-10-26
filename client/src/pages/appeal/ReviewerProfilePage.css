@@ -1,0 +1,25 @@
+.ho-so-btv__thong-tin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  margin: 0;
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  background: var(--fm-the);
+}
+
+.ho-so-btv__thong-tin dt { color: var(--fm-chu-nhat); font-size: 13px; }
+.ho-so-btv__thong-tin dd { margin: 6px 0 0; color: var(--fm-chu); font-weight: 600; }
+.ho-so-btv h2 { margin: 8px 0 0; font-size: 17px; }
+.ho-so-btv__phan-trang { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.ho-so-btv__phan-trang button {
+  color: var(--fm-chu);
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.ho-so-btv__phan-trang button:disabled { opacity: 0.5; cursor: default; }

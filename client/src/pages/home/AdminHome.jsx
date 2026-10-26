@@ -75,6 +75,12 @@ function taoCacNhom(dem) {
  * Trang chu cua Admin.
  * Cot trai: viec cho xu ly + quy tac khieu nai dang ap dung (API THAT, BF-03).
  * Cot phai: so lieu he thong.
+ *
+ * MUC LUC (so dong)
+ *   15  gopDanhSachViec              - Gop viec cua Admin thanh 1 danh sach "Chờ xử lý". Thu tu: the loai chua…
+ *   65  taoCacNhom                   - Cac o dem ben phai. Khac don vi (tai khoan / the loai / bo tieu chi) ne…
+ *   85  AdminHome                    - Trang chu cua Admin.
+ *   91    useEffect                  - tai du lieu khi mo trang
  */
 export default function AdminHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)         // null = dang tai

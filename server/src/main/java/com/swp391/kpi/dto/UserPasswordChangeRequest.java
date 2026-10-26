@@ -7,6 +7,10 @@ import lombok.Setter;
 
 /**
  * Nguoi dung tu doi mat khau: phai nhap dung mat khau hien tai.
+ *
+ * MUC LUC (so dong)
+ *   19  hang so                      - hang so dung trong file
+ *   24  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

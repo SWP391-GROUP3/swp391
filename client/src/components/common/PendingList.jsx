@@ -31,6 +31,11 @@ function chuHanChot(hanChot) {
  *
  * - danhSach: null = dang tai
  * - loi: chu bao loi khi tai that bai
+ *
+ * MUC LUC (so dong)
+ *    7  NGAY_GAP                     - Con <= so ngay nay thi to do han chot cho nguoi dung de y.
+ *   13  chuHanChot                   - Chu hien han chot. daysUntil lam tron len nen:
+ *   40  PendingList                  - Khoi "Chờ xử lý" tren trang chu cua moi vai tro.
  */
 export default function PendingList({ danhSach, loi }) {
   const idTieuDe = useId()

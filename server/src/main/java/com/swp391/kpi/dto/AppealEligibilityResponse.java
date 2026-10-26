@@ -7,6 +7,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   18  field                        - cac truong tra ve cho giao dien
+ */
 @Getter
 @Setter
 public class AppealEligibilityResponse {

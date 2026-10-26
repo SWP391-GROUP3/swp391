@@ -14,6 +14,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
+/**
+ * MUC LUC (so dong)
+ *   30  field                        - cac cot cua bang (khop schema.sql)
+ */
 @Entity
 @Table(name = "appeal_criteria")
 @Getter

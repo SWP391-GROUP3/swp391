@@ -6,6 +6,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   17  field                        - cac truong du lieu
+ *   19  findAll()
+ */
 @Repository
 @RequiredArgsConstructor
 public class UserReadRepository {

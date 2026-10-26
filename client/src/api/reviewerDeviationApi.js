@@ -1,5 +1,10 @@
 import { goiApi } from './goiApi.js'
 
+/**
+ * MUC LUC (so dong)
+ *    8  layBaoCaoDoLech
+ */
+
 export async function layBaoCaoDoLech(boLoc = {}) {
   const query = new URLSearchParams()
   if (boLoc.period) query.set('period', `${boLoc.period}-01`)

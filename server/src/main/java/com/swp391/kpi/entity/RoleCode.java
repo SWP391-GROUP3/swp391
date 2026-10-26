@@ -3,6 +3,9 @@ package com.swp391.kpi.entity;
 /**
  * Ma vai tro (cot roles.code). Ten hang trung dung gia tri trong data.sql.
  * Moi user dung 1 vai tro (users.role_id).
+ *
+ * MUC LUC (so dong)
+ *   11  gia tri                      - REPORTER, EDITOR, HEAD_OF_DEPARTMENT, EDITORIAL_SECRETARY, ACCOUNTANT, …
  */
 public enum RoleCode {
     REPORTER,               // Phong vien

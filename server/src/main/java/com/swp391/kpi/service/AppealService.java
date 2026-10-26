@@ -26,6 +26,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * MUC LUC (so dong)
+ *   47  hang so                      - hang so dung trong file
+ *   50  field                        - repository / service duoc inject
+ *   61  AppealService()
+ *   97  submitAppeal()
+ *  129  getEligibility()
+ *  159  getEligibleArticles()
+ *  173  getMyAppeals()
+ *  187  validateSubmission()
+ *  199  validateArticleAndWindow()
+ *  222  validateCriteria()
+ *  250  saveCriteria()
+ *  264  toResponse()
+ */
 @Service
 public class AppealService {
 

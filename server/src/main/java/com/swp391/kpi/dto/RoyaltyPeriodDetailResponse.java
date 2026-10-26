@@ -12,6 +12,10 @@ import java.util.List;
 /**
  * Bang ke 1 ky nhuan but (UC-50 buoc 1): cac bai da cham + tong tien tung nguoi.
  * returnNote khac null = Ke toan da tra ky ve, Thu ky xem ly do roi sua (UC-50 A1).
+ *
+ * MUC LUC (so dong)
+ *   24  field                        - cac truong tra ve cho giao dien
+ *   38  from()                       - Map phan thong tin ky; cac danh sach va tong tien service gan sau
  */
 @Getter
 @Setter

@@ -22,6 +22,13 @@ const TAI_KHOAN_MAU = [
 
 /**
  * Man dang nhap (UC-69). Nhap email HOAC ten dang nhap + mat khau.
+ *
+ * MUC LUC (so dong)
+ *   10  MAT_KHAU_MAU                 - Tai khoan mau - chep tu database/data.sql, mat khau chung 123456.
+ *   11  TAI_KHOAN_MAU
+ *   33  Login                        - Man dang nhap (UC-69). Nhap email HOAC ten dang nhap + mat khau.
+ *   40    chonTaiKhoanMau()          - Bam 1 tai khoan mau -> dien san ca 2 o, chi con bam "Dang nhap"
+ *   46    guiForm()
  */
 export default function Login({ onDangNhap }) {
   const [tenDangNhap, setTenDangNhap] = useState('')

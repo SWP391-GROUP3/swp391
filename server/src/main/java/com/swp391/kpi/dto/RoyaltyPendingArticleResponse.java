@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 
 /**
  * 1 bai da dang CHUA cham nhuan but, cho man Pending Grading List (UC-46).
+ *
+ * MUC LUC (so dong)
+ *   20  field                        - cac truong tra ve cho giao dien
+ *   34  from()                       - Map tay DTO cua BF-01 -> DTO cua BF-04 (AGENTS.md muc 3.4), them 3 so l…
  */
 @Getter
 @Setter
@@ -20,7 +24,7 @@ public class RoyaltyPendingArticleResponse {
     private String sectionName;
     private Integer categoryId;       // de frontend loc theo the loai
     private String categoryName;
-    private String declaredNature;    // tinh chat PV khai, Thu ky xac nhan lai khi cham (UC-47)
+    private String declaredNature;    // tinh chat PV khai, dung luon de tinh nhuan but (BR-IN-03)
     private LocalDateTime publishedAt;
     private LocalDate paymentDeadline;  // han chi = ngay dang + PAYMENT_DEADLINE_DAYS
     private Long daysLeft;              // so ngay con lai toi han chi, am = da qua han

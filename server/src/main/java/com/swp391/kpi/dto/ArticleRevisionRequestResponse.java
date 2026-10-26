@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 /**
  * Bai bi tra ve can sua (REVISION_REQUESTED) kem ghi chu moi nhat (trang chu Phong vien).
  * Dang du lieu khop client/src/api/reporterHomeApi.js: { articleId, title, note, returnedAt }.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  field                           cac truong tra ve cho giao dien
+ *   30  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

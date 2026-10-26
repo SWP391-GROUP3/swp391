@@ -13,6 +13,20 @@ const PAGE_SIZE = 10
  * UC-01 - "Bai cua toi": bai ma Phong vien la tac gia chinh hoac dong tac gia.
  * Loc theo nhom trang thai bang URL (?status=A,B), nen trang chu link thang toi
  * dung nhom duoc. Bam tieu de de mo chi tiet bai (UC-02).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  PAGE_SIZE                       So bai moi trang (AGENTS.md 3.7: ?page=0&size=10)
+ *   31  MyArticles()                    UC-01 - "Bai cua toi": bai ma Phong vien la tac gia chinh hoac dong tac gia
+ *   41    useEffect                     Tai lai danh sach moi khi doi bo loc hoac doi trang
+ *   58    selectGroup()                 Bam 1 nhom loc: ghi vao URL va quay ve trang dau
+ *   67    goToPage()                    Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   81  [Soan bai moi]                  mo trang /my-articles/new (ArticleEditor) de soan bai moi (UC-03)
+ *   92  chip [Tat ca]                   bo loc, ghi ?status= tren URL -> goi lai GET /api/articles
+ *  103  chip nhom trang thai            loc theo nhom (Nhap, Cho xac nhan...) -> ?status=A,B -> GET /api/articles
+ *  138  [ten bai] trong bang            mo trang /my-articles/:id (ArticleDetail) xem chi tiet bai (UC-02)
+ *  172  [Trang truoc] / [Trang sau]     doi ?page= tren URL -> tai trang khac cua danh sach
  */
 export default function MyArticles() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -49,6 +63,7 @@ export default function MyArticles() {
     setSearchParams(next)
   }
 
+  /** Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc. */
   function goToPage(newPage) {
     const next = new URLSearchParams(searchParams)
     next.set('page', newPage)
@@ -62,7 +77,7 @@ export default function MyArticles() {
           <h1 className="my-articles__title">Bài của tôi</h1>
           <p className="my-articles__subtitle">Bài bạn là tác giả chính hoặc đồng tác giả, sửa gần nhất xếp trước.</p>
         </div>
-        {/* UC-03 lam o Iter 2, route /my-articles/new dang la trang "sap co" */}
+        {/* UC-03: mo man soan bai (ArticleEditor) */}
         <Link to="/my-articles/new" className="nut-chinh-fm">
           <Icon><path d="M12 5v14M5 12h14" /></Icon>
           <span>Soạn bài mới</span>
@@ -122,8 +137,8 @@ export default function MyArticles() {
                     <td>
                       <Link to={`/my-articles/${article.id}`} className="my-articles__article-title">{article.title}</Link>
                     </td>
-                    {/* TODO(admin): hien ten the loai khi server tra ve (can entity Genre) */}
-                    <td>Mã {article.categoryId}</td>
+                    {/* Ten the loai server lay qua GenreService; the loai da tat thi hien ma */}
+                    <td>{article.categoryName || `Mã ${article.categoryId}`}</td>
                     <td className="my-articles__nowrap">{natureLabel(article.declaredNature)}</td>
                     <td className="my-articles__nowrap">
                       {article.myRole === 'MAIN_AUTHOR' ? (

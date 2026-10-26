@@ -7,6 +7,9 @@ import lombok.Setter;
 /**
  * So bai cua nguoi dung o 1 trang thai (trang chu Phong vien).
  * Dang du lieu khop client/src/api/reporterHomeApi.js: { status, count }.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

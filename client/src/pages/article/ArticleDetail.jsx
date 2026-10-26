@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getArticleDetail, withdrawArticle } from '../../api/articleApi.js'
+import {
+  acceptCoAuthorship, getArticleDetail, rejectCoAuthorship, submitArticle, withdrawArticle,
+} from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { STATUS_COLORS, statusLabel, natureLabel, confirmLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
@@ -10,6 +12,24 @@ import '../../styles/ArticleDetail.css'
  * UC-02 - Chi tiet bai: noi dung, khai bao, tac gia + trang thai xac nhan,
  * lich su trang thai. Tac gia chinh rut duoc bai dang "Da nop" (UC-11, BR-IN-08):
  * server tra canWithdraw de biet co hien nut hay khong.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   34  ArticleDetail()                 UC-02 - Chi tiet bai: noi dung, khai bao, tac gia + trang thai xac nhan, lich su trang thai
+ *   47    useEffect                     Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
+ *   63    handleConfirmWithdraw()       Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ban moi
+ *   79    runAction()                   Goi 1 API thao tac (nop bai, dong y, tu choi) roi thay du lieu bai bang ban moi server tra ve
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  102  [< Bai cua toi]                 quay ve trang /my-articles (MyArticles)
+ *  123  [Sua bai] / [Sua va nop lai]    chi hien khi canEdit -> mo trang /my-articles/:id/edit (ArticleEditor, UC-03/UC-10)
+ *  129  [Nop bai]                       chi hien khi canSubmit -> POST /api/articles/{id}/submit (UC-05), cap nhat lai trang
+ *  134  [Rut bai]                       chi hien khi canWithdraw -> mo hop hoi lai ngay ben duoi (UC-11)
+ *  163  [Tu choi]                       chi hien khi canRespond -> mo o nhap ly do tu choi (UC-12 A1)
+ *  167  [Dong y]                        dong tac gia dong y -> POST /api/articles/{id}/co-author/accept (UC-12)
+ *  174  [Huy] (o ly do)                 dong o nhap ly do, khong gui gi
+ *  178  [Gui tu choi]                   POST /api/articles/{id}/co-author/reject kem ly do -> bai ve Nhap
+ *  194  [Huy] (hop rut bai)             dong hop hoi, khong rut
+ *  197  [Xac nhan rut bai]              POST /api/articles/{id}/withdraw -> bai ve Nhap (BR-IN-08)
  */
 export default function ArticleDetail() {
   const { id } = useParams()
@@ -18,7 +38,10 @@ export default function ArticleDetail() {
   const [error, setError] = useState('')
   const [confirmingWithdraw, setConfirmingWithdraw] = useState(false)   // dang hien hop xac nhan rut bai
   const [withdrawing, setWithdrawing] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')            // bao thanh cong sau khi rut
+  const [successMessage, setSuccessMessage] = useState('')            // bao thanh cong sau khi rut / nop / tra loi
+  const [busy, setBusy] = useState(false)                             // dang goi API nop bai / tra loi xac nhan
+  const [rejecting, setRejecting] = useState(false)                   // dang hien o nhap ly do tu choi
+  const [rejectReason, setRejectReason] = useState('')
 
   // Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
   useEffect(() => {
@@ -52,6 +75,28 @@ export default function ArticleDetail() {
       })
   }
 
+  /** Goi 1 API thao tac (nop bai, dong y, tu choi) roi thay du lieu bai bang ban moi server tra ve. */
+  function runAction(request, message) {
+    setBusy(true)
+    setError('')
+    setSuccessMessage('')
+    request
+      .then((data) => {
+        setArticle(data)
+        setSuccessMessage(message)
+        setRejecting(false)
+        setRejectReason('')
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setBusy(false))
+  }
+
+  // Nhan xet chung cua lan BTV tra bai gan nhat (UC-10 buoc 1)
+  const returnLogs = article ? article.statusLogs.filter((log) => log.toStatus === 'REVISION_REQUESTED') : []
+  const returnNote = article && article.status === 'REVISION_REQUESTED' && returnLogs.length > 0
+    ? returnLogs[returnLogs.length - 1].note
+    : ''
+
   return (
     <div className="article-detail">
       <Link to="/my-articles" className="article-detail__back">
@@ -72,14 +117,72 @@ export default function ArticleDetail() {
                 {statusLabel(article.status)}
               </span>
             </div>
-            {article.canWithdraw && !confirmingWithdraw && (
-              <button type="button" className="nut-nhe article-detail__withdraw-button" onClick={() => setConfirmingWithdraw(true)}>
-                Rút bài
-              </button>
-            )}
+            <div className="article-detail__actions">
+              {/* Server tinh san canEdit / canSubmit / canResubmit (BR-IN-01, UC-05, UC-10) */}
+              {article.canEdit && (
+                <Link to={`/my-articles/${article.id}/edit`} className="nut-nhe">
+                  {article.canResubmit ? 'Sửa và nộp lại' : 'Sửa bài'}
+                </Link>
+              )}
+              {article.canSubmit && (
+                <button type="button" className="nut-chinh-fm" disabled={busy}
+                  onClick={() => runAction(submitArticle(article.id), 'Đã nộp bài.')}>
+                  {busy ? 'Đang nộp…' : 'Nộp bài'}
+                </button>
+              )}
+              {article.canWithdraw && !confirmingWithdraw && (
+                <button type="button" className="nut-nhe article-detail__withdraw-button" onClick={() => setConfirmingWithdraw(true)}>
+                  Rút bài
+                </button>
+              )}
+            </div>
           </div>
 
           {successMessage && <p className="article-detail__success" role="status">{successMessage}</p>}
+
+          {returnNote && (
+            <div className="article-detail__return-note">
+              <strong>Nhận xét của biên tập viên:</strong> {returnNote}
+            </div>
+          )}
+
+          {/* UC-12: dong tac gia dong y / tu choi (bat buoc ly do) */}
+          {article.canRespond && (
+            <div className="article-detail__respond-box">
+              <p>Bạn được mời làm đồng tác giả bài này. Xem nội dung và tỷ lệ của bạn rồi trả lời trước hạn.</p>
+              {rejecting && (
+                <>
+                  <label className="nhan" htmlFor="reject-reason">Lý do từ chối *</label>
+                  <textarea id="reject-reason" className="o-nhap" rows={3} maxLength={500} value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)} />
+                </>
+              )}
+              <div className="article-detail__confirm-actions">
+                {!rejecting && (
+                  <>
+                    <button type="button" className="nut-nhe" disabled={busy} onClick={() => setRejecting(true)}>
+                      Từ chối
+                    </button>
+                    <button type="button" className="nut-chinh-fm" disabled={busy}
+                      onClick={() => runAction(acceptCoAuthorship(article.id), 'Bạn đã đồng ý làm đồng tác giả.')}>
+                      Đồng ý
+                    </button>
+                  </>
+                )}
+                {rejecting && (
+                  <>
+                    <button type="button" className="nut-nhe" disabled={busy} onClick={() => setRejecting(false)}>
+                      Huỷ
+                    </button>
+                    <button type="button" className="article-detail__confirm-button" disabled={busy || !rejectReason.trim()}
+                      onClick={() => runAction(rejectCoAuthorship(article.id, rejectReason), 'Bạn đã từ chối, bài trở về Nháp.')}>
+                      Gửi từ chối
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Hop hoi lai truoc khi rut (BR-IN-08) */}
           {confirmingWithdraw && (
@@ -110,9 +213,9 @@ export default function ArticleDetail() {
               <section className="article-detail__section">
                 <h2 className="article-detail__section-title">Khai báo</h2>
                 <dl className="article-detail__declaration">
-                  {/* TODO(admin): hien ten the loai, ten ban khi server tra ve */}
-                  <dt>Thể loại khai</dt><dd>Mã {article.declaredCategoryId}</dd>
-                  <dt>Thể loại áp dụng</dt><dd>Mã {article.categoryId}</dd>
+                  {/* Ten the loai server lay qua GenreService; the loai da tat thi hien ma */}
+                  <dt>Thể loại khai</dt><dd>{article.declaredCategoryName || `Mã ${article.declaredCategoryId}`}</dd>
+                  <dt>Thể loại áp dụng</dt><dd>{article.categoryName || `Mã ${article.categoryId}`}</dd>
                   <dt>Tính chất</dt><dd>{natureLabel(article.declaredNature)}</dd>
                   <dt>Sự kiện</dt><dd>{article.eventId ? `Mã ${article.eventId}` : 'Không'}</dd>
                   <dt>Ngày tạo</dt><dd>{formatDate(article.createdAt)}</dd>
@@ -127,8 +230,7 @@ export default function ArticleDetail() {
                   {article.authors.map((author) => (
                     <li key={author.userId} className="article-detail__author">
                       <div>
-                        {/* TODO(admin): hien ho ten khi co entity User */}
-                        <span className="article-detail__name">Người dùng #{author.userId}</span>
+                        <span className="article-detail__name">{author.fullName || `Người dùng #${author.userId}`}</span>
                         <span className="article-detail__muted">
                           {author.mainAuthor ? 'Tác giả chính' : 'Đồng tác giả'} · {Number(author.sharePercent)}%
                         </span>
@@ -152,7 +254,10 @@ export default function ArticleDetail() {
                         <span className={`cham cham--${STATUS_COLORS[log.toStatus]}`} aria-hidden="true" />
                         {statusLabel(log.toStatus)}
                       </span>
-                      <span className="article-detail__muted"> · {formatDate(log.createdAt)}</span>
+                      <span className="article-detail__muted">
+                        {/* actorId null = job he thong tu chay (vd qua han xac nhan) */}
+                        {' · '}{formatDate(log.createdAt)}{' · '}{log.actorId == null ? 'Hệ thống' : (log.actorName || `Người dùng #${log.actorId}`)}
+                      </span>
                       {log.note && <p className="article-detail__note">{log.note}</p>}
                     </li>
                   ))}

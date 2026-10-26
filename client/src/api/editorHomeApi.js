@@ -7,6 +7,9 @@
  * ham thanh goiApi('/api/...'), component goi ham KHONG phai sua.
  * Ten field theo DTO tieng Anh (camelCase), trang thai dung chu trong CHECK
  * cua database/schema.sql.
+ *
+ * MUC LUC (so dong)
+ *   25  layTrangChuBienTapVien       - Tat ca so lieu trang chu cua BTV dang dang nhap:
  */
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 

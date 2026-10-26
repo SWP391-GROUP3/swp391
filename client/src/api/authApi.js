@@ -7,6 +7,9 @@ import { goiApi } from './goiApi.js'
  * Doi du lieu server (ten field tieng Anh cua DTO LoginResponse) sang dang ma
  * cac man hinh dang dung: nguoiDung.hoTen, nguoiDung.vaiTro (mang ma vai tro)...
  * @returns {{ token: string, nguoiDung: object }}
+ *
+ * MUC LUC (so dong)
+ *   14  dangNhap                     - Dang nhap (UC-69): POST /api/auth/login.
  */
 export async function dangNhap(login, matKhau) {
   const data = await goiApi('/api/auth/login', {

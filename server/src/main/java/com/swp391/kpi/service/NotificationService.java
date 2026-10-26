@@ -7,11 +7,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
+/**
+ * MUC LUC (so dong)
+ *   19  field                        - repository / service duoc inject
+ *   23  notifyHeads()
+ *   40  notifyRole()                 - Bao cho moi nguoi dang ACTIVE cua 1 vai tro (roles.code, vd "ACCOUNTANT…
+ */
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationRepository repository;
     private final UserReadService userReadService;
+
+    @Transactional
+    public void notifyUser(Integer userId, Integer articleId, String message) {
+        var notification = new Notification();
+        notification.setUserId(userId);
+        notification.setArticleId(articleId);
+        notification.setMessage(message);
+        notification.setIsRead(false);
+        notification.setCreatedAt(LocalDateTime.now());
+        repository.save(notification);
+    }
 
     @Transactional
     public void notifyHeads(Integer articleId, Integer sectionId, String message) {

@@ -4,6 +4,10 @@ import AppLayout from './AppLayout.jsx'
  * Menu cua Thu ky toa soan (luong royalty BF-04).
  * Man "Chấm nhuận bút" (UC-47, UC-48) mo tu danh sach bai cho cham, khong nam tren menu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
+ *
+ * MUC LUC (so dong)
+ *   12  MENU_THU_KY                  - Menu cua Thu ky toa soan (luong royalty BF-04).
+ *   25  SecretaryLayout              - Khung trang cua Thu ky toa soan.
  */
 const MENU_THU_KY = [
   {

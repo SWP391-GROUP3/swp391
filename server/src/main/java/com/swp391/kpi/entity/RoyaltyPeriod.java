@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
  * Ky nhuan but theo thang (bang royalty_periods, BR-RY-07):
  * OPEN -> CLOSED (Thu ky chot) -> LOCKED (Ke toan khoa) -> PAID (da chi het).
  * Moi thang chi co 1 ky: UNIQUE(period_year, period_month).
+ *
+ * MUC LUC (so dong)
+ *   34  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_periods")

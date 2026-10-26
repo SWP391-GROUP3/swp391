@@ -7,6 +7,9 @@ import lombok.Setter;
 /**
  * Body cua POST /api/auth/login.
  * login = email HOAC username (ca 2 cot deu UNIQUE trong bang users).
+ *
+ * MUC LUC (so dong)
+ *   19  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

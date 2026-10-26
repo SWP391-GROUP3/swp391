@@ -9,6 +9,10 @@ import java.math.BigDecimal;
 /**
  * DTO trả về cho Frontend hiển thị thông tin chỉ tiêu (UC-59).
  * Map tay bằng static method from() theo quy ước AGENTS.md mục 3.4.
+ *
+ * MUC LUC (so dong)
+ *   21  field                        - cac truong tra ve cho giao dien
+ *   32  from()                       - Map thủ công từ Entity sang DTO (không dùng MapStruct/ModelMapper).
  */
 @Getter
 @Setter

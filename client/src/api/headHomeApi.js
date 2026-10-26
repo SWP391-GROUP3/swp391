@@ -6,6 +6,9 @@
  * Khi backend xong (BF-02, BF-03, BF-05) chi can doi ruot ham thanh
  * goiApi('/api/...'), component goi ham KHONG phai sua.
  * Moi so lieu chi tinh trong BAN cua Truong ban (users.section_id).
+ *
+ * MUC LUC (so dong)
+ *   25  layTrangChuTruongBan         - Tat ca so lieu trang chu cua Truong ban:
  */
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 

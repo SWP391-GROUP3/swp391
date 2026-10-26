@@ -11,6 +11,9 @@ import java.time.LocalDate;
 /**
  * Cau hinh luat khieu nai theo ngay hieu luc (bang appeal_rule_configs).
  * Quy tac: Duyen dong is_active = 1 co effective_from lon nhat ma <= ngay hien tai.
+ *
+ * MUC LUC (so dong)
+ *   27  field                        - cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "appeal_rule_configs")

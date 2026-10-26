@@ -8,6 +8,12 @@ import java.util.Map;
 /**
  * Khung chung cho moi response cua API (xem CODING_PLAN muc 1.5).
  * Thanh cong: { success, message, data }. Loi: { success, message, errors }.
+ *
+ * MUC LUC (so dong)
+ *   22  field                        - cac truong tra ve cho giao dien
+ *   27  ApiResponse()
+ *   34  success()
+ *   38  error()
  */
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)   // field null thi khong in ra JSON

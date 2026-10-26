@@ -1,6 +1,11 @@
 /**
  * Dinh dang tien VND de hien thi: 2350000 -> "2.350.000 ₫".
  * Moi man hinh deu goi ham nay, khong tu format kieu khac (AGENTS.md muc 4).
+ *
+ * MUC LUC (so dong)
+ *   13  DINH_DANG_VND                - Tao 1 lan dung lai mai, khong tao moi moi lan goi ham.
+ *   19  KHONG_CO_SO                  - Chu hien khi chua co so tien (chua tai xong, hoac du lieu trong).
+ *   26  formatMoney                  - trong JSON co the la so hoac chuoi, nen nhan ca 2.
  */
 
 // Tao 1 lan dung lai mai, khong tao moi moi lan goi ham.

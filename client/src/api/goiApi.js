@@ -11,6 +11,11 @@ import { layToken, xoaPhien } from '../auth/phienDangNhap.js'
  * Dung:  goiApi('/api/royalty-rates')
  *        goiApi('/api/royalty-rates', { method: 'POST', body: { baseSalary: 2340000 } })
  * @returns phan "data" cua ApiResponse
+ *
+ * MUC LUC (so dong)
+ *   20  goiApi                       - Ham goi API dung chung cho MOI file trong src/api/ (thay cho fetch truc…
+ *   52  docJson                      - Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} d…
+ *   61  chuLoi                       - Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh.
  */
 export async function goiApi(duongDan, tuyChon = {}) {
   const headers = {}
@@ -33,12 +38,16 @@ export async function goiApi(duongDan, tuyChon = {}) {
   if (res.status === 401 && token) {
     xoaPhien()
     window.location.href = '/login'
-    throw new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+    const loi = new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+    loi.status = res.status
+    throw loi
   }
 
   const json = await docJson(res)
   if (!res.ok || json.success === false) {
-    throw new Error(chuLoi(json))
+    const loi = new Error(chuLoi(json))
+    loi.status = res.status
+    throw loi
   }
   return json.data
 }

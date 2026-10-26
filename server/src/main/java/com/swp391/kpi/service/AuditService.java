@@ -11,6 +11,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong)
+ *   25  field                        - repository / service duoc inject
+ *   28  log()
+ *   48  getLogs()
+ *   71  emptyToNull()
+ */
 @Service
 @RequiredArgsConstructor
 public class AuditService {

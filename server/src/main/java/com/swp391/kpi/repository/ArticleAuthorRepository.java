@@ -5,8 +5,17 @@ import com.swp391.kpi.entity.ArticleAuthorConfirmStatus;
 import com.swp391.kpi.entity.ArticleAuthorId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  findByArticleIdOrderBySharePercentDesc()  Moi tac gia cua 1 bai, ty le cao xep truoc
+ *   25  existsByArticleIdAndUserId()    Nguoi dung co phai la 1 tac gia cua bai khong (BR-IN-01: dong tac gia duoc xem)
+ *   28  findByUserIdAndArticleIdIn()    Dong cua nguoi dung trong nhieu bai cung luc (lay vai tro, ty le cho trang danh sach)
+ *   31  findByUserIdAndConfirmStatusOrderByConfirmDeadlineAsc()  Loi moi dong tac gia cua nguoi dung theo trang thai (vd PENDING), sap het han xep truoc
+ *   35  findByConfirmStatusAndConfirmDeadlineBefore()  Dong dang cho xac nhan ma da qua han (job het han 3 ngay, UC-12 A2)
+ */
 public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, ArticleAuthorId> {
 
     // Moi tac gia cua 1 bai, ty le cao xep truoc
@@ -21,4 +30,8 @@ public interface ArticleAuthorRepository extends JpaRepository<ArticleAuthor, Ar
     // Loi moi dong tac gia cua nguoi dung theo trang thai (vd PENDING), sap het han xep truoc
     List<ArticleAuthor> findByUserIdAndConfirmStatusOrderByConfirmDeadlineAsc(Integer userId,
                                                                               ArticleAuthorConfirmStatus confirmStatus);
+
+    // Dong dang cho xac nhan ma da qua han (job het han 3 ngay, UC-12 A2)
+    List<ArticleAuthor> findByConfirmStatusAndConfirmDeadlineBefore(ArticleAuthorConfirmStatus confirmStatus,
+                                                                    LocalDateTime time);
 }

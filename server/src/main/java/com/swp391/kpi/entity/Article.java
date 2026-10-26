@@ -19,6 +19,9 @@ import java.time.LocalDateTime;
  * Bai viet (bang articles). title/content la ban dang soan, sua thoai mai;
  * moi lan nop thi chup lai vao article_versions.
  * Rut bai: SUBMITTED -> DRAFT, ghi withdrawn_at (BR-IN-08).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   35  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "articles")
