@@ -17,6 +17,9 @@ public class AppealResolution {
     private Integer id;
     private Integer appealId;
     private Integer effectiveAttemptId;
+    @Enumerated(EnumType.STRING)
+    private AppealResolutionRule ruleApplied;
+    private Integer finalizedBy;
     @Column(precision = 5, scale = 2)
     private BigDecimal effectiveScore;
     private LocalDateTime finalizedAt;

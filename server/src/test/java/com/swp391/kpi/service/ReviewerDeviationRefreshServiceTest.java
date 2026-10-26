@@ -18,12 +18,14 @@ class ReviewerDeviationRefreshServiceTest {
     private final AppealResolutionRepository resolutions = mock(AppealResolutionRepository.class);
     private final CrossReviewTaskRepository cross = mock(CrossReviewTaskRepository.class);
     private final ReviewerDeviationRepository indices = mock(ReviewerDeviationRepository.class);
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc = mock(org.springframework.jdbc.core.JdbcTemplate.class);
     private final ReviewerDeviationRefreshService service = new ReviewerDeviationRefreshService(
-            users, scores, appeals, resolutions, cross, indices);
+            users, scores, appeals, resolutions, cross, indices, jdbc);
     private final LocalDate month = LocalDate.of(2026, 10, 1);
     private final LocalDateTime submitted = month.atStartOfDay();
 
     @BeforeEach void setUp() {
+        when(jdbc.queryForObject(anyString(), eq(Integer.class))).thenReturn(0);
         when(users.requireActive(8, "ADMIN", "HEAD_OF_DEPARTMENT"))
                 .thenReturn(new UserAccessResponse(8, "Admin", "ADMIN", null, null, "ACTIVE"));
     }

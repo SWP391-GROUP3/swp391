@@ -16,11 +16,13 @@ import '../../styles/QualityReportPage.css'
 export default function AuditLogPage() {
   const [thamSo] = useSearchParams()
   const khieuNaiTuUrl = thamSo.get('appealId') || ''
+  const loaiTuUrl = thamSo.get('entityType') || ''
+  const maTuUrl = thamSo.get('entityId') || ''
   // Doi pham vi URL thi reset ca form, du lieu va loi; huy lan tai cu khi unmount.
-  return <AuditLogContent key={thamSo.toString()} khieuNaiTuUrl={khieuNaiTuUrl} />
+  return <AuditLogContent key={thamSo.toString()} khieuNaiTuUrl={khieuNaiTuUrl} loaiTuUrl={loaiTuUrl} maTuUrl={maTuUrl} />
 }
 
-function AuditLogContent({ khieuNaiTuUrl }) {
+function AuditLogContent({ khieuNaiTuUrl, loaiTuUrl, maTuUrl }) {
   const [danhSach, setDanhSach] = useState(null)
   const [boLoc, setBoLoc] = useState({
     actorId: '',
@@ -28,8 +30,8 @@ function AuditLogContent({ khieuNaiTuUrl }) {
     appealId: khieuNaiTuUrl,
     editorId: '',
     actionType: '',
-    entityType: '',
-    entityId: '',
+    entityType: loaiTuUrl,
+    entityId: maTuUrl,
     fromTime: '',
     toTime: '',
   })
@@ -37,11 +39,11 @@ function AuditLogContent({ khieuNaiTuUrl }) {
 
   useEffect(() => {
     let conHienThi = true
-    layNhatKy({ appealId: khieuNaiTuUrl })
+    layNhatKy({ appealId: khieuNaiTuUrl, entityType: loaiTuUrl, entityId: maTuUrl })
       .then((data) => { if (conHienThi) setDanhSach(data) })
       .catch((error) => { if (conHienThi) setLoi(error.message) })
     return () => { conHienThi = false }
-  }, [khieuNaiTuUrl])
+  }, [khieuNaiTuUrl, loaiTuUrl, maTuUrl])
 
   async function locNhatKy(event) {
     event.preventDefault()

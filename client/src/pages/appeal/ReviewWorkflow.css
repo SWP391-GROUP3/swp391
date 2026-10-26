@@ -1,0 +1,24 @@
+.luong-qc { color: var(--fm-chu); }
+.luong-qc a { color: var(--fm-chu); }
+.luong-qc button {
+  border: 1px solid var(--fm-vien); border-radius: 6px; padding: 8px 12px;
+  color: var(--fm-chu); background: var(--fm-the); font: inherit; cursor: pointer;
+}
+.luong-qc button:disabled { opacity: .5; cursor: not-allowed; }
+.luong-qc input, .luong-qc select, .luong-qc textarea {
+  padding: 8px; border: 1px solid var(--fm-vien); border-radius: 6px;
+  background: var(--fm-the); color: var(--fm-chu); font: inherit; max-width: 100%;
+}
+.luong-qc__hai-cot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 1fr); gap: 20px; align-items: start; }
+.luong-qc__the { padding: 18px; border: 1px solid var(--fm-vien); background: var(--fm-the); border-radius: 8px; }
+.luong-qc__noi-dung { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; font-family: inherit; }
+.luong-qc__form { display: flex; flex-direction: column; gap: 16px; }
+.luong-qc__form label { display: flex; flex-direction: column; gap: 6px; }
+.luong-qc__tieu-chi { border: 1px solid var(--fm-vien); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.luong-qc__thao-tac { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.luong-qc__bang { width: 100%; border-collapse: collapse; text-align: left; }
+.luong-qc__bang th, .luong-qc__bang td { border-bottom: 1px solid var(--fm-vien); padding: 12px; vertical-align: top; }
+.luong-qc__bang p { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 140px; }
+.luong-qc__chon { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+.luong-qc__chon select { min-width: 220px; }
+@media (max-width: 1000px) { .luong-qc__hai-cot { grid-template-columns: 1fr; } }

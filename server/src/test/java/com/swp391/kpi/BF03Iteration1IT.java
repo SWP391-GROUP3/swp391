@@ -103,7 +103,13 @@ class BF03Iteration1IT {
     }
 
     @Test void reportRecalculatesActualResolvedAppealAndCrossReview() throws Exception {
-        Fixture fixture = fixture(1, 1);
+        String name = "bf03_report_" + UUID.randomUUID().toString().substring(0, 10);
+        Integer reviewer = jdbc.queryForObject("""
+                INSERT INTO users(username,email,password_hash,full_name,role_id,section_id)
+                OUTPUT INSERTED.id SELECT ?,?,'test-only',N'BTV báo cáo kiểm thử',id,1
+                FROM roles WHERE code='EDITOR'
+                """, Integer.class, name, name + "@test.invalid");
+        Fixture fixture = fixture(1, 1, reviewer);
         mvc.perform(post("/api/appeals").header("Authorization", bearer(1)).contentType("application/json")
                 .content(payload(fixture.articleId, fixture.criterionId))).andExpect(status().isCreated());
         Integer appealId = jdbc.queryForObject("SELECT id FROM appeals WHERE article_id = ?", Integer.class, fixture.articleId);
@@ -124,19 +130,20 @@ class BF03Iteration1IT {
                 """, batchId, fixture.articleId, fixture.attemptId, now);
         entityManager.clear();
         String response = mvc.perform(get("/api/reports/reviewer-deviations")
-                .header("Authorization", bearer(5)).param("period", now.toLocalDate().withDayOfMonth(1).toString()))
+                .header("Authorization", bearer(5)).param("period", now.toLocalDate().withDayOfMonth(1).toString())
+                .param("editorId", reviewer.toString()))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         var data = json.readTree(response).path("data");
         assertEquals(1, data.size());
-        assertEquals(3, data.get(0).path("editorId").asInt());
+        assertEquals(reviewer.intValue(), data.get(0).path("editorId").asInt());
         assertEquals(6.25, data.get(0).path("avgDeviation").asDouble());
         assertEquals(100.0, data.get(0).path("overturnRate").asDouble());
         assertEquals(1, data.get(0).path("appealCount").asInt());
         // Chay lai de chung minh update cung chi so, khong tao trung.
         mvc.perform(get("/api/reports/reviewer-deviations").header("Authorization", bearer(5))
                 .param("period", now.toLocalDate().withDayOfMonth(1).toString())).andExpect(status().isOk());
-        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM reviewer_deviation_indices WHERE editor_id=3 AND period=?",
-                Integer.class, now.toLocalDate().withDayOfMonth(1)));
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM reviewer_deviation_indices WHERE editor_id=? AND period=?",
+                Integer.class, reviewer, now.toLocalDate().withDayOfMonth(1)));
     }
 
     @Test void configurationCreationIsVersionedAuditedAndValidatesInput() throws Exception {
@@ -204,6 +211,10 @@ class BF03Iteration1IT {
     }
 
     private Fixture fixture(int authorId, int sectionId) {
+        return fixture(authorId, sectionId, 3);
+    }
+
+    private Fixture fixture(int authorId, int sectionId, int reviewerId) {
         Integer articleId = jdbc.queryForObject("""
                 INSERT INTO articles(author_id, section_id, declared_category_id, category_id, title, status)
                 OUTPUT INSERTED.id VALUES (?, ?, 3, 3, N'BF3 transaction test', 'SCORE_PUBLISHED')
@@ -214,14 +225,14 @@ class BF03Iteration1IT {
                 """, Integer.class, articleId, authorId);
         Integer assignmentId = jdbc.queryForObject("""
                 INSERT INTO assignments(article_id, editor_id, assigned_by)
-                OUTPUT INSERTED.id VALUES (?, 3, 5)
-                """, Integer.class, articleId);
+                OUTPUT INSERTED.id VALUES (?, ?, 5)
+                """, Integer.class, articleId, reviewerId);
         Integer setId = jdbc.queryForObject("SELECT criteria_set_version_id FROM scoring_attempts WHERE id=1", Integer.class);
         Integer attemptId = jdbc.queryForObject("""
                 INSERT INTO scoring_attempts(article_id, version_id, assignment_id, reviewer_id, attempt_no,
                     attempt_type, criteria_set_version_id, category_id, total_score, decision, submitted_at)
-                OUTPUT INSERTED.id VALUES (?, ?, ?, 3, 1, 'INITIAL', ?, 3, 70, 'ACCEPT', ?)
-                """, Integer.class, articleId, versionId, assignmentId, setId, LocalDateTime.now());
+                OUTPUT INSERTED.id VALUES (?, ?, ?, ?, 1, 'INITIAL', ?, 3, 70, 'ACCEPT', ?)
+                """, Integer.class, articleId, versionId, assignmentId, reviewerId, setId, LocalDateTime.now());
         jdbc.update("""
                 INSERT INTO scoring_attempt_details(scoring_attempt_id, criterion_id, score, comment)
                 SELECT ?, id, 70, N'Nhan xet test' FROM criteria WHERE criteria_set_version_id=?
