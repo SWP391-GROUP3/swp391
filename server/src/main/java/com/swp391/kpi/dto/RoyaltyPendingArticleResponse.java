@@ -24,7 +24,7 @@ public class RoyaltyPendingArticleResponse {
     private String sectionName;
     private Integer categoryId;       // de frontend loc theo the loai
     private String categoryName;
-    private String declaredNature;    // tinh chat PV khai, dung luon de tinh nhuan but (BR-IN-03)
+    private String declaredNature;    // tinh chat PV khai, Thu ky xac nhan lai khi cham (UC-47)
     private LocalDateTime publishedAt;
     private LocalDate paymentDeadline;  // han chi = ngay dang + PAYMENT_DEADLINE_DAYS
     private Long daysLeft;              // so ngay con lai toi han chi, am = da qua han

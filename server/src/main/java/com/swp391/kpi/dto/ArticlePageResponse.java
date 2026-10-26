@@ -9,8 +9,8 @@ import java.util.List;
  * 1 trang ket qua cua danh sach "Bai cua toi" (UC-01).
  * Tra ve DTO rieng thay vi Page cua Spring cho JSON gon va de doc.
  *
- * MUC LUC (so dong - ten - tac dung)
- *   19  field                           cac truong tra ve cho giao dien
+ * MUC LUC (so dong)
+ *   19  field                        - cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

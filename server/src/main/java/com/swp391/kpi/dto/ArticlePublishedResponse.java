@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 /**
  * 1 bai da dang, cho BF-04 lam danh sach bai cho cham nhuan but (UC-46).
  *
- * MUC LUC (so dong - ten - tac dung)
- *   20  field                           cac truong tra ve cho giao dien
- *   34  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong)
+ *   20  cac truong: id, title, tac gia, ban, the loai, tinh chat, ngay dang
+ *   34  from(row, authorName) - doi 1 dong SQL + ten tac gia sang DTO
  */
 @Getter
 @Setter

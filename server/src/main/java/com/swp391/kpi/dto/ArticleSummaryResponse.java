@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 /**
  * 1 dong trong danh sach "Bai cua toi" (UC-01).
  *
- * MUC LUC (so dong - ten - tac dung)
- *   24  hang so                         ten tham so, ten hanh dong, gioi han... (khong viet so ma trong code)
- *   27  field                           cac truong tra ve cho giao dien
- *   41  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong)
+ *   24  hang so                      - Vai tro cua nguoi dang xem trong bai
+ *   27  field                        - cac truong tra ve cho giao dien
+ *   40  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter
@@ -26,8 +26,7 @@ public class ArticleSummaryResponse {
 
     private Integer id;
     private String title;
-    private Integer categoryId;
-    private String categoryName;       // ten the loai, service gan sau khi goi from() (GenreService)
+    private Integer categoryId;        // TODO(admin): tra them ten the loai khi co Genre
     private String declaredNature;
     private String status;
     private String myRole;             // MAIN_AUTHOR hoac CO_AUTHOR
