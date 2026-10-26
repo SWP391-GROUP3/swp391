@@ -56,6 +56,12 @@ class ScoringAttemptServiceTest {
     @Mock
     private ArticleService articleService;
 
+    @Mock
+    private ScoreApprovalRepository scoreApprovalRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private ScoringAttemptService scoringAttemptService;
 
@@ -480,5 +486,59 @@ class ScoringAttemptServiceTest {
         );
 
         assertTrue(ex.getMessage().contains("Từ chối bài viết (REJECT) bắt buộc phải nhập lý do"));
+    }
+
+    @Test
+    @DisplayName("Lấy phiếu chấm gần nhất thành công kèm thông tin BTV và thời hạn khiếu nại 7 ngày (UC-34, BR-SC-10)")
+    void testGetLatestAttemptByArticle_Success_WithAnnouncedScore() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+
+        ScoringAttempt attempt = new ScoringAttempt();
+        attempt.setId(510);
+        attempt.setArticleId(10);
+        attempt.setReviewerId(3);
+        attempt.setTotalScore(new BigDecimal("88.00"));
+        attempt.setDecision(ScoringDecision.ACCEPT);
+        attempt.setSubmittedAt(LocalDateTime.now().minusDays(1));
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+
+        ScoringAttemptDetail detail = new ScoringAttemptDetail();
+        detail.setId(1);
+        detail.setScore(new BigDecimal("90.00"));
+        detail.setComment("Bài viết sắc sảo");
+        detail.setCriterion(criterion1);
+        when(scoringAttemptDetailRepository.findByScoringAttemptId(510)).thenReturn(List.of(detail));
+
+        User reviewer = new User();
+        reviewer.setId(3);
+        reviewer.setFullName("Lê Hoàng Cường");
+        when(userRepository.findById(3)).thenReturn(Optional.of(reviewer));
+
+        ScoreApproval approval = new ScoreApproval();
+        approval.setAnnouncedAt(LocalDateTime.now().minusDays(2));
+        when(scoreApprovalRepository.findByScoringAttemptId(510)).thenReturn(Optional.of(approval));
+
+        com.swp391.kpi.dto.ScoringAttemptResponse res = scoringAttemptService.getLatestAttemptByArticle(10);
+
+        assertNotNull(res);
+        assertEquals(510, res.getId());
+        assertEquals("Lê Hoàng Cường", res.getReviewerName());
+        assertEquals(new BigDecimal("88.00"), res.getTotalScore());
+        assertNotNull(res.getAnnouncedAt());
+        assertTrue(res.getIsAppealWindowOpen());
+        assertEquals(4, res.getDaysRemaining());
+        assertEquals(1, res.getDetails().size());
+        assertEquals("Tính thời sự", res.getDetails().get(0).getCriterionName());
+    }
+
+    @Test
+    @DisplayName("Ném NotFoundException khi bài viết chưa có phiếu chấm nào (UC-34)")
+    void testGetLatestAttemptByArticle_NotFound_ThrowsException() {
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () ->
+                scoringAttemptService.getLatestAttemptByArticle(10)
+        );
     }
 }

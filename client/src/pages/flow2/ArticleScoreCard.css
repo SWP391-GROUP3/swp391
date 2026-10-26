@@ -1,0 +1,195 @@
+/* ===========================================================================
+   ArticleScoreCard.css - Bảng điểm đánh giá chất lượng bài viết (UC-34)
+   Dành cho Phóng viên (tác giả / đồng tác giả) xem điểm theo tiêu chí & nhận xét BTV.
+   Tất cả màu sắc sử dụng biến --fm-* từ index.css
+   =========================================================================== */
+
+.bang-diem-pv {
+  margin-top: 24px;
+}
+
+.bang-diem-pv__the {
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.bang-diem-pv__dau {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--fm-vien);
+}
+
+.bang-diem-pv__tieu-de {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fm-chu);
+}
+
+.bang-diem-pv__mo-ta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.bang-diem-pv__khoi-diem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bang-diem-pv__diem-so {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0284c7;
+  line-height: 1;
+}
+
+.bang-diem-pv__thang-diem {
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+/* Banner cửa sổ khiếu nại (BR-SC-10 / BR-QC-01) */
+.bang-diem-pv__banner-khieu-nai {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.bang-diem-pv__banner-khieu-nai--mo {
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  color: #5b21b6;
+}
+
+.bang-diem-pv__banner-khieu-nai--het-han {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+.bang-diem-pv__thong-tin-khieu-nai {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.bang-diem-pv__nut-khieu-nai {
+  padding: 7px 14px;
+  background: #7c3aed;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.bang-diem-pv__nut-khieu-nai:hover {
+  opacity: 0.9;
+}
+
+/* Bảng điểm chi tiết */
+.bang-diem-pv__bang-bao {
+  overflow-x: auto;
+  margin-bottom: 18px;
+}
+
+.bang-diem-pv__bang {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.bang-diem-pv__bang th {
+  padding: 10px 12px;
+  background: var(--fm-nen);
+  color: var(--fm-chu-nhat);
+  font-weight: 500;
+  border-bottom: 1px solid var(--fm-vien);
+  white-space: nowrap;
+}
+
+.bang-diem-pv__bang td {
+  padding: 12px;
+  border-bottom: 1px solid var(--fm-vien);
+  vertical-align: middle;
+  color: var(--fm-chu);
+}
+
+.bang-diem-pv__ten-tieu-chi {
+  font-weight: 500;
+  color: var(--fm-chu);
+}
+
+.bang-diem-pv__nhan-xet-tieu-chi {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+  line-height: 1.4;
+}
+
+.bang-diem-pv__canh-bao-diem-thap {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #fef2f2;
+  color: #dc2626;
+  margin-right: 6px;
+}
+
+.bang-diem-pv__dong-tong-ket {
+  background: var(--fm-nen);
+  font-weight: 600;
+}
+
+.bang-diem-pv__dong-tong-ket td {
+  border-top: 2px solid var(--fm-vien);
+  padding: 12px;
+}
+
+/* Ghi chú chung của BTV */
+.bang-diem-pv__ghi-chu-btv {
+  background: var(--fm-nen);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  padding: 14px;
+  font-size: 13px;
+  color: var(--fm-chu);
+  line-height: 1.5;
+}
+
+.bang-diem-pv__ghi-chu-btv strong {
+  color: var(--fm-chu);
+}
+
+.bang-diem-pv__tai {
+  padding: 20px;
+  text-align: center;
+  color: var(--fm-chu-nhat);
+  font-size: 13px;
+}

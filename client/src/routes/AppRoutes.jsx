@@ -47,6 +47,7 @@ import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
 import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
 import ScoringSheet from '../pages/flow2/ScoringSheet.jsx'
 import ScoreApprovalQueue from '../pages/flow2/ScoreApprovalQueue.jsx'
+import PublishingQueue from '../pages/flow2/PublishingQueue.jsx'
 import Flow2Dashboard from '../pages/flow2/Flow2Dashboard.jsx'
 import ScoreCalculatorTester from '../pages/flow2/ScoreCalculatorTester.jsx'
 import UserProfile from '../pages/profile/UserProfile.jsx'
@@ -74,19 +75,12 @@ const TRANG_BTV_CHUA_LAM = [
 const TRANG_TK_CHUA_LAM = []
 
 const TRANG_TB_CHUA_LAM = [
-  { path: '/score-approvals',       ten: 'Duyệt điểm' },              // UC-29
-  { path: '/score-approvals/:id',   ten: 'Chi tiết kết quả chấm' },   // UC-30, 31, 32
-  { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
   { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
   { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
   { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
-  { path: '/publishing', ten: 'Duyệt đăng' },              // UC-33
-  { path: '/cross-reviews', ten: 'Đợt chấm chéo' },           // UC-40
-  { path: '/reviewers/:id', ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs', ten: 'Nhật ký chấm' },            // UC-45
-  { path: '/kpi-board', ten: 'Bảng KPI của ban' },        // UC-61, 66
+  { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
-  { path: '/kpi-reports', ten: 'Báo cáo' },                 // UC-64, 65, 68
+  { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
 
 const TRANG_KT_CHUA_LAM = [
@@ -199,11 +193,12 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           )}
           {vaiTro === 'HEAD_OF_DEPARTMENT' && (
             <>
-              {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm & UC-29..32 Duyệt điểm */}
+              {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm, UC-29..32 Duyệt điểm & UC-33 Duyệt đăng */}
               <Route path="/assignments" element={<AssignmentQueue nguoiDung={nguoiDung} />} />
 
               <Route path="/score-approvals" element={<ScoreApprovalQueue nguoiDung={nguoiDung} />} />
               <Route path="/score-approvals/:id" element={<ScoreApprovalQueue nguoiDung={nguoiDung} />} />
+              <Route path="/publishing" element={<PublishingQueue nguoiDung={nguoiDung} />} />
 
               <Route path="/appeals" element={<AppealManagementPage />} />
               <Route path="/appeals/:id" element={<AppealDetailPage />} />

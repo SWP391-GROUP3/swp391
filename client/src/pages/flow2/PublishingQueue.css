@@ -1,0 +1,416 @@
+/* ===========================================================================
+   PublishingQueue.css - Giao diện Hàng chờ duyệt xuất bản của Trưởng ban (UC-33)
+   Tất cả màu sắc sử dụng biến --fm-* từ index.css
+   Bám sát mockup-06 và mockup-07 trong docs/srs-images/
+   =========================================================================== */
+
+.duyet-dang {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.duyet-dang__the {
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.duyet-dang__dau {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.duyet-dang__tieu-de {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--fm-chu);
+}
+
+.duyet-dang__mo-ta {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.duyet-dang__nut-lam-moi {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  color: var(--fm-chu);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.duyet-dang__nut-lam-moi:hover {
+  background: var(--fm-nen);
+}
+
+/* Thống kê trên cùng */
+.duyet-dang__thong-ke {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.duyet-dang__thong-ke-the {
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duyet-dang__thong-ke-nhan {
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.duyet-dang__thong-ke-so {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--fm-chu);
+}
+
+.duyet-dang__thong-ke-ghi-chu {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+/* Thanh bộ lọc */
+.duyet-dang__bo-loc {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.duyet-dang__o-tim-kiem {
+  flex: 1;
+  min-width: 250px;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  color: var(--fm-chu);
+}
+
+.duyet-dang__o-tim-kiem:focus {
+  outline: none;
+  border-color: var(--fm-chinh);
+}
+
+/* Bảng */
+.duyet-dang__bang-bao {
+  overflow-x: auto;
+}
+
+.duyet-dang__bang {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.duyet-dang__bang th {
+  padding: 12px 14px;
+  background: var(--fm-nen);
+  color: var(--fm-chu-nhat);
+  font-weight: 500;
+  border-bottom: 1px solid var(--fm-vien);
+  white-space: nowrap;
+}
+
+.duyet-dang__bang td {
+  padding: 14px;
+  border-bottom: 1px solid var(--fm-vien);
+  vertical-align: middle;
+  color: var(--fm-chu);
+}
+
+.duyet-dang__bang tr:hover {
+  background: var(--fm-the);
+}
+
+.duyet-dang__tieu-de-bai {
+  font-weight: 600;
+  color: var(--fm-chu);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.duyet-dang__tac-gia-sub {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+/* Huy hiệu (Badge) */
+.duyet-dang__huy-hieu {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.duyet-dang__huy-hieu--diem {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.duyet-dang__huy-hieu--cho-dang {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.duyet-dang__huy-hieu--khieu-nai-mo {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.duyet-dang__huy-hieu--het-han {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Nút thao tác */
+.duyet-dang__nut-kiem-duyet {
+  padding: 6px 12px;
+  background: var(--fm-chinh);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.duyet-dang__nut-kiem-duyet:hover {
+  opacity: 0.9;
+}
+
+/* Modal theo mockup-07 */
+.duyet-dang__modal-nen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.duyet-dang__modal-hop {
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 10px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.duyet-dang__modal-dau {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--fm-vien);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.duyet-dang__modal-dau h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fm-chu);
+}
+
+.duyet-dang__nut-dong {
+  background: transparent;
+  border: none;
+  color: var(--fm-chu-nhat);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.duyet-dang__nut-dong:hover {
+  color: var(--fm-chu);
+}
+
+.duyet-dang__modal-than {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.duyet-dang__muc-chon {
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  padding: 12px 16px;
+  background: var(--fm-nen);
+}
+
+.duyet-dang__muc-chon-tieu-de {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--fm-chu-nhat);
+  margin-bottom: 8px;
+}
+
+.duyet-dang__radio-nhan {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fm-chu);
+  cursor: pointer;
+}
+
+.duyet-dang__thong-tin-meta {
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--fm-vien);
+  padding-bottom: 10px;
+}
+
+.duyet-dang__bai-tieu-de {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--fm-chu);
+}
+
+.duyet-dang__bai-noi-dung {
+  background: var(--fm-nen);
+  padding: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--fm-vien);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fm-chu);
+  max-height: 250px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.duyet-dang__canh-bao {
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  color: #854d0e;
+  line-height: 1.5;
+}
+
+.duyet-dang__thong-bao-ban-giao {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 13px;
+  color: #166534;
+  line-height: 1.5;
+}
+
+.duyet-dang__modal-duoi {
+  padding: 14px 20px;
+  border-top: 1px solid var(--fm-vien);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--fm-the);
+}
+
+.duyet-dang__nut-phu {
+  padding: 8px 16px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  color: var(--fm-chu);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.duyet-dang__nut-phu:hover {
+  background: var(--fm-nen);
+}
+
+.duyet-dang__nut-xac-nhan-dang {
+  padding: 8px 18px;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.duyet-dang__nut-xac-nhan-dang:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.duyet-dang__nut-xac-nhan-dang:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Thông báo & Trống */
+.duyet-dang__thong-bao {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.duyet-dang__thong-bao--thanh-cong {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.duyet-dang__thong-bao--loi {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.duyet-dang__trong {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--fm-chu-nhat);
+}

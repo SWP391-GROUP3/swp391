@@ -4,6 +4,7 @@ import { getArticleDetail, withdrawArticle } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { STATUS_COLORS, statusLabel, natureLabel, confirmLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
+import ArticleScoreCard from '../flow2/ArticleScoreCard.jsx'
 import '../../styles/ArticleDetail.css'
 
 /**
@@ -101,6 +102,11 @@ export default function ArticleDetail() {
                 </button>
               </div>
             </div>
+          )}
+
+          {/* UC-34: Bang diem danh gia chat luong theo tieu chi khi da cong bo diem hoac xuat ban */}
+          {(article.status === 'SCORE_PUBLISHED' || article.status === 'PUBLISHED') && (
+            <ArticleScoreCard articleId={article.id} />
           )}
 
           <div className="article-detail__grid">

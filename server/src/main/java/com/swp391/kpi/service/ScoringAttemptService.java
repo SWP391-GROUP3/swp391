@@ -33,6 +33,8 @@ public class ScoringAttemptService {
     private final CategoryChangeLogRepository categoryChangeLogRepository;
     private final GenreRepository genreRepository;
     private final ArticleService articleService;
+    private final ScoreApprovalRepository scoreApprovalRepository;
+    private final UserRepository userRepository;
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
     @Transactional
@@ -136,7 +138,30 @@ public class ScoringAttemptService {
                 .map(ScoringAttemptDetailResponse::from)
                 .toList();
 
-        return ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
+        ScoringAttemptResponse res = ScoringAttemptResponse.from(attempt, detailResponses, article.getTitle(), article.getContent());
+
+        // Bo sung thong tin BTV cham
+        if (attempt.getReviewerId() != null) {
+            userRepository.findById(attempt.getReviewerId())
+                    .ifPresent(u -> res.setReviewerName(u.getFullName()));
+        }
+
+        // Bo sung thong tin cong bo diem va thoi han khieu nai 7 ngay (BR-SC-10, UC-34)
+        scoreApprovalRepository.findByScoringAttemptId(attempt.getId()).ifPresent(approval -> {
+            if (approval.getAnnouncedAt() != null) {
+                LocalDateTime announcedAt = approval.getAnnouncedAt();
+                LocalDateTime deadline = announcedAt.plusDays(7);
+                boolean open = LocalDateTime.now().isBefore(deadline);
+                long days = open ? java.time.temporal.ChronoUnit.DAYS.between(LocalDateTime.now(), deadline) : 0;
+
+                res.setAnnouncedAt(announcedAt);
+                res.setAppealDeadline(deadline);
+                res.setIsAppealWindowOpen(open);
+                res.setDaysRemaining((int) Math.max(0, days));
+            }
+        });
+
+        return res;
     }
 
     // BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
