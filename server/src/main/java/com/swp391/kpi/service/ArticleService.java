@@ -8,7 +8,6 @@ import com.swp391.kpi.dto.ArticleRevisionRequestResponse;
 import com.swp391.kpi.dto.ArticleStatusCountResponse;
 import com.swp391.kpi.dto.ArticleStatusLogResponse;
 import com.swp391.kpi.dto.ArticleSummaryResponse;
-import com.swp391.kpi.dto.GenreResponse;
 import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleAuthor;
@@ -38,25 +37,20 @@ import java.util.Map;
  * Nghiep vu bai viet BF-01. Moi lan doi articles.status deu di qua changeStatus()
  * de ghi kem 1 dong article_status_logs (AGENTS.md muc 2).
  *
- * MUC LUC (so dong - ten - tac dung)
- *   66  hang so                         ten tham so, ten hanh dong, gioi han... (khong viet so ma trong code)
- *   73  field                           repository / service duoc inject
- *  ---- Ham public (controller / luong khac goi) ----
- *   86  getMyArticles()                 UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau
- *  133  getArticleDetail()              UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai
- *  148  withdrawArticle()               UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAFT (BR-IN-08)
- *  172  publishArticle()                Cho BF-02 (UC-33 duyet dang): bai SCORE_PUBLISHED -> PUBLISHED
- *  187  getMyStatusCounts()             Trang chu Phong vien: so bai cua nguoi dung o tung trang thai
- *  208  getMyRevisionRequests()         Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can sua, kem ghi chu cua lan tra ve gan nh…
- *  228  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi (UC-12), sap het han xep truoc
- *  268  updateArticleStatus()           Ham dung chung cho cac luong khac (BF-02, BF-03, BF-04) doi trang thai bai viet va tu dong ghi 1 dong lich su…
- *  ---- Ham phu (private, chi dung trong file) ----
- *  250  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  256  isAuthor()                      Tac gia chinh (articles.author_id) hoac co dong trong article_authors
- *  273  changeStatus()                  doi articles.status va ghi 1 dong article_status_logs trong cung transaction (AGENTS muc 2)
- *  292  toDetailResponse()              Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
- *  337  loadGenreNames()                Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
- *  346  loadUserNames()                 Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien
+ * MUC LUC (so dong)
+ *   60  hang so                      - So dong toi da 1 trang, tranh client xin qua nhieu 1 lan
+ *   65  field                        - repository / service duoc inject
+ *   76  getMyArticles()              - UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nh…
+ *  120  getArticleDetail()           - UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai.
+ *  135  withdrawArticle()            - UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAF…
+ *  158  getMyStatusCounts()          - Trang chu Phong vien: so bai cua nguoi dung o tung trang thai.
+ *  179  getMyRevisionRequests()      - Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can …
+ *  199  getMyCoAuthorInvites()       - Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi …
+ *  221  findArticle()                - Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  227  isAuthor()                   - Tac gia chinh (articles.author_id) hoac co dong trong article_authors
+ *  238  changeStatus()               - Doi trang thai bai va ghi 1 dong lich su trong cung transaction (AGENTS…
+ *  257  toDetailResponse()           - Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
+ *  279  loadUserNames()              - Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao di…
  */
 @Service
 @RequiredArgsConstructor
@@ -67,16 +61,12 @@ public class ArticleService {
 
     // Ten hanh dong ghi vao article_status_logs.action khi rut bai
     private static final String ACTION_WITHDRAW = "WITHDRAW";
-    // Ten hanh dong khi Truong ban duyet dang (giong database/data.sql)
-    private static final String ACTION_PUBLISH = "PUBLISH";
 
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ArticleStatusLogRepository articleStatusLogRepository;
     // Ho ten nguoi dung la du lieu luong admin -> goi service cua ho, khong query bang users (AGENTS.md muc 2)
     private final UserReadService userReadService;
-    // Ten the loai la du lieu luong admin -> goi GenreService
-    private final GenreService genreService;
 
     /**
      * UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau.
@@ -109,12 +99,9 @@ public class ArticleService {
             }
         }
 
-        Map<Integer, String> genreNames = loadGenreNames();
         List<ArticleSummaryResponse> items = new ArrayList<>();
         for (Article article : articlePage.getContent()) {
-            ArticleSummaryResponse item = ArticleSummaryResponse.from(article, myAuthorRows.get(article.getId()), currentUserId);
-            item.setCategoryName(genreNames.get(article.getCategoryId()));
-            items.add(item);
+            items.add(ArticleSummaryResponse.from(article, myAuthorRows.get(article.getId()), currentUserId));
         }
 
         ArticlePageResponse result = new ArticlePageResponse();
@@ -161,22 +148,6 @@ public class ArticleService {
         article.setWithdrawnAt(LocalDateTime.now());
         changeStatus(article, ArticleStatus.DRAFT, currentUserId, ACTION_WITHDRAW, null);
         return toDetailResponse(article, currentUserId);
-    }
-
-    /**
-     * Cho BF-02 (UC-33 duyet dang): bai SCORE_PUBLISHED -> PUBLISHED. Bat buoc ghi published_at
-     * va approved_by (CHECK ck_articles_published); BF-04 dung published_at de chon don gia va
-     * tinh han chi (GBR-08) - yeu cau cua nhom truong 24/10 (A7).
-     */
-    @Transactional
-    public void publishArticle(Integer articleId, Integer approverId) {
-        Article article = findArticle(articleId);
-        if (article.getStatus() != ArticleStatus.SCORE_PUBLISHED) {
-            throw new BusinessException("Chỉ duyệt đăng được bài đã công bố điểm.");
-        }
-        article.setPublishedAt(LocalDateTime.now());
-        article.setApprovedBy(approverId);
-        changeStatus(article, ArticleStatus.PUBLISHED, approverId, ACTION_PUBLISH, null);
     }
 
     /**
@@ -261,8 +232,8 @@ public class ArticleService {
     }
 
     /**
-     * Ham dung chung cho cac luong khac (BF-02, BF-03, BF-04) doi trang thai bai viet
-     * va tu dong ghi 1 dong lich su article_status_logs (AGENTS.md muc 2).
+     * Doi trang thai bai va ghi 1 dong lich su trong cung transaction (AGENTS.md muc 2).
+     * Luong khac (BF-02...) goi qua ham nay.
      */
     @Transactional
     public void updateArticleStatus(Integer articleId, ArticleStatus newStatus, Integer actorId, String action, String note) {
@@ -293,12 +264,8 @@ public class ArticleService {
         Map<Integer, String> userNames = loadUserNames();
 
         List<ArticleAuthorResponse> authors = new ArrayList<>();
-        ArticleAuthor myRow = null;   // dong cua nguoi dang xem, de biet co duoc tra loi xac nhan khong
         for (ArticleAuthor author : articleAuthorRepository.findByArticleIdOrderBySharePercentDesc(article.getId())) {
             authors.add(ArticleAuthorResponse.from(author, article.getAuthorId(), userNames.get(author.getUserId())));
-            if (author.getUserId().equals(currentUserId)) {
-                myRow = author;
-            }
         }
 
         List<ArticleStatusLogResponse> statusLogs = new ArrayList<>();
@@ -310,36 +277,8 @@ public class ArticleService {
         boolean canWithdraw = article.getAuthorId().equals(currentUserId)
                 && article.getStatus() == ArticleStatus.SUBMITTED;
 
-        ArticleDetailResponse dto = ArticleDetailResponse.from(article, userNames.get(article.getAuthorId()),
+        return ArticleDetailResponse.from(article, userNames.get(article.getAuthorId()),
                 authors, statusLogs, canWithdraw);
-
-        Map<Integer, String> genreNames = loadGenreNames();
-        dto.setDeclaredCategoryName(genreNames.get(article.getDeclaredCategoryId()));
-        dto.setCategoryName(genreNames.get(article.getCategoryId()));
-
-        // BR-IN-01: chi tac gia chinh sua, khi bai DRAFT hoac REVISION_REQUESTED
-        boolean isMainAuthor = article.getAuthorId().equals(currentUserId);
-        dto.setCanEdit(isMainAuthor && (article.getStatus() == ArticleStatus.DRAFT
-                || article.getStatus() == ArticleStatus.REVISION_REQUESTED));
-        dto.setCanSubmit(isMainAuthor && article.getStatus() == ArticleStatus.DRAFT);
-        dto.setCanResubmit(isMainAuthor && article.getStatus() == ArticleStatus.REVISION_REQUESTED);
-
-        // UC-12 Preconditions: bai PENDING_CONFIRMATION, minh la dong tac gia dang PENDING, chua qua han
-        dto.setCanRespond(!isMainAuthor && myRow != null
-                && article.getStatus() == ArticleStatus.PENDING_CONFIRMATION
-                && myRow.getConfirmStatus() == ArticleAuthorConfirmStatus.PENDING
-                && myRow.getConfirmDeadline() != null
-                && myRow.getConfirmDeadline().isAfter(LocalDateTime.now()));
-        return dto;
-    }
-
-    // Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
-    private Map<Integer, String> loadGenreNames() {
-        Map<Integer, String> names = new HashMap<>();
-        for (GenreResponse genre : genreService.getActiveGenres()) {
-            names.put(genre.getId(), genre.getName());
-        }
-        return names;
     }
 
     // Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien

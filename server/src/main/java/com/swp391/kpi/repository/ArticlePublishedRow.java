@@ -7,16 +7,11 @@ import java.time.LocalDateTime;
  * Day la "interface projection" cua Spring Data: Spring tu tao object, moi getter
  * lay dung cot co ten bi danh (AS ...) giong ten getter. Khong phai entity, khong co bang.
  *
- * MUC LUC (so dong - ten - tac dung)
- *   22  getId()                         cot id cua cau query
- *   23  getTitle()                      cot title cua cau query
- *   24  getDeclaredNature()             cot declaredNature cua cau query
- *   25  getPublishedAt()                cot publishedAt cua cau query
- *   27  getAuthorId()                   cot authorId cua cau query
- *   29  getSectionId()                  cot sectionId cua cau query
- *   30  getSectionName()                cot sectionName cua cau query
- *   32  getCategoryId()                 cot categoryId cua cau query
- *   33  getCategoryName()               cot categoryName cua cau query
+ * MUC LUC (so dong)
+ *   17  bai:      getId, getTitle, getDeclaredNature, getPublishedAt
+ *   22  tac gia:  getAuthorId
+ *   24  ban:      getSectionId, getSectionName
+ *   27  the loai: getCategoryId, getCategoryName
  */
 public interface ArticlePublishedRow {
     Integer getId();

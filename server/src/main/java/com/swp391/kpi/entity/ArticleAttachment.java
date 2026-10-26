@@ -21,8 +21,14 @@ import java.time.LocalDateTime;
  * - Khong tinh nhuan but khi: external_source khac NULL (nguon ngoai), hoac
  *   trung (DUPLICATE/SIMILAR) voi anh da tung duoc tra nhuan but (BR-IN-05, BR-RY-04).
  *
- * MUC LUC (so dong - ten - tac dung)
- *   36  field                           cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong)
+ *   42  id, articleId, versionId
+ *   49  authorId               - nguoi nhan nhuan but phan anh nay
+ *   52  mediaType, mediaKind   - IMAGE/VIDEO; loai tac pham tra media_factors
+ *   58  externalSource, url, caption
+ *   66  fileHash, dhash        - ma bam de kiem trung
+ *   71  hashResult, distanceBits, matchedAttachmentId - ket qua kiem trung
+ *   77  createdAt
  */
 @Entity
 @Table(name = "article_attachments")

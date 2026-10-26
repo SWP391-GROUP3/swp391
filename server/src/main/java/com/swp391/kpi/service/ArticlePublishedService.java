@@ -34,15 +34,13 @@ import java.util.Optional;
  * Tach rieng khoi ArticleService (nghiep vu cua Phong vien) cho de tim va de doc.
  * Luong khac goi cac ham public o day, KHONG goi repository cua BF-01 (AGENTS.md muc 2).
  *
- * MUC LUC (so dong - ten - tac dung)
- *   51  field                           repository / service duoc inject
- *  ---- Ham public (controller / luong khac goi) ----
- *   62  getPublishedArticles()          UC-46 (BF-04): moi bai PUBLISHED, bai dang som nhat len dau (gan han chi nhat)
- *   77  getArticleForRoyalty()          UC-47, UC-48 (BF-04): thong tin 1 bai de cham nhuan but
- *  ---- Ham phu (private, chi dung trong file) ----
- *   94  loadUserNames()                 Ho ten moi nguoi dung, lay qua service cua luong admin (khong tu query bang users)
- *  105  buildAuthorList()               Tac gia da dong y (ACCEPTED)
- *  128  buildAttachmentList()           Anh/video cua ban nop (SUBMISSION) moi nhat - Minh chot 17/10
+ * MUC LUC (so dong)
+ *   60  getPublishedArticles()        - UC-46: moi bai PUBLISHED, dang som nhat len dau
+ *   75  getArticleForRoyalty(id)      - UC-47, 48: 1 bai PUBLISHED + tac gia + anh/video
+ *       --- ham phu ---
+ *   92  loadUserNames()               - Map userId -> ho ten (qua UserReadService)
+ *  103  buildAuthorList(...)          - tac gia ACCEPTED, tac gia chinh dung dau
+ *  126  buildAttachmentList(...)      - anh/video cua ban nop (SUBMISSION) moi nhat
  */
 @Service
 @RequiredArgsConstructor

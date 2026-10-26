@@ -2,6 +2,7 @@ package com.swp391.kpi.service;
 
 import org.springframework.stereotype.Component;
 import com.swp391.kpi.dto.CriteriaScoreInput;
+import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;

@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { layChiTietKpiPhongVien } from '../../api/kpiApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import './ReporterKpiDetails.css'
+import '../../styles/ReporterKpiDetails.css'
 
 /**
  * Man hinh Chi tiet KPI cua mot phong vien (UC-62: View Reporter KPI Details).
