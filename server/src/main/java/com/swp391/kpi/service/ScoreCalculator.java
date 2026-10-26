@@ -1,11 +1,12 @@
 package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.CriteriaScoreInput;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+
+
+// Tinh diem chat luong DECIMAL(5,2), lam tron HALF_UP theo BR-SC-07
 
 /**
  * Engine tính điểm chất lượng bài viết (Quality Scoring Calculator).
@@ -18,6 +19,7 @@ import java.util.List;
  *   78  isCommentRequired()          - Kiểm tra tiêu chí có bắt buộc nhập nhận xét hay không (BR-QA-08: score …
  */
 @Component
+
 public class ScoreCalculator {
 
     public static final BigDecimal MIN_SCORE = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
