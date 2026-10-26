@@ -1,5 +1,8 @@
 package com.swp391.kpi.service;
 
+import com.swp391.kpi.dto.GenreResponse;
+import com.swp391.kpi.dto.PublishingItemResponse;
+import com.swp391.kpi.dto.PublishingResponse;
 import com.swp391.kpi.dto.ScoreApprovalDecisionRequest;
 import com.swp391.kpi.dto.ScoreApprovalItemResponse;
 import com.swp391.kpi.dto.ScoreApprovalResponse;
@@ -20,11 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Service xu ly phe duyet diem danh gia cua Truong ban bien tap (UC-29, UC-31, UC-32, BR-SC-10).
+ * Service xu ly phe duyet diem danh gia va duyet xuat ban cua Truong ban bien tap (UC-29, UC-31, UC-32, UC-33, BR-SC-10, BR-SC-11).
  */
 @Service
 @RequiredArgsConstructor
@@ -36,6 +42,7 @@ public class ScoreApprovalService {
     private final UserRepository userRepository;
     private final ArticleService articleService;
     private final ScoringAttemptService scoringAttemptService;
+    private final GenreService genreService;
 
     /**
      * Lay danh sach cac bai viet cho Truong ban duyet diem (UC-29).
@@ -167,5 +174,102 @@ public class ScoreApprovalService {
         scoringAttemptService.openScoringAttempt(articleId, attempt.getReviewerId());
 
         return ScoreApprovalResponse.from(saved);
+    }
+
+    /**
+     * Lay danh sach cac bai viet cho Truong ban duyet xuat ban (UC-33).
+     * Chi lay cac bai co status = SCORE_PUBLISHED.
+     */
+    @Transactional(readOnly = true)
+    public List<PublishingItemResponse> getPendingPublishing(Integer sectionId) {
+        List<Article> articles = (sectionId != null)
+                ? articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.SCORE_PUBLISHED, sectionId)
+                : articleRepository.findByStatusOrderByUpdatedAtDesc(ArticleStatus.SCORE_PUBLISHED);
+
+        Map<Integer, String> genreMap = new HashMap<>();
+        for (GenreResponse g : genreService.getActiveGenres()) {
+            genreMap.put(g.getId(), g.getName());
+        }
+
+        List<PublishingItemResponse> result = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Article article : articles) {
+            ScoringAttempt attempt = scoringAttemptRepository
+                    .findTopByArticleIdOrderByAttemptNoDesc(article.getId())
+                    .orElse(null);
+
+            if (attempt != null && attempt.getSubmittedAt() != null) {
+                String reviewerName = userRepository.findById(attempt.getReviewerId())
+                        .map(User::getFullName)
+                        .orElse("Biên tập viên #" + attempt.getReviewerId());
+
+                String authorName = userRepository.findById(article.getAuthorId())
+                        .map(User::getFullName)
+                        .orElse("Tác giả #" + article.getAuthorId());
+
+                String categoryName = genreMap.getOrDefault(article.getCategoryId(), "Chưa phân loại");
+
+                ScoreApproval approval = scoreApprovalRepository.findByScoringAttemptId(attempt.getId())
+                        .orElse(null);
+
+                LocalDateTime scoreApprovedAt = (approval != null && approval.getAnnouncedAt() != null)
+                        ? approval.getAnnouncedAt()
+                        : (approval != null ? approval.getDecidedAt() : null);
+
+                LocalDateTime appealDeadline = (scoreApprovedAt != null) ? scoreApprovedAt.plusDays(7) : null;
+                boolean appealOpen = appealDeadline != null && now.isBefore(appealDeadline);
+                long daysRemaining = 0;
+                if (appealOpen && scoreApprovedAt != null) {
+                    daysRemaining = ChronoUnit.DAYS.between(now, appealDeadline);
+                    if (daysRemaining < 0) {
+                        daysRemaining = 0;
+                    }
+                }
+
+                PublishingItemResponse item = new PublishingItemResponse(
+                        article.getId(),
+                        article.getTitle(),
+                        authorName,
+                        article.getCategoryId(),
+                        categoryName,
+                        attempt.getTotalScore(),
+                        reviewerName,
+                        scoreApprovedAt,
+                        appealDeadline,
+                        appealOpen,
+                        (int) daysRemaining,
+                        article.getUpdatedAt()
+                );
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Truong ban phe duyet xuat ban bai viet (UC-33, BR-SC-11).
+     * Chuyen bai viet sang PUBLISHED, dong dau thoi gian published_at va nguoi duyet approved_by.
+     * Ban giao sang luong BF-04 de tinh nhuan but.
+     */
+    @Transactional
+    public PublishingResponse approvePublishing(Integer articleId, Integer headId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+
+        if (article.getStatus() != ArticleStatus.SCORE_PUBLISHED) {
+            throw new BusinessException("Chỉ có thể duyệt xuất bản các bài viết đã công bố điểm (SCORE_PUBLISHED)");
+        }
+
+        // Goi articleService.publishArticle de cap nhat trang thai va ghi article_status_logs (AGENTS.md muc 2)
+        articleService.publishArticle(articleId, headId);
+
+        return new PublishingResponse(
+                articleId,
+                ArticleStatus.PUBLISHED.name(),
+                LocalDateTime.now(),
+                headId,
+                "Duyệt xuất bản bài viết thành công"
+        );
     }
 }

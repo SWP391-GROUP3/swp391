@@ -1,6 +1,8 @@
 package com.swp391.kpi.controller;
 
 import com.swp391.kpi.dto.ApiResponse;
+import com.swp391.kpi.dto.PublishingItemResponse;
+import com.swp391.kpi.dto.PublishingResponse;
 import com.swp391.kpi.dto.ScoreApprovalDecisionRequest;
 import com.swp391.kpi.dto.ScoreApprovalItemResponse;
 import com.swp391.kpi.dto.ScoreApprovalResponse;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller xu ly cac API phe duyet diem danh gia cua Truong ban (UC-29, UC-31, UC-32).
+ * Controller xu ly cac API phe duyet diem danh gia va duyet xuat ban cua Truong ban (UC-29, UC-31, UC-32, UC-33).
  */
 @RestController
 @RequestMapping("/api/score-approvals")
@@ -58,4 +60,27 @@ public class ScoreApprovalController {
         ScoreApprovalResponse response = scoreApprovalService.returnScore(articleId, request, headId);
         return ResponseEntity.ok(ApiResponse.success("Yêu cầu chấm lại thành công", response));
     }
+
+    /**
+     * Lay danh sach bai viet cho duyet xuat ban (UC-33).
+     */
+    @GetMapping("/publishing")
+    public ResponseEntity<ApiResponse<List<PublishingItemResponse>>> getPendingPublishing(
+            @RequestParam(required = false) Integer sectionId) {
+        List<PublishingItemResponse> list = scoreApprovalService.getPendingPublishing(sectionId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách chờ duyệt xuất bản thành công", list));
+    }
+
+    /**
+     * Truong ban phe duyet xuat ban bai viet (UC-33).
+     */
+    @PostMapping("/article/{articleId}/publish")
+    public ResponseEntity<ApiResponse<PublishingResponse>> approvePublishing(
+            @PathVariable Integer articleId,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer headId = Integer.valueOf(jwt.getSubject());
+        PublishingResponse response = scoreApprovalService.approvePublishing(articleId, headId);
+        return ResponseEntity.ok(ApiResponse.success("Duyệt xuất bản bài viết thành công", response));
+    }
 }
+

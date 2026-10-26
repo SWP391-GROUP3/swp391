@@ -84,14 +84,14 @@ Phối hợp: *Royalty Estimate* của Minh (BF1, Iter3) gọi service nhuận b
 
 | Dòng | Màn hình / chức năng | Loại | Use case | Trạng thái | Ghi chú |
 |---|---|---|---|---|---|
-| 54 | Criteria Sets by Category | Screen | View Criteria Sets | To Do | The Admin views the criteria sets of every category, with version number, status (DRAFT / ACTIVE / RETIRED) and the weight of each criterion. |
-| 55 | Criteria Sets by Category | Screen | Create Criteria Set Version | To Do | The Admin creates a new version of the criteria set of a category (criterion names and percentage weights). A version that has been used is never edited; a change always creates a new version. |
-| 56 | Criteria Sets by Category | Screen | Validate Total Criteria Weight | To Do | The system checks that the weights of all criteria in a version add up to 100% (each weight > 0) before the version can be saved. |
-| 57 | Criteria Sets by Category | Screen | Activate Criteria Set Version | To Do | The Admin sets a saved version as the active version of its category. The version used for a scoring is the one active at the moment the Editor opens the scoring sheet. |
-| 58 | Assignment Queue | Screen | View Assignment Queue | To Do | The Head of Department views the articles in SUBMITTED status that are waiting for an Editor, with category, author and submission date. |
-| 59 | Assign Editor | Screen | View Suggested Editors | To Do | The system suggests Editors for an article: those currently scoring the fewest articles first, with priority to Editors who have already scored the same category. |
-| 60 | Assign Editor | Screen | Assign Editor to Article | To Do | The Head of Department selects an Editor for the article. The system saves the assignment, changes the status to ASSIGNED and notifies the Editor. |
-| 61 | Editor Work Queue | Screen | View My Assigned Articles | To Do | The Editor views the articles assigned to them, including articles returned to them for re-scoring, with status and assignment date. |
+| 54 | Criteria Sets by Category | Screen | View Criteria Sets | Done | The Admin views the criteria sets of every category, with version number, status (DRAFT / ACTIVE / RETIRED) and the weight of each criterion. |
+| 55 | Criteria Sets by Category | Screen | Create Criteria Set Version | Done | The Admin creates a new version of the criteria set of a category (criterion names and percentage weights). A version that has been used is never edited; a change always creates a new version. |
+| 56 | Criteria Sets by Category | Screen | Validate Total Criteria Weight | Done | The system checks that the weights of all criteria in a version add up to 100% (each weight > 0) before the version can be saved. |
+| 57 | Criteria Sets by Category | Screen | Activate Criteria Set Version | Done | The Admin sets a saved version as the active version of its category. The version used for a scoring is the one active at the moment the Editor opens the scoring sheet. |
+| 58 | Assignment Queue | Screen | View Assignment Queue | Done | The Head of Department views the articles in SUBMITTED status that are waiting for an Editor, with category, author and submission date. |
+| 59 | Assign Editor | Screen | View Suggested Editors | Done | The system suggests Editors for an article: those currently scoring the fewest articles first, with priority to Editors who have already scored the same category. |
+| 60 | Assign Editor | Screen | Assign Editor to Article | Done | The Head of Department selects an Editor for the article. The system saves the assignment, changes the status to ASSIGNED and notifies the Editor. |
+| 61 | Editor Work Queue | Screen | View My Assigned Articles | Done | The Editor views the articles assigned to them, including articles returned to them for re-scoring, with status and assignment date. |
 
 ### BF3 · Vũ (4)
 
@@ -132,13 +132,13 @@ Phối hợp: *Royalty Estimate* của Minh (BF1, Iter3) gọi service nhuận b
 
 | Dòng | Màn hình / chức năng | Loại | Use case | Trạng thái | Ghi chú |
 |---|---|---|---|---|---|
-| 62 | Editor Work Queue | Screen | Open Article for Scoring | To Do | The Editor opens an assigned article and its scoring sheet. The system loads the criteria set version that is active at that moment and locks it for this scoring. |
-| 63 | Editor Work Queue | Screen | Change Article Category | To Do | Before scoring, the Editor may change the category the Reporter declared. The system logs who changed it, from which category and to which. After scoring, the category is locked. |
-| 64 | Editor Work Queue | Screen | Score by Criteria | To Do | The Editor enters a score (0–100) for each criterion of the sheet. A comment is mandatory for every criterion scored below 50. |
-| 65 | Editor Work Queue | Screen | Calculate Total Score | To Do | The system calculates the total score of the article = Σ (criterion score × criterion weight), on a scale of 100. |
-| 66 | Editor Work Queue | Screen | Accept Article and Submit Score | To Do | The Editor chooses Accept and submits the scoring sheet. The system saves the scoring attempt, locks it and changes the status to PENDING_APPROVAL. |
-| 67 | Editor Work Queue | Screen | Return Article for Revision | To Do | The Editor returns the article to the Reporter with a mandatory comment. The system saves the attempt, changes the status to REVISION_REQUESTED and notifies the Reporter (back to Flow 01). |
-| 68 | Editor Work Queue | Screen | Reject Article | To Do | The Editor rejects the article with a mandatory reason. The system saves the attempt, changes the status to REJECTED (final) and notifies the Reporter. |
+| 62 | Editor Work Queue | Screen | Open Article for Scoring | Done | The Editor opens an assigned article and its scoring sheet. The system loads the criteria set version that is active at that moment and locks it for this scoring. |
+| 63 | Editor Work Queue | Screen | Change Article Category | Done | Before scoring, the Editor may change the category the Reporter declared. The system logs who changed it, from which category and to which. After scoring, the category is locked. |
+| 64 | Editor Work Queue | Screen | Score by Criteria | Done | The Editor enters a score (0–100) for each criterion of the sheet. A comment is mandatory for every criterion scored below 50. |
+| 65 | Editor Work Queue | Screen | Calculate Total Score | Done | The system calculates the total score of the article = Σ (criterion score × criterion weight), on a scale of 100. |
+| 66 | Editor Work Queue | Screen | Accept Article and Submit Score | Done | The Editor chooses Accept and submits the scoring sheet. The system saves the scoring attempt, locks it and changes the status to PENDING_APPROVAL. |
+| 67 | Editor Work Queue | Screen | Return Article for Revision | Done | The Editor returns the article to the Reporter with a mandatory comment. The system saves the attempt, changes the status to REVISION_REQUESTED and notifies the Reporter (back to Flow 01). |
+| 68 | Editor Work Queue | Screen | Reject Article | Done | The Editor rejects the article with a mandatory reason. The system saves the attempt, changes the status to REJECTED (final) and notifies the Reporter. |
 
 ### BF3 · Vũ (2)
 
@@ -180,12 +180,12 @@ Phối hợp: *Royalty Estimate* của Minh (BF1, Iter3) gọi service nhuận b
 
 | Dòng | Màn hình / chức năng | Loại | Use case | Trạng thái | Ghi chú |
 |---|---|---|---|---|---|
-| 69 | Score Approval | Screen | View Approval Queue | To Do | The Head of Department views the scoring results waiting for approval (status PENDING_APPROVAL). |
-| 70 | Score Approval | Screen | Review Scoring Details | To Do | The Head of Department opens a scoring result to see the score of each criterion, the comments and the total score before deciding. |
-| 71 | Score Approval | Screen | Approve Scoring Result | To Do | The Head of Department approves the scoring result. The system publishes the score (status SCORE_PUBLISHED), starts the 7-day complaint deadline (Flow 03) and notifies the Reporter. |
-| 72 | Score Approval | Screen | Request Re-scoring | To Do | The Head of Department does not approve the score and sends the article back to the same Editor with a reason. The new score replaces the old one; both attempts are kept. |
-| 73 | Publish Approval | Screen | Approve Article for Publishing | To Do | The Head of Department approves the article for publishing. The system records the publish date (status PUBLISHED). This date decides the unit rate and the payment deadline in Flow 04. |
-| 74 | Scoring Result by Criterion (*) | Screen | View Scoring Result by Criterion | To Do | The main author or a co-author views the published score of their article, criterion by criterion, with the Editor's comments. |
+| 69 | Score Approval | Screen | View Approval Queue | Done | The Head of Department views the scoring results waiting for approval (status PENDING_APPROVAL). |
+| 70 | Score Approval | Screen | Review Scoring Details | Done | The Head of Department opens a scoring result to see the score of each criterion, the comments and the total score before deciding. |
+| 71 | Score Approval | Screen | Approve Scoring Result | Done | The Head of Department approves the scoring result. The system publishes the score (status SCORE_PUBLISHED), starts the 7-day complaint deadline (Flow 03) and notifies the Reporter. |
+| 72 | Score Approval | Screen | Request Re-scoring | Done | The Head of Department does not approve the score and sends the article back to the same Editor with a reason. The new score replaces the old one; both attempts are kept. |
+| 73 | Publish Approval | Screen | Approve Article for Publishing | Done | The Head of Department approves the article for publishing. The system records the publish date (status PUBLISHED). This date decides the unit rate and the payment deadline in Flow 04. |
+| 74 | Scoring Result by Criterion (*) | Screen | View Scoring Result by Criterion | Done | The main author or a co-author views the published score of their article, criterion by criterion, with the Editor's comments. |
 
 ### BF3 · Vũ (4)
 

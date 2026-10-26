@@ -31,6 +31,11 @@ public class ScoringAttemptResponse {
     private String decisionNote;
     private LocalDateTime openedAt;
     private LocalDateTime submittedAt;
+    private String reviewerName;
+    private LocalDateTime announcedAt;
+    private LocalDateTime appealDeadline;
+    private Boolean isAppealWindowOpen;
+    private Integer daysRemaining;
     private List<ScoringAttemptDetailResponse> details;
 
     public static ScoringAttemptResponse from(ScoringAttempt attempt,
