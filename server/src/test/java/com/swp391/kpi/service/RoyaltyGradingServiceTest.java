@@ -142,9 +142,9 @@ class RoyaltyGradingServiceTest {
     void previewGradingCalculatesArticleAndMediaAmounts() {
         stubArticle(royaltyArticle(null, null));
 
-        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID, null);
+        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID);
 
-        // khong gui nature -> dung tinh chat PV khai (ORIGINAL)
+        // tinh chat lay theo PV khai (ORIGINAL), Thu ky khong chon lai
         assertEquals(RoyaltyNature.ORIGINAL, preview.getNature());
         // 5.00 x 82.50 / 100 = 4.125 -> 4.13; x 100% x 100% = 4.13
         assertMoney("4.13", preview.getSuggestedFactor());
@@ -168,12 +168,15 @@ class RoyaltyGradingServiceTest {
     }
 
     @Test
-    void previewGradingUsesNatureConfirmedBySecretary() {
-        stubArticle(royaltyArticle(null, null));
+    void previewGradingUsesNatureDeclaredByReporter() {
+        ArticleRoyaltyInfoResponse translated = royaltyArticle(null, null);
+        translated.setDeclaredNature("TRANSLATION");   // PV khai bai dich, khoa luc nop (BR-IN-03)
+        stubArticle(translated);
 
-        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID, RoyaltyNature.TRANSLATION);
+        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID);
 
         // 4.13 x 70% = 2.891 -> 2.89; 2.89 x 234.000 = 676.260 -> 676.000
+        assertEquals(RoyaltyNature.TRANSLATION, preview.getNature());
         assertMoney("70", preview.getNatureRate());
         assertMoney("2.89", preview.getFinalFactor());
         assertMoney("676000", preview.getArticleAmount());
@@ -187,7 +190,7 @@ class RoyaltyGradingServiceTest {
         stubArticle(royaltyArticle(1, new BigDecimal("80.00")));
         when(eventRepository.findById(1)).thenReturn(Optional.of(storm));
 
-        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID, RoyaltyNature.ORIGINAL);
+        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID);
 
         // diem 82.50 < 90 nen bi giam con 80%: 4.13 x 80% = 3.304 -> 3.30; x 234.000 = 772.200 -> 772.000
         assertMoney("80.00", preview.getSaturationRate());
@@ -202,7 +205,7 @@ class RoyaltyGradingServiceTest {
                 .thenReturn(Optional.empty());
 
         BusinessException error = assertThrows(BusinessException.class,
-                () -> royaltyGradingService.previewGrading(ARTICLE_ID, null));
+                () -> royaltyGradingService.previewGrading(ARTICLE_ID));
 
         assertTrue(error.getMessage().contains("12/10/2026"));
     }
@@ -372,7 +375,6 @@ class RoyaltyGradingServiceTest {
     private static RoyaltyGradingCreateRequest createRequest() {
         RoyaltyGradingCreateRequest request = new RoyaltyGradingCreateRequest();
         request.setArticleId(ARTICLE_ID);
-        request.setNature(RoyaltyNature.ORIGINAL);
         return request;
     }
 
