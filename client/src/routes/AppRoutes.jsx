@@ -29,7 +29,6 @@ import AdminHome from '../pages/home/AdminHome.jsx'
 import MyArticles from '../pages/article/MyArticles.jsx'
 import ArticleDetail from '../pages/article/ArticleDetail.jsx'
 import CoAuthorInvites from '../pages/article/CoAuthorInvites.jsx'
-import ArticleEditor from '../pages/article/ArticleEditor.jsx'
 import MonthlyTargetSetting from '../pages/kpi/MonthlyTargetSetting.jsx'
 import KpiBenchmarksConfig from '../pages/kpi/KpiBenchmarksConfig.jsx'
 import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
@@ -42,6 +41,7 @@ import RoyaltyPendingList from '../pages/royalty/RoyaltyPendingList.jsx'
 import RoyaltyGrading from '../pages/royalty/RoyaltyGrading.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
+import ReaderDataImport from '../pages/admin/ReaderDataImport.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
 import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
 import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
@@ -57,6 +57,8 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
 const TRANG_PV_CHUA_LAM = [
+  { path: '/my-articles/new',   ten: 'Soạn bài mới' },           // UC-03
+  { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
   { path: '/my-royalties', ten: 'Nhuận bút' },              // UC-57
 ]
 
@@ -97,7 +99,6 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/system-parameters', ten: 'Tham số hệ thống' },        // UC-13
   { path: '/criteria-sets', ten: 'Bộ tiêu chí' },             // UC-14, 15
   { path: '/criteria-sets/:id', ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-  { path: '/reader-imports', ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
 /**
@@ -179,9 +180,6 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
-              {/* BF-01 (Minh) Iter 2: UC-03, 04, 05 soan / sua / nop bai, UC-10 sua va nop lai */}
-              <Route path="/my-articles/new" element={<ArticleEditor nguoiDung={nguoiDung} />} />
-              <Route path="/my-articles/:id/edit" element={<ArticleEditor nguoiDung={nguoiDung} />} />
               {/* BF-01 (Minh): UC-12 danh sach loi moi dong tac gia */}
               <Route path="/co-author-invites" element={<CoAuthorInvites />} />
               {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
@@ -249,6 +247,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
               <Route path="/media-factors" element={<MediaFactors />} />
+              <Route path="/reader-imports" element={<ReaderDataImport />} />
             </>
           )}
 

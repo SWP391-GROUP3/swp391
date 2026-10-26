@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
  * Khop dang du lieu client/src/api/reporterHomeApi.js: { articleId, title, mainAuthorName,
  * sharePercent, confirmDeadline }. Giu them mainAuthorId cho ai can tra theo ma.
  *
- * MUC LUC (so dong - ten - tac dung)
- *   24  field                           cac truong tra ve cho giao dien
- *   31  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong)
+ *   24  field                        - cac truong tra ve cho giao dien
+ *   31  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

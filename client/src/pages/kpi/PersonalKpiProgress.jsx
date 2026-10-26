@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { layChiTietKpiPhongVien } from '../../api/kpiApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import './PersonalKpiProgress.css'
+import '../../styles/PersonalKpiProgress.css'
 
 /**
  * Man hinh KPI Ca nhan & Tien do (UC-60: View Personal KPI & Progress, UC-67: View Final KPI Result).

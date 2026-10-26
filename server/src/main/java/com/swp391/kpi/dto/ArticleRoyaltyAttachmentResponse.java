@@ -9,9 +9,9 @@ import lombok.Setter;
  * BF-04 dua vao externalSource, hashResult, matchedAttachmentId de biet anh nao
  * KHONG duoc tinh tien (nguon ngoai, hoac trung anh da tung tra nhuan but - BR-IN-05).
  *
- * MUC LUC (so dong - ten - tac dung)
- *   20  field                           cac truong tra ve cho giao dien
- *   30  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong)
+ *   20  cac truong: id, authorId, mediaType, mediaKind, externalSource, hashResult, ...
+ *   30  from(attachment)
  */
 @Getter
 @Setter

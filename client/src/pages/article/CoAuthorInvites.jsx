@@ -5,16 +5,14 @@ import { formatDate, daysUntil } from '../../utils/formatDate.js'
 import '../../styles/CoAuthorInvites.css'
 
 /**
- * UC-12 - "Xac nhan dong tac gia": bai dang cho nguoi dung xac nhan ty le dong tac gia,
- * sap het han xep truoc. Bam tieu de de mo chi tiet bai (UC-02), nut Dong y / Tu choi nam o do.
+ * UC-12 (phan xem) - "Xac nhan dong tac gia": bai dang cho nguoi dung xac nhan
+ * ty le dong tac gia, sap het han xep truoc. Bam tieu de de xem bai (UC-02).
+ * Nut Dong y / Tu choi lam o buoc sau cua Iter 2.
  *
- * MUC LUC (so dong - ten - tac dung)
- *   19  CoAuthorInvites()               UC-12 - "Xac nhan dong tac gia": bai dang cho nguoi dung xac nhan ty le dong tac gia, sap het han xep truoc
- *   23    useEffect                     tai du lieu khi mo trang
- *   39    deadlineText()                Han xac nhan 3 ngay (BR-IN-06): hien so ngay con lai cho de thay
- *
- * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   82  [ten bai] trong bang            mo /my-articles/:id (ArticleDetail): xem bai va bam Dong y / Tu choi o do (UC-12)
+ * MUC LUC (so dong)
+ *   17  CoAuthorInvites              - UC-12 (phan xem) - "Xac nhan dong tac gia": bai dang cho nguoi dung xac…
+ *   21    useEffect                  - tai du lieu khi mo trang
+ *   37    deadlineText()             - Han xac nhan 3 ngay (BR-IN-06): hien so ngay con lai cho de thay
  */
 export default function CoAuthorInvites() {
   const [invites, setInvites] = useState(null)   // null = dang tai
@@ -52,7 +50,7 @@ export default function CoAuthorInvites() {
       <div className="co-author-invites__header">
         <h1 className="co-author-invites__title">Xác nhận đồng tác giả</h1>
         <p className="co-author-invites__subtitle">
-          Bài đang chờ bạn đồng ý tỷ lệ đồng tác giả, sắp hết hạn xếp trước. Bấm tên bài để xem và trả lời; quá hạn bài sẽ về Nháp.
+          Bài đang chờ bạn đồng ý tỷ lệ đồng tác giả, sắp hết hạn xếp trước. Quá hạn 3 ngày bài sẽ về Nháp.
         </p>
       </div>
 
