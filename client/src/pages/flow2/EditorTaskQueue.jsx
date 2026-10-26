@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { layBaiDuocGiaoCuaBtv } from '../../api/assessmentApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_BAI_DUOC_GIAO, BT_DAU_TICH } from './bieuTuongBf02.jsx'
@@ -12,6 +13,7 @@ import '../../styles/Flow2.css'
  */
 
 export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
+  const navigate = useNavigate()
   // Lấy ID BTV: Nếu đang đăng nhập thì lấy ID (ví dụ cuong.lh = 3), hoặc mặc định là 3
   const [editorId, setEditorId] = useState(nguoiDung?.id || 3)
   const [tasks, setTasks] = useState([])
@@ -97,7 +99,7 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
                       type="button"
                       onClick={() => {
                         if (onSelectTaskToScore) onSelectTaskToScore(task)
-                        else alert(`Mở bài #${task.articleId} để chấm điểm (Sẵn sàng tích hợp sang Iteration 2)!`)
+                        else navigate('/assigned-articles/' + task.articleId)
                       }}
                       className="nut-chinh-fm"
                     >

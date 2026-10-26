@@ -19,6 +19,16 @@ public class ArticleReadService {
     private final ArticleReadRepository repository;
 
     @Transactional(readOnly = true)
+    public boolean isAuthor(Integer articleId, Integer userId) { return repository.isAuthor(articleId, userId); }
+
+    @Transactional(readOnly = true)
+    public com.swp391.kpi.dto.ArticleVersionReadResponse getVersion(Integer articleId, Integer versionId) {
+        var versions = repository.findVersion(articleId, versionId);
+        if (versions.isEmpty()) throw new NotFoundException("Không tìm thấy phiên bản bài được chấm.");
+        return versions.get(0);
+    }
+
+    @Transactional(readOnly = true)
     public java.util.List<ArticleReadResponse> getPublishedByAuthor(Integer authorId) {
         return repository.findPublishedByAuthorId(authorId);
     }

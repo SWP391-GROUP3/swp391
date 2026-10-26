@@ -30,6 +30,8 @@ public class AppealManagementService {
     private final AuditService audit;
     private final NotificationService notifications;
     private final ObjectMapper json;
+    private final jakarta.persistence.EntityManager em;
+    private final ReviewerDeviationRefreshService deviations;
 
     public Page<AppealManagementResponse> getQueue(Integer userId, String status, Integer articleId,
             Integer reviewerId, LocalDate fromDate, LocalDate toDate, int page, int size) {
@@ -88,6 +90,31 @@ public class AppealManagementService {
     }
 
     @Transactional
+    public AppealManagementResponse assignSecond(Integer id, AppealAssignRequest request, Integer userId) {
+        var appeal = scopedAppeal(id, userId, true);
+        if (!requiresSecond(appeal)) throw new BusinessException("Khiếu nại chưa cần S2 hoặc đã được giao S2.");
+        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false);
+        var attempt = scoring.createSecondDraft(id, appeal.getArticleId(), appeal.getScoringAttemptId(),
+                candidate.reviewerId(), candidate.crossDepartment());
+        audit.log(userId, "ASSIGN", "appeals", id, null, assignmentJson(attempt, request.getReason()));
+        notifications.notifyUser(candidate.reviewerId(), appeal.getArticleId(), "Bạn được giao phiếu chấm mù #" + attempt.id() + ".");
+        return response(appeal, articles.getArticle(appeal.getArticleId()), attempt, true);
+    }
+
+    private boolean requiresSecond(Appeal appeal) {
+        if (appeal.getStatus() != AppealStatus.IN_REVIEW) return false;
+        List<ScoringAppealAttemptResponse> reviews = new ArrayList<>();
+        for (var attempt : scoring.getArticleAttempts(appeal.getArticleId()))
+            if (appeal.getId().equals(attempt.appealId())) reviews.add(attempt);
+        if (reviews.size() != 1 || reviews.get(0).submittedAt() == null) return false;
+        var original = scoring.getComparisonCard(appeal.getScoringAttemptId());
+        var first = scoring.getComparisonCard(reviews.get(0).id());
+        var rule = rules.findById(appeal.getRuleConfigId()).orElseThrow(() -> new NotFoundException("Không tìm thấy cấu hình khiếu nại."));
+        return new AppealScoreCalculator().compare(original.totalScore(), first.totalScore(), null,
+                rule.getVarianceThreshold()).requiresSecondReview();
+    }
+
+    @Transactional
     public AppealManagementResponse reassign(Integer id, AppealReassignRequest request, Integer userId) {
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.IN_REVIEW)
@@ -111,8 +138,13 @@ public class AppealManagementService {
 
     private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) {
         var head = users.requireActive(userId, "HEAD_OF_DEPARTMENT");
+        if (lock) deviations.lockWorkflow();
         var appeal = (lock ? appeals.findLockedById(id) : appeals.findById(id))
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy khiếu nại."));
+        if (lock) {
+            em.refresh(appeal, jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+            scoring.lockReviewSnapshots(id, appeal.getArticleId());
+        }
         var article = articles.getArticle(appeal.getArticleId());
         if (head.sectionId() == null || !head.sectionId().equals(article.sectionId()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền quản lý khiếu nại này.");
@@ -129,7 +161,8 @@ public class AppealManagementService {
 
     private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) {
         var current = currentAttempt(appeal);
-        if (appeal.getStatus() == AppealStatus.RESOLVED || (current != null && current.submittedAt() != null))
+        if (appeal.getStatus() == AppealStatus.RESOLVED
+                || (current != null && current.submittedAt() != null && !requiresSecond(appeal)))
             return List.of();
         Set<Integer> excluded = new HashSet<>();
         for (var attempt : scoring.getArticleAttempts(appeal.getArticleId())) excluded.add(attempt.reviewerId());

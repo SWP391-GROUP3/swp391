@@ -55,4 +55,11 @@ public class AppealManagementController {
         return ResponseEntity.ok(ApiResponse.success("Giao lại phiếu chấm mù thành công",
                 service.reassign(id, request, Integer.valueOf(jwt.getSubject()))));
     }
+
+    @PostMapping("/{id}/assign-second")
+    public ResponseEntity<ApiResponse<AppealManagementResponse>> assignSecond(@PathVariable Integer id,
+            @Valid @RequestBody AppealAssignRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(ApiResponse.success("Phân công S2 thành công",
+                service.assignSecond(id, request, Integer.valueOf(jwt.getSubject()))));
+    }
 }

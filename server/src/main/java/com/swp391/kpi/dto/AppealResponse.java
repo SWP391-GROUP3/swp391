@@ -21,4 +21,6 @@ public class AppealResponse {
     private String status;
     private LocalDateTime submittedAt;
     private List<AppealCriterionResponse> criteria;
+    private java.math.BigDecimal effectiveScore;
+    private LocalDateTime resolvedAt;
 }

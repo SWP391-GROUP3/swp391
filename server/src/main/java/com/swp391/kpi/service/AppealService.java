@@ -56,6 +56,7 @@ public class AppealService {
     private final NotificationService notificationService;
     private final ArticleReadService articleReadService;
     private final Clock clock;
+    private final AppealEffectiveScoreService effectiveScores;
 
     @Autowired
     public AppealService(
@@ -66,10 +67,11 @@ public class AppealService {
             AuditService auditService,
             UserReadService userReadService,
             NotificationService notificationService,
-            ArticleReadService articleReadService) {
+            ArticleReadService articleReadService,
+            AppealEffectiveScoreService effectiveScores) {
         this(appealRepository, appealCriterionRepository, appealRuleConfigService,
                 appealSubmissionDataProvider, auditService, userReadService, notificationService,
-                articleReadService, Clock.systemDefaultZone());
+                articleReadService, effectiveScores, Clock.systemDefaultZone());
     }
 
     AppealService(
@@ -81,6 +83,7 @@ public class AppealService {
             UserReadService userReadService,
             NotificationService notificationService,
             ArticleReadService articleReadService,
+            AppealEffectiveScoreService effectiveScores,
             Clock clock) {
         this.appealRepository = appealRepository;
         this.appealCriterionRepository = appealCriterionRepository;
@@ -91,6 +94,7 @@ public class AppealService {
         this.notificationService = notificationService;
         this.articleReadService = articleReadService;
         this.clock = clock;
+        this.effectiveScores = effectiveScores;
     }
 
     @Transactional
@@ -287,6 +291,9 @@ public class AppealService {
         response.setStatus(appeal.getStatus().name());
         response.setSubmittedAt(appeal.getSubmittedAt());
         response.setCriteria(criterionResponses);
+        response.setResolvedAt(appeal.getResolvedAt());
+        if (appeal.getStatus() == AppealStatus.RESOLVED)
+            response.setEffectiveScore(effectiveScores.getEffectiveScore(appeal.getArticleId(), context.getTotalScore()));
         return response;
     }
 }

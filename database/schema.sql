@@ -22,7 +22,8 @@
    CÁCH DÙNG: mở file này trong SSMS, bấm Execute (F5).
    File re-runnable: xoá SẠCH mọi bảng trong swp391_kpi rồi tạo lại từ đầu,
    kể cả bảng của schema cũ. Chạy lại là MẤT HẾT DỮ LIỆU.
-   Sửa schema thì sửa file này, commit, rồi báo cả nhóm chạy lại.
+   DB da co du lieu: dung migration tuong ung, KHONG chay lai file nay.
+   BF03 Iter3: database/migrations/BF03_iter3_safe.sql chi ALTER CHECK.
 
    Quy ước:
    - Tên bảng/cột snake_case tiếng Anh. Spring Boot tự map
@@ -499,9 +500,10 @@ CREATE TABLE scoring_attempts (
                                                      (attempt_type <> 'APPEAL' AND appeal_id IS NULL)),
     CONSTRAINT ck_scoring_attempts_decision   CHECK (decision IN ('ACCEPT','REVISION','REJECT')),
     CONSTRAINT ck_scoring_attempts_score      CHECK (total_score BETWEEN 0 AND 100),
-    -- Đã nộp thì phải có điểm và quyết định.
+    -- APPEAL chi cham diem; INITIAL/RESCORE van bat buoc quyet dinh xuat ban.
     CONSTRAINT ck_scoring_attempts_submitted  CHECK (submitted_at IS NULL
-                                                     OR (total_score IS NOT NULL AND decision IS NOT NULL))
+                                                     OR (total_score IS NOT NULL
+                                                         AND (attempt_type = 'APPEAL' OR decision IS NOT NULL)))
 );
 CREATE INDEX ix_scoring_attempts_reviewer ON scoring_attempts(reviewer_id);
 
@@ -576,10 +578,10 @@ CREATE TABLE appeal_criteria (
     CONSTRAINT uq_appeal_criteria           UNIQUE (appeal_id, criterion_id)
 );
 
-/* Kết quả cuối của khiếu nại. effective_attempt_id = lần chấm được dùng làm
-   điểm chính thức sau khiếu nại (có thể là lần cũ hoặc lần chấm lại).
-   rule_applied [ĐỀ XUẤT]: KEEP_ORIGINAL (lệch <= variance_threshold, giữ
-   điểm cũ) | USE_RESCORE (lệch lớn, dùng điểm chấm lại). */
+/* Ket qua Head xac nhan theo BR-QC-06/07. effective_score la diem chinh thuc.
+   effective_attempt_id tham chieu S1 hoac S2; khong suy diem trung binh tu FK.
+   Giu KEEP_ORIGINAL/USE_RESCORE de doc lich su. Ban ghi moi dung USE_S1,
+   AVERAGE_S0_S2, AVERAGE_S1_S2 hoac USE_S2_TIE va phai co effective_score. */
 CREATE TABLE appeal_resolutions (
     id                    INT IDENTITY(1,1) PRIMARY KEY,
     appeal_id             INT          NOT NULL UNIQUE,
@@ -592,7 +594,8 @@ CREATE TABLE appeal_resolutions (
     CONSTRAINT fk_appeal_resolutions_attempt   FOREIGN KEY (effective_attempt_id) REFERENCES scoring_attempts(id),
     CONSTRAINT fk_appeal_resolutions_finalizer FOREIGN KEY (finalized_by)         REFERENCES users(id),
     CONSTRAINT ck_appeal_resolutions_score CHECK (effective_score BETWEEN 0 AND 100),
-    CONSTRAINT ck_appeal_resolutions_rule      CHECK (rule_applied IN ('KEEP_ORIGINAL','USE_RESCORE'))
+    CONSTRAINT ck_appeal_resolutions_rule      CHECK (rule_applied IN ('KEEP_ORIGINAL','USE_RESCORE','USE_S1',
+                                                                     'AVERAGE_S0_S2','AVERAGE_S1_S2','USE_S2_TIE'))
 );
 
 /* Cấu hình luật khiếu nại, có hiệu lực theo ngày. Dùng dòng is_active = 1

@@ -32,10 +32,37 @@ public class ReviewerDeviationRefreshService {
     private final AppealResolutionRepository resolutionRepository;
     private final CrossReviewTaskRepository crossReviewTaskRepository;
     private final ReviewerDeviationRepository indexRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
+
+    // ponytail: khoa ghi BF03 toan DB; tach tong hop rieng khi so luong ghi tang cao.
+    @Transactional
+    public void lockWorkflow() {
+        Integer result = jdbc.queryForObject("""
+                DECLARE @result INT;
+                EXEC @result = sys.sp_getapplock @Resource=N'BF03_SCORE_WRITES',
+                    @LockMode='Exclusive', @LockOwner='Transaction', @LockTimeout=15000;
+                SELECT @result;
+                """, Integer.class);
+        if (result == null || result < 0)
+            throw new com.swp391.kpi.exception.BusinessException("Đang có thao tác chất lượng chấm khác. Vui lòng thử lại.");
+    }
 
     @Transactional
     public Set<Integer> refresh(LocalDate period, Integer currentUserId) {
         var user = userReadService.requireActive(currentUserId, "ADMIN", "HEAD_OF_DEPARTMENT");
+        lockWorkflow();
+        return calculatePeriod(period, user.role(), user.sectionId());
+    }
+
+    // Chi workflow BF03 da kiem tra quyen duoc goi; khong co endpoint nhan sectionId tu client.
+    @Transactional
+    public Set<Integer> refreshSection(LocalDate period, Integer sectionId) {
+        if (sectionId == null) throw new IllegalArgumentException("Missing department");
+        lockWorkflow();
+        return calculatePeriod(period, "HEAD_OF_DEPARTMENT", sectionId);
+    }
+
+    private Set<Integer> calculatePeriod(LocalDate period, String role, Integer sectionId) {
         if (period == null || period.getDayOfMonth() != 1)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kỳ báo cáo phải là ngày đầu tháng.");
         var attempts = scoringReadService.getSubmittedAttempts();
@@ -53,7 +80,7 @@ public class ReviewerDeviationRefreshService {
         for (var task : crossReviewTaskRepository.findAll()) {
             if (task.getStatus() != CrossReviewTaskStatus.DONE || !inPeriod(task.getSubmittedAt(), period)) continue;
             var original = byId.get(task.getOriginalScoringId());
-            if (original == null || !inScope(user.role(), user.sectionId(), original.reviewerId(), reviewerSections)) continue;
+            if (original == null || !inScope(role, sectionId, original.reviewerId(), reviewerSections)) continue;
             addDifference(differences, original.reviewerId(), task.getScore().subtract(original.totalScore()));
         }
         for (var resolution : resolutionRepository.findAll()) {
@@ -61,7 +88,7 @@ public class ReviewerDeviationRefreshService {
             var appeal = appealRepository.findById(resolution.getAppealId()).orElse(null);
             if (appeal == null || appeal.getStatus() != AppealStatus.RESOLVED) continue;
             var original = byId.get(appeal.getScoringAttemptId());
-            if (original == null || !inScope(user.role(), user.sectionId(), original.reviewerId(), reviewerSections)) continue;
+            if (original == null || !inScope(role, sectionId, original.reviewerId(), reviewerSections)) continue;
             BigDecimal effective = resolution.getEffectiveScore();
             if (effective == null) {
                 var effectiveAttempt = byId.get(resolution.getEffectiveAttemptId());
@@ -75,7 +102,7 @@ public class ReviewerDeviationRefreshService {
         }
         for (var attempt : attempts) {
             if (!"APPEAL".equals(attempt.attemptType()) && inPeriod(attempt.submittedAt(), period)
-                    && inScope(user.role(), user.sectionId(), attempt.reviewerId(), reviewerSections)) {
+                    && inScope(role, sectionId, attempt.reviewerId(), reviewerSections)) {
                 workload.merge(attempt.reviewerId(), 1, Integer::sum);
             }
         }

@@ -1,4 +1,6 @@
 package com.swp391.kpi.repository;
 import com.swp391.kpi.entity.AppealResolution;
 import org.springframework.data.jpa.repository.JpaRepository;
-public interface AppealResolutionRepository extends JpaRepository<AppealResolution, Integer> {}
+public interface AppealResolutionRepository extends JpaRepository<AppealResolution, Integer> {
+    java.util.Optional<AppealResolution> findByAppealId(Integer appealId);
+}

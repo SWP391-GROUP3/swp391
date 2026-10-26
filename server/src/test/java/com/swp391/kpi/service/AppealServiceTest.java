@@ -67,6 +67,7 @@ class AppealServiceTest {
                 userReadService,
                 notificationService,
                 articleReadService,
+                org.mockito.Mockito.mock(AppealEffectiveScoreService.class),
                 FIXED_CLOCK);
     }
 

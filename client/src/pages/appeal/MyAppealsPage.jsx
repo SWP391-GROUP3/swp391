@@ -50,6 +50,7 @@ export default function MyAppealsPage() {
           <div>
             <h2>{appeal.articleTitle}</h2>
             <p>Gửi lúc {dinhDangThoiGian(appeal.submittedAt)} · {appeal.criteria.length} tiêu chí</p>
+            {appeal.status === 'RESOLVED' && <p>Điểm hiệu lực đã xác nhận: <strong>{appeal.effectiveScore ?? 'Đang cập nhật'}/100</strong> · {dinhDangThoiGian(appeal.resolvedAt)}</p>}
             <details>
               <summary>Tiêu chí đã khiếu nại</summary>
               {appeal.criteria.map((item) => (

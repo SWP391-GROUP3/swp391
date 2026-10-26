@@ -35,7 +35,7 @@ Mô tả sơ đồ (3 làn: Reporter/Author | Editor | Head of Department):
    - Đã có `S2` → so sánh `D0 = ABS(S2 - S0)` và `D1 = ABS(S2 - S1)`, lấy trung bình của cặp gồm `S2` và điểm gần `S2` hơn; nếu `D0 = D1` thì dùng `S2`.
 5. Mọi nhánh → Complete Audit Log recording & control reporting → Update the deviation indices for the editors → End.
 
-> **Quy tắc chốt:** `T` là `variance_threshold` của cấu hình được gắn với khiếu nại, giá trị nghiệp vụ mặc định là 5 điểm. Chênh lệch được lấy theo trị tuyệt đối nên cả trường hợp tăng và giảm quá `T` đều phát sinh `S2`. Nếu chênh lệch đúng bằng `T` thì dùng `S1` và không chấm lại lần 2. `database/data.sql` hiện đang để 10 điểm và cần người phụ trách DB xử lý riêng trước khi triển khai (xem mục **Phụ thuộc cần nhóm xử lý sau**).
+> **Quy tắc chốt:** `T` là `variance_threshold` của cấu hình được gắn với khiếu nại, giá trị nghiệp vụ mặc định là 5 điểm. Chênh lệch được lấy theo trị tuyệt đối nên cả trường hợp tăng và giảm quá `T` đều phát sinh `S2`. Nếu chênh lệch đúng bằng `T` thì dùng `S1` và không chấm lại lần 2. Kiểm tra ngày 26/10/2026: `database/data.sql` đã đặt mặc định 5 điểm; cấu hình cũ gắn với từng appeal vẫn được giữ nguyên.
 
 ## Use Case Diagram
 
@@ -357,19 +357,19 @@ Actor chính: Reporter, Head of ED, Editor · 11 use case · ID 35–45
 3. Trong khi appeal còn SUBMITTED hoặc IN_REVIEW, điểm cũ tạm thời vẫn có hiệu lực; quy trình xuất bản không bị dừng.
 4. Appeal chỉ thay điểm hiệu lực, không tự thay đổi quyết định xuất bản hoặc trạng thái bài.
 
-## Phụ thuộc cần nhóm xử lý sau
+## Tình trạng phụ thuộc — cập nhật 26/10/2026
 
-Các điểm dưới đây được ghi rõ để không code sai, nhưng **không được sửa trong phạm vi BF-03 này**:
+Người dùng đã duyệt đề xuất Iter3, bao gồm thay đổi CHECK và tích hợp BF02/snapshot tối thiểu:
 
-1. `database/data.sql` đang đặt `variance_threshold = 10.00`, trong khi giá trị nghiệp vụ mặc định đã chốt trong tài liệu này là 5 điểm.
-2. `appeal_resolutions` hiện chỉ lưu `effective_attempt_id`, nhưng kết quả theo BR-QC-07 có thể là trung bình của hai lần chấm và không thuộc riêng attempt nào. Nhóm DB cần bổ sung điểm hiệu lực số, đề xuất `effective_score DECIMAL(5,2) NOT NULL`, và chốt cách dùng hoặc thay thế `effective_attempt_id`.
-3. `appeal_resolutions.rule_applied` hiện chỉ có `KEEP_ORIGINAL` và `USE_RESCORE`, không mô tả được các kết quả `USE_S1`, `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, hoặc `USE_S2_TIE`. Nhóm DB cần chốt lại enum trước khi triển khai.
-4. `scoring_attempts.assignment_id` hiện bắt buộc và lần đã nộp bắt buộc có `decision`; hai ràng buộc này chưa phù hợp với APPEAL attempt không có quyết định ACCEPT/REVISION/REJECT.
-5. `appeals` chưa có `rule_config_id`, nên chưa thể đóng băng cấu hình áp dụng cho từng appeal như BR-QC-12.
-6. Luật một appeal mỗi bài mới được kiểm tra ở service; schema chưa có UNIQUE trên `appeals(article_id)`, nên vẫn có rủi ro tạo trùng khi hai request chạy đồng thời.
-7. BF-04 chưa quy định cách xử lý một kỳ CLOSED khi điểm thay đổi. BF-05 chưa quy định điều kiện chờ hết cửa sổ khiếu nại trước khi FINALIZED. Hai chủ luồng cần xác nhận các điểm tích hợp trong bảng trên.
-8. `SRS_Overview.md` (GBR-07) và ảnh use-case/swimlane gốc vẫn mô tả chấm lần 3 rồi lấy trung vị. Theo phạm vi đã chốt, lần sửa này chỉ cập nhật BF-03; nhóm cần đồng bộ các tài liệu/ảnh liên quan trong một thay đổi riêng.
+1. `data.sql` đã đặt ngưỡng mặc định 5. Không ghi đè cấu hình của appeal đang xử lý.
+2. Đã có `effective_score DECIMAL(5,2) NULL`: NULL chỉ dùng cho dữ liệu lịch sử; kết quả mới luôn ghi điểm số. `effective_attempt_id` tham chiếu S1 hoặc S2, không thay thế điểm trung bình đã chốt.
+3. Enum bổ sung `USE_S1`, `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE`; giữ hai mã cũ để đọc lịch sử.
+4. APPEAL đã nộp không bắt buộc decision; INITIAL/RESCORE vẫn bắt buộc. `assignment_id` giữ FK của phân công gốc, không tạo quyết định xuất bản giả.
+5. Đã có `appeals.rule_config_id` và UNIQUE `appeals(article_id)` từ Iter1.
+6. Migration giữ dữ liệu: `database/migrations/BF03_iter3_safe.sql`. Không chạy lại `schema.sql` trên database chung.
+7. **Chưa tích hợp ghi BF04/BF05:** cần chủ luồng chốt hợp đồng tính lại OPEN, điều chỉnh LOCKED/PAID, xử lý CLOSED và bảo vệ FINALIZED. BF03 cung cấp `AppealEffectiveScoreService`, ghi audit `PENDING_INTEGRATION`; không tuyên bố đã tự đồng bộ tiền/KPI.
+8. GBR-07 trong Overview đã đồng bộ công thức S2. Ảnh gốc dùng làm tham khảo, không được dùng để suy ra luật trung vị khác với đặc tả này.
 
 ## Luật chung liên quan
 
-GBR-06 (khiếu nại trong 7 ngày, 1 lần/bài, chấm mù), GBR-07 (quy tắc xử lý chênh lệch điểm), GBR-11 (kỳ đã khoá không đổi, sinh dòng điều chỉnh) — xem `SRS_Overview.md`. BF-03 hiện dùng trị tuyệt đối, tối đa hai đợt chấm lại và quy tắc trọng tài `S2` theo BR-QC-06/07; nội dung GBR-07 đang ghi cách lấy trung vị cũ và cần được nhóm đồng bộ trong một thay đổi riêng.
+GBR-06 (khiếu nại trong 7 ngày, 1 lần/bài, chấm mù), GBR-07 (trị tuyệt đối, tối đa hai đợt chấm lại và trọng tài S2), GBR-11 (kỳ đã khoá không đổi, sinh dòng điều chỉnh) — xem `SRS_Overview.md`. Việc ghi tiền/KPI thuộc hợp đồng BF04/BF05 chưa triển khai trong lần này.
