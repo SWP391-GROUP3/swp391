@@ -14,6 +14,11 @@ import ReviewerDeviationPage from '../pages/appeal/ReviewerDeviationPage.jsx'
 import ReviewerProfilePage from '../pages/appeal/ReviewerProfilePage.jsx'
 import AppealManagementPage from '../pages/appeal/AppealManagementPage.jsx'
 import AppealDetailPage from '../pages/appeal/AppealDetailPage.jsx'
+import BlindReviewQueuePage from '../pages/appeal/BlindReviewQueuePage.jsx'
+import BlindReviewPage from '../pages/appeal/BlindReviewPage.jsx'
+import AppealComparisonPage from '../pages/appeal/AppealComparisonPage.jsx'
+import CrossReviewBatchPage from '../pages/appeal/CrossReviewBatchPage.jsx'
+import CrossReviewBatchDetailPage from '../pages/appeal/CrossReviewBatchDetailPage.jsx'
 import AuditLogPage from '../pages/appeal/AuditLogPage.jsx'
 import ReporterHome from '../pages/home/ReporterHome.jsx'
 import EditorHome from '../pages/home/EditorHome.jsx'
@@ -56,6 +61,8 @@ const TRANG_PV_CHUA_LAM = [
 ]
 
 const TRANG_BTV_CHUA_LAM = [
+  { path: '/assigned-articles/:id', ten: 'Chấm bài' },               // UC-22…28
+  { path: '/my-scorings',           ten: 'Lịch sử chấm' },           // UC-21
   { path: '/re-reviews', ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
   { path: '/re-reviews/:id', ten: 'Phiếu chấm lại' },         // UC-36, UC-37
   { path: '/my-scorings', ten: 'Lịch sử chấm' },           // UC-21
@@ -65,6 +72,12 @@ const TRANG_BTV_CHUA_LAM = [
 const TRANG_TK_CHUA_LAM = []
 
 const TRANG_TB_CHUA_LAM = [
+  { path: '/score-approvals',       ten: 'Duyệt điểm' },              // UC-29
+  { path: '/score-approvals/:id',   ten: 'Chi tiết kết quả chấm' },   // UC-30, 31, 32
+  { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
+  { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
+  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
+  { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/publishing', ten: 'Duyệt đăng' },              // UC-33
   { path: '/cross-reviews', ten: 'Đợt chấm chéo' },           // UC-40
   { path: '/reviewers/:id', ten: 'Hồ sơ biên tập viên' },     // UC-42
@@ -179,6 +192,9 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
             <>
               {/* BF-02 (Duong): UC-21 Bài được giao & UC-22..28 Chấm điểm */}
               <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
+              <Route path="/re-reviews" element={<BlindReviewQueuePage />} />
+              <Route path="/re-reviews/:id" element={<BlindReviewPage />} />
+              <Route path="/cross-review-tasks/:id" element={<BlindReviewPage cheo />} />
               <Route path="/assigned-articles/:articleId" element={<ScoringSheet nguoiDung={nguoiDung} />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
             </>
@@ -193,6 +209,9 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
 
               <Route path="/appeals" element={<AppealManagementPage />} />
               <Route path="/appeals/:id" element={<AppealDetailPage />} />
+              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage />} />
+              <Route path="/cross-reviews" element={<CrossReviewBatchPage />} />
+              <Route path="/cross-reviews/:id" element={<CrossReviewBatchDetailPage />} />
 
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}

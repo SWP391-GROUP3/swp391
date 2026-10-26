@@ -21,6 +21,9 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface ScoringAttemptRepository extends JpaRepository<ScoringAttempt, Integer> {
 
+    List<ScoringAttempt> findByReviewerIdAndAttemptTypeOrderByOpenedAtDesc(Integer reviewerId,
+            com.swp391.kpi.entity.AttemptType attemptType);
+
     long countByReviewerIdAndAttemptTypeAndSubmittedAtIsNull(Integer reviewerId,
             com.swp391.kpi.entity.AttemptType attemptType);
 

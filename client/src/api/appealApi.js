@@ -49,3 +49,11 @@ export function phanCongKhieuNai(id, reviewerId, reason) {
 export function giaoLaiKhieuNai(id, duLieu) {
   return goiApi(`/api/appeals/${id}/reassign`, { method: 'POST', body: duLieu })
 }
+
+export function layPhieuChamMu() { return goiApi('/api/appeal-reviews') }
+export function layChiTietChamMu(id) { return goiApi(`/api/appeal-reviews/${id}`) }
+export function luuNhapChamMu(id, criteria) { return goiApi(`/api/appeal-reviews/${id}`, { method: 'PUT', body: { criteria } }) }
+export function nopPhieuChamMu(id, criteria) { return goiApi(`/api/appeal-reviews/${id}/submit`, { method: 'POST', body: { criteria } }) }
+export function laySoSanhKhieuNai(id) { return goiApi(`/api/appeals/${id}/comparison`) }
+export function phanCongLanHai(id, reviewerId, reason) { return goiApi(`/api/appeals/${id}/assign-second`, { method: 'POST', body: { reviewerId, reason } }) }
+export function chotDiemKhieuNai(id, expectedAttemptId) { return goiApi(`/api/appeals/${id}/finalize`, { method: 'POST', body: { expectedAttemptId } }) }

@@ -56,7 +56,8 @@ public class AppealAuditQueryService {
         for (var log : auditLogRepository.search(actorId, blankToNull(actionType), blankToNull(entityType),
                 entityId, fromTime, toTime)) {
             Integer logArticleId = findArticle(log);
-            if (!"ADMIN".equals(user.role()) && cannotView(user.role(), user.sectionId(), logArticleId)) {
+            if (!"ADMIN".equals(user.role()) && cannotView(user.role(), user.sectionId(), logArticleId)
+                    && !canViewBatchLog(log, user.sectionId())) {
                 if (entityId != null && entityType != null) throw forbidden();
                 continue;
             }
@@ -78,9 +79,35 @@ public class AppealAuditQueryService {
                     .flatMap(r -> appealRepository.findById(r.getAppealId())).map(Appeal::getArticleId).orElse(null);
             case "scoring_attempts" -> scoringReadService.getAttempt(log.getEntityId()).articleId();
             case "cross_review_tasks" -> crossReviewTaskRepository.findById(log.getEntityId())
-                    .map(CrossReviewTask::getArticleId).orElse(null);
+                    .map(CrossReviewTask::getArticleId).orElseGet(() -> articleFromSnapshot(log.getNewValue()));
+            case "cross_review_batches" -> findBatchArticle(log);
             default -> null;
         };
+    }
+
+    private Integer findBatchArticle(AuditLog log) {
+        var tasks = crossReviewTaskRepository.findByBatchIdOrderById(log.getEntityId());
+        if (!tasks.isEmpty()) return tasks.get(0).getArticleId();
+        var before = articleFromSnapshot(log.getOldValue());
+        return before != null ? before : articleFromSnapshot(log.getNewValue());
+    }
+
+    private Integer articleFromSnapshot(String snapshot) {
+        if (snapshot == null) return null;
+        try {
+            var root = json.readTree(snapshot);
+            var article = root.path("articleId");
+            if (!article.isIntegralNumber()) article = root.path("batch").path("tasks").path(0).path("articleId");
+            return article.isIntegralNumber() ? article.intValue() : null;
+        } catch (com.fasterxml.jackson.core.JsonProcessingException ex) { return null; }
+    }
+
+    private boolean canViewBatchLog(AuditLog log, Integer sectionId) {
+        if (!"cross_review_batches".equals(log.getEntityType()) || sectionId == null || log.getNewValue() == null) return false;
+        try {
+            var section = json.readTree(log.getNewValue()).get("sectionId");
+            return section != null && section.isIntegralNumber() && sectionId.equals(section.intValue());
+        } catch (com.fasterxml.jackson.core.JsonProcessingException ex) { return false; }
     }
 
     private boolean matchesAppeal(AuditLog log, Integer appealId) {

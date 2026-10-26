@@ -17,6 +17,8 @@ import org.springframework.data.repository.query.Param;
  */
 public interface AppealRepository extends JpaRepository<Appeal, Integer> {
 
+    Optional<Appeal> findByArticleId(Integer articleId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from Appeal a where a.id = :id")
     Optional<Appeal> findLockedById(@Param("id") Integer id);

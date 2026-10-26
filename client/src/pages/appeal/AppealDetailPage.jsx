@@ -73,7 +73,8 @@ export default function AppealDetailPage() {
       </li>)}</ul>
       <h2>Phân công chấm mù</h2>
       {phieu ? <p>Phiếu #{phieu.id} · BTV #{phieu.reviewerId} · {phieu.crossDepartment ? 'Khác ban' : 'Cùng ban'} · {phieu.submittedAt ? `Đã nộp ${formatDate(phieu.submittedAt)}` : 'Chưa nộp'}</p> : <p>Chưa phân công người chấm lại.</p>}
-      {!coTheGiao && <p>Chỉ đọc: khiếu nại đã giải quyết hoặc phiếu đã nộp. So sánh/chốt điểm thuộc Iter3.</p>}
+      {!coTheGiao && <p>Phân công hiện tại chỉ đọc. Mở so sánh để theo dõi kết quả, giao S2 nếu cần hoặc chốt điểm.</p>}
+      <Link to={`/appeals/${id}/comparison`}>So sánh &amp; chốt điểm</Link>
       {coTheGiao && (nguoiCham.length ? <form key={khoa} className="chi-tiet-kn__form" onSubmit={luuPhanCong}>
         <p>{nguoiCham[0].crossDepartment ? 'Không còn BTV hợp lệ cùng ban. Phân công khác ban bắt buộc có lý do.' : 'Ưu tiên các BTV hợp lệ cùng ban; người đã tham gia không được chọn lại.'}</p>
         <label>Biên tập viên mới<select name="reviewerId" required defaultValue="" disabled={dangLuu}>
