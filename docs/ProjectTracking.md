@@ -55,7 +55,7 @@ Phối hợp: *Royalty Estimate* của Minh (BF1, Iter3) gọi service nhuận b
 
 | Dòng Excel | Excel đang ghi | Đúng theo SRS / schema |
 |---|---|---|
-| Functions 24, Use Case 52 | Thư ký *set/adjust* hệ số, kiểm theo khung hệ số thể loại | Hệ thống tự tính hệ số = hệ số chuẩn thể loại × điểm / 100. Thư ký chỉ xác nhận tính chất bài (BR-RY-01 mới) |
+| Functions 24, Use Case 52 | Thư ký *set/adjust* hệ số, kiểm theo khung hệ số thể loại | Hệ thống tự tính hệ số = hệ số chuẩn thể loại × điểm / 100. Tính chất bài lấy theo phóng viên khai, Thư ký không sửa hệ số (BR-RY-01 mới, bỏ bước xác nhận tính chất 24/10/2026) |
 | Functions 21, Use Case 61 | Admin đặt hệ số **min/max** cho ảnh/video | Mỗi loại (`media_kind`) có **1 hệ số cố định** `media_factors.factor` (BR-RY-04, UC-56) |
 | Functions 28, Use Case 58 | Lúc *Lock* hệ thống mới tính tiền và chia theo % | Tiền và các dòng chia cho từng tác giả có ngay **khi chấm xong** (UC-47). *Lock* chỉ khoá số liệu và tạo phiếu chi UNPAID (UC-53) |
 | Functions 23, Use Case 51 | Bài đã đăng **của một kỳ** | Bài đã đăng **chưa chấm**, có cảnh báo hạn chi (UC-46). Bài chỉ vào kỳ khi chấm xong (BR-RY-05) |

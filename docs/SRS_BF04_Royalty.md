@@ -11,7 +11,7 @@
 
 Mô tả sơ đồ (3 làn: Editorial Secretary | Accountant | Reporter):
 
-1. Secretary (Start: Article published, from BF-02): Review royalty queue (payment deadline warnings) → Open royalty assessment form (view system-calculated coefficient) → Confirm work nature (original / translation / compilation / repost) → Assess images / videos (fixed coefficient by type) → Complete assessment (article joins open period) → **Month-end?** No → bài tiếp theo (quay lại bước 1).
+1. Secretary (Start: Article published, from BF-02): Review royalty queue (payment deadline warnings) → Open royalty assessment form (view system-calculated coefficient) → Assess images / videos (fixed coefficient by type) → Complete assessment (article joins open period) → **Month-end?** No → bài tiếp theo (quay lại bước 1).
 2. Yes → Review period sheet (incl. adjustment lines) & submit to Accountant. Một điểm vào khác: *Score changed after period locked (from BF-03)* cũng đi vào bước xem bảng kỳ.
 3. Accountant: Check royalty period → **Period valid?**
    - No → return (reopen period) → quay lại bước 2 của Secretary.
@@ -35,7 +35,7 @@ Primary actors: Editorial Secretary, Accountant · Others: Reporter, Admin · 12
 | ID | Use Case | Feature | Use Case Description |
 |---|---|---|---|
 | 46 | View Articles Pending Grading | Royalty Grading | The Editorial Secretary views published articles that have not been graded yet, with payment-deadline warnings. |
-| 47 | Grade Article Royalty | Royalty Grading | The system calculates the coefficient = category base factor × score / 100, minimum 1, and the Secretary confirms the nature (translation 70%, compilation 50%, repost 30%). Saturated events reduce the coefficient by submission order. When grading is complete, the article joins the open period. |
+| 47 | Grade Article Royalty | Royalty Grading | The system calculates the coefficient = category base factor × score / 100, minimum 1, multiplied by the nature rate of the nature declared by the reporter (translation 70%, compilation 50%, repost 30%). Saturated events reduce the coefficient by submission order. When grading is complete, the article joins the open period. |
 | 48 | Grade Media Royalty | Royalty Grading | The Secretary grades each image/video with the fixed coefficient of its media type. Reused or external media receive no royalty. |
 | 49 | View Royalty Periods | Royalty Period | The Secretary and the Accountant view monthly royalty periods with status and total amount. |
 | 50 | Close Royalty Period | Royalty Period | At month-end, the Secretary reviews the period sheet (including adjustment lines) and submits it to the Accountant. |
@@ -60,11 +60,10 @@ Primary actors: Editorial Secretary, Accountant · Others: Reporter, Admin · 12
 | Business Rules | BR-RY-01 … 06 |
 
 **Normal Flow**
-1. System shows the article, score, category and nature, and shows the coefficient calculated from the score (BR-RY-01).
-2. Secretary confirms the nature.
-3. System calculates final factor and amount (BR-RY-02, 03).
-4. Secretary grades images/videos if any (BR-RY-04).
-5. Secretary clicks Complete; system saves and adds the article to the OPEN period (BR-RY-05).
+1. System shows the article, score, category and the nature declared by the reporter, and shows the coefficient calculated from the score (BR-RY-01).
+2. System calculates final factor and amount from the declared nature (BR-RY-02, 03).
+3. Secretary grades images/videos if any (BR-RY-04).
+4. Secretary clicks Complete; system saves and adds the article to the OPEN period (BR-RY-05).
 
 **Alternative / Exceptions**
 - A1 Score changed after grading (BF-03): a new version is created; if the period is LOCKED the difference goes to the next period (BR-RY-06).
@@ -142,6 +141,7 @@ Simple view and configuration use cases (UC-46, 48, 49, 51, 52, 55, 56, 57) are 
 
 > **Ghi chú:**
 > - BR-RY-01 đã đổi theo quyết định của nhóm (13/10/2026): bỏ chia bậc điểm 90/70 (100/80/60%), hệ số = hệ số chuẩn thể loại × điểm / 100, hệ thống tự tính, Thư ký **không** nâng được nữa (nên bỏ luôn UC-47 A1 cũ). PR `[DB]` ngày 18/10/2026 đã bỏ tham số `SCORE_TIER_*`, `TIER_RATE_*`, sửa comment bảng `royalty_gradings` và bỏ cột `genres.max_factor`. Cột `tier_rate` giữ lại, lưu bằng điểm (cho phép 0); `applied_factor` luôn bằng `suggested_factor`.
+> - Bỏ bước Thư ký xác nhận tính chất bài (24/10/2026, commit `0032f57`): tính chất lấy thẳng từ `articles.declared_nature` (phóng viên khai lúc nộp bài), Thư ký không chọn lại. Swimlane đã vẽ lại bỏ ô *Confirm work nature*; file nguồn `srs-images/bf04-swimlane.drawio`.
 > - Hạn chi nhuận bút (UC-46): SRS không ghi số ngày. Nhóm chốt (14/10/2026) tham số `PAYMENT_DEADLINE_DAYS` = 30 ngày kể từ ngày đăng, cảnh báo khi còn ≤ `PAYMENT_WARN_DAYS` = 7 ngày.
 > - UC-53 A1 ghi "period goes back to OPEN" khi Kế toán trả lại; swimlane ghi "return (reopen period)". Hai chỗ khớp nhau.
 > - Làm tròn chia đồng tác giả: BR-RY-03 ghi "rounded to 1,000 VND", GBR-10 nói rõ là **làm tròn xuống (FLOOR)**, phần dư dồn cho tác giả chính.
