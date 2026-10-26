@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
  * share_percent = 100 (BR-IN-02). Dong tac gia phai xac nhan truoc
  * confirm_deadline, qua han thi EXPIRED (BR-IN-06).
  *
- * MUC LUC (so dong)
- *   35  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   35  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "article_authors")

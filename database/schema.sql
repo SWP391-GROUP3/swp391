@@ -344,11 +344,13 @@ CREATE TABLE duplication_matches (
 );
 
 /* Lịch sử xử lý bài. Chỉ INSERT. note bắt buộc khi trả bài
-   (REVISION_REQUESTED) hoặc từ chối (REJECTED): kiểm ở tầng service. */
+   (REVISION_REQUESTED) hoặc từ chối (REJECTED): kiểm ở tầng service.
+   actor_id NULL = job hệ thống tự chạy (vd quá hạn 3 ngày xác nhận đồng
+   tác giả, UC-12 A2), giống audit_logs. */
 CREATE TABLE article_status_logs (
     id           INT IDENTITY(1,1) PRIMARY KEY,
     article_id   INT            NOT NULL,
-    actor_id     INT            NOT NULL,
+    actor_id     INT            NULL,
     action       VARCHAR(20)    NOT NULL,   -- CREATE, SUBMIT, WITHDRAW, ASSIGN, RETURN, REJECT, PUBLISH, ...
     from_status  VARCHAR(20)    NULL,       -- NULL ở lần tạo bài
     to_status    VARCHAR(20)    NOT NULL,

@@ -32,7 +32,7 @@ public class RoyaltyGradingResponse {
     private BigDecimal baseFactor;      // he so chuan the loai
     private BigDecimal suggestedFactor; // = baseFactor x diem / 100
     private BigDecimal saturationRate;  // % bao hoa su kien
-    private RoyaltyNature nature;       // tinh chat Thu ky xac nhan
+    private RoyaltyNature nature;       // tinh chat bai PV khai (BR-IN-03)
     private BigDecimal natureRate;      // % theo tinh chat
     private BigDecimal finalFactor;     // he so cuoi, toi thieu 1
     private BigDecimal unitPrice;       // don gia hieu luc tai ngay dang
