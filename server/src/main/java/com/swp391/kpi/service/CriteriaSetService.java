@@ -10,7 +10,6 @@ import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.CriteriaRepository;
 import com.swp391.kpi.repository.CriteriaSetVersionRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

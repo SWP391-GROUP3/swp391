@@ -40,6 +40,8 @@ import MediaFactors from '../pages/royalty/MediaFactors.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
 import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
 import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
+import ScoringSheet from '../pages/flow2/ScoringSheet.jsx'
+import ScoreApprovalQueue from '../pages/flow2/ScoreApprovalQueue.jsx'
 import Flow2Dashboard from '../pages/flow2/Flow2Dashboard.jsx'
 import ScoreCalculatorTester from '../pages/flow2/ScoreCalculatorTester.jsx'
 import UserProfile from '../pages/profile/UserProfile.jsx'
@@ -50,42 +52,39 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
 const TRANG_PV_CHUA_LAM = [
-  { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
+  { path: '/my-royalties', ten: 'Nhuận bút' },              // UC-57
 ]
 
 const TRANG_BTV_CHUA_LAM = [
-  { path: '/assigned-articles/:id', ten: 'Chấm bài' },               // UC-22…28
-  { path: '/re-reviews',            ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
-  { path: '/re-reviews/:id',        ten: 'Phiếu chấm lại' },         // UC-36, UC-37
-  { path: '/my-scorings',           ten: 'Lịch sử chấm' },           // UC-21
+  { path: '/re-reviews', ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
+  { path: '/re-reviews/:id', ten: 'Phiếu chấm lại' },         // UC-36, UC-37
+  { path: '/my-scorings', ten: 'Lịch sử chấm' },           // UC-21
 ]
 
 // Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
 const TRANG_TK_CHUA_LAM = []
 
 const TRANG_TB_CHUA_LAM = [
-  { path: '/score-approvals',       ten: 'Duyệt điểm' },              // UC-29
-  { path: '/score-approvals/:id',   ten: 'Chi tiết kết quả chấm' },   // UC-30, 31, 32
-  { path: '/publishing',            ten: 'Duyệt đăng' },              // UC-33
-  { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
-  { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
-  { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
+  { path: '/publishing', ten: 'Duyệt đăng' },              // UC-33
+  { path: '/cross-reviews', ten: 'Đợt chấm chéo' },           // UC-40
+  { path: '/reviewers/:id', ten: 'Hồ sơ biên tập viên' },     // UC-42
+  { path: '/audit-logs', ten: 'Nhật ký chấm' },            // UC-45
+  { path: '/kpi-board', ten: 'Bảng KPI của ban' },        // UC-61, 66
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
-  { path: '/kpi-reports',           ten: 'Báo cáo' },                 // UC-64, 65, 68
+  { path: '/kpi-reports', ten: 'Báo cáo' },                 // UC-64, 65, 68
 ]
 
 const TRANG_KT_CHUA_LAM = [
-  { path: '/royalty-payments',    ten: 'Chi trả nhuận bút' },       // UC-54
+  { path: '/royalty-payments', ten: 'Chi trả nhuận bút' },       // UC-54
 ]
 
 const TRANG_ADMIN_CHUA_LAM = [
-  { path: '/users',              ten: 'Tài khoản' },
-  { path: '/genres',             ten: 'Thể loại' },
-  { path: '/system-parameters',  ten: 'Tham số hệ thống' },        // UC-13
-  { path: '/criteria-sets',      ten: 'Bộ tiêu chí' },             // UC-14, 15
-  { path: '/criteria-sets/:id',  ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-  { path: '/reader-imports',     ten: 'Nhập số liệu độc giả' },    // UC-63
+  { path: '/users', ten: 'Tài khoản' },
+  { path: '/genres', ten: 'Thể loại' },
+  { path: '/system-parameters', ten: 'Tham số hệ thống' },        // UC-13
+  { path: '/criteria-sets', ten: 'Bộ tiêu chí' },             // UC-14, 15
+  { path: '/criteria-sets/:id', ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
+  { path: '/reader-imports', ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
 /**
@@ -93,12 +92,12 @@ const TRANG_ADMIN_CHUA_LAM = [
  * Layout = khung + menu, TrangChu = trang hien o /main, trangChuaLam = danh sach o tren.
  */
 const KHUNG_THEO_VAI_TRO = {
-  REPORTER:            { Layout: ReporterLayout,   TrangChu: ReporterHome,   trangChuaLam: TRANG_PV_CHUA_LAM },
-  EDITOR:              { Layout: EditorLayout,     TrangChu: EditorHome,     trangChuaLam: TRANG_BTV_CHUA_LAM },
-  EDITORIAL_SECRETARY: { Layout: SecretaryLayout,  TrangChu: SecretaryHome,  trangChuaLam: TRANG_TK_CHUA_LAM },
-  HEAD_OF_DEPARTMENT:  { Layout: HeadLayout,       TrangChu: HeadHome,       trangChuaLam: TRANG_TB_CHUA_LAM },
-  ACCOUNTANT:          { Layout: AccountantLayout, TrangChu: AccountantHome, trangChuaLam: TRANG_KT_CHUA_LAM },
-  ADMIN:               { Layout: AdminLayout,      TrangChu: AdminHome,      trangChuaLam: TRANG_ADMIN_CHUA_LAM },
+  REPORTER: { Layout: ReporterLayout, TrangChu: ReporterHome, trangChuaLam: TRANG_PV_CHUA_LAM },
+  EDITOR: { Layout: EditorLayout, TrangChu: EditorHome, trangChuaLam: TRANG_BTV_CHUA_LAM },
+  EDITORIAL_SECRETARY: { Layout: SecretaryLayout, TrangChu: SecretaryHome, trangChuaLam: TRANG_TK_CHUA_LAM },
+  HEAD_OF_DEPARTMENT: { Layout: HeadLayout, TrangChu: HeadHome, trangChuaLam: TRANG_TB_CHUA_LAM },
+  ACCOUNTANT: { Layout: AccountantLayout, TrangChu: AccountantHome, trangChuaLam: TRANG_KT_CHUA_LAM },
+  ADMIN: { Layout: AdminLayout, TrangChu: AdminHome, trangChuaLam: TRANG_ADMIN_CHUA_LAM },
 }
 
 /**
@@ -178,17 +177,23 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           )}
           {vaiTro === 'EDITOR' && (
             <>
-              {/* BF-02 (Duong): UC-21 Bài được giao */}
+              {/* BF-02 (Duong): UC-21 Bài được giao & UC-22..28 Chấm điểm */}
               <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
+              <Route path="/assigned-articles/:articleId" element={<ScoringSheet nguoiDung={nguoiDung} />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
             </>
           )}
           {vaiTro === 'HEAD_OF_DEPARTMENT' && (
             <>
-              {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm */}
+              {/* BF-02 (Duong): UC-18, 19, 20 Phân công chấm & UC-29..32 Duyệt điểm */}
               <Route path="/assignments" element={<AssignmentQueue nguoiDung={nguoiDung} />} />
+
+              <Route path="/score-approvals" element={<ScoreApprovalQueue nguoiDung={nguoiDung} />} />
+              <Route path="/score-approvals/:id" element={<ScoreApprovalQueue nguoiDung={nguoiDung} />} />
+
               <Route path="/appeals" element={<AppealManagementPage />} />
               <Route path="/appeals/:id" element={<AppealDetailPage />} />
+
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
               <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
