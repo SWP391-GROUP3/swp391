@@ -19,7 +19,8 @@ import { layToken, xoaPhien } from '../auth/phienDangNhap.js'
  */
 export async function goiApi(duongDan, tuyChon = {}) {
   const headers = {}
-  if (tuyChon.body !== undefined) {
+  const isFormData = typeof FormData !== 'undefined' && tuyChon.body instanceof FormData
+  if (tuyChon.body !== undefined && !isFormData) {
     headers['Content-Type'] = 'application/json'
   }
   const token = layToken()
@@ -30,7 +31,7 @@ export async function goiApi(duongDan, tuyChon = {}) {
   const res = await fetch(duongDan, {
     method: tuyChon.method || 'GET',
     headers,
-    body: tuyChon.body !== undefined ? JSON.stringify(tuyChon.body) : undefined,
+    body: tuyChon.body !== undefined ? (isFormData ? tuyChon.body : JSON.stringify(tuyChon.body)) : undefined,
   })
 
   // Dang co token ma van 401 = token het han hoac bi sua -> bat dang nhap lai.

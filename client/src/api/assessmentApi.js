@@ -2,9 +2,9 @@ import { goiApi } from './goiApi.js'
 
 
 // API Client cho Luong BF-02 (Phan cong & Danh gia chat luong)
-export function layDanhSachBoTieuChi(categoryId) {
-  return goiApi(`/api/criteria-sets/category/${categoryId}`)
-
+// export function layDanhSachBoTieuChi(categoryId) {
+//   return goiApi(`/api/criteria-sets/category/${categoryId}`)
+// }
   /**
    * API client cho Luồng BF-02: Phân công, Đánh giá chất lượng & Duyệt đăng.
    *

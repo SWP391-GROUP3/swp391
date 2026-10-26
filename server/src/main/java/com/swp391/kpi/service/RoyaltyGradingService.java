@@ -128,6 +128,11 @@ public class RoyaltyGradingService {
     // UC-47 buoc 1-4: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
     // nature = tinh chat Thu ky dang chon; null thi lay tinh chat PV da khai.
     @Transactional(readOnly = true)
+    public RoyaltyGradingResponse previewGrading(Integer articleId) {
+        return previewGrading(articleId, null);
+    }
+
+    @Transactional(readOnly = true)
     public RoyaltyGradingResponse previewGrading(Integer articleId, RoyaltyNature nature) {
         ArticleRoyaltyInfoResponse article = articlePublishedService.getArticleForRoyalty(articleId);
         RoyaltyNature confirmedNature = nature;

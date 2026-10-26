@@ -233,8 +233,14 @@ public class ArticleService {
 
     /**
      * Doi trang thai bai va ghi 1 dong lich su trong cung transaction (AGENTS.md muc 2).
-     * Luong khac (BF-02...) sau nay cung phai doi trang thai qua ham cua ArticleService.
+     * Luong khac (BF-02...) goi qua ham nay.
      */
+    @Transactional
+    public void updateArticleStatus(Integer articleId, ArticleStatus newStatus, Integer actorId, String action, String note) {
+        Article article = findArticle(articleId);
+        changeStatus(article, newStatus, actorId, action, note);
+    }
+
     private void changeStatus(Article article, ArticleStatus newStatus, Integer actorId, String action, String note) {
         LocalDateTime now = LocalDateTime.now();
 

@@ -41,6 +41,7 @@ import RoyaltyPendingList from '../pages/royalty/RoyaltyPendingList.jsx'
 import RoyaltyGrading from '../pages/royalty/RoyaltyGrading.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
+import ReaderDataImport from '../pages/admin/ReaderDataImport.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
 import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
 import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
@@ -98,7 +99,6 @@ const TRANG_ADMIN_CHUA_LAM = [
   { path: '/system-parameters', ten: 'Tham số hệ thống' },        // UC-13
   { path: '/criteria-sets', ten: 'Bộ tiêu chí' },             // UC-14, 15
   { path: '/criteria-sets/:id', ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-  { path: '/reader-imports', ten: 'Nhập số liệu độc giả' },    // UC-63
 ]
 
 /**
@@ -247,6 +247,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
               <Route path="/media-factors" element={<MediaFactors />} />
+              <Route path="/reader-imports" element={<ReaderDataImport />} />
             </>
           )}
 

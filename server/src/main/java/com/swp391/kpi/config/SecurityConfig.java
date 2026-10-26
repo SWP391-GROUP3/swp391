@@ -69,6 +69,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/royalty-periods/**").hasAnyRole("EDITORIAL_SECRETARY", "ACCOUNTANT")
                         // BF-04: cham nhuan but chi Thu ky toa soan (UC-46, 47, 48)
                         .requestMatchers("/api/royalty-gradings/**").hasRole("EDITORIAL_SECRETARY")
+                        // BF-05: chi Admin nhap so lieu doc gia tu CSV va xem nhat ky (UC-63)
+                        .requestMatchers("/api/reader-imports/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 // Bat che do kiem JWT: doc header Authorization, kiem chu ky + han dung bang JwtDecoder
                 .oauth2ResourceServer(oauth2 -> oauth2
