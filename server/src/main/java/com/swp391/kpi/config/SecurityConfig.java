@@ -29,15 +29,16 @@ import java.nio.charset.StandardCharsets;
  * - POST /api/auth/login: ai cung goi duoc (chua co token thi moi can dang nhap)
  * - BF-04: them don gia = Ke toan, sua he so anh/video = Admin, xem ky nhuan but = Thu ky + Ke toan,
  *   cham nhuan but = Thu ky
+ * - BF-01: tao / sua / nop bai (POST, PUT /api/articles/**) = Phong vien
  * - moi API con lai: phai gui header "Authorization: Bearer <token>" hop le
  * Chan theo vai tro (vd chi Ke toan them don gia) -> them .requestMatchers(...).hasRole(...)
  *
  * MUC LUC (so dong)
- *   46  hang so                      - hang so dung trong file
- *   49  field                        - cac truong du lieu
- *   52  securityFilterChain()
- *   89  jwtAuthenticationConverter() - Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER",
- *  100  writeError()                 - Ghi loi ra response dang { success: false, message: "..." } giong Globa…
+ *   47  hang so                      - hang so dung trong file
+ *   50  field                        - cac truong du lieu
+ *   53  securityFilterChain()
+ *   94  jwtAuthenticationConverter() - Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER",
+ *  105  writeError()                 - Ghi loi ra response dang { success: false, message: "..." } giong Globa…
  */
 @Configuration
 @RequiredArgsConstructor
@@ -71,6 +72,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/royalty-gradings/**").hasRole("EDITORIAL_SECRETARY")
                         // BF-05: chi Admin nhap so lieu doc gia tu CSV va xem nhat ky (UC-63)
                         .requestMatchers("/api/reader-imports/**").hasRole("ADMIN")
+                        // BF-01: chi Phong vien tao / sua / nop / rut bai, xac nhan dong tac gia (UC-03, 05, 10, 11, 12).
+                        // GET de nguyen vi luong khac cung doc qua /api/articles (vd BF-03 appeal-eligibility).
+                        .requestMatchers(HttpMethod.POST, "/api/articles/**").hasRole("REPORTER")
+                        .requestMatchers(HttpMethod.PUT, "/api/articles/**").hasRole("REPORTER")
                         .anyRequest().authenticated())
                 // Bat che do kiem JWT: doc header Authorization, kiem chu ky + han dung bang JwtDecoder
                 .oauth2ResourceServer(oauth2 -> oauth2
