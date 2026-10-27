@@ -10,11 +10,14 @@ import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.RoyaltyGrading;
 import com.swp391.kpi.entity.RoyaltyLine;
 import com.swp391.kpi.entity.RoyaltyLineType;
+import com.swp391.kpi.entity.RoyaltyPayment;
+import com.swp391.kpi.entity.RoyaltyPaymentStatus;
 import com.swp391.kpi.entity.RoyaltyPeriod;
 import com.swp391.kpi.entity.RoyaltyPeriodStatus;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.repository.RoyaltyGradingRepository;
 import com.swp391.kpi.repository.RoyaltyLineRepository;
+import com.swp391.kpi.repository.RoyaltyPaymentRepository;
 import com.swp391.kpi.repository.RoyaltyPeriodRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +32,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,16 +46,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Kiem tra ky nhuan but (UC-49, UC-50), khong can DB.
+ * Kiem tra ky nhuan but (UC-49, UC-50, UC-52, UC-53), khong can DB.
  */
 @ExtendWith(MockitoExtension.class)
 class RoyaltyPeriodServiceTest {
 
     private static final Integer SECRETARY_ID = 4;
+    private static final Integer ACCOUNTANT_ID = 5;
 
     @Mock private RoyaltyPeriodRepository royaltyPeriodRepository;
     @Mock private RoyaltyGradingRepository royaltyGradingRepository;
     @Mock private RoyaltyLineRepository royaltyLineRepository;
+    @Mock private RoyaltyPaymentRepository royaltyPaymentRepository;
     @Mock private RoyaltyGradingService royaltyGradingService;
     @Mock private ArticlePublishedService articlePublishedService;
     @Mock private UserReadService userReadService;
@@ -199,6 +207,160 @@ class RoyaltyPeriodServiceTest {
         verify(royaltyPeriodRepository, never()).save(any(RoyaltyPeriod.class));
     }
 
+    // ------------------------------------------------------- UC-52 tra ky
+
+    @Test
+    void returnPeriodReopensClosedPeriodWithNoteAndNotifiesSecretary() {
+        RoyaltyPeriod september = period(1, 2026, 9, RoyaltyPeriodStatus.CLOSED);
+        when(royaltyPeriodRepository.findById(1)).thenReturn(Optional.of(september));
+        when(royaltyPeriodRepository.save(any(RoyaltyPeriod.class))).thenAnswer(call -> call.getArgument(0));
+
+        RoyaltyPeriodResponse result = royaltyPeriodService.returnPeriod(1, "  Sai tỷ lệ bài 5  ", ACCOUNTANT_ID);
+
+        assertEquals(RoyaltyPeriodStatus.OPEN, result.getStatus());
+        assertEquals("Sai tỷ lệ bài 5", result.getReturnNote());   // bo khoang trang 2 dau
+        assertEquals(ACCOUNTANT_ID, september.getReturnedBy());
+        verify(notificationService).notifyRole(eq("EDITORIAL_SECRETARY"), contains("9/2026"));
+        verify(auditService).log(eq(ACCOUNTANT_ID), eq("RETURN"), eq("royalty_periods"), eq(1), any(), any());
+    }
+
+    @Test
+    void returnPeriodFailsWhenPeriodIsNotClosed() {
+        // Ky OPEN chua chot va ky LOCKED da khoa deu khong tra duoc (BR-RY-07)
+        when(royaltyPeriodRepository.findById(1)).thenReturn(Optional.of(period(1, 2026, 9, RoyaltyPeriodStatus.LOCKED)));
+
+        BusinessException error = assertThrows(BusinessException.class,
+                () -> royaltyPeriodService.returnPeriod(1, "Sai tỷ lệ", ACCOUNTANT_ID));
+
+        assertTrue(error.getMessage().contains("Chỉ trả lại được kỳ đã chốt"));
+        verify(royaltyPeriodRepository, never()).save(any(RoyaltyPeriod.class));
+        verify(notificationService, never()).notifyRole(any(), any());
+    }
+
+    // ------------------------------------------------------- UC-53 khoa ky
+
+    @Test
+    void lockPeriodCreatesOneUnpaidPaymentPerPersonAndAttachesLines() {
+        RoyaltyPeriod september = period(1, 2026, 9, RoyaltyPeriodStatus.CLOSED);
+        RoyaltyGrading article5 = grading(2, 5, "966000");
+        RoyaltyLine anArticle = line(article5, 1, RoyaltyLineType.ARTICLE, "580000");
+        RoyaltyLine binhArticle = line(article5, 2, RoyaltyLineType.ARTICLE, "386000");
+        RoyaltyLine binhMedia = line(article5, 2, RoyaltyLineType.MEDIA, "234000");
+        when(royaltyPeriodRepository.findById(1)).thenReturn(Optional.of(september));
+        // Ky 8/2026 khong co: ky dau tien, chua ai no
+        when(royaltyPeriodRepository.findByPeriodYearAndPeriodMonth((short) 2026, (byte) 8)).thenReturn(Optional.empty());
+        when(royaltyLineRepository.findByPeriodId(1)).thenReturn(List.of(anArticle, binhArticle, binhMedia));
+        when(royaltyPaymentRepository.save(any(RoyaltyPayment.class))).thenAnswer(call -> call.getArgument(0));
+        when(royaltyPeriodRepository.save(any(RoyaltyPeriod.class))).thenAnswer(call -> call.getArgument(0));
+
+        RoyaltyPeriodResponse result = royaltyPeriodService.lockPeriod(1, ACCOUNTANT_ID);
+
+        assertEquals(RoyaltyPeriodStatus.LOCKED, result.getStatus());
+        assertEquals(ACCOUNTANT_ID, september.getLockedBy());
+        assertNotNull(september.getLockedAt());
+
+        // 2 phieu, xep theo id nguoi: An 580.000, Binh 386.000 + 234.000
+        ArgumentCaptor<RoyaltyPayment> captor = ArgumentCaptor.forClass(RoyaltyPayment.class);
+        verify(royaltyPaymentRepository, times(2)).save(captor.capture());
+        RoyaltyPayment an = captor.getAllValues().get(0);
+        assertEquals(Integer.valueOf(1), an.getUserId());
+        assertMoney("580000", an.getGrossAmount());
+        assertMoney("0", an.getDebtIn());
+        assertMoney("580000", an.getPaidAmount());
+        assertEquals(RoyaltyPaymentStatus.UNPAID, an.getStatus());
+        assertNull(an.getPaidBy());
+        RoyaltyPayment binh = captor.getAllValues().get(1);
+        assertMoney("620000", binh.getGrossAmount());
+        assertMoney("620000", binh.getPaidAmount());
+
+        // Moi dong tien gan dung phieu cua nguoi nhan
+        assertSame(an, anArticle.getPayment());
+        assertSame(binh, binhArticle.getPayment());
+        assertSame(binh, binhMedia.getPayment());
+        verify(auditService).log(eq(ACCOUNTANT_ID), eq("LOCK"), eq("royalty_periods"), eq(1), any(), any());
+    }
+
+    @Test
+    void lockPeriodCarriesDebtFromPreviousPeriodAndCreatesZeroPaymentForDebtorWithoutLines() {
+        RoyaltyPeriod october = period(2, 2026, 10, RoyaltyPeriodStatus.CLOSED);
+        RoyaltyPeriod september = period(1, 2026, 9, RoyaltyPeriodStatus.LOCKED);
+        when(royaltyPeriodRepository.findById(2)).thenReturn(Optional.of(october));
+        when(royaltyPeriodRepository.findByPeriodYearAndPeriodMonth((short) 2026, (byte) 9)).thenReturn(Optional.of(september));
+        // Ky 9: An con no 200.000, Cuong con no 50.000, Binh het no
+        when(royaltyPaymentRepository.findByPeriodId(1)).thenReturn(List.of(
+                payment(1, "200000"), payment(2, "0"), payment(3, "50000")));
+        when(royaltyLineRepository.findByPeriodId(2)).thenReturn(List.of(
+                line(grading(3, 6, "500000"), 1, RoyaltyLineType.ARTICLE, "500000")));
+        when(royaltyPaymentRepository.save(any(RoyaltyPayment.class))).thenAnswer(call -> call.getArgument(0));
+        when(royaltyPeriodRepository.save(any(RoyaltyPeriod.class))).thenAnswer(call -> call.getArgument(0));
+
+        royaltyPeriodService.lockPeriod(2, ACCOUNTANT_ID);
+
+        ArgumentCaptor<RoyaltyPayment> captor = ArgumentCaptor.forClass(RoyaltyPayment.class);
+        verify(royaltyPaymentRepository, times(2)).save(captor.capture());
+        // An: 500.000 - no 200.000 = chi 300.000, het no
+        RoyaltyPayment an = captor.getAllValues().get(0);
+        assertEquals(Integer.valueOf(1), an.getUserId());
+        assertMoney("200000", an.getDebtIn());
+        assertMoney("300000", an.getPaidAmount());
+        assertMoney("0", an.getDebtOut());
+        // Cuong: ky 10 khong co dong tien nhung van co phieu 0d, giu no 50.000
+        RoyaltyPayment cuong = captor.getAllValues().get(1);
+        assertEquals(Integer.valueOf(3), cuong.getUserId());
+        assertMoney("0", cuong.getGrossAmount());
+        assertMoney("0", cuong.getPaidAmount());
+        assertMoney("50000", cuong.getDebtOut());
+    }
+
+    @Test
+    void lockPeriodFailsWhenPreviousPeriodIsNotLocked() {
+        when(royaltyPeriodRepository.findById(2)).thenReturn(Optional.of(period(2, 2026, 10, RoyaltyPeriodStatus.CLOSED)));
+        // Ky 9 bi Ke toan tra ve, dang OPEN lai -> chua biet no cua ky 9
+        when(royaltyPeriodRepository.findByPeriodYearAndPeriodMonth((short) 2026, (byte) 9))
+                .thenReturn(Optional.of(period(1, 2026, 9, RoyaltyPeriodStatus.OPEN)));
+
+        BusinessException error = assertThrows(BusinessException.class,
+                () -> royaltyPeriodService.lockPeriod(2, ACCOUNTANT_ID));
+
+        assertTrue(error.getMessage().contains("Kỳ 9/2026 chưa khoá"));
+        verify(royaltyPaymentRepository, never()).save(any(RoyaltyPayment.class));
+        verify(royaltyPeriodRepository, never()).save(any(RoyaltyPeriod.class));
+    }
+
+    @Test
+    void lockPeriodFailsWhenPeriodIsNotClosed() {
+        when(royaltyPeriodRepository.findById(1)).thenReturn(Optional.of(period(1, 2026, 9, RoyaltyPeriodStatus.OPEN)));
+
+        BusinessException error = assertThrows(BusinessException.class,
+                () -> royaltyPeriodService.lockPeriod(1, ACCOUNTANT_ID));
+
+        assertTrue(error.getMessage().contains("Chỉ khoá được kỳ đã chốt"));
+        verify(royaltyPaymentRepository, never()).save(any(RoyaltyPayment.class));
+    }
+
+    // ------------------------------------------- bang ke sau khi cham lai
+
+    @Test
+    void getPeriodDetailShowsOnlyLatestVersionOfRegradedArticle() {
+        RoyaltyGrading version1 = grading(2, 5, "966000");
+        RoyaltyGrading version2 = grading(4, 5, "1050000");
+        version2.setVersionNo(2);
+        when(royaltyPeriodRepository.findById(1)).thenReturn(Optional.of(period(1, 2026, 9, RoyaltyPeriodStatus.OPEN)));
+        when(royaltyGradingRepository.findByPeriodIdOrderByGradedAtAsc(1)).thenReturn(List.of(version1, version2));
+        // Dong tien ban 1 da bi xoa luc cham lai, chi con dong cua ban 2
+        when(royaltyLineRepository.findByPeriodId(1)).thenReturn(List.of(
+                line(version2, 1, RoyaltyLineType.ARTICLE, "1050000")));
+        when(articlePublishedService.getPublishedArticles()).thenReturn(List.of(published(5, "Bai 5")));
+        when(userReadService.getUsers()).thenReturn(List.of(
+                new UserAccessResponse(1, "Nguyen Van An", "REPORTER", 1, "Ban Thoi su", "ACTIVE")));
+
+        RoyaltyPeriodDetailResponse detail = royaltyPeriodService.getPeriodDetail(1);
+
+        assertEquals(1, detail.getArticles().size());
+        assertMoney("1050000", detail.getArticles().get(0).getTotalAmount());
+        assertEquals(Integer.valueOf(1), detail.getGradedArticleCount());
+    }
+
     // ----------------------------------------------------------- du lieu gia
 
     private static RoyaltyPeriod period(Integer id, int year, int month, RoyaltyPeriodStatus status) {
@@ -214,8 +376,17 @@ class RoyaltyPeriodServiceTest {
         RoyaltyGrading grading = new RoyaltyGrading();
         grading.setId(id);
         grading.setArticleId(articleId);
+        grading.setVersionNo(1);
         grading.setAmount(new BigDecimal(amount));
         return grading;
+    }
+
+    // Phieu chi da khoa cua ky truoc, chi can nguoi nhan va no chuyen sang ky sau
+    private static RoyaltyPayment payment(Integer userId, String debtOut) {
+        RoyaltyPayment payment = new RoyaltyPayment();
+        payment.setUserId(userId);
+        payment.setDebtOut(new BigDecimal(debtOut));
+        return payment;
     }
 
     private static RoyaltyLine line(RoyaltyGrading grading, Integer userId, RoyaltyLineType type, String amount) {

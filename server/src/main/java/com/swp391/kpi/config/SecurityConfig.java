@@ -66,6 +66,9 @@ public class SecurityConfig {
                         // BF-04: chi Thu ky chot ky (UC-50). Phai dat TRUOC luat /api/royalty-periods/**
                         // vi Spring xet tu tren xuong, gap luat khop dau tien la dung.
                         .requestMatchers(HttpMethod.POST, "/api/royalty-periods/*/close").hasRole("EDITORIAL_SECRETARY")
+                        // BF-04: chi Ke toan tra ky (UC-52) va khoa ky (UC-53). Cung phai dat TRUOC /api/royalty-periods/**
+                        .requestMatchers(HttpMethod.POST, "/api/royalty-periods/*/return").hasRole("ACCOUNTANT")
+                        .requestMatchers(HttpMethod.POST, "/api/royalty-periods/*/lock").hasRole("ACCOUNTANT")
                         // BF-04: ky nhuan but co tong tien, chi Thu ky va Ke toan xem (UC-49, UC-50)
                         .requestMatchers("/api/royalty-periods/**").hasAnyRole("EDITORIAL_SECRETARY", "ACCOUNTANT")
                         // BF-04: cham nhuan but chi Thu ky toa soan (UC-46, 47, 48)

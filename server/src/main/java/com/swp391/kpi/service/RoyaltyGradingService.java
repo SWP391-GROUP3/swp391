@@ -52,33 +52,34 @@ import java.util.Set;
  * goi may tinh va luu ket qua.
  *
  * MUC LUC (so dong)
- *   80  hang so                      - hang so dung trong file
- *   86  field                        - repository / service duoc inject
- *  104  getPendingArticles()         - UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap t…
- *  130  previewGrading()             - UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
- *  146  completeGrading()            - UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va ca…
- *  171  calculate()                  - Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan …
- *  209  findSaturationRate()         - Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 10…
- *  221  splitArticleAmount()         - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.0…
- *  240  gradeMedia()                 - UC-48: cham tung anh/video. Anh duoc tinh tien = he so co dinh cua loai…
- *  260  findNoRoyaltyReason()        - Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN…
- *  273  findMediaFactor()            - He so co dinh cua loai anh/video (bang media_factors, UC-56)
- *  279  sumMediaAmount()
- *  288  findRateOnPublishDate()      - UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi kho…
- *  295  findOpenPeriod()
- *  299  fillPeriod()
- *  308  saveGrading()                - Phieu cham phien ban 1. tier_rate luu bang diem, applied = suggested (B…
- *  334  saveArticleLines()           - Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GB…
- *  345  saveMediaItemsAndLines()     - Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA…
- *  365  newLine()
- *  381  readInt()                    - Lay 1 tham so so nguyen. Thieu hoac sai dinh dang thi bao loi ro rang,
+ *   81  hang so                      - hang so dung trong file
+ *   87  field                        - repository / service duoc inject
+ *  105  getPendingArticles()         - UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap t…
+ *  131  previewGrading()             - UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi.
+ *  154  completeGrading()            - UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va ca…
+ *  191  checkCanRegrade()            - Cham lai chi khi ky cua phien ban cu con OPEN, bat buoc ly do (nhom chot 27/10)
+ *  206  calculate()                  - Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan …
+ *  244  findSaturationRate()         - Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 10…
+ *  256  splitArticleAmount()         - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.0…
+ *  275  gradeMedia()                 - UC-48: cham tung anh/video. Anh duoc tinh tien = he so co dinh cua loai…
+ *  295  findNoRoyaltyReason()        - Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN…
+ *  308  findMediaFactor()            - He so co dinh cua loai anh/video (bang media_factors, UC-56)
+ *  314  sumMediaAmount()
+ *  323  findRateOnPublishDate()      - UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi kho…
+ *  330  findOpenPeriod()
+ *  334  fillPeriod()
+ *  344  saveGrading()                - Phieu cham 1 phien ban (khong sua phien ban cu). tier_rate luu bang die…
+ *  371  saveArticleLines()           - Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GB…
+ *  382  saveMediaItemsAndLines()     - Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA…
+ *  402  newLine()
+ *  418  readInt()                    - Lay 1 tham so so nguyen. Thieu hoac sai dinh dang thi bao loi ro rang,
  */
 @Service
 @RequiredArgsConstructor
 public class RoyaltyGradingService {
 
     private static final String ROYALTY_FLOW = "BF-04";  // gia tri cot system_parameters.flow cua luong nhuan but
-    private static final int FIRST_VERSION = 1;          // Iter 2: moi bai chi co phieu phien ban 1
+    private static final int FIRST_VERSION = 1;          // lan cham dau; cham lai thi tang dan
     private static final String HASH_DUPLICATE = "DUPLICATE";  // trung y het file anh da co
     private static final String HASH_SIMILAR = "SIMILAR";      // dhash gan giong anh da co
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -132,7 +133,13 @@ public class RoyaltyGradingService {
         RoyaltyRate rate = findRateOnPublishDate(article);
         RoyaltyGradingResponse preview = calculate(article, rate);
 
-        // Cho Thu ky biet bai se vao ky nao. Chua co ky OPEN thi de trong, luc Hoan tat moi bao loi.
+        // Cho Thu ky biet bai se vao ky nao: cham lai thi vao ky cua phien ban cu (checkCanRegrade).
+        Optional<RoyaltyGrading> previous = royaltyGradingRepository.findFirstByArticleIdOrderByVersionNoDesc(articleId);
+        if (previous.isPresent()) {
+            fillPeriod(preview, previous.get().getPeriod());
+            return preview;
+        }
+        // Lan dau: ky OPEN. Chua co ky OPEN thi de trong, luc Hoan tat moi bao loi.
         Optional<RoyaltyPeriod> openPeriod = findOpenPeriod();
         if (openPeriod.isPresent()) {
             fillPeriod(preview, openPeriod.get());
@@ -142,27 +149,55 @@ public class RoyaltyGradingService {
 
     // UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien
     // cua tung nguoi vao ky dang OPEN (BR-RY-05). Tat ca trong 1 transaction: loi la khong luu gi.
+    // Bai da cham thi day la cham lai: phien ban moi, bat buoc ly do (xem checkCanRegrade).
     @Transactional
     public RoyaltyGradingResponse completeGrading(RoyaltyGradingCreateRequest request, Integer currentUserId) {
         ArticleRoyaltyInfoResponse article = articlePublishedService.getArticleForRoyalty(request.getArticleId());
-        if (royaltyGradingRepository.existsByArticleId(article.getId())) {
-            throw new BusinessException("Bài này đã được chấm nhuận bút.");
+        Optional<RoyaltyGrading> previous = royaltyGradingRepository.findFirstByArticleIdOrderByVersionNoDesc(article.getId());
+
+        RoyaltyPeriod period;
+        int versionNo;
+        String recalcReason = null;
+        if (previous.isPresent()) {
+            period = checkCanRegrade(previous.get(), request.getRecalcReason());
+            versionNo = previous.get().getVersionNo() + 1;
+            recalcReason = request.getRecalcReason().trim();
+            royaltyLineRepository.deleteByGradingId(previous.get().getId());   // ky con OPEN nen xoa duoc
+        } else {
+            // UC-47 E1: khong co ky OPEN thi khong hoan tat duoc
+            period = findOpenPeriod().orElseThrow(() -> new BusinessException(
+                    "Chưa có kỳ nhuận bút đang mở, chưa thể hoàn tất chấm nhuận bút."));
+            versionNo = FIRST_VERSION;
         }
-        // UC-47 E1: khong co ky OPEN thi khong hoan tat duoc
-        RoyaltyPeriod period = findOpenPeriod().orElseThrow(() -> new BusinessException(
-                "Chưa có kỳ nhuận bút đang mở, chưa thể hoàn tất chấm nhuận bút."));
         RoyaltyRate rate = findRateOnPublishDate(article);
         RoyaltyGradingResponse result = calculate(article, rate);
 
-        RoyaltyGrading grading = saveGrading(result, period, rate, currentUserId);
+        RoyaltyGrading grading = saveGrading(result, period, rate, versionNo, recalcReason, currentUserId);
         saveArticleLines(grading, period, result.getAuthors());
         saveMediaItemsAndLines(grading, period, result.getMediaItems());
-        auditService.log(currentUserId, "CREATE", "royalty_gradings", grading.getId(), null,
-                "{\"final_factor\":" + grading.getFinalFactor() + ",\"amount\":" + grading.getAmount() + "}");
+        String action = previous.isPresent() ? "RECALCULATE" : "CREATE";
+        auditService.log(currentUserId, action, "royalty_gradings", grading.getId(), null,
+                "{\"version_no\":" + versionNo + ",\"final_factor\":" + grading.getFinalFactor()
+                        + ",\"amount\":" + grading.getAmount() + "}");
 
         result.setGradingId(grading.getId());
         fillPeriod(result, period);
         return result;
+    }
+
+    // Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky,
+    // UC-52); phien ban moi vao CUNG ky do. Ky da chot/khoa thi khong cham lai duoc (BR-RY-06),
+    // chenh lech sau khoa se thanh dong dieu chinh khi lam BF-03 (UC-47 A1).
+    private RoyaltyPeriod checkCanRegrade(RoyaltyGrading previous, String recalcReason) {
+        RoyaltyPeriod period = previous.getPeriod();
+        if (period.getStatus() != RoyaltyPeriodStatus.OPEN) {
+            throw new BusinessException("Bài này đã được chấm nhuận bút trong kỳ " + period.getPeriodMonth() + "/"
+                    + period.getPeriodYear() + " (đang " + period.getStatus() + "), không chấm lại được.");
+        }
+        if (recalcReason == null || recalcReason.isBlank()) {
+            throw new BusinessException("Bài này đã được chấm nhuận bút. Muốn chấm lại phải nhập lý do.");
+        }
+        return period;
     }
 
     // ------------------------------------------------------------ tinh toan
@@ -304,15 +339,17 @@ public class RoyaltyGradingService {
 
     // ------------------------------------------------------------------ luu
 
-    // Phieu cham phien ban 1. tier_rate luu bang diem, applied = suggested (BR-RY-01 moi).
+    // Phieu cham 1 phien ban (khong sua phien ban cu). tier_rate luu bang diem, applied = suggested
+    // (BR-RY-01 moi). recalcReason NULL voi phien ban 1, bat buoc tu phien ban 2 (ck_royalty_gradings_recalc).
     private RoyaltyGrading saveGrading(RoyaltyGradingResponse result, RoyaltyPeriod period, RoyaltyRate rate,
-                                       Integer currentUserId) {
+                                       int versionNo, String recalcReason, Integer currentUserId) {
         RoyaltyGrading grading = new RoyaltyGrading();
         grading.setScoringAttemptId(result.getScoringAttemptId());
         grading.setArticleId(result.getArticleId());
         grading.setCategoryId(result.getCategoryId());
         grading.setGradedBy(currentUserId);
-        grading.setVersionNo(FIRST_VERSION);
+        grading.setVersionNo(versionNo);
+        grading.setRecalcReason(recalcReason);
         grading.setPeriod(period);
         grading.setRate(rate);
         grading.setScoreUsed(result.getScoreUsed());

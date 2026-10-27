@@ -10,10 +10,16 @@ import java.util.List;
  * UC-47/48 chi dung save() co san de ghi dong ARTICLE / MEDIA.
  *
  * MUC LUC (so dong)
- *   18  findByPeriodId()             - Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi …
+ *   19  findByPeriodId()             - Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi …
+ *   24  deleteByGradingId()          - Cham lai trong ky OPEN: xoa dong tien cua phien ban cu (ky chua khoa)
  */
 public interface RoyaltyLineRepository extends JpaRepository<RoyaltyLine, Integer> {
 
     // Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi (UC-50)
     List<RoyaltyLine> findByPeriodId(Integer periodId);
+
+    // Cham lai trong ky OPEN (nhom chot 27/10/2026): xoa dong tien cua phien ban cu.
+    // Chi duoc goi khi ky con OPEN; ky da khoa thi khong bao gio xoa (BR-RY-06).
+    // Spring tu viet cau DELETE tu ten ham; service goi phai co @Transactional.
+    void deleteByGradingId(Integer gradingId);
 }

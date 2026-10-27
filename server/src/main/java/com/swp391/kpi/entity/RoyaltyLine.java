@@ -56,9 +56,10 @@ public class RoyaltyLine {
     @JoinColumn(name = "original_line_id")
     private RoyaltyLine originalLine;       // chi co voi dong ADJUSTMENT: tro dong cu bi dieu chinh
 
-    // FK toi royalty_payments: entity RoyaltyPayment chua co (Iter3, UC-53) nen tam de Integer (AGENTS.md 3.3).
-    // NULL cho toi luc Ke toan khoa ky thi gan vao phieu chi.
-    private Integer paymentId;
+    // NULL cho toi luc Ke toan khoa ky thi gan vao phieu chi cua nguoi nhan (UC-53)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private RoyaltyPayment payment;
 
     // FK toi users (luong admin): de Integer, nguoi nhan tien
     private Integer userId;
