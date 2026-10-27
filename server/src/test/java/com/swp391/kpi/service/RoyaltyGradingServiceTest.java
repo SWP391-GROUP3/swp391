@@ -57,7 +57,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Kiem tra cham nhuan but (UC-46, 47, 48), khong can DB.
+ * Kiem tra cham nhuan but (UC-46, 47, 48) va cham lai trong ky OPEN, khong can DB.
  * So lieu mau giong bai 5 trong data.sql: diem 82.50, Bai phan anh (he so chuan 5.00),
  * 2 tac gia 60/40, 3 anh (1 anh moi, 1 anh nguon ngoai, 1 anh trung anh da tra tien).
  */
@@ -255,14 +255,64 @@ class RoyaltyGradingServiceTest {
         assertEquals(Integer.valueOf(10), result.getGradingId());
     }
 
-    @Test
-    void completeGradingFailsWhenArticleAlreadyGraded() {
-        stubArticle(royaltyArticle(null, null));
-        when(royaltyGradingRepository.existsByArticleId(ARTICLE_ID)).thenReturn(true);
+    // ------------------------------------------- cham lai (nhom chot 27/10)
 
-        assertThrows(BusinessException.class,
+    @Test
+    void completeGradingRegradesInSameOpenPeriodWithNewVersionAndDeletesOldLines() {
+        stubArticle(royaltyArticle(null, null));
+        // Phien ban 1 thuoc ky 9 dang OPEN (Ke toan vua tra ve), khac ky OPEN cu nhat ma stub tra (id 1)
+        RoyaltyGrading version1 = previousGrading(7, period(3, 9, RoyaltyPeriodStatus.OPEN));
+        when(royaltyGradingRepository.findFirstByArticleIdOrderByVersionNoDesc(ARTICLE_ID)).thenReturn(Optional.of(version1));
+        when(royaltyGradingRepository.save(any(RoyaltyGrading.class))).thenAnswer(call -> {
+            RoyaltyGrading grading = call.getArgument(0);
+            grading.setId(11);
+            return grading;
+        });
+        when(royaltyMediaItemRepository.save(any(RoyaltyMediaItem.class))).thenAnswer(call -> call.getArgument(0));
+        RoyaltyGradingCreateRequest request = createRequest();
+        request.setRecalcReason("  Sửa tỷ lệ đồng tác giả  ");
+
+        royaltyGradingService.completeGrading(request, SECRETARY_ID);
+
+        ArgumentCaptor<RoyaltyGrading> captor = ArgumentCaptor.forClass(RoyaltyGrading.class);
+        verify(royaltyGradingRepository).save(captor.capture());
+        RoyaltyGrading version2 = captor.getValue();
+        assertEquals(Integer.valueOf(2), version2.getVersionNo());
+        assertEquals("Sửa tỷ lệ đồng tác giả", version2.getRecalcReason());
+        assertEquals(Integer.valueOf(3), version2.getPeriod().getId());   // cung ky voi phien ban cu
+        verify(royaltyLineRepository).deleteByGradingId(7);
+        verify(royaltyLineRepository, times(3)).save(any(RoyaltyLine.class));
+        verify(auditService).log(eq(SECRETARY_ID), eq("RECALCULATE"), eq("royalty_gradings"), eq(11), isNull(), anyString());
+    }
+
+    @Test
+    void completeGradingFailsWhenRegradeHasNoReason() {
+        stubArticle(royaltyArticle(null, null));
+        RoyaltyGrading version1 = previousGrading(7, period(1, 10, RoyaltyPeriodStatus.OPEN));
+        when(royaltyGradingRepository.findFirstByArticleIdOrderByVersionNoDesc(ARTICLE_ID)).thenReturn(Optional.of(version1));
+
+        BusinessException error = assertThrows(BusinessException.class,
                 () -> royaltyGradingService.completeGrading(createRequest(), SECRETARY_ID));
 
+        assertTrue(error.getMessage().contains("phải nhập lý do"));
+        verify(royaltyLineRepository, never()).deleteByGradingId(any());
+        verify(royaltyGradingRepository, never()).save(any(RoyaltyGrading.class));
+    }
+
+    @Test
+    void completeGradingFailsWhenPreviousVersionPeriodIsNotOpen() {
+        stubArticle(royaltyArticle(null, null));
+        // Ky 9 da khoa: khong sua duoc (BR-RY-06), chenh lech se la dong dieu chinh khi lam BF-03
+        RoyaltyGrading version1 = previousGrading(7, period(3, 9, RoyaltyPeriodStatus.LOCKED));
+        when(royaltyGradingRepository.findFirstByArticleIdOrderByVersionNoDesc(ARTICLE_ID)).thenReturn(Optional.of(version1));
+        RoyaltyGradingCreateRequest request = createRequest();
+        request.setRecalcReason("Sửa tỷ lệ");
+
+        BusinessException error = assertThrows(BusinessException.class,
+                () -> royaltyGradingService.completeGrading(request, SECRETARY_ID));
+
+        assertTrue(error.getMessage().contains("không chấm lại được"));
+        verify(royaltyLineRepository, never()).deleteByGradingId(any());
         verify(royaltyGradingRepository, never()).save(any(RoyaltyGrading.class));
     }
 
@@ -370,6 +420,25 @@ class RoyaltyGradingServiceTest {
         attachment.setHashResult(hashResult);
         attachment.setMatchedAttachmentId(matchedAttachmentId);
         return attachment;
+    }
+
+    private static RoyaltyPeriod period(Integer id, int month, RoyaltyPeriodStatus status) {
+        RoyaltyPeriod period = new RoyaltyPeriod();
+        period.setId(id);
+        period.setPeriodYear((short) 2026);
+        period.setPeriodMonth((byte) month);
+        period.setStatus(status);
+        return period;
+    }
+
+    // Phien ban 1 da luu cua bai 5, thuoc ky truyen vao
+    private static RoyaltyGrading previousGrading(Integer id, RoyaltyPeriod period) {
+        RoyaltyGrading grading = new RoyaltyGrading();
+        grading.setId(id);
+        grading.setArticleId(ARTICLE_ID);
+        grading.setVersionNo(1);
+        grading.setPeriod(period);
+        return grading;
     }
 
     private static RoyaltyGradingCreateRequest createRequest() {

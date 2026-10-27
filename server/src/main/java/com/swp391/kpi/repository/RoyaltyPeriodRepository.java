@@ -14,11 +14,12 @@ import java.util.Optional;
  * Doc bang royalty_periods (ky nhuan but, UC-49).
  *
  * MUC LUC (so dong)
- *   26  findAllByOrderByPeriodYearDescPeriodMonthDesc() - Cac ky, thang moi nhat len dau
- *   30  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc() - Ky dang o 1 trang thai, ky cu nhat len dau. UC-47 dung voi OPEN: bai ch…
- *   33  existsByPeriodYearAndPeriodMonth() - Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi t…
- *   39  sumLineAmountByPeriodId()
- *   44  countGradedArticlesByPeriodId()
+ *   27  findAllByOrderByPeriodYearDescPeriodMonthDesc() - Cac ky, thang moi nhat len dau
+ *   31  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc() - Ky dang o 1 trang thai, ky cu nhat len dau. UC-47 dung voi OPEN: bai ch…
+ *   34  existsByPeriodYearAndPeriodMonth() - Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi t…
+ *   37  findByPeriodYearAndPeriodMonth() - Ky cua 1 thang: khoa ky can tim ky thang truoc de lay no chuyen tiep (UC-53 A2)
+ *   43  sumLineAmountByPeriodId()
+ *   48  countGradedArticlesByPeriodId()
  */
 public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, Integer> {
 
@@ -31,6 +32,9 @@ public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, In
 
     // Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi tu tao ky thang sau
     boolean existsByPeriodYearAndPeriodMonth(Short periodYear, Byte periodMonth);
+
+    // Ky cua 1 thang: khoa ky can tim ky thang truoc de lay no chuyen tiep (UC-53 A2)
+    Optional<RoyaltyPeriod> findByPeriodYearAndPeriodMonth(Short periodYear, Byte periodMonth);
 
     // Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines.
     // Dung SQL thuong (nativeQuery) vi entity RoyaltyLine chua co, Iter2 moi lam.
