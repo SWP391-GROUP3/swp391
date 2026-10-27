@@ -1,0 +1,147 @@
+/* ===========================================================================
+   pages/article/ArticleEditor.jsx - Soan / sua bai (UC-03, 04, 05, 10).
+   Tien to class: .article-editor__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+   Bo cuc giong chi tiet bai: cot trai noi dung, cot phai khai bao + tac gia + nut.
+
+   MUC LUC (so dong - khoi CSS)
+     14  tieu de, bo cuc dau trang
+     63  Luoi 2 cot
+     96  Tac gia va ty le
+    137  Nut luu / nop
+    145  man hinh hep (@media)
+   =========================================================================== */
+
+.article-editor__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+  text-decoration: none;
+}
+
+.article-editor__back:hover { color: var(--fm-chu); }
+
+.article-editor__header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.article-editor__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.article-editor__muted {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--fm-chu-nhat);
+}
+
+.article-editor__success {
+  margin: 0 0 16px;
+  padding: 9px 12px;
+  font-size: 13px;
+  background: var(--fm-chon);
+  border-radius: 6px;
+}
+
+/* Nhan xet cua BTV khi tra bai (UC-10) */
+.article-editor__return-note {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: var(--fm-chu-y);
+  background: var(--fm-chu-y-nen);
+  border-radius: 8px;
+}
+
+/* ---- Luoi 2 cot ---- */
+.article-editor__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+.article-editor__side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.article-editor__section {
+  padding: 20px 24px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.article-editor__section-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.article-editor__content {
+  min-height: 420px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+/* ---- Tac gia va ty le ---- */
+.article-editor__authors {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.article-editor__author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.article-editor__author-name { flex: 1; min-width: 0; }
+
+.article-editor__share { width: 80px; text-align: right; }
+
+.article-editor__total {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fm-tot);
+}
+
+.article-editor__total--sai { color: var(--fm-loi); }
+
+.article-editor__add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.article-editor__add select { flex: 1; min-width: 0; }
+
+.article-editor__add .nut-nhe:disabled,
+.article-editor__actions button:disabled { opacity: .6; cursor: not-allowed; }
+
+/* ---- Nut luu / nop ---- */
+.article-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Man hinh hep: 2 cot thanh 1 cot */
+@media (max-width: 960px) {
+  .article-editor__grid { grid-template-columns: 1fr; }
+}

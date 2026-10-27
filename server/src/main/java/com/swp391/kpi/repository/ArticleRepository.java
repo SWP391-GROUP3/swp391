@@ -11,12 +11,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   26  findMyArticles                 - UC-01 bai cua toi
- *   31  findMyArticlesByStatuses       - UC-01 loc theo trang thai
- *   38  findMyArticleStatuses          - trang chu PV: dem bai theo trang thai
- *   41  findByAuthorIdAndStatus...     - trang chu PV: bai bi tra ve
- *   57  findPublishedRows              - cho BF-04 (UC-46): moi bai da dang + ten ban, the loai
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  findMyArticles()                Bai ma nguoi dung la tac gia chinh hoac dong tac gia (UC-01)
+ *   31  findMyArticlesByStatuses()      Nhu tren nhung chi lay bai co trang thai nam trong danh sach statuses
+ *   38  findMyArticleStatuses()         Trang thai cua moi bai cua nguoi dung, de dem so bai theo trang thai (trang chu PV)
+ *   41  findByAuthorIdAndStatusOrderByUpdatedAtDesc()  Bai cua tac gia chinh dang o 1 trang thai (vd bai bi tra ve REVISION_REQUESTED)
+ *   57  findPublishedRows()             Cho BF-04 (UC-46): moi bai PUBLISHED, dang som nhat len dau (gan han chi nhat)
  */
 public interface ArticleRepository extends JpaRepository<Article, Integer> {
 

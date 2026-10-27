@@ -3,10 +3,11 @@
    Tien to class: .article-detail__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
    Bo cuc: cot trai noi dung, cot phai khai bao / tac gia / lich su.
 
-   MUC LUC (so dong)
-     12  tieu de, bo cuc dau trang
-     96  Luoi 2 cot
-    175  man hinh hep (@media)
+   MUC LUC (so dong - khoi CSS)
+     13  tieu de, bo cuc dau trang
+     97  Luoi 2 cot
+    176  man hinh hep (@media)
+    180  Iter 2: nut thao tac, nhan xet BTV, o tra loi xac nhan
    =========================================================================== */
 
 .article-detail__back {
@@ -175,3 +176,37 @@
 @media (max-width: 900px) {
   .article-detail__grid { grid-template-columns: 1fr; }
 }
+
+/* ---- Iter 2: nut thao tac, nhan xet BTV, o tra loi xac nhan ---- */
+.article-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.article-detail__actions .nut-nhe { text-decoration: none; }
+.article-detail__actions button:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Nhan xet chung cua BTV khi tra bai (UC-10 buoc 1) */
+.article-detail__return-note {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: var(--fm-chu-y);
+  background: var(--fm-chu-y-nen);
+  border-radius: 8px;
+}
+
+/* Hop tra loi loi moi dong tac gia (UC-12) */
+.article-detail__respond-box {
+  margin-bottom: 20px;
+  padding: 16px;
+  font-size: 13.5px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-chinh);
+  border-radius: 8px;
+}
+
+.article-detail__respond-box p { margin: 0 0 12px; }
+.article-detail__respond-box button:disabled { opacity: .6; cursor: not-allowed; }

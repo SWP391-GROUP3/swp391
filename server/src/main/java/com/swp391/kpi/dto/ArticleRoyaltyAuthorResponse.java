@@ -9,9 +9,9 @@ import java.math.BigDecimal;
 /**
  * 1 tac gia cua bai, dung de BF-04 chia tien nhuan but (GBR-10).
  *
- * MUC LUC (so dong)
- *   20  cac truong: userId, fullName, sharePercent, mainAuthor
- *   28  from(author, fullName, mainAuthorId)
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           cac truong tra ve cho giao dien
+ *   28  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter
