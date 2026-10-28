@@ -304,3 +304,9 @@
   font-size: 20px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ---- Ke toan kiem tra ky (UC-52, 53) va ly do cham lai: o ly do chiem ca hang ---- */
+.royalty__review { flex-direction: column; align-items: stretch; }
+.royalty__review-note { flex: 1 1 100%; }
+.royalty__textarea { min-height: 72px; resize: vertical; }
+.royalty__review .nut-phu:disabled { opacity: .6; cursor: not-allowed; }

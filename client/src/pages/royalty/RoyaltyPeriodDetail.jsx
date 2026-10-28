@@ -1,25 +1,34 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { closeRoyaltyPeriod, getRoyaltyPeriodDetail } from '../../api/royaltyApi.js'
+import {
+  closeRoyaltyPeriod, getRoyaltyPeriodDetail, lockRoyaltyPeriod, returnRoyaltyPeriod,
+} from '../../api/royaltyApi.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import { PERIOD_STATUS_COLORS, natureLabel, periodStatusLabel } from '../../utils/royaltyLabels.js'
 import '../../styles/Royalty.css'
 
+const RETURN_NOTE_MAX = 1000   // = cot royalty_periods.return_note NVARCHAR(1000)
+
 /**
- * UC-50 - "Bang ke ky nhuan but" (Thu ky va Ke toan dung chung 1 trang).
+ * UC-50, 51, 52, 53 - "Bang ke ky nhuan but" (Thu ky va Ke toan dung chung 1 trang).
  * Tren: tong tien tung nguoi (Ke toan can de lam phieu chi). Duoi: cac bai da cham trong ky.
- * Chi Thu ky thay nut "Chot ky", va chi khi ky dang OPEN (BR-RY-07).
- * Ky bi Ke toan tra ve (UC-52) thi hien ly do de Thu ky sua (UC-50 A1).
+ * Thu ky: ky OPEN thi chot ky (UC-50) va cham lai bai trong ky (nhom chot 27/10/2026).
+ * Ke toan: ky CLOSED thi tra ky kem ly do (UC-52) hoac khoa ky de tao phieu chi (UC-53) (BR-RY-07).
+ * Ky bi Ke toan tra ve thi hien ly do de Thu ky sua (UC-50 A1).
  *
  * MUC LUC (so dong)
- *   24  RoyaltyPeriodDetail          - UC-50 - "Bang ke ky nhuan but" (Thu ky va Ke toan dung chung 1 trang).
- *   32    useEffect                  - tai du lieu khi mo trang
- *   40    handleClose()
- *  121  SummaryItem
- *  131  PeopleCard                   - Tong tien tung nguoi trong ky (UC-50 "total per person").
- *  167  ArticlesCard                 - Cac bai da cham trong ky: he so, tien bai, tien anh.
+ *   33  RoyaltyPeriodDetail          - UC-50, 51, 52, 53 - "Bang ke ky nhuan but" (Thu ky va Ke toan dung chung…
+ *   41    useEffect                  - tai du lieu khi mo trang
+ *   49    handleClose()
+ *   71    handleAccountantDone()     - Ke toan tra / khoa ky xong: tai lai bang ke, hien thong bao
+ *  143  AccountantReviewCard         - UC-51..53: Ke toan kiem tra ky CLOSED roi tra lai (kem ly do) hoac khoa ky.
+ *  148    handleReturn()
+ *  165    handleLock()
+ *  210  SummaryItem
+ *  220  PeopleCard                   - Tong tien tung nguoi trong ky (UC-50 "total per person").
+ *  256  ArticlesCard                - Cac bai da cham trong ky: he so, tien bai, tien anh. Ky OPEN thi Thu ky c…
  */
 export default function RoyaltyPeriodDetail({ nguoiDung }) {
   const { id } = useParams()
@@ -58,8 +67,19 @@ export default function RoyaltyPeriodDetail({ nguoiDung }) {
     }
   }
 
+  // Ke toan tra / khoa ky xong: tai lai bang ke, hien thong bao
+  async function handleAccountantDone(message) {
+    const updated = await getRoyaltyPeriodDetail(id)
+    setPeriod(updated)
+    setSuccessMessage(message)
+  }
+
   const isSecretary = Boolean(nguoiDung?.vaiTro?.includes('EDITORIAL_SECRETARY'))
-  const canClose = isSecretary && period && period.status === 'OPEN'
+  const isAccountant = Boolean(nguoiDung?.vaiTro?.includes('ACCOUNTANT'))
+  const isOpen = Boolean(period && period.status === 'OPEN')
+  const canClose = isSecretary && isOpen
+  const canRegrade = isSecretary && isOpen                                    // cham lai chi khi ky con mo
+  const canReview = isAccountant && period && period.status === 'CLOSED'    // UC-52, 53 chi voi ky da chot
 
   return (
     <div>
@@ -83,8 +103,8 @@ export default function RoyaltyPeriodDetail({ nguoiDung }) {
 
       {period && (
         <>
-          {/* UC-50 A1: Ke toan tra ky ve thi Thu ky thay ly do */}
-          {period.returnNote && (
+          {/* UC-50 A1: Ke toan tra ky ve thi Thu ky thay ly do (chi can khi ky dang mo lai de sua) */}
+          {isOpen && period.returnNote && (
             <p className="thong-bao-loi" role="alert">Kế toán đã trả kỳ về: {period.returnNote}</p>
           )}
 
@@ -108,12 +128,81 @@ export default function RoyaltyPeriodDetail({ nguoiDung }) {
               </div>
             </div>
           )}
+          {canReview && <AccountantReviewCard period={period} onDone={handleAccountantDone} />}
           {successMessage && <p className="thong-bao-thanh-cong" role="status">{successMessage}</p>}
 
           <PeopleCard people={period.people} />
-          <ArticlesCard articles={period.articles} />
+          <ArticlesCard articles={period.articles} canRegrade={canRegrade} />
         </>
       )}
+    </div>
+  )
+}
+
+/** UC-51..53: Ke toan kiem tra ky CLOSED roi tra lai (kem ly do) hoac khoa ky. */
+function AccountantReviewCard({ period, onDone }) {
+  const [note, setNote] = useState('')
+  const [isWorking, setIsWorking] = useState(false)
+  const [actionError, setActionError] = useState('')
+
+  async function handleReturn() {
+    // UC-52: ly do bat buoc (CHECK ck_royalty_periods_returned); server cung kiem lai
+    if (note.trim() === '') {
+      setActionError('Vui lòng nhập lý do trả lại kỳ.')
+      return
+    }
+    setIsWorking(true)
+    setActionError('')
+    try {
+      await returnRoyaltyPeriod(period.id, note.trim())
+      await onDone(`Đã trả kỳ ${period.periodMonth}/${period.periodYear} về cho Thư ký sửa.`)
+    } catch (err) {
+      setActionError(err.message)
+      setIsWorking(false)
+    }
+  }
+
+  async function handleLock() {
+    const confirmed = window.confirm(
+      `Khoá kỳ tháng ${period.periodMonth}/${period.periodYear}? Sau khi khoá, số liệu của kỳ không sửa được nữa và hệ thống tạo phiếu chi cho từng người.`)
+    if (!confirmed) {
+      return
+    }
+    setIsWorking(true)
+    setActionError('')
+    try {
+      await lockRoyaltyPeriod(period.id)
+      await onDone(`Đã khoá kỳ ${period.periodMonth}/${period.periodYear} và tạo phiếu chi cho từng người.`)
+    } catch (err) {
+      setActionError(err.message)
+      setIsWorking(false)
+    }
+  }
+
+  return (
+    <div className="royalty__card">
+      <h2 className="royalty__card-title">Kiểm tra kỳ</h2>
+      <p className="royalty__hint">
+        Đối chiếu tiền từng người bên dưới. Sai thì trả kỳ về cho Thư ký kèm lý do; đúng thì khoá kỳ để tạo phiếu chi.
+      </p>
+      {actionError && <p className="thong-bao-loi" role="alert">{actionError}</p>}
+      <div className="royalty__form royalty__review">
+        <label className="royalty__field royalty__review-note">
+          Lý do trả lại (bắt buộc khi trả kỳ)
+          <textarea className="royalty__input royalty__input--full royalty__textarea" rows={3}
+                    maxLength={RETURN_NOTE_MAX} value={note} disabled={isWorking}
+                    onChange={(event) => setNote(event.target.value)}
+                    placeholder="Vd: Bài 5 sai tỷ lệ đồng tác giả" />
+        </label>
+        <div className="royalty__actions">
+          <button type="button" className="nut-phu" onClick={handleReturn} disabled={isWorking}>
+            Trả kỳ về Thư ký
+          </button>
+          <button type="button" className="nut-chinh-fm" onClick={handleLock} disabled={isWorking}>
+            {isWorking ? 'Đang xử lý…' : 'Khoá kỳ và tạo phiếu chi'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -163,8 +252,8 @@ function PeopleCard({ people }) {
   )
 }
 
-/** Cac bai da cham trong ky: he so, tien bai, tien anh. */
-function ArticlesCard({ articles }) {
+/** Cac bai da cham trong ky: he so, tien bai, tien anh. Ky OPEN thi Thu ky cham lai duoc tung bai. */
+function ArticlesCard({ articles, canRegrade }) {
   return (
     <div className="royalty__card">
       <h2 className="royalty__card-title">Bài đã chấm trong kỳ</h2>
@@ -182,6 +271,7 @@ function ArticlesCard({ articles }) {
                 <th className="royalty__number">Ảnh / video</th>
                 <th className="royalty__number">Tổng</th>
                 <th>Ngày chấm</th>
+                {canRegrade && <th>Thao tác</th>}
               </tr>
             </thead>
             <tbody>
@@ -195,6 +285,13 @@ function ArticlesCard({ articles }) {
                   <td className="royalty__number">{formatMoney(article.mediaAmount)}</td>
                   <td className="royalty__number royalty__strong">{formatMoney(article.totalAmount)}</td>
                   <td className="royalty__date">{formatDate(article.gradedAt)}</td>
+                  {canRegrade && (
+                    <td className="royalty__nowrap">
+                      <Link to={`/royalty-grading/${article.articleId}?chamLai=1`} className="royalty__link">
+                        Chấm lại
+                      </Link>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

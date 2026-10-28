@@ -1,64 +1,72 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { completeRoyaltyGrading, previewRoyaltyGrading } from '../../api/royaltyApi.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
-import { NATURE_LABELS, mediaKindLabel } from '../../utils/royaltyLabels.js'
+import { mediaKindLabel, natureLabel } from '../../utils/royaltyLabels.js'
 import '../../styles/Royalty.css'
+
+const RECALC_REASON_MAX = 500   // = cot royalty_gradings.recalc_reason NVARCHAR(500)
 
 /**
  * UC-47, UC-48 - "Cham nhuan but" 1 bai (Thu ky toa soan).
- * He so va tien do SERVER tinh (BR-RY-01: Thu ky khong sua he so). Thu ky chi:
- *   1. xac nhan tinh chat bai -> goi lai xem truoc de thay so moi
- *   2. xem anh/video nao duoc tinh tien (UC-48)
- *   3. bam Hoan tat -> luu phieu, bai vao ky dang mo (BR-RY-05)
+ * He so va tien do SERVER tinh (BR-RY-01: Thu ky khong sua he so); tinh chat bai lay theo
+ * PV khai (BR-IN-03, Thu ky khong chon lai). Thu ky chi:
+ *   1. xem anh/video nao duoc tinh tien (UC-48)
+ *   2. bam Hoan tat -> luu phieu, bai vao ky dang mo (BR-RY-05)
+ * Mo tu bang ke voi ?chamLai=1 la cham lai (nhom chot 27/10/2026): bat buoc ly do,
+ * phieu moi vao cung ky voi phieu cu, chi duoc khi ky do con mo.
  *
  * MUC LUC (so dong)
- *   26  RoyaltyGrading               - UC-47, UC-48 - "Cham nhuan but" 1 bai (Thu ky toa soan).
- *   36    useEffect                  - Moi lan doi tinh chat thi tinh lai (xem truoc, chua luu)
- *   45    handleNatureChange()
- *   52    handleComplete()
- *  145  FormulaCard                  - Cac buoc cong thuc (BR-RY-01..03): server tinh, man hinh chi hien de Th…
- *  172  AuthorCard                   - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong, ta…
- *  198  MediaCard                    - UC-48: tung anh/video. Anh khong tinh tien (nguon ngoai, tai su dung) h…
+ *   29  RoyaltyGrading               - UC-47, UC-48 - "Cham nhuan but" 1 bai (Thu ky toa soan).
+ *   41    useEffect                  - Tinh truoc he so va tien khi mo trang (xem truoc, chua luu)
+ *   50    handleComplete()
+ *  162  FormulaCard                  - Cac buoc cong thuc (BR-RY-01..03): server tinh, man hinh chi hien de Th…
+ *  189  AuthorCard                   - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong, ta…
+ *  215  MediaCard                   - UC-48: tung anh/video. Anh khong tinh tien (nguon ngoai, tai su dung) h…
  */
 export default function RoyaltyGrading() {
   const { articleId } = useParams()
-  const [nature, setNature] = useState('')        // '' = dung tinh chat PV khai (server tu chon)
+  const [searchParams] = useSearchParams()
+  const isRegrade = searchParams.get('chamLai') === '1'
   const [grading, setGrading] = useState(null)    // phieu tinh san: xem truoc, hoac da luu (co gradingId)
+  const [recalcReason, setRecalcReason] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
 
-  // Moi lan doi tinh chat thi tinh lai (xem truoc, chua luu)
+  // Tinh truoc he so va tien khi mo trang (xem truoc, chua luu)
   useEffect(() => {
     let isMounted = true
-    previewRoyaltyGrading(articleId, nature)
+    previewRoyaltyGrading(articleId)
       .then((data) => { if (isMounted) setGrading(data) })
       .catch((err) => { if (isMounted) setLoadError(err.message) })
       .finally(() => { if (isMounted) setIsLoading(false) })
     return () => { isMounted = false }
-  }, [articleId, nature])
-
-  function handleNatureChange(event) {
-    setIsLoading(true)
-    setLoadError('')
-    setSaveError('')
-    setNature(event.target.value)
-  }
+  }, [articleId])
 
   async function handleComplete() {
+    // Cham lai bat buoc ly do (CHECK ck_royalty_gradings_recalc); server cung kiem lai
+    if (isRegrade && recalcReason.trim() === '') {
+      setSaveError('Vui lòng nhập lý do chấm lại.')
+      return
+    }
+    const action = isRegrade ? 'Chấm lại' : 'Hoàn tất chấm'
     const confirmed = window.confirm(
-      `Hoàn tất chấm nhuận bút bài này với tổng ${formatMoney(grading.totalAmount)}? Sau khi lưu không sửa được.`)
+      `${action} nhuận bút bài này với tổng ${formatMoney(grading.totalAmount)}?`)
     if (!confirmed) {
       return
     }
     setIsSaving(true)
     setSaveError('')
     try {
-      const saved = await completeRoyaltyGrading({ articleId: Number(articleId), nature: grading.nature })
+      const body = { articleId: Number(articleId) }
+      if (isRegrade) {
+        body.recalcReason = recalcReason.trim()
+      }
+      const saved = await completeRoyaltyGrading(body)
       setGrading(saved)
     } catch (err) {
       setSaveError(err.message)
@@ -69,12 +77,16 @@ export default function RoyaltyGrading() {
 
   const isSaved = Boolean(grading && grading.gradingId)
   const hasOpenPeriod = Boolean(grading && grading.periodId)
+  // Cham lai thi quay ve bang ke cua ky; lan dau thi ve danh sach bai cho cham
+  const backLink = isRegrade && hasOpenPeriod
+    ? { to: `/royalty-periods/${grading.periodId}`, label: '← Bảng kê kỳ nhuận bút' }
+    : { to: '/royalty-grading', label: '← Bài chờ chấm nhuận bút' }
 
   return (
     <div>
       <div className="royalty__header">
-        <Link to="/royalty-grading" className="royalty__back">← Bài chờ chấm nhuận bút</Link>
-        <h1 className="royalty__title">Chấm nhuận bút</h1>
+        <Link to={backLink.to} className="royalty__back">{backLink.label}</Link>
+        <h1 className="royalty__title">{isRegrade ? 'Chấm lại nhuận bút' : 'Chấm nhuận bút'}</h1>
         {grading && <p className="royalty__subtitle">{grading.title}</p>}
       </div>
 
@@ -99,24 +111,29 @@ export default function RoyaltyGrading() {
               <span>{hasOpenPeriod ? `Tháng ${grading.periodMonth}/${grading.periodYear}` : 'Chưa có kỳ đang mở'}</span>
             </div>
 
-            <label className="royalty__field royalty__total-field">
-              Tính chất bài (Thư ký xác nhận)
-              <select className="royalty__input royalty__input--full" value={grading.nature}
-                      onChange={handleNatureChange} disabled={isSaved || isSaving || isLoading}>
-                {Object.entries(NATURE_LABELS).map(([code, label]) => (
-                  <option key={code} value={code}>{label}</option>
-                ))}
-              </select>
-            </label>
+            {/* BR-IN-03: tinh chat PV khai luc nop bai, Thu ky chi xem */}
+            <div className="royalty__total-row">
+              <span>Tính chất bài (phóng viên khai)</span><span>{natureLabel(grading.nature)}</span>
+            </div>
 
-            {isLoading && <p className="royalty__muted">Đang tính lại…</p>}
+            {isRegrade && !isSaved && (
+              <label className="royalty__field royalty__total-field">
+                Lý do chấm lại (bắt buộc)
+                <textarea className="royalty__input royalty__input--full royalty__textarea" rows={3}
+                          maxLength={RECALC_REASON_MAX} value={recalcReason} disabled={isSaving}
+                          onChange={(event) => setRecalcReason(event.target.value)}
+                          placeholder="Vd: Kế toán trả kỳ vì sai tỷ lệ đồng tác giả" />
+              </label>
+            )}
+
             {loadError && <p className="thong-bao-loi" role="alert">{loadError}</p>}
             {saveError && <p className="thong-bao-loi" role="alert">{saveError}</p>}
 
             {isSaved ? (
               <>
                 <p className="thong-bao-thanh-cong" role="status">
-                  Đã chấm nhuận bút. Bài vào kỳ tháng {grading.periodMonth}/{grading.periodYear}.
+                  {isRegrade ? 'Đã chấm lại nhuận bút (phiên bản mới).' : 'Đã chấm nhuận bút.'} Bài
+                  thuộc kỳ tháng {grading.periodMonth}/{grading.periodYear}.
                 </p>
                 <div className="royalty__total-links">
                   <Link to={`/royalty-periods/${grading.periodId}`} className="royalty__link">Xem bảng kê kỳ</Link>
@@ -127,7 +144,7 @@ export default function RoyaltyGrading() {
               <>
                 <button type="button" className="nut-chinh-fm royalty__input--full" onClick={handleComplete}
                         disabled={isSaving || isLoading || Boolean(loadError) || !hasOpenPeriod}>
-                  {isSaving ? 'Đang lưu…' : 'Hoàn tất chấm nhuận bút'}
+                  {isSaving ? 'Đang lưu…' : (isRegrade ? 'Lưu chấm lại' : 'Hoàn tất chấm nhuận bút')}
                 </button>
                 {!hasOpenPeriod && (
                   <p className="royalty__muted">Chưa có kỳ nhuận bút đang mở nên chưa thể hoàn tất (UC-47 E1).</p>
