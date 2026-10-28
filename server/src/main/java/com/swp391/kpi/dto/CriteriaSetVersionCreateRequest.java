@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Request DTO tạo phiên bản bộ tiêu chí mới (UC-15, UC-16).
  *
- * MUC LUC (so dong)
- *   24  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

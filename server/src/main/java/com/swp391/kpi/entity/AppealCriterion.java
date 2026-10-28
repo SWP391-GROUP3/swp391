@@ -15,8 +15,10 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 /**
- * MUC LUC (so dong)
- *   30  field                        - cac cot cua bang (khop schema.sql)
+ * Entity anh xa bang appeal_criteria trong schema.sql. Chi dung trong service, khong tra thang ra API.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "appeal_criteria")

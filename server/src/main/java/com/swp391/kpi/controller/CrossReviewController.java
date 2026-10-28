@@ -11,6 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * API cham cheo (UC-40): Truong ban tao / dong dot, go bai; BTV xem va nop phieu cham cheo.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  field                           service duoc inject
+ *   34  batches()                       batches [GET /api/cross-review-batches]
+ *   38  candidates()                    candidates [GET /api/cross-review-batches/candidates]
+ *   43  batch()                         batch [GET /api/cross-review-batches/{id}]
+ *   47  create()                        tao [POST /api/cross-review-batches]
+ *   51  close()                         chot [POST /api/cross-review-batches/{id}/close]
+ *   55  remove()                        xoa [DELETE /api/cross-review-batches/{id}/tasks/{taskId}]
+ *   59  tasks()                         tasks [GET /api/cross-review-tasks]
+ *   63  task()                          task [GET /api/cross-review-tasks/{id}]
+ *   67  submit()                        nop [POST /api/cross-review-tasks/{id}/submit]
+ */
 @RestController @RequiredArgsConstructor
 public class CrossReviewController {
     private final CrossReviewService service;

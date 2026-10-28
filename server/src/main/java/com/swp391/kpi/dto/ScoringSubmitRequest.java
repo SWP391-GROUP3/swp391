@@ -8,6 +8,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * DTO client gui len API. Dung o: ScoringAttemptController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
+ */
 @Getter
 @Setter
 @NoArgsConstructor

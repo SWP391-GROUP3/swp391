@@ -7,8 +7,8 @@
  * goiApi('/api/...'), component goi ham KHONG phai sua.
  * Moi so lieu chi tinh trong BAN cua Truong ban (users.section_id).
  *
- * MUC LUC (so dong)
- *   25  layTrangChuTruongBan         - Tat ca so lieu trang chu cua Truong ban:
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  layTrangChuTruongBan()          Tat ca so lieu trang chu cua Truong ban: - counts: so bai cua ban the… [du lieu gia (chua co API)]
  */
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 

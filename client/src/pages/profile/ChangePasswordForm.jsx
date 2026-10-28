@@ -8,10 +8,13 @@ const DO_DAI_TOI_THIEU = 6
  * The "Đổi mật khẩu" tren trang Ho so. Phai nhap dung mat khau hien tai.
  * Doi xong van giu dang nhap (token khong phu thuoc mat khau).
  *
- * MUC LUC (so dong)
- *    5  DO_DAI_TOI_THIEU             - Giong UserPasswordChangeRequest.MIN_PASSWORD_LENGTH o server
- *   16  ChangePasswordForm           - The "Đổi mật khẩu" tren trang Ho so. Phai nhap dung mat khau hien tai.
- *   24    guiForm()
+ * MUC LUC (so dong - ten - tac dung)
+ *    5  DO_DAI_TOI_THIEU                Giong UserPasswordChangeRequest.MIN_PASSWORD_LENGTH o server
+ *   19  ChangePasswordForm()            xem tom tat dau file
+ *   27    guiForm()                     gui form
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   64  form, nut [Dang luu… / Doi mat khau]  guiForm() -> goi PUT /api/users/me/password
  */
 export default function ChangePasswordForm() {
   const [matKhauCu, setMatKhauCu] = useState('')

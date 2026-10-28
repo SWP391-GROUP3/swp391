@@ -5,8 +5,8 @@ package com.swp391.kpi.exception;
  * GlobalExceptionHandler bat loi nay va tra HTTP 409.
  * Vi du: throw new BusinessException("Kỳ nhuận bút đã khoá, không thể sửa");
  *
- * MUC LUC (so dong)
- *   13  BusinessException()
+ * MUC LUC (so dong - ten - tac dung)
+ *   13  BusinessException()             ham khoi tao
  */
 public class BusinessException extends RuntimeException {
 

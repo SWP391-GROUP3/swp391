@@ -19,13 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
  * Sai mat khau hien tai -> BusinessException (409), KHONG dung UnauthorizedException (401):
  * frontend (goiApi) gap 401 la tu dang xuat, nguoi dung go nham 1 lan se bi da ra ngoai.
  *
- * MUC LUC (so dong)
- *   34  hang so                      - hang so dung trong file
- *   40  field                        - repository / service duoc inject
- *   44  getMyProfile()
- *   50  updateMyProfile()
- *   67  changeMyPassword()
- *   88  findUser()
+ * MUC LUC (so dong - ten - tac dung)
+ *   36  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   42  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   46  getMyProfile()                  lay my profile
+ *   52  updateMyProfile()               cap nhat my profile
+ *   69  changeMyPassword()              doi my password
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *   90  findUser()                      tim user
  */
 @Service
 @RequiredArgsConstructor

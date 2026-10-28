@@ -9,8 +9,10 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   21  field                        - cac truong tra ve cho giao dien
+ * DTO client gui len API. Dung o: AppealController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

@@ -14,22 +14,24 @@ import '../../styles/ArticleEditor.css'
  * /my-articles/new = bai moi, /my-articles/:id/edit = sua bai DRAFT / REVISION_REQUESTED.
  * Moi luat (5 tac gia, tong 100%, ai duoc sua) kiem o server; man nay chi hien loi server tra ve.
  *
+ * MO TRANG NAY TAI: /my-articles/new, /my-articles/:id/edit
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   34  ArticleEditor()                 Work Editor (Iter 2): soan / sua ban nhap (UC-03), khai dong tac gia + ty le (UC-04), nop bai (UC-05), sua va…
- *   54    useEffect                     Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
- *   97    changeField()                 Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat)
- *  102    changeShare()                 Doi ty le cua 1 tac gia
- *  107    addCoAuthor()                 Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap
- *  115    removeCoAuthor()              Bo 1 dong tac gia (UC-04 A1: phai chia lai ty le truoc khi luu)
- *  120    buildPayload()                Du lieu gui server: dung ten field cua ArticleSaveRequest
- *  131    save()                        Luu nhap; alsoSubmit = true thi luu xong nop luon (UC-05) hoac nop lai (UC-10)
+ *   36  ArticleEditor()                 xem tom tat dau file
+ *   56    useEffect                     Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
+ *   99    changeField()                 Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat)
+ *  104    changeShare()                 Doi ty le cua 1 tac gia
+ *  109    addCoAuthor()                 Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap
+ *  117    removeCoAuthor()              Bo 1 dong tac gia (UC-04 A1: phai chia lai ty le truoc khi luu)
+ *  122    buildPayload()                Du lieu gui server: dung ten field cua ArticleSaveRequest
+ *  133    save()                        Luu nhap; alsoSubmit = true thi luu xong nop luon (UC-05) hoac nop lai (UC-10)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  161  [< Chi tiet bai / Bai cua toi]  quay ve /my-articles/:id (dang sua) hoac /my-articles (bai moi), khong luu
- *  230  [Bo] o dong dong tac gia        bo nguoi do khoi danh sach (chua goi server, bam Luu moi luu)
- *  248  [Them]                          them nguoi chon o o 'Them dong tac gia' vao danh sach, ty le 0%
- *  254  [Luu nhap]                      bai moi: POST /api/articles roi chuyen sang /my-articles/:id/edit; bai cu: PUT /api/articles/{id}
- *  257  [Luu va nop bai] / [nop lai]    luu nhu tren roi POST /submit (UC-05) hoac /resubmit (UC-10), xong mo /my-articles/:id
+ *  163  [< Chi tiet bai / Bai cua toi]  quay ve /my-articles/:id (dang sua) hoac /my-articles (bai moi), khong luu
+ *  232  [Bo] o dong dong tac gia        bo nguoi do khoi danh sach (chua goi server, bam Luu moi luu)
+ *  250  [Them]                          them nguoi chon o o 'Them dong tac gia' vao danh sach, ty le 0%
+ *  256  [Luu nhap]                      bai moi: POST /api/articles roi chuyen sang /my-articles/:id/edit; bai cu: PUT /api/articles/{id}
+ *  259  [Luu va nop bai] / [nop lai]    luu nhu tren roi POST /submit (UC-05) hoac /resubmit (UC-10), xong mo /my-articles/:id
  */
 export default function ArticleEditor({ nguoiDung }) {
   const { id } = useParams()            // khong co id = bai moi

@@ -6,13 +6,24 @@ import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/AppealPage.css'
 
 /**
- * MUC LUC (so dong)
- *   18  AppealCreatePage
- *   31    useEffect                  - tai du lieu khi mo trang
- *   39    useEffect                  - tai du lieu khi mo trang
- *   60    doiLuaChon()
- *   72    doiLyDo()
- *   76    guiForm()
+ * Man Phong vien tao khieu nai diem (UC-35): chon bai da cong bo diem con trong han, chon tieu chi bi
+ * khieu nai va ghi ly do, roi gui.
+ *
+ * MO TRANG NAY TAI: /my-appeals/new
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   29  AppealCreatePage()              appeal create page
+ *   42    useEffect                     tai du lieu khi mo trang
+ *   50    useEffect                     tai du lieu khi mo trang
+ *   71    doiLuaChon()                  doi lua chon
+ *   83    doiLyDo()                     doi ly do
+ *   87    guiForm()                     gui form
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  118  link [Khieu nai cua toi]        mo trang /my-appeals (MyAppealsPage)
+ *  122  form, nut [Xem ket qua cham]    doi tham so tren URL -> tai lai danh sach
+ *  143  form, nut [Dang gui… / Gui khieu nai]  guiForm() -> goi POST /api/appeals; chuyen sang /my-appeals (MyAppealsPage)
+ *  189  link [Huy]                      mo trang /main (trang chu theo vai tro)
  */
 
 export default function AppealCreatePage() {

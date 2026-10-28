@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * MUC LUC (so dong)
- *   24  field                        - repository / service duoc inject
- *   30  getReport()
+ * Doc bao cao do lech nguoi cham (UC-41) cho man Truong ban.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  field                           repository / service duoc inject
+ *   32  getReport()                     lay report
  */
 @Service
 @RequiredArgsConstructor

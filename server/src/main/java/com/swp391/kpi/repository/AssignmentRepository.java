@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * MUC LUC (so dong)
- *   22  findByArticleId()            - Tìm lượt phân công theo mã bài viết (quan hệ 1-1)
- *   25  findByEditorIdOrderByAssignedAtDesc() - Lấy danh sách bài viết được phân công cho một BTV (UC-21)
- *   29  countAssignedArticlesByEditorId() - Đếm số bài viết mà một BTV đang phụ trách (chưa hoàn thành) để gợi ý BT…
+ * Repository truy van bang cua entity Assignment (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  findByArticleId()               Tim luot phan cong theo ma bai viet (quan he 1-1)
+ *   27  findByEditorIdOrderByAssignedAtDesc()  Lay danh sach bai viet duoc phan cong cho mot BTV (UC-21)
+ *   31  countAssignedArticlesByEditorId()  Dem so bai viet ma mot BTV dang phu trach (chua hoan thanh) de goi y BTV it viec nhat (UC-19, BR-QA-04)
  */
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Integer> {

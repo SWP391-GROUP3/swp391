@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 
 /**
  * DTO dai dien cho 1 dong trong Hang cho duyet xuat ban cua Truong ban (UC-33).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

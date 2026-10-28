@@ -14,19 +14,21 @@ const PAGE_SIZE = 10
  * Loc theo nhom trang thai bang URL (?status=A,B), nen trang chu link thang toi
  * dung nhom duoc. Bam tieu de de mo chi tiet bai (UC-02).
  *
+ * MO TRANG NAY TAI: /my-articles
+ *
  * MUC LUC (so dong - ten - tac dung)
  *   10  PAGE_SIZE                       So bai moi trang (AGENTS.md 3.7: ?page=0&size=10)
- *   31  MyArticles()                    UC-01 - "Bai cua toi": bai ma Phong vien la tac gia chinh hoac dong tac gia
- *   41    useEffect                     Tai lai danh sach moi khi doi bo loc hoac doi trang
- *   58    selectGroup()                 Bam 1 nhom loc: ghi vao URL va quay ve trang dau
- *   67    goToPage()                    Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc
+ *   33  MyArticles()                    xem tom tat dau file
+ *   43    useEffect                     Tai lai danh sach moi khi doi bo loc hoac doi trang
+ *   60    selectGroup()                 Bam 1 nhom loc: ghi vao URL va quay ve trang dau
+ *   69    goToPage()                    Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   81  [Soan bai moi]                  mo trang /my-articles/new (ArticleEditor) de soan bai moi (UC-03)
- *   92  chip [Tat ca]                   bo loc, ghi ?status= tren URL -> goi lai GET /api/articles
- *  103  chip nhom trang thai            loc theo nhom (Nhap, Cho xac nhan...) -> ?status=A,B -> GET /api/articles
- *  138  [ten bai] trong bang            mo trang /my-articles/:id (ArticleDetail) xem chi tiet bai (UC-02)
- *  172  [Trang truoc] / [Trang sau]     doi ?page= tren URL -> tai trang khac cua danh sach
+ *   83  [Soan bai moi]                  mo trang /my-articles/new (ArticleEditor) de soan bai moi (UC-03)
+ *   94  chip [Tat ca]                   bo loc, ghi ?status= tren URL -> goi lai GET /api/articles
+ *  105  chip nhom trang thai            loc theo nhom (Nhap, Cho xac nhan...) -> ?status=A,B -> GET /api/articles
+ *  140  [ten bai] trong bang            mo trang /my-articles/:id (ArticleDetail) xem chi tiet bai (UC-02)
+ *  174  [Trang truoc] / [Trang sau]     doi ?page= tren URL -> tai trang khac cua danh sach
  */
 export default function MyArticles() {
   const [searchParams, setSearchParams] = useSearchParams()

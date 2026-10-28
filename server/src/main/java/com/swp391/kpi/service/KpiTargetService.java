@@ -19,16 +19,16 @@ import java.util.List;
 /**
  * Service xử lý toàn bộ logic nghiệp vụ liên quan đến chỉ tiêu KPI tháng (UC-58, UC-59).
  *
- * MUC LUC (so dong)
- *   37  field                        - repository / service duoc inject
- *   43  getTargetsByPeriod()         - Lấy danh sách chỉ tiêu theo kỳ (năm và tháng) cho màn hình UC-59.
- *   56  getTargetById()              - Lấy chi tiết chỉ tiêu theo ID.
- *   63  hang so                      - Danh sách định mức chuẩn mẫu theo ngạch phóng viên (UC-58)
- *   73  getDefaultBenchmarks()       - Lấy danh sách định mức chuẩn theo ngạch phóng viên (UC-58).
- *   80  updateBenchmarks()           - Cập nhật danh sách định mức chuẩn theo ngạch phóng viên (UC-58).
- *   91  createTarget()               - Giao chỉ tiêu mới cho phóng viên trong tháng (UC-59).
- *  121  updateTarget()               - Điều chỉnh chỉ tiêu đã giao (UC-59 Nhánh ngoại lệ A2).
- *  136  deleteTarget()               - Xoá chỉ tiêu KPI theo ID.
+ * MUC LUC (so dong - ten - tac dung)
+ *   37  field                           repository / service duoc inject
+ *   63  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   43  getTargetsByPeriod()            Lay danh sach chi tieu theo ky (nam va thang) cho man hinh UC-59
+ *   56  getTargetById()                 Lay chi tiet chi tieu theo ID
+ *   73  getDefaultBenchmarks()          Lay danh sach dinh muc chuan theo ngach phong vien (UC-58)
+ *   80  updateBenchmarks()              Cap nhat danh sach dinh muc chuan theo ngach phong vien (UC-58)
+ *   91  createTarget()                  Giao chi tieu moi cho phong vien trong thang (UC-59)
+ *  121  updateTarget()                  Dieu chinh chi tieu da giao (UC-59 Nhanh ngoai le A2)
+ *  136  deleteTarget()                  Xoa chi tieu KPI theo ID
  */
 @Service
 @RequiredArgsConstructor

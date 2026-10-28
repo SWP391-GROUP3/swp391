@@ -64,11 +64,14 @@ function DongTienDo({ nhan, thucTe, chiTieu, donVi }) {
  * Dat khi dat CA HAI chi tieu (BR-KPI-05). Trong thang chi la ket qua DU KIEN,
  * ket qua chinh thuc chi co khi Truong ban chot ky (UC-66, UC-67).
  *
- * MUC LUC (so dong)
- *    8  tinhPhanTram                 - Phan tram do dai thanh tien do, toi da 100 (vuot chi tieu van chi day t…
- *   19  DongTienDo                   - 1 dong tien do: nhan, "4 / 6 bai", thanh ngang, dong goi y con thieu ba…
- *   73  KpiProgressCard              - Khoi "KPI thang nay" (UC-60): so bai da dang va diem TB so voi chi tieu
- *   77    useEffect                  - tai du lieu khi mo trang
+ * MUC LUC (so dong - ten - tac dung)
+ *    8  tinhPhanTram()                  Phan tram do dai thanh tien do, toi da 100 (vuot chi tieu van chi day thanh)
+ *   19  DongTienDo()                    1 dong tien do: nhan, "4 / 6 bai", thanh ngang, dong goi y con thieu bao nhieu
+ *   76  KpiProgressCard()               xem tom tat dau file
+ *   80    useEffect                     tai du lieu khi mo trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  119  link [Xem chi tiet KPI →]       mo trang /my-kpi (PersonalKpiProgress)
  */
 export default function KpiProgressCard() {
   const [kpi, setKpi] = useState(undefined)   // undefined = dang tai, null = chua giao chi tieu

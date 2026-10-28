@@ -12,6 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * API ho so bien tap vien (UC-42): danh sach BTV, ho so chat luong, lich su cham.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   28  field                           service duoc inject
+ *   31  getEditors()                    lay editors [GET /api/reviewers]
+ *   37  getProfile()                    lay profile [GET /api/reviewers/{editorId}]
+ *   45  getHistory()                    lay history [GET /api/reviewers/{editorId}/scoring-history]
+ */
 @RestController
 @RequestMapping("/api/reviewers")
 @RequiredArgsConstructor

@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
  * DTO phan hoi nhat ky import CSV so lieu doc gia (UC-63).
  * Map tay bang ham from() theo quy uoc AGENTS.md muc 3.4.
  *
- * MUC LUC (so dong)
- *   20  field                        - cac truong tra ve cho giao dien
- *   30  from()                       - doi entity sang DTO
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong tra ve cho giao dien
+ *   29  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

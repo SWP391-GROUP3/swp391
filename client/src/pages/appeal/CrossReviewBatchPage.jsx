@@ -4,6 +4,26 @@ import { layDotChamCheo, layBaiChamCheoHopLe, taoDotChamCheo } from '../../api/c
 import '../../styles/QualityReportPage.css'
 import './ReviewWorkflow.css'
 
+/**
+ * Man Truong ban tao dot cham cheo moi (chon khoang ngay, bai hop le) va xem cac dot trong ban
+ * (UC-40). Ket qua cham cheo chi de do do lech, khong doi diem chinh thuc.
+ *
+ * MO TRANG NAY TAI: /cross-reviews
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   27  CrossReviewBatchPage()          cross review batch page
+ *   37    useEffect                     tai du lieu khi mo trang
+ *   43    taiBai()                      tai bai
+ *   49    doiLuaChon()                  doi lua chon
+ *   52    taoDot()                      tao dot
+ *   65    doiNgay()                     doi ngay
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   71  form, nut [Tim bai da cham]     taiBai() -> goi GET /api/cross-review-batches/candidates?{newURLSearchParamsfromDatetoDate})}
+ *   76  form, nut [Dang xu ly… / Tao dot cham cheo]  taoDot() -> hoi xac nhan; goi POST /api/cross-review-batches
+ *   96  link [{dot.batchName}]          mo trang /cross-reviews/{dot.id} (CrossReviewBatchDetailPage)
+ */
+
 export default function CrossReviewBatchPage() {
   const dieuHuong = useNavigate()
   const [cacDot, setCacDot] = useState(null)

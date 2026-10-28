@@ -11,6 +11,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO tra ve cho giao dien. Dung o: ScoringAttemptController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  field                           cac truong tra ve cho giao dien
+ *   48  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ */
 @Getter
 @Setter
 @NoArgsConstructor

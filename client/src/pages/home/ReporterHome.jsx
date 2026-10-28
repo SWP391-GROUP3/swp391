@@ -49,11 +49,11 @@ function tinhSoBaiTheoNhom(thongKe) {
  * Trang chu cua Phong vien.
  * Cot trai: viec cho xu ly + KPI thang. Cot phai: so bai theo trang thai.
  *
- * MUC LUC (so dong)
- *   14  NHOM_TRANG_THAI              - Gop 9 trang thai cua articles.status (schema.sql) thanh 7 nhom de PV de…
- *   29  tinhSoBaiTheoNhom            - Cong so bai cua tung nhom tu danh sach { status, count } server tra ve,
- *   58  ReporterHome                 - Trang chu cua Phong vien.
- *   62    useEffect                  - tai du lieu khi mo trang
+ * MUC LUC (so dong - ten - tac dung)
+ *   14  NHOM_TRANG_THAI                 Gop 9 trang thai cua articles.status (schema.sql) thanh 7 nhom de PV de doc
+ *   29  tinhSoBaiTheoNhom()             Cong so bai cua tung nhom tu danh sach { status, count } server tra ve, doi thanh dang StatusCounter can: { n…
+ *   58  ReporterHome()                  xem tom tat dau file
+ *   62    useEffect                     tai du lieu khi mo trang
  */
 export default function ReporterHome({ nguoiDung }) {
   const [cacNhom, setCacNhom] = useState(null)   // null = dang tai

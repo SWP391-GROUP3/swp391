@@ -75,11 +75,11 @@ function taoCacNhom(dem) {
  * Trang chu cua Truong ban bien tap.
  * Cot trai: viec cho xu ly + tom tat KPI thang cua ban. Cot phai: viec cua ban theo buoc.
  *
- * MUC LUC (so dong)
- *   15  gopDanhSachViec              - Gop viec cua Truong ban thanh 1 danh sach "Chờ xử lý".
- *   64  taoCacNhom                   - Cac o dem ben phai. Khac don vi (bai / khieu nai) nen khong hien tong.
- *   84  HeadHome                     - Trang chu cua Truong ban bien tap.
- *   88    useEffect                  - tai du lieu khi mo trang
+ * MUC LUC (so dong - ten - tac dung)
+ *   15  gopDanhSachViec()               Gop viec cua Truong ban thanh 1 danh sach "Cho xu ly"
+ *   64  taoCacNhom()                    Cac o dem ben phai. Khac don vi (bai / khieu nai) nen khong hien tong.
+ *   84  HeadHome()                      xem tom tat dau file
+ *   88    useEffect                     tai du lieu khi mo trang
  */
 export default function HeadHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)   // null = dang tai

@@ -2,6 +2,16 @@
    PublishingQueue.css - Giao diện Hàng chờ duyệt xuất bản của Trưởng ban (UC-33)
    Tất cả màu sắc sử dụng biến --fm-* từ index.css
    Bám sát mockup-06 và mockup-07 trong docs/srs-images/
+
+   MUC LUC (so dong - khoi CSS)
+     17  tieu de, bo cuc dau trang
+     68  Thong ke tren cung
+    102  Thanh bo loc
+    126  Bang
+    170  Huy hieu (Badge)
+    201  Nut thao tac
+    221  Modal theo mockup-07
+    402  Thong bao & Trong
    =========================================================================== */
 
 .duyet-dang {

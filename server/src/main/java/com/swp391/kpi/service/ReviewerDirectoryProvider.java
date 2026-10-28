@@ -3,8 +3,10 @@ package com.swp391.kpi.service;
 import java.util.Optional;
 
 /**
- * MUC LUC (so dong)
- *   11  findEditor()
+ * Interface tim thong tin BTV, de service BF-03 khong goi thang repository cua luong khac.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   13  findEditor()                    tim editor
  */
 public interface ReviewerDirectoryProvider {
 

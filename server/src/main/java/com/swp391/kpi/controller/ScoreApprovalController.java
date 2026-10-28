@@ -18,6 +18,14 @@ import java.util.List;
 
 /**
  * Controller xu ly cac API phe duyet diem danh gia va duyet xuat ban cua Truong ban (UC-29, UC-31, UC-32, UC-33).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   35  field                           service duoc inject
+ *   41  getPendingApprovals()           Lay danh sach bai viet cho duyet diem (UC-29) [GET /api/score-approvals]
+ *   51  approveScore()                  Truong ban phe duyet diem danh gia (UC-32) [POST /api/score-approvals/article/{articleId}/approve]
+ *   63  returnScore()                   Truong ban yeu cau cham lai (UC-31) [POST /api/score-approvals/article/{articleId}/return]
+ *   76  getPendingPublishing()          Lay danh sach bai viet cho duyet xuat ban (UC-33) [GET /api/score-approvals/publishing]
+ *   86  approvePublishing()             Truong ban phe duyet xuat ban bai viet (UC-33) [POST /api/score-approvals/article/{articleId}/publish]
  */
 @RestController
 @RequestMapping("/api/score-approvals")

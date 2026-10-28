@@ -27,19 +27,24 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * MUC LUC (so dong)
- *   47  hang so                      - hang so dung trong file
- *   50  field                        - repository / service duoc inject
- *   61  AppealService()
- *   97  submitAppeal()
- *  129  getEligibility()
- *  159  getEligibleArticles()
- *  173  getMyAppeals()
- *  187  validateSubmission()
- *  199  validateArticleAndWindow()
- *  222  validateCriteria()
- *  250  saveCriteria()
- *  264  toResponse()
+ * Nghiep vu Phong vien gui khieu nai (UC-35): kiem tra bai va han khieu nai, tieu chi hop le, luu
+ * khieu nai; danh sach bai co the khieu nai va khieu nai cua toi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   52  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   55  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   67  AppealService()                 ham khoi tao
+ *  106  submitAppeal()                  nop appeal
+ *  138  getEligibility()                lay eligibility
+ *  168  getEligibleArticles()           lay eligible articles
+ *  182  getMyAppeals()                  lay my appeals
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  196  validateSubmission()            kiem tra submission
+ *  208  validateArticleAndWindow()      kiem tra article va window
+ *  231  validateCriteria()              kiem tra criteria
+ *  259  saveCriteria()                  luu criteria
+ *  273  toResponse()                    doi sang response
  */
 @Service
 public class AppealService {

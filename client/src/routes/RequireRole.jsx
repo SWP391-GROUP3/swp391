@@ -10,8 +10,12 @@ import { Navigate } from 'react-router-dom'
  * vi ai cung goi thang API duoc ma khong qua man hinh.
  * replace: khong luu vao lich su, bam Back khong quay lai trang bi chan.
  *
- * MUC LUC (so dong)
- *   16  RequireRole                  - Chan route o phia giao dien:
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  RequireRole()                   xem tom tat dau file
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   22  tu chuyen trang (Navigate)      chuyen sang /login (Login)
+ *   25  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
  */
 export default function RequireRole({ nguoiDung, vaiTro, children }) {
   if (!nguoiDung) {

@@ -8,8 +8,8 @@
  * Ten field theo DTO tieng Anh (camelCase), trang thai dung chu trong CHECK
  * cua database/schema.sql.
  *
- * MUC LUC (so dong)
- *   25  layTrangChuBienTapVien       - Tat ca so lieu trang chu cua BTV dang dang nhap:
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  layTrangChuBienTapVien()        Tat ca so lieu trang chu cua BTV dang dang nhap: - statusCounts: so b… [du lieu gia (chua co API)]
  */
 import { giaLapGoiApi, cachHomNay } from './duLieuGia.js'
 

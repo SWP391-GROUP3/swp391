@@ -5,10 +5,10 @@
  *   - getRoyaltyPeriods():  cac ky nhuan but (UC-49), lay ky dang OPEN
  * Ten field tra ve giu nhu ban du lieu gia truoc day, nen SecretaryHome.jsx dung tiep duoc.
  *
- * MUC LUC (so dong)
- *   17  SO_BAI_TREN_TRANG_CHU        - So bai cho cham hien o danh sach "Chờ xử lý"
- *   27  layTrangChuThuKy             - Tat ca so lieu trang chu cua Thu ky
- *   61  timKyDangMo                  - Ky dang OPEN, null neu khong co
+ * MUC LUC (so dong - ten - tac dung)
+ *   17  SO_BAI_TREN_TRANG_CHU           So bai cho cham hien o danh sach "Cho xu ly" (han chi gan nhat truoc)
+ *   27  layTrangChuThuKy()              Tat ca so lieu trang chu cua Thu ky: - counts.pendingGrading: so bai cho cham (UC-46) - counts.nearDeadline: …
+ *   61  timKyDangMo()                   Ky dang OPEN, null neu khong co
  */
 import { getPendingGradings, getRoyaltyPeriods } from './royaltyApi.js'
 

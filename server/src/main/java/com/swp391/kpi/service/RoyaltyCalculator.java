@@ -14,20 +14,22 @@ import java.util.Map;
  * Moi nguong va ty le lay tu bang system_parameters: service doc ra roi truyen
  * vao constructor, KHONG viet cung so trong class nay.
  *
- * MUC LUC (so dong)
- *   34  hang so                      - hang so dung trong file
- *   37  field                        - repository / service duoc inject
- *   47  RoyaltyCalculator()          - params: param_key -> param_value, lay tu bang system_parameters.
- *   59  unitPrice()                  - Don gia 1 he so = luong co so x UNIT_PRICE_PERCENT / 100, bo phan le du…
- *   65  suggestedFactor()            - He so goi y = he so chuan cua the loai x diem / 100 (BR-RY-01, nhom da …
- *   74  effectiveSaturationRate()    - Ty le bao hoa (%) dung de tinh tien (GBR-09):
- *   87  natureRate()                 - Ty le % theo tinh chat bai (BR-RY-02), lay tu system_parameters NATURE_…
- *   98  finalFactor()                - He so cuoi = he so x ty le bao hoa / 100 x ty le tinh chat / 100, toi t…
- *  107  calculateAmount()            - Tien = he so x don gia, lam tron XUONG ve boi so ROUNDING_UNIT (1.000d).
- *  115  splitAmount()                - Chia tien bai cho cac tac gia (GBR-10). sharePercents: % cua tung tac g…
- *  136  roundDown()                  - Lam tron XUONG ve boi so cua ROUNDING_UNIT: chia ra so "nghin dong", bo…
- *  143  checkSharesAddUpTo100()      - Tong % cac tac gia phai dung 100 (BF-01 da kiem luc nop bai, day la lop…
- *  156  readDecimal()                - Lay 1 tham so dang so. Thieu hoac sai dinh dang thi bao loi ngay luc ta…
+ * MUC LUC (so dong - ten - tac dung)
+ *   36  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   39  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   49  RoyaltyCalculator()             params: param_key -> param_value, lay tu bang system_parameters
+ *   61  unitPrice()                     Don gia 1 he so = luong co so x UNIT_PRICE_PERCENT / 100, bo phan le duoi 1 dong (UC-55)
+ *   67  suggestedFactor()               He so goi y = he so chuan cua the loai x diem / 100 (BR-RY-01, nhom da doi: nhan thang diem thay cho chia bac…
+ *   76  effectiveSaturationRate()       Ty le bao hoa (%) dung de tinh tien (GBR-09): - bai khong thuoc su kien (articleSaturationRate = null) -> 100…
+ *   89  natureRate()                    Ty le % theo tinh chat bai (BR-RY-02), lay tu system_parameters NATURE_RATE_..
+ *  100  finalFactor()                   He so cuoi = he so x ty le bao hoa / 100 x ty le tinh chat / 100, toi thieu MIN_FINAL_FACTOR (BR-RY-02)
+ *  109  calculateAmount()               Tien = he so x don gia, lam tron XUONG ve boi so ROUNDING_UNIT (1.000d)
+ *  117  splitAmount()                   Chia tien bai cho cac tac gia (GBR-10)
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  138  roundDown()                     Lam tron XUONG ve boi so cua ROUNDING_UNIT: chia ra so "nghin dong", bo phan le, nhan lai
+ *  145  checkSharesAddUpTo100()         Tong % cac tac gia phai dung 100 (BF-01 da kiem luc nop bai, day la lop chan cuoi de khong bao gio chia sai t…
+ *  158  readDecimal()                   Lay 1 tham so dang so
  */
 public class RoyaltyCalculator {
 

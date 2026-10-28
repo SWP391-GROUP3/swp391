@@ -5,6 +5,27 @@ import { formatDate } from '../../utils/formatDate.js'
 import '../../styles/QualityReportPage.css'
 import './AppealManagementPage.css'
 
+/**
+ * Man Truong ban quan ly hang cho khieu nai (UC-43): loc theo trang thai, xem han xu ly, bam vao 1
+ * khieu nai de xem chi tiet.
+ *
+ * MO TRANG NAY TAI: /appeals
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   29  tenTrangThai                    ten trang thai
+ *   31  AppealManagementPage()          appeal management page
+ *   38    useEffect                     tai du lieu khi mo trang
+ *   46    locDanhSach()                 loc danh sach
+ *   54    doiTrang()                    doi trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   65  form, nut [Loc danh sach]       locDanhSach() -> xu ly tren trang
+ *   75  [Xoa bo loc]                    xu ly tren trang
+ *   83  link [# {dong.id} · {dong.articleTitle}]  mo trang /appeals/{dong.id} (AppealDetailPage)
+ *   92  [Trang truoc]                   doiTrang() -> xu ly tren trang
+ *   94  [Trang sau]                     doiTrang() -> xu ly tren trang
+ */
+
 const tenTrangThai = { SUBMITTED: 'Đã gửi', IN_REVIEW: 'Đang chấm lại', RESOLVED: 'Đã giải quyết' }
 
 export default function AppealManagementPage() {

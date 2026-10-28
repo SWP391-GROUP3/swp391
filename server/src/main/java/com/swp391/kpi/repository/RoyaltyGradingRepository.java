@@ -10,10 +10,10 @@ import java.util.Optional;
 /**
  * Doc/ghi bang royalty_gradings (phieu cham nhuan but, UC-46, UC-47).
  *
- * MUC LUC (so dong)
- *   23  findGradedArticleIds()       - Id cac bai DA co phieu cham (UC-46 loai cac bai nay khoi danh sach cho …
- *   26  findFirstByArticleIdOrderByVersionNoDesc() - Phien ban cham moi nhat cua 1 bai; rong = chua cham (cham lai Iter 3)
- *   30  findByPeriodIdOrderByGradedAtAsc() - Cac phieu cham thuoc 1 ky, cham truoc len dau (bang ke ky, UC-50).
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  findGradedArticleIds()          Id cac bai DA co phieu cham (UC-46 loai cac bai nay khoi danh sach cho cham)
+ *   26  findFirstByArticleIdOrderByVersionNoDesc()  Phien ban cham moi nhat cua 1 bai; rong = bai chua cham lan nao (UC-47, cham lai Iter 3)
+ *   30  findByPeriodIdOrderByGradedAtAsc()  Cac phieu cham thuoc 1 ky, cham truoc len dau (bang ke ky, UC-50)
  */
 public interface RoyaltyGradingRepository extends JpaRepository<RoyaltyGrading, Integer> {
 

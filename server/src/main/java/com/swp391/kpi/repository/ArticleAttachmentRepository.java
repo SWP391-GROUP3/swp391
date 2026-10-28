@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 /**
+ * Repository truy van bang cua entity ArticleAttachment (Spring Data JPA). Chi service cung luong goi.
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   15  findByVersionIdOrderByIdAsc()   Anh/video da gan vao 1 ban (article_versions.id), anh them truoc xep truoc
+ *   17  findByVersionIdOrderByIdAsc()   Anh/video da gan vao 1 ban (article_versions.id), anh them truoc xep truoc
  */
 public interface ArticleAttachmentRepository extends JpaRepository<ArticleAttachment, Integer> {
 

@@ -7,9 +7,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   18  field                        - cac truong tra ve cho giao dien
- *   28  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
+ * DTO tra ve cho giao dien. Dung o: AuditLogController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           cac truong tra ve cho giao dien
+ *   30  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

@@ -8,8 +8,10 @@ import org.hibernate.annotations.Nationalized;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   19  field                        - cac cot cua bang (khop schema.sql)
+ * Entity anh xa bang notifications trong schema.sql. Chi dung trong service, khong tra thang ra API.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "notifications")

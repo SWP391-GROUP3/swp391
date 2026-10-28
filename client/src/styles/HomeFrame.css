@@ -3,10 +3,12 @@
    .trang-chu__khoi: khung the trang o cot trai (PendingList, SummaryCard,
    KpiProgressCard... deu dung).
 
-   MUC LUC (so dong)
-     12  tieu de, bo cuc dau trang
-     63  man hinh hep (@media)
-     67  man hinh hep (@media)
+   MUC LUC (so dong - khoi CSS)
+     14  tieu de, bo cuc dau trang
+     43  Khung the trang o cot trai
+     64  Man hinh hep: 2 cot thanh 1 cot (cot dem so luong tu len tren - xem StatusCounter.css)
+     65  man hinh hep (@media)
+     69  man hinh hep (@media)
    =========================================================================== */
 
 .trang-chu__dau { margin-bottom: 24px; }

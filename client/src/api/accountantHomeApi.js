@@ -6,8 +6,8 @@
  * Khi backend BF-04 xong chi can doi ruot ham thanh goiApi('/api/...'),
  * component goi ham KHONG phai sua. Trang thai dung chu trong CHECK cua schema.sql.
  *
- * MUC LUC (so dong)
- *   21  layTrangChuKeToan            - So lieu trang chu Ke toan:
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  layTrangChuKeToan()             So lieu trang chu Ke toan: - periodStatusCounts: so ky nhuan but NAM … [du lieu gia (chua co API)]
  */
 import { giaLapGoiApi } from './duLieuGia.js'
 

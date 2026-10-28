@@ -16,6 +16,34 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Nghiep vu cham cheo (UC-40): tao dot (chon bai hop le, kiem tra ngay), dong dot, go bai; BTV xem va
+ * nop phieu cham cheo.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   50  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   62  getBatches()                    lay batches
+ *   70  getBatch()                      lay batch
+ *   74  getCandidates()                 lay candidates
+ *   92  create()                        tao
+ *  132  getMyTasks()                    lay my tasks
+ *  142  getTask()                       lay task
+ *  150  submit()                        nop
+ *  185  close()                         chot
+ *  200  removeTask()                    xoa task
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  214  eligible()                      eligible
+ *  226  response()                      response
+ *  237  blind()                         blind
+ *  245  scopedBatch()                   scoped batch
+ *  253  section()                       section
+ *  259  lockedBatch()                   locked batch
+ *  263  requireOpen()                   bat buoc open
+ *  266  validateDates()                 kiem tra dates
+ *  269  forbidden()                     forbidden
+ *  270  encode()                        encode
+ */
 @Service @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CrossReviewService {

@@ -11,8 +11,8 @@ import java.math.BigDecimal;
  * Một tiêu chí chấm thành phần trong phiên bản bộ tiêu chí.
  * Bảng: criteria
  *
- * MUC LUC (so dong)
- *   26  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "criteria")

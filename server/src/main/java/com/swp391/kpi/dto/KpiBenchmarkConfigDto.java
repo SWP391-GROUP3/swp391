@@ -11,8 +11,8 @@ import java.math.BigDecimal;
  * DTO đại diện cho định mức chuẩn theo ngạch phóng viên (UC-58).
  * Phục vụ cấu hình và nút "Áp dụng định mức chuẩn" trong UC-59.
  *
- * MUC LUC (so dong)
- *   24  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

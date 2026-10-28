@@ -15,8 +15,8 @@ import org.hibernate.annotations.Nationalized;
  * Code doc theo param_key, khong viet cung so trong Java.
  * Hien chi anh xa cac cot can de DOC; cot unit, updated_by, updated_at them khi lam man Admin sua tham so.
  *
- * MUC LUC (so dong)
- *   30  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   30  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "system_parameters")

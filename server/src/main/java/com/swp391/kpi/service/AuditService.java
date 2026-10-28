@@ -12,11 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   25  field                        - repository / service duoc inject
- *   28  log()
- *   48  getLogs()
- *   71  emptyToNull()
+ * Ghi va doc bang audit_logs (dung chung): moi thao tac quan trong ghi 1 dong ai - lam gi - gia tri
+ * truoc / sau.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   30  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   33  log()                           ghi log
+ *   53  getLogs()                       lay logs
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *   76  emptyToNull()                   empty to null
  */
 @Service
 @RequiredArgsConstructor

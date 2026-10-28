@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 /**
  * Tong tien cua 1 nguoi trong ky (UC-50 "total per person"), cong tu cac dong royalty_lines.
  *
- * MUC LUC (so dong)
- *   18  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   18  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

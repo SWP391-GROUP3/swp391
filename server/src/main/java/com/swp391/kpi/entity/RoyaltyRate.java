@@ -17,8 +17,8 @@ import java.time.LocalDate;
  * Doi don gia = THEM dong moi voi ngay hieu luc moi, KHONG sua dong cu:
  * bai dang ngay nao dung don gia co effective_from lon nhat ma <= ngay do (BR-RY-03).
  *
- * MUC LUC (so dong)
- *   32  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_rates")

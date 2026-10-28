@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 /**
  * Phan tien bai viet cua 1 tac gia trong phieu cham (dong ARTICLE, GBR-10).
  *
- * MUC LUC (so dong)
- *   19  field                        - cac truong tra ve cho giao dien
- *   26  from()                       - Map tac gia cua BF-01 + so tien da chia
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
+ *   26  from()                          Map tac gia cua BF-01 + so tien da chia
  */
 @Getter
 @Setter

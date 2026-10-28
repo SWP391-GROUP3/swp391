@@ -4,10 +4,15 @@ import { BT_MAY_TINH, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
 /**
- * MUC LUC (so dong)
- *   13  ScoreCalculatorTester
- *   30    handleScoreChange()
- *   36    handleCommentChange()
+ * Trang thu (khong co trong menu): nhap diem tung tieu chi de thu ham tinh tong diem co trong so cua
+ * BF-02.
+ *
+ * MO TRANG NAY TAI: /calculator
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   18  ScoreCalculatorTester()         score calculator tester
+ *   35    handleScoreChange()           xu ly score change
+ *   41    handleCommentChange()         xu ly comment change
  */
 
 export default function ScoreCalculatorTester() {

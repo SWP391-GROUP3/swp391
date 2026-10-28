@@ -10,11 +10,20 @@ import '../styles/ReporterLayout.css'
  * Menu cua Phong vien. Moi muc ghi UC tuong ung trong SRS.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
  *
- * MUC LUC (so dong)
- *   19  MENU_PHONG_VIEN              - Menu cua Phong vien. Moi muc ghi UC tuong ung trong SRS.
- *   40  ChipViTien                   - Chip vi tien canh ten, bam vao mo trang Nhuan but (UC-57). Chi Phong vi…
- *   46    useEffect                  - Tai so du vi 1 lan khi khung trang hien ra
- *   67  ReporterLayout               - Khung trang cua Phong vien = khung chung + menu Phong vien + chip vi.
+ * MUC LUC (so dong - ten - tac dung)
+ *   28  MENU_PHONG_VIEN                 xem tom tat dau file
+ *   49  ChipViTien()                    Chip vi tien canh ten, bam vao mo trang Nhuan but (UC-57)
+ *   55    useEffect                     Tai so du vi 1 lan khi khung trang hien ra
+ *   76  ReporterLayout()                Khung trang cua Phong vien = khung chung + menu Phong vien + chip vi
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   32  menu [Bai cua toi]              mo trang /my-articles (MyArticles)
+ *   34  menu [Soan bai moi]             mo trang /my-articles/new (ArticleEditor)
+ *   36  menu [Xac nhan dong tac gia]    mo trang /co-author-invites (CoAuthorInvites)
+ *   38  menu [Khieu nai diem]           mo trang /my-appeals (MyAppealsPage)
+ *   40  menu [Nhuan but]                mo trang /my-royalties (ComingSoon - chua lam "Nhuan but")
+ *   42  menu [KPI ca nhan]              mo trang /my-kpi (PersonalKpiProgress)
+ *   66  link [{loiVi}. / So du vi: {formatMoney(soDu)}]  mo trang /my-royalties (ComingSoon - chua lam "Nhuan but")
  */
 const MENU_PHONG_VIEN = [
   {

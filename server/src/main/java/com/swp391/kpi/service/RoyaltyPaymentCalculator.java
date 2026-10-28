@@ -11,9 +11,9 @@ import java.math.BigDecimal;
  *   con lai <  0: paid = 0,       debtOut = debtIn - gross
  * Luon dung: paid - debtOut = gross - debtIn (CHECK ck_royalty_payments_amount).
  *
- * MUC LUC (so dong)
- *   22  paidAmount()                 - So tien thuc chi cho nguoi nhan: phan con lai sau khi tru no, khong am
- *   31  debtOut()                    - No chuyen sang ky sau: chi co khi tien ky nay khong du tra no
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  paidAmount()                    So tien thuc chi cho nguoi nhan: phan con lai sau khi tru no, khong am
+ *   30  debtOut()                       No chuyen sang ky sau: chi co khi tien ky nay khong du tra no
  */
 public class RoyaltyPaymentCalculator {
 

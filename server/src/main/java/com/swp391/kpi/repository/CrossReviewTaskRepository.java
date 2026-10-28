@@ -1,6 +1,14 @@
 package com.swp391.kpi.repository;
 import com.swp391.kpi.entity.CrossReviewTask;
 import org.springframework.data.jpa.repository.JpaRepository;
+/**
+ * Repository truy van bang cua entity CrossReviewTask (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   13  findByBatchIdOrderById()        tim theo batch id order theo id
+ *   14  findByReviewerIdOrderByIdDesc()  tim theo reviewer id order theo id desc
+ *   17  findLockedById()                tim locked theo id
+ */
 public interface CrossReviewTaskRepository extends JpaRepository<CrossReviewTask, Integer> {
     java.util.List<CrossReviewTask> findByBatchIdOrderById(Integer batchId);
     java.util.List<CrossReviewTask> findByReviewerIdOrderByIdDesc(Integer reviewerId);

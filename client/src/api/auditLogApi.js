@@ -1,8 +1,10 @@
 import { goiApi } from './goiApi.js'
 
 /**
- * MUC LUC (so dong)
- *    8  layNhatKy
+ * API nhat ky cham (UC-45): lay nhat ky thao tac cham / khieu nai theo bo loc. Goi qua goiApi().
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  layNhatKy()                     lay nhat ky [GET duongDan]
  */
 
 export async function layNhatKy(boLoc = {}) {

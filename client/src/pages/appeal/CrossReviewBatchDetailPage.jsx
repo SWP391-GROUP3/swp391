@@ -4,6 +4,25 @@ import { layChiTietDotCheo, dongDotChamCheo, goBaiChamCheo } from '../../api/cro
 import '../../styles/QualityReportPage.css'
 import './ReviewWorkflow.css'
 
+/**
+ * Man Truong ban xem 1 dot cham cheo (UC-40): danh sach bai va BTV duoc giao, tien do nop phieu; go
+ * bai khoi dot hoac dong dot.
+ *
+ * MO TRANG NAY TAI: /cross-reviews/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  CrossReviewBatchDetailPage()    cross review batch detail page
+ *   30  BatchDetail()                   batch detail
+ *   35    useEffect                     tai du lieu khi mo trang
+ *   40    xuLy()                        xu ly
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   49  link [← Cac dot cham cheo]      mo trang /cross-reviews (CrossReviewBatchPage)
+ *   59  [Go bai]                        xuLy() -> hoi xac nhan; goi DELETE /api/cross-review-batches/{id}/tasks/{taskId}
+ *   63  [Dong dot]                      xuLy() -> hoi xac nhan; goi POST /api/cross-review-batches/{id}/close
+ *   64  link [Nhat ky dot]              mo trang /audit-logs?entityType=cross_review_batches&entityId={id} (AuditLogPage)
+ */
+
 export default function CrossReviewBatchDetailPage() {
   const { id } = useParams()
   return <BatchDetail key={id} id={id} />

@@ -21,11 +21,11 @@ import java.util.List;
 /**
  * Controller cung cap cac API cho Job tong hop KPI va bang theo doi KPI toan ban (UC-61).
  *
- * MUC LUC (so dong)
- *   35  field                        - service duoc inject
- *   42  getDepartmentDashboard()     - Lay du lieu bang theo doi KPI ban bien tap (UC-61: View Department KPI …
- *   55  getReporterKpiDetail()       - Lay chi tiet hieu suat KPI cua mot phong vien theo chu ky thang (UC-62,…
- *   69  triggerAggregation()         - Kich hoat job tong hop KPI tu dong theo chu ky thang (Automated Aggrega…
+ * MUC LUC (so dong - ten - tac dung)
+ *   35  field                           service duoc inject
+ *   42  getDepartmentDashboard()        Lay du lieu bang theo doi KPI ban bien tap (UC-61: View Department KPI Boa… [GET /api/kpi-snapshots/dashboard]
+ *   55  getReporterKpiDetail()          Lay chi tiet hieu suat KPI cua mot phong vien theo ch… [GET /api/kpi-snapshots/reporters/{reporterId}/details]
+ *   69  triggerAggregation()            Kich hoat job tong hop KPI tu dong theo chu ky thang (Automated Aggregati… [POST /api/kpi-snapshots/aggregate]
  */
 @RestController
 @RequestMapping("/api/kpi-snapshots")

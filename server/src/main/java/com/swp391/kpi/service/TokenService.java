@@ -20,10 +20,10 @@ import java.time.temporal.ChronoUnit;
  *   role = ma vai tro, vd REPORTER (SecurityConfig doi thanh quyen ROLE_REPORTER)
  *   iat / exp = luc tao / luc het han
  *
- * MUC LUC (so dong)
- *   32  hang so                      - hang so dung trong file
- *   35  field                        - repository / service duoc inject
- *   40  createToken()
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   35  field                           repository / service duoc inject
+ *   40  createToken()                   tao token
  */
 @Service
 @RequiredArgsConstructor

@@ -8,9 +8,9 @@ import lombok.Setter;
  * 1 the loai dang dung, tra ve cho o chon the loai (vd man soan bai UC-03 cua BF-01).
  * Khong tra base_factor: he so nhuan but la viec cua Thu ky / Ke toan, phong vien khong can.
  *
- * MUC LUC (so dong)
- *   19  field                        - cac truong tra ve cho giao dien
- *   24  from()                       - Map tay entity -> DTO (AGENTS.md muc 3.4)
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
+ *   24  from()                          Map tay entity -> DTO (AGENTS.md muc 3.4)
  */
 @Getter
 @Setter

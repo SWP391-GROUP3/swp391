@@ -9,9 +9,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   20  field                        - cac truong tra ve cho giao dien
- *   32  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
+ * DTO tra ve cho giao dien. Dung o: ReviewerDeviationController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  field                           cac truong tra ve cho giao dien
+ *   34  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

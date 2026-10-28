@@ -24,11 +24,11 @@ import java.util.List;
  * API cham nhuan but cua Thu ky toa soan (UC-46, 47, 48).
  * SecurityConfig chi cho vai tro EDITORIAL_SECRETARY goi /api/royalty-gradings/**.
  *
- * MUC LUC (so dong)
- *   38  field                        - service duoc inject
- *   42  getPendingArticles()         - GET /api/royalty-gradings/pending: bai da dang chua cham, kem han chi v…
- *   50  previewGrading()             - GET /api/royalty-gradings/preview?articleId=5
- *   58  completeGrading()            - POST /api/royalty-gradings body { "articleId": 5 }
+ * MUC LUC (so dong - ten - tac dung)
+ *   38  field                           service duoc inject
+ *   42  getPendingArticles()            lay pending articles [GET /api/royalty-gradings/pending]
+ *   50  previewGrading()                Xem truoc he so va tien, chua luu (UC-47 buoc 1-3) [GET /api/royalty-gradings/preview]
+ *   58  completeGrading()               Hoan tat cham: luu phieu, anh/video, dong tien vao ky dang OPEN (UC-47 buoc 4, U… [POST /api/royalty-gradings]
  */
 @RestController
 @RequestMapping("/api/royalty-gradings")

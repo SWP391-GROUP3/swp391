@@ -4,6 +4,28 @@ import { laySoSanhKhieuNai, layNguoiChamHopLe, phanCongLanHai, chotDiemKhieuNai 
 import '../../styles/QualityReportPage.css'
 import './ReviewWorkflow.css'
 
+/**
+ * Man Truong ban so sanh diem goc va cac lan cham lai mu cua 1 khieu nai (UC-39), he thong de xuat ket
+ * qua theo luat chenh lech; can thi giao cham lan 2 (S2), xong thi chot diem.
+ *
+ * MO TRANG NAY TAI: /appeals/:id/comparison
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   29  TEN_LUAT                        hang so
+ *   31  AppealComparisonPage()          appeal comparison page
+ *   36  ComparisonContent()             comparison content
+ *   42    useEffect                     tai du lieu khi mo trang
+ *   54    xuLy()                        xu ly
+ *   63    giaoLanHai()                  giao lan hai
+ *   74    xacNhan()                     xac nhan
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   80  link [← Chi tiet khieu nai]     mo trang /appeals/{id} (AppealDetailPage)
+ *  102  form, nut [Phan cong S2]        giaoLanHai() -> hoi xac nhan; goi POST /api/appeals/{id}/assign-second
+ *  110  [Xac nhan diem hieu luc]        xacNhan() -> hoi xac nhan; goi POST /api/appeals/{id}/finalize
+ *  112  link [Xem nhat ky]              mo trang /audit-logs?appealId={id} (AuditLogPage)
+ */
+
 const TEN_LUAT = { USE_S1: 'Dùng điểm S1', AVERAGE_S0_S2: 'Trung bình S0 và S2', AVERAGE_S1_S2: 'Trung bình S1 và S2', USE_S2_TIE: 'Dùng S2 khi hai khoảng cách bằng nhau', KEEP_ORIGINAL: 'Giữ điểm gốc (lịch sử)', USE_RESCORE: 'Dùng điểm chấm lại (lịch sử)' }
 
 export default function AppealComparisonPage() {

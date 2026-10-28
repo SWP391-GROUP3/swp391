@@ -6,8 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * MUC LUC (so dong)
- *   18  field                        - cac truong tra ve cho giao dien
+ * DTO tra ve cho giao dien. Dung o: AssignmentController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

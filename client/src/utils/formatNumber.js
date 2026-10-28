@@ -2,9 +2,9 @@
  * Dinh dang so thuong (diem, so bai) kieu Viet Nam: 72.5 -> "72,5".
  * Toi da 2 chu so thap phan vi diem/he so luu DECIMAL(5,2).
  *
- * MUC LUC (so dong)
- *    9  DINH_DANG_SO                 - Dinh dang so thuong (diem, so bai) kieu Viet Nam: 72.5 -> "72,5".
- *   15  formatNumber
+ * MUC LUC (so dong - ten - tac dung)
+ *    9  DINH_DANG_SO                    xem tom tat dau file
+ *   15  formatNumber()                  dinh dang number
  */
 const DINH_DANG_SO = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 })
 

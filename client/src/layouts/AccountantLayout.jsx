@@ -6,9 +6,14 @@ import AppLayout from './AppLayout.jsx'
  * mo tu "Kỳ nhuận bút", khong nam tren menu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
  *
- * MUC LUC (so dong)
- *   13  MENU_KE_TOAN                 - Menu cua Ke toan (luong royalty BF-04).
- *   28  AccountantLayout             - Khung trang cua Ke toan.
+ * MUC LUC (so dong - ten - tac dung)
+ *   18  MENU_KE_TOAN                    xem tom tat dau file
+ *   33  AccountantLayout()              Khung trang cua Ke toan
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   22  menu [Ky nhuan but]             mo trang /royalty-periods (RoyaltyPeriods)
+ *   24  menu [Chi tra]                  mo trang /royalty-payments (ComingSoon - chua lam "Chi tra nhuan but")
+ *   26  menu [Don gia nhuan but]        mo trang /royalty-rates (RoyaltyRates)
  */
 const MENU_KE_TOAN = [
   {

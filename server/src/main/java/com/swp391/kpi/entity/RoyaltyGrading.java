@@ -23,8 +23,8 @@ import java.time.LocalDateTime;
  * Moi lan tinh lai la 1 PHIEN BAN MOI (version_no tang, bat buoc recalc_reason),
  * KHONG sua phien ban cu. Luu du tung buoc cong thuc de giai trinh (BR-RY-01..03).
  *
- * MUC LUC (so dong)
- *   38  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   38  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_gradings")

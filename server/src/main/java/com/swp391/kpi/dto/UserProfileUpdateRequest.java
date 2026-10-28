@@ -11,8 +11,8 @@ import lombok.Setter;
  * Vai tro, ban, trang thai, username do Admin quan ly -> khong nhan o day.
  * Do dai lay theo schema.sql: full_name NVARCHAR(100), email VARCHAR(150).
  *
- * MUC LUC (so dong)
- *   23  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

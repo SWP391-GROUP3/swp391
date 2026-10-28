@@ -6,10 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 
 /**
- * MUC LUC (so dong)
- *   17  field                        - repository / service duoc inject
- *   22  getSubmissionContext()
- *   28  getSubmissionContext()
+ * Ban lay du lieu tu DB cho AppealSubmissionDataProvider: thong tin bai, diem va tieu chi can de kiem
+ * tra khi gui khieu nai.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           repository / service duoc inject
+ *   25  getSubmissionContext()          lay submission context
+ *   31  getSubmissionContext()          lay submission context
  */
 @Service
 @RequiredArgsConstructor

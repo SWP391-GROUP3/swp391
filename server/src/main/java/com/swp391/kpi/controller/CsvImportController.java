@@ -26,11 +26,11 @@ import java.nio.charset.StandardCharsets;
 /**
  * Controller xu ly API nhap so lieu tuong tac doc gia (UC-63) va nhat ky import.
  *
- * MUC LUC (so dong)
- *   33  field                        - service duoc inject
- *   38  uploadReaderCsv()            - Tai len file CSV so lieu doc gia (UC-63)
- *   54  getImportLogs()              - Danh sach nhat ky import co phan trang
- *   67  downloadTemplate()           - Tai file CSV mau de nhap lieu
+ * MUC LUC (so dong - ten - tac dung)
+ *   40  field                           service duoc inject
+ *   47  uploadReaderCsv()               Tai len file CSV so lieu doc gia (UC-63, BR-KPI-03) [POST /api/reader-imports]
+ *   62  getImportLogs()                 Lay danh sach nhat ky import theo thoi gian moi nhat [GET /api/reader-imports/logs]
+ *   76  downloadTemplate()              Tai file CSV mau cho so lieu doc gia [GET /api/reader-imports/template]
  */
 @RestController
 @RequestMapping("/api/reader-imports")

@@ -18,17 +18,27 @@ const RETURN_NOTE_MAX = 1000   // = cot royalty_periods.return_note NVARCHAR(100
  * Ke toan: ky CLOSED thi tra ky kem ly do (UC-52) hoac khoa ky de tao phieu chi (UC-53) (BR-RY-07).
  * Ky bi Ke toan tra ve thi hien ly do de Thu ky sua (UC-50 A1).
  *
- * MUC LUC (so dong)
- *   33  RoyaltyPeriodDetail          - UC-50, 51, 52, 53 - "Bang ke ky nhuan but" (Thu ky va Ke toan dung chung…
- *   41    useEffect                  - tai du lieu khi mo trang
- *   49    handleClose()
- *   71    handleAccountantDone()     - Ke toan tra / khoa ky xong: tai lai bang ke, hien thong bao
- *  143  AccountantReviewCard         - UC-51..53: Ke toan kiem tra ky CLOSED roi tra lai (kem ly do) hoac khoa ky.
- *  148    handleReturn()
- *  165    handleLock()
- *  210  SummaryItem
- *  220  PeopleCard                   - Tong tien tung nguoi trong ky (UC-50 "total per person").
- *  256  ArticlesCard                - Cac bai da cham trong ky: he so, tien bai, tien anh. Ky OPEN thi Thu ky c…
+ * MO TRANG NAY TAI: /royalty-periods/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   12  RETURN_NOTE_MAX                 hang so
+ *   43  RoyaltyPeriodDetail()           xem tom tat dau file
+ *   51    useEffect                     tai du lieu khi mo trang
+ *   59    handleClose()                 xu ly close
+ *   81    handleAccountantDone()        Ke toan tra / khoa ky xong: tai lai bang ke, hien thong bao
+ *  153  AccountantReviewCard()          UC-51..53: Ke toan kiem tra ky CLOSED roi tra lai (kem ly do) hoac khoa ky
+ *  158    handleReturn()                xu ly return
+ *  175    handleLock()                  xu ly lock
+ *  220  SummaryItem()                   summary item
+ *  230  PeopleCard()                    Tong tien tung nguoi trong ky (UC-50 "total per person")
+ *  266  ArticlesCard()                  Cac bai da cham trong ky: he so, tien bai, tien anh
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   97  link [← Ky nhuan but]           mo trang /royalty-periods (RoyaltyPeriods)
+ *  135  [Dang chot… / Chot ky va gui Ke toan]  handleClose() -> hoi xac nhan; goi POST /api/royalty-periods/{periodId}/close, GET /api/royalty-periods/{periodId}
+ *  208  [Tra ky ve Thu ky]              handleReturn() -> goi POST /api/royalty-periods/{periodId}/return; bao len component cha (onDone)
+ *  211  [Dang xu ly… / Khoa ky va tao phieu chi]  handleLock() -> hoi xac nhan; goi POST /api/royalty-periods/{periodId}/lock; bao len component cha (onDone)
+ *  300  link [Cham lai]                 mo trang /royalty-grading/{article.articleId}?chamLai=1 (RoyaltyGrading)
  */
 export default function RoyaltyPeriodDetail({ nguoiDung }) {
   const { id } = useParams()

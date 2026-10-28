@@ -10,10 +10,13 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   22  field                        - repository / service duoc inject
- *   24  requireActive()
- *   38  getUsers()
+ * Ham doc nguoi dung cho luong khac: kiem tra tai khoan dang hoat dong, lay danh sach nguoi dung (ho
+ * ten, vai tro, ban).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  field                           repository / service duoc inject
+ *   27  requireActive()                 bat buoc active
+ *   41  getUsers()                      lay users
  */
 @Service
 @RequiredArgsConstructor

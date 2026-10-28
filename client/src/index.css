@@ -5,8 +5,21 @@
    TODO: cac phan LOGIN / MAIN / KPI ben duoi co tu truoc quy uoc nay ->
    nguoi phu trach tung man chuyen sang Login.css, KpiBenchmarksConfig.css...
 
-   MUC LUC (so dong)
-     12  tieu de, bo cuc dau trang
+   MUC LUC (so dong - khoi CSS)
+     25  tieu de, bo cuc dau trang
+     85  LOGIN
+    160  MAIN
+    205  Vung noi dung - dang de trong, cho cac chuc nang duoc chen vao
+    212  Thanh dieu huong tab
+    246  KPI
+    457  Modal Popup
+    542  DUNG CHUNG
+    547  Chu chi danh cho trinh doc man hinh, an tren giao dien
+    557  Cham mau nhan trang thai, giong "• DEVELOPMENT" tren the Figma.
+    574  Nut phu nen xanh nhat (Figma): "Sua bai", "Ve trang chu"... Dung cho ca <a> va <button>
+    599  Nut chinh nen xanh duong Figma ("Soan bai moi", "Them don gia", "Luu"...).
+    628  Bang du lieu kieu Figma: dau cot chu xam nho, chi ke ngang, re chuot thi to nen.
+    655  Nhan trang thai dang vien thuoc (pill): "Dang ap dung", "DRAFT"...
    =========================================================================== */
 
 :root {

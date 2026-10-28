@@ -10,8 +10,8 @@ import lombok.Setter;
  * Chi gui bai nao; moi con so khac he thong tu tinh (BR-RY-01), tinh chat bai lay theo PV khai (BR-IN-03).
  * Cham lai bai da cham (phien ban 2 tro di) thi bat buoc them ly do (CHECK ck_royalty_gradings_recalc).
  *
- * MUC LUC (so dong)
- *   20  field                        - cac truong client gui len
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

@@ -5,9 +5,13 @@ import AppLayout from './AppLayout.jsx'
  * Man "Chấm nhuận bút" (UC-47, UC-48) mo tu danh sach bai cho cham, khong nam tren menu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
  *
- * MUC LUC (so dong)
- *   12  MENU_THU_KY                  - Menu cua Thu ky toa soan (luong royalty BF-04).
- *   25  SecretaryLayout              - Khung trang cua Thu ky toa soan.
+ * MUC LUC (so dong - ten - tac dung)
+ *   16  MENU_THU_KY                     xem tom tat dau file
+ *   29  SecretaryLayout()               Khung trang cua Thu ky toa soan
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   20  menu [Cham nhuan but]           mo trang /royalty-grading (RoyaltyPendingList)
+ *   22  menu [Ky nhuan but]             mo trang /royalty-periods (RoyaltyPeriods)
  */
 const MENU_THU_KY = [
   {

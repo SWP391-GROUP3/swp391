@@ -105,12 +105,12 @@ function gopDanhSachViec(duLieu) {
  * Trang chu cua Bien tap vien.
  * Cot trai: viec cho xu ly + thong ke thang. Cot phai: bai duoc giao theo trang thai.
  *
- * MUC LUC (so dong)
- *   14  NHOM_TRANG_THAI              - Gop trang thai cac bai DUOC GIAO CHO BTV (articles.status) thanh 5 nhom.
- *   23  tinhSoBaiTheoNhom            - Doi { status, count } server tra ve thanh cac nhom cho StatusCounter.
- *   42  gopDanhSachViec              - Gop cac loai viec thanh 1 danh sach "Chờ xử lý".
- *  115  EditorHome                   - Trang chu cua Bien tap vien.
- *  119    useEffect                  - tai du lieu khi mo trang
+ * MUC LUC (so dong - ten - tac dung)
+ *   14  NHOM_TRANG_THAI                 Gop trang thai cac bai DUOC GIAO CHO BTV (articles.status) thanh 5 nhom
+ *   23  tinhSoBaiTheoNhom()             Doi { status, count } server tra ve thanh cac nhom cho StatusCounter
+ *   42  gopDanhSachViec()               Gop cac loai viec thanh 1 danh sach "Cho xu ly"
+ *  115  EditorHome()                    xem tom tat dau file
+ *  119    useEffect                     tai du lieu khi mo trang
  */
 export default function EditorHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)   // null = dang tai

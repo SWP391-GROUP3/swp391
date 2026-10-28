@@ -23,13 +23,13 @@ import java.util.Optional;
  * Service xử lý nghiệp vụ Quản lý bộ tiêu chí chấm (Luồng BF-02 / Admin).
  * Thực thi các Use Cases: UC-14, UC-15, UC-16, UC-17 và Business Rules: BR-QA-01, 02, 03.
  *
- * MUC LUC (so dong)
- *   38  field                        - repository / service duoc inject
- *   41  CriteriaSetService()
- *   51  getVersionsByCategory()      - Lấy toàn bộ danh sách phiên bản bộ tiêu chí của một thể loại (UC-14).
- *   68  getActiveVersionByCategory() - Lấy phiên bản bộ tiêu chí đang ACTIVE của một thể loại (BR-QA-03).
- *   83  createDraftVersion()         - Tạo phiên bản bộ tiêu chí mới ở trạng thái DRAFT (UC-15, UC-16).
- *  144  activateVersion()            - Kích hoạt một phiên bản DRAFT thành ACTIVE (UC-17, BR-QA-03).
+ * MUC LUC (so dong - ten - tac dung)
+ *   37  field                           repository / service duoc inject
+ *   40  CriteriaSetService()            ham khoi tao
+ *   50  getVersionsByCategory()         Lay toan bo danh sach phien ban bo tieu chi cua mot the loai (UC-14)
+ *   67  getActiveVersionByCategory()    Lay phien ban bo tieu chi dang ACTIVE cua mot the loai (BR-QA-03)
+ *   82  createDraftVersion()            Tao phien ban bo tieu chi moi o trang thai DRAFT (UC-15, UC-16)
+ *  143  activateVersion()               Kich hoat mot phien ban DRAFT thanh ACTIVE (UC-17, BR-QA-03)
  */
 @Service
 public class CriteriaSetService {

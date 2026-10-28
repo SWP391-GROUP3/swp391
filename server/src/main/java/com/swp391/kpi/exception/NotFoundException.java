@@ -5,8 +5,8 @@ package com.swp391.kpi.exception;
  * GlobalExceptionHandler bat loi nay va tra HTTP 404.
  * Vi du: throw new NotFoundException("Không tìm thấy bài viết");
  *
- * MUC LUC (so dong)
- *   13  NotFoundException()
+ * MUC LUC (so dong - ten - tac dung)
+ *   13  NotFoundException()             ham khoi tao
  */
 public class NotFoundException extends RuntimeException {
 

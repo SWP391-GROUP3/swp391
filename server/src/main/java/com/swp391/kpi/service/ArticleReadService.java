@@ -8,10 +8,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * MUC LUC (so dong)
- *   19  field                        - repository / service duoc inject
- *   22  getPublishedByAuthor()
- *   27  getArticle()
+ * Ham doc bai cho luong khac (BF-03): kiem tra 1 nguoi co phai tac gia cua bai khong, lay thong tin
+ * bai.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           repository / service duoc inject
+ *   27  isAuthor()                      kiem tra author
+ *   30  getVersion()                    lay version
+ *   37  getPublishedByAuthor()          lay published theo author
+ *   42  getArticle()                    lay article
  */
 @Service
 @RequiredArgsConstructor

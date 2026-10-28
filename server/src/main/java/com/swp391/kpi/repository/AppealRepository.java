@@ -11,9 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 /**
- * MUC LUC (so dong)
- *   15  existsByArticleId()
- *   17  findAllByAppellantIdOrderBySubmittedAtDesc()
+ * Repository truy van bang cua entity Appeal (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  findByArticleId()               tim theo article id
+ *   28  findLockedById()                tim locked theo id
+ *   30  existsByArticleId()             kiem tra ton tai theo article id
+ *   32  findAllByAppellantIdOrderBySubmittedAtDesc()  tim tat ca theo appellant id order theo submitted at desc
  */
 public interface AppealRepository extends JpaRepository<Appeal, Integer> {
 

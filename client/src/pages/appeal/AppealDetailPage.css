@@ -1,3 +1,11 @@
+/* ===========================================================================
+   CSS rieng cua man Chi tiet khieu nai (AppealDetailPage.jsx). Tien to class rieng, mau dung bien
+   --fm-*.
+
+   MUC LUC (so dong - khoi CSS)
+      9  tieu de, bo cuc dau trang
+   =========================================================================== */
+
 .chi-tiet-kn h2 { font-size: 17px; color: var(--fm-chu); margin-bottom: 0; }
 .chi-tiet-kn p { overflow-wrap: anywhere; }
 .chi-tiet-kn__ly-do p { white-space: pre-wrap; }

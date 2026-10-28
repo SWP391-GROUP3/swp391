@@ -1,7 +1,10 @@
 /**
- * MUC LUC (so dong)
- *    7  dinhDangThoiGian
- *   14  thoiGianConLai
+ * Ham dinh dang dung chung cho cac man BF-03: hien thoi gian va thoi gian con lai cua han khieu nai /
+ * han cham.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  dinhDangThoiGian()              dinh dang thoi gian
+ *   17  thoiGianConLai()                thoi gian con lai
  */
 
 export function dinhDangThoiGian(giaTri) {

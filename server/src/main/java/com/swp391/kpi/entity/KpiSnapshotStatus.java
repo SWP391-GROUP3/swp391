@@ -5,8 +5,10 @@ package com.swp391.kpi.entity;
  * DRAFT = so tam, tinh lai duoc;
  * FINALIZED = da chot, bat bien (BR-KPI-06).
  *
- * MUC LUC (so dong)
- *   12  gia tri                      - DRAFT, FINALIZED
+ * MUC LUC (so dong - ten - tac dung)
+ *  ---- Gia tri (trung CHECK trong schema.sql) ----
+ *   14  DRAFT
+ *   15  FINALIZED
  */
 public enum KpiSnapshotStatus {
     DRAFT,

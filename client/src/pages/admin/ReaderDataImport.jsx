@@ -8,13 +8,26 @@ import './ReaderDataImport.css'
  * Cho phép Quản trị viên tải lên file CSV số liệu đọc hàng ngày (ghi đè nếu trùng),
  * xem thống kê xử lý và theo dõi nhật ký lịch sử nhập file (audit log).
  *
- * MUC LUC (so dong)
- *   20  ReaderDataImport             - Component man hinh chinh
- *   36    taiLichSuImport()          - Lay danh sach nhat ky import theo trang
- *   52    xuLyChonFile()             - Xu ly khi nguoi dung chon file CSV
- *   64    xuLyKopThaFile()           - Ho tro keo tha file
- *   82    xuLyTaiLen()               - Gui file len backend thuc thi import
- *  110    dinhDangNgayGio()          - Format thoi gian hien thi
+ * MO TRANG NAY TAI: /reader-imports
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  ReaderDataImport()              xem tom tat dau file
+ *   51    useEffect                     tai du lieu khi mo trang
+ *   57    taiLichSuImport()             tai lich su import
+ *   74    xuLyChonFile()                xu ly chon file
+ *   88    xuLyKeoTha()                  xu ly keo tha
+ *  104    xuLyTaiLen()                  xu ly tai len
+ *  130    dinhDangNgayGio()             dinh dang ngay gio
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  164  [Tai len so lieu]               tren trang: tab hien tai
+ *  175  [Nhat ky nhap file (Audit History)]  tren trang: tab hien tai
+ *  212  [Tai file mau (.csv)]           taiFileCsvMau() -> xu ly tren trang
+ *  226  [Dang xu ly import... / Tien hanh Nhap d…]  xuLyTaiLen() -> goi POST /api/reader-imports
+ *  247  [vung nen ngoai hop thoai]      mo hop chon file
+ *  369  [Dang tai... / Lam moi]         taiLichSuImport() -> goi GET /api/reader-imports/logs?page={page}&size={size}
+ *  461  [Trang truoc]                   tren trang: trang
+ *  469  [Trang sau]                     tren trang: trang
  */
 export default function ReaderDataImport() {
   const [tabHienTai, setTabHienTai] = useState('upload') // 'upload' | 'history'

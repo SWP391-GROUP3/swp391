@@ -16,12 +16,15 @@ import java.util.Optional;
 
 
 /**
- * MUC LUC (so dong)
- *   30  field                        - repository / service duoc inject
- *   38  assignArticle()              - Trưởng ban phân công một bài viết cho một BTV chấm chất lượng (UC-18, U…
- *   67  getAssignmentByArticleId()   - Lấy thông tin phân công hiện tại của bài viết.
- *   76  getAssignmentsByEditorId()   - Lấy danh sách các bài viết được phân công cho 1 BTV (Hàng việc của BTV …
- *   87  getEditorWorkload()          - Thống kê khối lượng công việc hiện tại của một BTV để phục vụ gợi ý phâ…
+ * Nghiep vu phan cong bai cho BTV (UC-18...20): giao bai, tra phan cong theo bai / theo BTV, tinh khoi
+ * luong viec de goi y BTV.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   33  field                           repository / service duoc inject
+ *   41  assignArticle()                 Truong ban phan cong mot bai viet cho mot BTV cham chat luong (UC-18, UC-20, BR-QA-04)
+ *   70  getAssignmentByArticleId()      Lay thong tin phan cong hien tai cua bai viet
+ *   79  getAssignmentsByEditorId()      Lay danh sach cac bai viet duoc phan cong cho 1 BTV (Hang viec cua BTV - UC-21)
+ *   90  getEditorWorkload()             Thong ke khoi luong cong viec hien tai cua mot BTV de phuc vu goi y phan cong (UC-19)
  */
 @Service
 @RequiredArgsConstructor

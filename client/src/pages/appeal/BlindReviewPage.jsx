@@ -6,6 +6,25 @@ import { tinhTongTam, kiemTraPhieuCham } from './blindScorecard.js'
 import '../../styles/QualityReportPage.css'
 import './ReviewWorkflow.css'
 
+/**
+ * Phieu cham lai mu (UC-37) hoac phieu cham cheo (UC-40, prop cheo): BTV doc noi dung bai, cham tung
+ * tieu chi khong thay diem cu, luu nhap hoac nop phieu.
+ *
+ * MO TRANG NAY TAI: /re-reviews/:id, /cross-review-tasks/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   28  BlindReviewPage()               blind review page
+ *   33  BlindReviewForm()               blind review form
+ *   41    useEffect                     tai du lieu khi mo trang
+ *   52    doiDong()                     doi dong
+ *   56    luuPhieu()                    luu phieu
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   83  link [← Danh sach phieu]        mo trang /re-reviews (BlindReviewQueuePage)
+ *   93  form, nut [Dang luu… / Nop phieu cham]  hoi xac nhan; tren trang: loi, mo dang luu, dong/xoa loi
+ *  105  [Luu nhap]                      luuPhieu() -> hoi xac nhan; tren trang: loi, mo dang luu, dong/xoa loi
+ */
+
 export default function BlindReviewPage({ cheo = false }) {
   const { id } = useParams()
   return <BlindReviewForm key={`${cheo}/${id}`} id={id} cheo={cheo} />

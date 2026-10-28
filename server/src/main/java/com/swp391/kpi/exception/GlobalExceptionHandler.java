@@ -16,13 +16,13 @@ import java.util.Map;
  * Controller khong tu try/catch, cu de loi bay len day.
  * Loi khac (sai URL, sai method...) de Spring tu xu ly de giu dung status.
  *
- * MUC LUC (so dong)
- *   32  handleDataConflict()
- *   38  handleStatus()
- *   45  handleValidation()           - @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
- *   56  handleNotFound()             - Khong tim thay du lieu -> 404
- *   63  handleUnauthorized()         - Dang nhap that bai (sai tai khoan/mat khau, tai khoan bi khoa) -> 401
- *   70  handleBusiness()             - Vi pham quy tac nghiep vu -> 409
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  handleDataConflict()            xu ly data conflict
+ *   38  handleStatus()                  xu ly status
+ *   45  handleValidation()              @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
+ *   56  handleNotFound()                Khong tim thay du lieu -> 404
+ *   63  handleUnauthorized()            Dang nhap that bai (sai tai khoan/mat khau, tai khoan bi khoa) -> 401
+ *   70  handleBusiness()                Vi pham quy tac nghiep vu -> 409
  */
 @RestControllerAdvice
 @SuppressWarnings("unused") // Cac handler duoc Spring goi qua @ExceptionHandler.

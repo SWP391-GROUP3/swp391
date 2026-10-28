@@ -16,10 +16,10 @@ import java.util.List;
  * Doc the loai bai (luong admin). Luong khac goi service nay,
  * khong goi thang GenreRepository (AGENTS.md muc 2).
  *
- * MUC LUC (so dong)
- *   28  field                        - repository / service duoc inject
- *   33  getBaseFactor()              - He so chuan cua 1 the loai. BF-04 dung khi cham nhuan but:
- *   41  getActiveGenres()            - Cac the loai dang dung cho o chon the loai (vd man soan bai UC-03 cua BF-01)
+ * MUC LUC (so dong - ten - tac dung)
+ *   28  field                           repository / service duoc inject
+ *   33  getBaseFactor()                 He so chuan cua 1 the loai
+ *   41  getActiveGenres()               Cac the loai dang dung cho o chon the loai (vd man soan bai UC-03 cua BF-01)
  */
 @Service
 @RequiredArgsConstructor

@@ -5,8 +5,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * MUC LUC (so dong)
- *   16  field                        - cac truong tra ve cho giao dien
+ * DTO client gui len API. Dung o: AssignmentController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   18  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

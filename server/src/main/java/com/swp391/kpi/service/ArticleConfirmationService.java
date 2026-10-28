@@ -27,7 +27,7 @@ import java.util.Optional;
  * va job het han 3 ngay (UC-12 A2). Doi trang thai bai qua ArticleService.updateArticleStatus().
  *
  * MUC LUC (so dong - ten - tac dung)
- *   47  hang so                         ten tham so, ten hanh dong, gioi han... (khong viet so ma trong code)
+ *   47  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *   53  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
  *   66  acceptCoAuthorship()            UC-12 buoc 2-4: dong tac gia dong y

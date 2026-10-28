@@ -9,13 +9,22 @@ import { BT_PHAN_CONG, BT_THONG_TIN, BT_BIEU_DO } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
 /**
- * MUC LUC (so dong)
- *   21  AssignmentQueue
- *   45    useEffect                  - tai du lieu khi mo trang
- *   49    useEffect                  - tai du lieu khi mo trang
- *   53    loadWorkload()
- *   62    loadCurrentAssignment()
- *   72    handleAssign()
+ * Man Truong ban phan cong bai (UC-18, UC-19, UC-20): danh sach bai SUBMITTED cho phan cong, goi y BTV
+ * it viec / da cham cung the loai, chon BTV de giao bai.
+ *
+ * MO TRANG NAY TAI: /assignments
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   30  AssignmentQueue()               assignment queue
+ *   54    useEffect                     tai du lieu khi mo trang
+ *   58    useEffect                     tai du lieu khi mo trang
+ *   62    loadWorkload()                tai workload
+ *   71    loadCurrentAssignment()       tai current assignment
+ *   81    handleAssign()                xu ly assign
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  145  [Dang chon / Chon]              tren trang: selected article id
+ *  173  form, nut [Dang luu... / Xac nhan Phan cong ba…]  handleAssign() -> goi POST /api/assignments, GET /api/assignments/editor/{editorId}/workload
  */
 
 export default function AssignmentQueue({ nguoiDung }) {

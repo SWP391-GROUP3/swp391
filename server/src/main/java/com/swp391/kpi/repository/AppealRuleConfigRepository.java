@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * MUC LUC (so dong)
- *   24  findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc() - Lay cau hinh dang ap dung: is_active = 1, effective_from <= ngay kiem t…
- *   31  existsByEffectiveFrom()      - Kiem tra xem da co cau hinh bat dau tu ngay nay chua (UC-44 E2: khong d…
- *   36  findAllByOrderByEffectiveFromDesc() - Lay toan bo lich su cau hinh sap xep giam dan theo ngay hieu luc.
+ * Repository truy van bang cua entity AppealRuleConfig (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc()  Lay cau hinh dang ap dung: is_active = 1, effective_from <= ngay kiem tra, lay dong moi nhat
+ *   33  existsByEffectiveFrom()         Kiem tra xem da co cau hinh bat dau tu ngay nay chua (UC-44 E2: khong duoc trung effective_from)
+ *   38  findAllByOrderByEffectiveFromDesc()  Lay toan bo lich su cau hinh sap xep giam dan theo ngay hieu luc
  */
 @Repository
 public interface AppealRuleConfigRepository extends JpaRepository<AppealRuleConfig, Integer> {

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * MUC LUC (so dong)
- *   17  findByScoringAttemptId()     - Lấy kết quả duyệt điểm của một lần chấm
+ * Repository truy van bang cua entity ScoreApproval (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  findByScoringAttemptId()        Lay ket qua duyet diem cua mot lan cham
  */
 @Repository
 public interface ScoreApprovalRepository extends JpaRepository<ScoreApproval, Integer> {

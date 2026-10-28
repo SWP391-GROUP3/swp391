@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * Doc bang genres (the loai).
  *
- * MUC LUC (so dong)
- *   17  findByIsActiveTrueOrderByNameAsc() - Cac the loai dang dung (is_active = 1), xep theo ten
+ * MUC LUC (so dong - ten - tac dung)
+ *   17  findByIsActiveTrueOrderByNameAsc()  Cac the loai dang dung (is_active = 1), xep theo ten
  */
 public interface GenreRepository extends JpaRepository<Genre, Integer> {
 

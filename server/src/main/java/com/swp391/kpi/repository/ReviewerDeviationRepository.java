@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   16  findAllByOrderByPeriodDescEditorIdAsc()
+ * Repository truy van bang cua entity ReviewerDeviationIndex (Spring Data JPA). Chi service cung luong
+ * goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  findAllByOrderByPeriodDescEditorIdAsc()  tim tat ca theo order theo period desc editor id asc
  */
 @Repository
 public interface ReviewerDeviationRepository extends JpaRepository<ReviewerDeviationIndex, Integer> {

@@ -101,12 +101,22 @@ function MenuTaiKhoan({ nguoiDung, onDangXuat }) {
  *             Muc "Trang chủ" luon tu them o dau, khong can khai bao.
  * - phanThem: hien them tren thanh tren, truoc ten nguoi dung (vd chip vi cua Phong vien)
  *
- * MUC LUC (so dong)
- *    8  MUC_TRANG_CHU                - Muc "Trang chủ" - vai tro nao cung co, AppLayout tu them o dau menu.
- *   15  MucMenu                      - 1 muc menu. NavLink tu them class "active" va aria-current="page" cho t…
- *   30  MenuTaiKhoan                 - Ten + avatar o goc phai thanh tren. Bam vao -> menu tha: "Hồ sơ của tôi…
- *   34    useEffect                  - tai du lieu khi mo trang
- *  111  AppLayout                    - Khung trang dung chung cho moi vai tro: sidebar trai + thanh tren + vun…
+ * MUC LUC (so dong - ten - tac dung)
+ *    8  MUC_TRANG_CHU                   Muc "Trang chu" - vai tro nao cung co, AppLayout tu them o dau menu
+ *   15  MucMenu()                       1 muc menu. NavLink tu them class "active" va aria-current="page" cho trang dang mo.
+ *   30  MenuTaiKhoan()                  Ten + avatar o goc phai thanh tren
+ *   34    useEffect                     tai du lieu khi mo trang
+ *  121  AppLayout()                     xem tom tat dau file
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *    9  menu [Trang chu]                mo trang /main (trang chu theo vai tro)
+ *   19  menu [{muc.icon} {muc.nhan}]    mo trang {muc.path} (trang lay tu du lieu)
+ *   64  [{nguoiDung.hoTen} {nguoiDung.tenVaiTro}…]  tren trang: mo menu
+ *   80  link [Ho so cua toi]            mo trang /profile (UserProfile)
+ *   80  Link [Ho so cua toi]            tren trang: dong/xoa mo menu
+ *   84  [Dang xuat]                     onDangXuat() -> bao len component cha (onDangXuat)
+ *  126  link [Bo qua toi noi dung chinh]  mo #noi-dung-chinh
+ *  145  [Dang xuat]                     onDangXuat() -> bao len component cha (onDangXuat)
  */
 export default function AppLayout({ nguoiDung, onDangXuat, tenMenu, nhomMenu, phanThem, children }) {
   return (

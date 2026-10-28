@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   17  field                        - cac truong tra ve cho giao dien
+ * DTO tra ve cho giao dien. Dung o: AppealController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

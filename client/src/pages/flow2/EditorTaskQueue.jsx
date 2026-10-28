@@ -6,10 +6,19 @@ import { BT_BAI_DUOC_GIAO, BT_DAU_TICH } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
 
 /**
- * MUC LUC (so dong)
- *   14  EditorTaskQueue
- *   21    useEffect                  - tai du lieu khi mo trang
- *   25    loadEditorTasks()
+ * Man BTV xem bai duoc giao cham (UC-21, UC-22): danh sach bai, trang thai, ngay giao; bam de mo phieu
+ * cham.
+ *
+ * MO TRANG NAY TAI: /assigned-articles
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  EditorTaskQueue()               editor task queue
+ *   32    useEffect                     tai du lieu khi mo trang
+ *   36    loadEditorTasks()             tai editor tasks
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   68  [Lam moi]                       loadEditorTasks() -> goi GET /api/assignments/editor/{editorId}
+ *  109  [Bat dau Cham bai]              bao len component cha (onSelectTaskToScore)
  */
 
 export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {

@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   13  ScoringReadResponse()
+ * DTO tra ve cho giao dien. Dung o: ReviewerDeviationRefreshService, ReviewerProfileService,
+ * RoyaltyGradingService.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   16  ScoringReadResponse()           ham khoi tao
  */
 public record ScoringReadResponse(Integer id, Integer articleId, Integer reviewerId, String attemptType,
                                   BigDecimal totalScore, LocalDateTime submittedAt, LocalDateTime announcedAt,

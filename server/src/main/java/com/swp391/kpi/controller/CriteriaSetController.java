@@ -15,12 +15,12 @@ import java.util.List;
 /**
  * REST Controller cho Quản lý bộ tiêu chí chấm (Admin - Luồng BF-02).
  *
- * MUC LUC (so dong)
- *   30  field                        - service duoc inject
- *   36  getVersionsByCategory()      - Lấy danh sách các phiên bản bộ tiêu chí theo mã thể loại (UC-14).
- *   46  getActiveVersionByCategory() - Lấy phiên bản bộ tiêu chí đang ACTIVE của thể loại (BR-QA-03).
- *   56  createDraftVersion()         - Tạo một phiên bản bộ tiêu chí mới ở trạng thái DRAFT (UC-15, UC-16, BR-…
- *   67  activateVersion()            - Kích hoạt một phiên bản DRAFT thành ACTIVE (UC-17, BR-QA-03).
+ * MUC LUC (so dong - ten - tac dung)
+ *   30  field                           service duoc inject
+ *   36  getVersionsByCategory()         Lay danh sach cac phien ban bo tieu chi theo ma the loai (UC-1… [GET /api/criteria-sets/category/{categoryId}]
+ *   46  getActiveVersionByCategory()    Lay phien ban bo tieu chi dang ACTIVE cua the loai (BR-… [GET /api/criteria-sets/category/{categoryId}/active]
+ *   56  createDraftVersion()            Tao mot phien ban bo tieu chi moi o trang thai DRAFT (UC-15, UC-16, BR-QA-01) [POST /api/criteria-sets]
+ *   67  activateVersion()               Kich hoat mot phien ban DRAFT thanh ACTIVE (UC-17, BR-QA-03) [PUT /api/criteria-sets/{versionId}/activate]
  */
 @RestController
 @RequestMapping("/api/criteria-sets")

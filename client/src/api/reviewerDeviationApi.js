@@ -1,8 +1,10 @@
 import { goiApi } from './goiApi.js'
 
 /**
- * MUC LUC (so dong)
- *    8  layBaoCaoDoLech
+ * API bao cao do lech nguoi cham (UC-41). Goi qua goiApi().
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  layBaoCaoDoLech()               lay bao cao do lech [GET duongDan]
  */
 
 export async function layBaoCaoDoLech(boLoc = {}) {

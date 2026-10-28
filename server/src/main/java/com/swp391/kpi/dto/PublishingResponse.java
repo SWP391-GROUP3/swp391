@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 
 /**
  * DTO ket qua sau khi Truong ban duyet xuat ban bai viet thanh cong (UC-33).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

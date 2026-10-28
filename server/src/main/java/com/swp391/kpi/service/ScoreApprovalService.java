@@ -31,6 +31,14 @@ import java.util.Map;
 
 /**
  * Service xu ly phe duyet diem danh gia va duyet xuat ban cua Truong ban bien tap (UC-29, UC-31, UC-32, UC-33, BR-SC-10, BR-SC-11).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   47  field                           repository / service duoc inject
+ *   60  getPendingApprovals()           Lay danh sach cac bai viet cho Truong ban duyet diem (UC-29)
+ *   87  approveScore()                  Truong ban phe duyet diem danh gia (UC-32, BR-SC-10)
+ *  135  returnScore()                   Truong ban yeu cau cham lai (UC-31, BR-SC-10)
+ *  192  getPendingPublishing()          Lay danh sach cac bai viet cho Truong ban duyet xuat ban (UC-33)
+ *  264  approvePublishing()             Truong ban phe duyet xuat ban bai viet (UC-33, BR-SC-11)
  */
 @Service
 @RequiredArgsConstructor

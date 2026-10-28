@@ -2,6 +2,12 @@
    ArticleScoreCard.css - Bảng điểm đánh giá chất lượng bài viết (UC-34)
    Dành cho Phóng viên (tác giả / đồng tác giả) xem điểm theo tiêu chí & nhận xét BTV.
    Tất cả màu sắc sử dụng biến --fm-* từ index.css
+
+   MUC LUC (so dong - khoi CSS)
+     13  tieu de, bo cuc dau trang
+     67  Banner cua so khieu nai (BR-SC-10 / BR-QC-01)
+    119  Bang diem chi tiet
+    181  Ghi chu chung cua BTV
    =========================================================================== */
 
 .bang-diem-pv {

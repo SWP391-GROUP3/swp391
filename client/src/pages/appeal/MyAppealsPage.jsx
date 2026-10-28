@@ -5,10 +5,17 @@ import { dinhDangThoiGian } from './appealFormat.js'
 import '../../styles/AppealPage.css'
 
 /**
- * MUC LUC (so dong)
- *   14  TEN_TRANG_THAI
- *   20  MyAppealsPage
- *   25    useEffect                  - tai du lieu khi mo trang
+ * Man Phong vien xem cac khieu nai da gui va trang thai xu ly (UC-35); nut tao khieu nai moi.
+ *
+ * MO TRANG NAY TAI: /my-appeals
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  TEN_TRANG_THAI                  hang so
+ *   27  MyAppealsPage()                 my appeals page
+ *   32    useEffect                     tai du lieu khi mo trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   47  link [Gui khieu nai]            mo trang /my-appeals/new (AppealCreatePage)
  */
 
 const TEN_TRANG_THAI = {

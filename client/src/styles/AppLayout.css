@@ -4,13 +4,20 @@
    vung noi dung ben phai. Moi class bat dau bang "khung-app".
    Style rieng cua 1 vai tro (vd chip vi Phong vien) de trong file layout cua vai tro do.
 
-   MUC LUC (so dong)
-     16  tieu de, bo cuc dau trang
-     45  Sidebar
-    124  Phan ben phai: thanh tren + noi dung
-    214  Menu tai khoan: bam ten/avatar -> menu tha (Ho so cua toi, Dang xuat)
-    288  man hinh hep (@media)
-    311  man hinh hep (@media)
+   MUC LUC (so dong - khoi CSS)
+     23  tieu de, bo cuc dau trang
+     31  Dien thoai: bo do tre ~300ms khi cham vao link/nut
+     35  Link "Bo qua toi noi dung chinh": an ngoai man hinh, Tab toi thi hien
+     52  Sidebar
+     82  Nhom menu co tieu de (vd "Duyet bai", "KPI & bao cao")
+     98  1 muc menu (NavLink) va nut Dang xuat
+    118  NavLink tu gan class "active" cho trang dang mo
+    131  Phan ben phai: thanh tren + noi dung
+    221  Menu tai khoan: bam ten/avatar -> menu tha (Ho so cua toi, Dang xuat)
+    294  Man hinh hep (laptop nho, tablet): sidebar chi con icon
+    295  man hinh hep (@media)
+    317  Dien thoai: an o tim kiem, thu hep le
+    318  man hinh hep (@media)
    =========================================================================== */
 
 .khung-app {

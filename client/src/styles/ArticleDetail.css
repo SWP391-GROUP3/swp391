@@ -4,10 +4,17 @@
    Bo cuc: cot trai noi dung, cot phai khai bao / tac gia / lich su.
 
    MUC LUC (so dong - khoi CSS)
-     13  tieu de, bo cuc dau trang
-     97  Luoi 2 cot
-    176  man hinh hep (@media)
-    180  Iter 2: nut thao tac, nhan xet BTV, o tra loi xac nhan
+     20  tieu de, bo cuc dau trang
+     59  Nut "Rut bai": nut nhe, chu hong de nguoi dung thay day la thao tac can can nhac.
+     71  Hop hoi lai truoc khi rut bai
+    104  Luoi 2 cot
+    131  Giu xuong dong cua noi dung bai
+    138  Bang khai bao: nhan ben trai, gia tri ben phai
+    182  Man hinh hep: 2 cot thanh 1 cot
+    183  man hinh hep (@media)
+    187  Iter 2: nut thao tac, nhan xet BTV, o tra loi xac nhan
+    198  Nhan xet chung cua BTV khi tra bai (UC-10 buoc 1)
+    208  Hop tra loi loi moi dong tac gia (UC-12)
    =========================================================================== */
 
 .article-detail__back {

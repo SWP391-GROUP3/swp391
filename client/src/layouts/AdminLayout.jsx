@@ -6,9 +6,21 @@ import AppLayout from './AppLayout.jsx'
  * (SRS_Overview 4.1: quan ly tai khoan, the loai) va bang ma luong admin so huu.
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
  *
- * MUC LUC (so dong)
- *   13  MENU_ADMIN                   - Menu cua Quan tri he thong (Admin). Chia 3 nhom co tieu de.
- *   52  AdminLayout                  - Khung trang cua Admin.
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  MENU_ADMIN                      xem tom tat dau file
+ *   64  AdminLayout()                   Khung trang cua Admin
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   29  menu [Tai khoan]                mo trang /users (ComingSoon - chua lam "Tai khoan")
+ *   31  menu [The loai]                 mo trang /genres (ComingSoon - chua lam "The loai")
+ *   33  menu [Tham so he thong]         mo trang /system-parameters (ComingSoon - chua lam "Tham so he thong")
+ *   40  menu [Bo tieu chi]              mo trang /criteria-sets (CriteriaManagement)
+ *   42  menu [Cau hinh khieu nai]       mo trang /appeal-rules (AppealRuleConfigPage)
+ *   44  menu [Ho so bien tap vien]      mo trang /reviewers (ReviewerDeviationPage)
+ *   46  menu [Nhat ky he thong]         mo trang /audit-logs (AuditLogPage)
+ *   53  menu [He so anh/video]          mo trang /media-factors (MediaFactors)
+ *   55  menu [Dinh muc KPI chuan]       mo trang /kpi-benchmarks (KpiBenchmarksConfig)
+ *   57  menu [Nhap so lieu doc gia]     mo trang /reader-imports (ReaderDataImport)
  */
 const MENU_ADMIN = [
   {

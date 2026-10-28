@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  * Ghi nhận Trưởng ban giao một bài viết cho một BTV chấm chất lượng.
  * Bảng: assignments
  *
- * MUC LUC (so dong)
- *   26  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "assignments")

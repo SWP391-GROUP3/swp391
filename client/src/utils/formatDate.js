@@ -2,11 +2,11 @@
  * Ngay gio server tra ve dang LocalDateTime cua Spring: "2026-10-15T17:00:00"
  * (khong co mui gio). new Date() hieu chuoi nay la gio cua may nguoi dung.
  *
- * MUC LUC (so dong)
- *   12  DINH_DANG_NGAY
- *   16  MS_MOT_NGAY
- *   19  formatDate                   - "2026-10-12T17:00:00" -> "12/10/2026"; chuoi rong / sai -> "—".
- *   34  daysUntil                    - So ngay con lai tu bay gio toi han chot, lam tron len.
+ * MUC LUC (so dong - ten - tac dung)
+ *   12  DINH_DANG_NGAY                  hang so
+ *   16  MS_MOT_NGAY                     hang so
+ *   19  formatDate()                    "2026-10-12T17:00:00" -> "12/10/2026"; chuoi rong / sai -> "—"
+ *   34  daysUntil()                     So ngay con lai tu bay gio toi han chot, lam tron len
  */
 
 const DINH_DANG_NGAY = new Intl.DateTimeFormat('vi-VN', {

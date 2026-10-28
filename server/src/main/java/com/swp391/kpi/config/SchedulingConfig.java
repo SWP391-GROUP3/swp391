@@ -11,6 +11,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * mau nay = dau moi gio). Dung cron, KHONG dung fixedRate: fixedRate chay ngay luc app khoi dong,
  * ke ca khi chay test, de lam doi du lieu.
  * Se dung cho: job het han xac nhan dong tac gia 3 ngay (BF-01, UC-12 A2), job tong hop KPI (BF-05).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *  (khong co ham - chi khai bao du lieu)
  */
 @Configuration
 @EnableScheduling

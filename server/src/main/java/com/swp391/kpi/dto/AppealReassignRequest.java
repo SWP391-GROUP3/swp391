@@ -4,6 +4,12 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO client gui len API. Dung o: AppealManagementController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   16  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
+ */
 @Getter @Setter
 public class AppealReassignRequest {
     @NotNull(message = "Thiếu mã phiếu chấm.") @Positive(message = "Mã phiếu không hợp lệ.")

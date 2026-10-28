@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * Doc/ghi bang royalty_payments (phieu chi tung nguoi trong ky, UC-53, UC-54).
  *
- * MUC LUC (so dong)
- *   18  findByPeriodId()             - Cac phieu chi cua 1 ky: khoa ky sau lay no chuyen tiep (debt_out)
+ * MUC LUC (so dong - ten - tac dung)
+ *   17  findByPeriodId()                Cac phieu chi cua 1 ky: khoa ky sau lay no chuyen tiep (debt_out)
  */
 public interface RoyaltyPaymentRepository extends JpaRepository<RoyaltyPayment, Integer> {
 

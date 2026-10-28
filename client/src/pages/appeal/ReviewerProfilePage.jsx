@@ -6,6 +6,22 @@ import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/QualityReportPage.css'
 import './ReviewerProfilePage.css'
 
+/**
+ * Man Ho so va lich su cham cua 1 BTV (UC-42): chi so chat luong trong thang, lich su phieu cham da
+ * nop va cham cheo da hoan thanh.
+ *
+ * MO TRANG NAY TAI: /reviewers/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  ReviewerProfilePage()           reviewer profile page
+ *   38    useEffect                     tai du lieu khi mo trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   52  link [← Quay lai bao cao do lech]  mo trang /reviewers (ReviewerDeviationPage)
+ *   90  [Trang truoc]                   xu ly tren trang
+ *   93  [Trang sau]                     xu ly tren trang
+ */
+
 export default function ReviewerProfilePage() {
   const { id } = useParams()
   const location = useLocation()

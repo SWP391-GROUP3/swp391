@@ -6,6 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 // Request DTO cho BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
+/**
+ * DTO client gui len API. Dung o: ScoringAttemptController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
+ *   24  CategoryChangeRequest()         ham khoi tao
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -14,7 +14,11 @@ import java.util.List;
  * Tuân thủ quy tắc làm tròn DECIMAL(5,2), RoundingMode.HALF_UP theo AGENTS.md
  * và GBR-08.
  *
- * MUC LUC (so dong)
+ * MUC LUC (so dong - ten - tac dung)
+ *   33  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   43  calculateTotalScore()           Tinh tong diem co trong so tu danh sach diem thanh phan
+ *   67  validateItem()                  Kiem tra tinh hop le cua diem thanh phan (0 - 100)
+ *   91  isCommentRequired()             Kiem tra tieu chi co bat buoc nhap nhan xet hay khong (BR-QA-08: score < 50.00)
  * 23 hang so - hang so dung trong file
  * 32 calculateTotalScore() - Tính tổng điểm có trọng số từ danh sách điểm thành
  * phần.

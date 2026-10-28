@@ -7,6 +7,21 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Logic thuan (khong @Service) so sanh diem cham lai voi diem goc va tinh tong co trong so, dung khi
+ * chot khieu nai.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   29  Item()                          item
+ *   30  Result()                        result
+ *   32  compare()                       compare
+ *   46  weightedTotal()                 weighted total
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *   70  requireScore()                  bat buoc score
+ *   76  result()                        result
+ */
 public class AppealScoreCalculator {
     private static final BigDecimal MAX_SCORE = new BigDecimal("100");
     private static final BigDecimal COMMENT_THRESHOLD = new BigDecimal("50");

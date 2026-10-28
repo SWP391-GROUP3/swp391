@@ -9,10 +9,12 @@ import '../../styles/PersonalKpiProgress.css'
  * Danh cho Phong vien tu theo doi chi tieu duoc giao, tien do quy doi dong tac gia (0.6 / 0.4),
  * so lieu tuong tac doc gia va ket qua danh gia PASS / NOT_PASS.
  *
- * MUC LUC (so dong)
- *   17  PersonalKpiProgress          - Man hinh KPI Ca nhan & Tien do (UC-60: View Personal KPI & Progress, UC…
- *   24    useEffect                  - tai du lieu khi mo trang
- *   30    taiKpiCaNhan()
+ * MO TRANG NAY TAI: /my-kpi
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  PersonalKpiProgress()           xem tom tat dau file
+ *   26    useEffect                     tai du lieu khi mo trang
+ *   32    taiKpiCaNhan()                tai kpi ca nhan
  */
 export default function PersonalKpiProgress({ nguoiDung }) {
   const [nam, setNam] = useState(2026)

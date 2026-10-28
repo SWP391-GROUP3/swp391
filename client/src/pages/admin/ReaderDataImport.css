@@ -1,6 +1,17 @@
 /* ===========================================================================
    Man hinh Nhap so lieu doc gia (UC-63) va Lich su nhat ky import
    Tien to class: .nhap-so-lieu__
+
+   MUC LUC (so dong - khoi CSS)
+     17  tieu de, bo cuc dau trang
+     41  Tabs
+     73  Banner thong tin
+     94  Vung Upload
+    203  Thong ke ket qua
+    252  Danh sach canh bao
+    278  Bang Lich su Import
+    376  Phan trang
+    408  Thong bao loi & thanh cong
    =========================================================================== */
 
 .nhap-so-lieu {

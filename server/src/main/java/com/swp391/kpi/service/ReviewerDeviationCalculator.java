@@ -6,8 +6,10 @@ import java.math.RoundingMode;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   13  calculate()
+ * Logic thuan (khong @Service) tinh chi so do lech diem cua 1 BTV so voi nguoi cham khac (UC-41).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   15  calculate()                     tinh
  */
 public class ReviewerDeviationCalculator {
     public ReviewerDeviationIndex calculate(List<BigDecimal> differences, int appealCount,
