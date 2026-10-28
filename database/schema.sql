@@ -24,6 +24,8 @@
    kể cả bảng của schema cũ. Chạy lại là MẤT HẾT DỮ LIỆU.
    DB da co du lieu: dung migration tuong ung, KHONG chay lai file nay.
    BF03 Iter3: database/migrations/BF03_iter3_safe.sql chi ALTER CHECK.
+   BF01 Iter2: database/migrations/BF01_iter2_actor_id_null.sql cho
+   article_status_logs.actor_id NULL (job he thong).
 
    Quy ước:
    - Tên bảng/cột snake_case tiếng Anh. Spring Boot tự map
