@@ -8,8 +8,8 @@ import { goiApi } from './goiApi.js'
  * cac man hinh dang dung: nguoiDung.hoTen, nguoiDung.vaiTro (mang ma vai tro)...
  * @returns {{ token: string, nguoiDung: object }}
  *
- * MUC LUC (so dong)
- *   14  dangNhap                     - Dang nhap (UC-69): POST /api/auth/login.
+ * MUC LUC (so dong - ten - tac dung)
+ *   14  dangNhap()                      xem tom tat dau file [POST /api/auth/login]
  */
 export async function dangNhap(login, matKhau) {
   const data = await goiApi('/api/auth/login', {

@@ -10,6 +10,12 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO client gui len API. Dung o: ScoringAttemptService.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
+ */
 @Getter
 @Setter
 @NoArgsConstructor

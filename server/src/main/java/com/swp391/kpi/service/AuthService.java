@@ -17,10 +17,10 @@ import java.util.Optional;
  * Dang nhap (UC-69). Dang xuat (UC-70) lam o frontend: xoa token la xong,
  * vi server khong luu phien (STATELESS).
  *
- * MUC LUC (so dong)
- *   31  hang so                      - Sai tai khoan hay sai mat khau deu bao CUNG 1 cau: khong cho nguoi ngoai
- *   34  field                        - repository / service duoc inject
- *   39  login()
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   34  field                           repository / service duoc inject
+ *   39  login()                         dang nhap
  */
 @Service
 @RequiredArgsConstructor

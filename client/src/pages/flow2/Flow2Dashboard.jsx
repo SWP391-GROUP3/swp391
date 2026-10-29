@@ -11,8 +11,13 @@ import '../../styles/Flow2.css'
  * Dashboard tong hop cho Luong BF-02 (Phan cong, Danh gia chat luong & Duyet dang).
  * Co the nhung truc tiep vao Main.jsx ma khong lam vo bat ky giao dien chung nao.
  *
- * MUC LUC (so dong)
- *   17  Flow2Dashboard               - Dashboard tong hop cho Luong BF-02 (Phan cong, Danh gia chat luong & Du…
+ * MO TRANG NAY TAI: /flow2, /flow2-dashboard
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  Flow2Dashboard()                flow2 dashboard
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   73  [{t.icon} {t.label}]            tren trang: active tab, dong/xoa selected article id to score
  */
 import ScoringSheet from './ScoringSheet.jsx'
 import ScoreApprovalQueue from './ScoreApprovalQueue.jsx'

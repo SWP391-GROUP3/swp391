@@ -1,3 +1,12 @@
+/**
+ * Ham thuan cho phieu cham mu (BF-03): tinh tong diem tam tren giao dien va kiem tra phieu da cham du
+ * tieu chi chua.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  tinhTongTam()                   tinh tong tam
+ *   21  kiemTraPhieuCham()              kiem tra phieu cham
+ */
+
 export function tinhTongTam(cacDong) {
   let tong = 0
   for (const dong of cacDong) {

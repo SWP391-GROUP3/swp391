@@ -10,6 +10,13 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * DTO tra ve cho giao dien. Dung o: ScoreApprovalController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  field                           cac truong tra ve cho giao dien
+ *   39  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ */
 @Getter
 @Setter
 @NoArgsConstructor

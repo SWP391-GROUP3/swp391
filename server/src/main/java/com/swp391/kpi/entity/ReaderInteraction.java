@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
  * Thong ke tuong tac doc gia theo ngay cua bai viet tu file CSV (bang reader_interactions).
  * Thuoc so huu cua luong kpi (BF-05).
  *
- * MUC LUC (so dong)
- *   31  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "reader_interactions")

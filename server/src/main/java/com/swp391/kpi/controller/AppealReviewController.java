@@ -10,6 +10,20 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+/**
+ * API cham lai mu va chot khieu nai (UC-37...39): diem hieu luc cua bai, hang cho va phieu cham mu cua
+ * BTV, luu / nop phieu, so sanh diem, chot ket qua.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   29  field                           service duoc inject
+ *   32  effectiveScore()                effective score [GET /api/articles/{id}/effective-score]
+ *   37  queue()                         queue [GET /api/appeal-reviews]
+ *   41  card()                          card [GET /api/appeal-reviews/{id}]
+ *   45  draft()                         draft [PUT /api/appeal-reviews/{id}]
+ *   50  submit()                        nop [POST /api/appeal-reviews/{id}/submit]
+ *   55  comparison()                    comparison [GET /api/appeals/{id}/comparison]
+ *   59  finalizeAppeal()                chot appeal [POST /api/appeals/{id}/finalize]
+ */
 @RestController @RequiredArgsConstructor
 public class AppealReviewController {
     private final AppealReviewService service;

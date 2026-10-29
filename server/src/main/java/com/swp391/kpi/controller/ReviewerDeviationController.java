@@ -17,9 +17,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   29  field                        - service duoc inject
- *   32  getReport()
+ * API bao cao do lech nguoi cham (UC-41).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  field                           service duoc inject
+ *   34  getReport()                     lay report [GET /api/reports/reviewer-deviations]
  */
 @RestController
 @RequestMapping("/api/reports/reviewer-deviations")

@@ -1,6 +1,10 @@
 /* ===========================================================================
    ScoreApprovalQueue.css - Giao diện Hàng chờ duyệt điểm của Trưởng ban (UC-29..32)
    Tất cả màu sắc sử dụng biến --fm-* từ index.css
+
+   MUC LUC (so dong - khoi CSS)
+     10  tieu de, bo cuc dau trang
+     61  Modal chi tiet
    =========================================================================== */
 
 .duyet-diem {

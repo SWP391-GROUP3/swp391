@@ -8,6 +8,39 @@ import {
 import './ScoreApprovalQueue.css'
 import '../../styles/Flow2.css'
 
+/**
+ * Man Truong ban duyet diem (UC-29...32): hang cho duyet, xem chi tiet phieu cham, duyet diem hoac yeu
+ * cau BTV cham lai kem ly do.
+ *
+ * MO TRANG NAY TAI: /score-approvals, /score-approvals/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   44  ScoreApprovalQueue()            score approval queue
+ *   59    useEffect                     tai du lieu khi mo trang
+ *   63    taiDanhSach()                 tai danh sach
+ *   76    xemChiTiet()                  xem chi tiet
+ *   89    xuLyDuyetDiem()               xu ly duyet diem
+ *  108    moModalChamLai()              mo modal cham lai
+ *  114    xacNhanChamLai()              xac nhan cham lai
+ *  135    dinhDangNgay()                dinh dang ngay
+ *  148    renderNhanDeXuat()            render nhan de xuat
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  174  [Dang tai... / Lam moi danh sach]  taiDanhSach() -> goi GET /api/score-approvals{query}
+ *  242  [Xem chi tiet]                  xemChiTiet() -> goi GET /api/scoring-attempts/article/{articleId}/latest
+ *  251  [Duyet diem]                    xuLyDuyetDiem() -> hoi xac nhan; goi POST /api/score-approvals/article/{articleId}/approve, GET /api/score-approvals{query}
+ *  260  [Cham lai]                      moModalChamLai() -> tren trang: bai viet cham lai, dong/xoa ly do cham lai, dong/xoa loi
+ *  277  [vung nen ngoai hop thoai]      tren trang: dong/xoa phieu xem chi tiet
+ *  285  [✕]                             tren trang: dong/xoa phieu xem chi tiet
+ *  356  [Dong]                          tren trang: dong/xoa phieu xem chi tiet
+ *  364  [Yeu cau cham lai]              tren trang: bai viet cham lai, dong/xoa ly do cham lai, dong/xoa loi
+ *  376  [Phe duyet diem nay]            xuLyDuyetDiem() -> hoi xac nhan; goi POST /api/score-approvals/article/{articleId}/approve, GET /api/score-approvals{query}
+ *  388  [vung nen ngoai hop thoai]      tren trang: dong/xoa bai viet cham lai
+ *  396  [✕]                             tren trang: dong/xoa bai viet cham lai
+ *  422  [Huy bo]                        tren trang: dong/xoa bai viet cham lai
+ *  431  [Dang gui... / Xac nhan yeu cau cham lai]  xacNhanChamLai() -> goi POST /api/score-approvals/article/{articleId}/return, GET /api/score-approvals{query}
+ */
+
 export default function ScoreApprovalQueue({ nguoiDung }) {
   const [danhSach, setDanhSach] = useState([])
   const [dangTai, setDangTai] = useState(false)

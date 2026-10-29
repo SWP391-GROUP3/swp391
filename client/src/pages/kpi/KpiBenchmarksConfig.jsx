@@ -6,12 +6,18 @@ import { layDinhMucChuan, capNhatDinhMucChuan } from '../../api/kpiApi.js'
  * Cho phép Trưởng ban / Quản trị viên cấu hình các mức chỉ tiêu chuẩn
  * theo từng ngạch phóng viên (Tập sự, Sơ cấp, Kỳ cựu).
  *
- * MUC LUC (so dong)
- *   16  KpiBenchmarksConfig          - Màn hình 1: KPI Benchmarks Config Screen (UC-58).
- *   23    useEffect                  - tai du lieu khi mo trang
- *   27    taiDuLieu()
- *   40    thayDoiGiaTri()
- *   49    xuLyLuu()
+ * MO TRANG NAY TAI: /kpi-benchmarks
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  KpiBenchmarksConfig()           xem tom tat dau file
+ *   29    useEffect                     tai du lieu khi mo trang
+ *   33    taiDuLieu()                   tai du lieu
+ *   46    thayDoiGiaTri()               thay doi gia tri
+ *   55    xuLyLuu()                     xu ly luu
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  101  form, nut [Dang luu... / Luu cau hinh dinh muc]  xuLyLuu() -> goi PUT /api/kpi-targets/benchmarks
+ *  167  [Tai lai mac dinh]              taiDuLieu() -> goi GET /api/kpi-targets/benchmarks
  */
 export default function KpiBenchmarksConfig() {
   const [dinhMuc, setDinhMuc] = useState([])

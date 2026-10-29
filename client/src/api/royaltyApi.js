@@ -1,19 +1,19 @@
 /**
  * API cua luong royalty (BF-04). Goi qua goiApi(): tu gan token, tu bao loi tieng Viet.
  *
- * MUC LUC (so dong)
- *   25  getRoyaltyRates              - UC-55: tat ca phien ban don gia nhuan but (royalty_rates), moi nhat tru…
- *   33  createRoyaltyRate            - UC-55: them don gia moi. Ke toan chi nhap luong co so, server tu tinh d…
- *   38  getMediaFactors              - UC-56: he so cua tung loai anh/video. Moi dong: { id, mediaKind: "PHOTO…
- *   43  updateMediaFactor            - UC-56: Admin sua he so 1 loai anh/video.
- *   52  getRoyaltyPeriods            - UC-49: cac ky nhuan but, ky moi nhat truoc.
- *   62  getPendingGradings           - UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han chi)…
- *   71  previewRoyaltyGrading        - UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu.
- *   81  completeRoyaltyGrading       - UC-47 buoc 5: Thu ky bam Hoan tat (hoac cham lai kem ly do) -> luu phieu…
- *   91  getRoyaltyPeriodDetail       - UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNote,…
- *   96  closeRoyaltyPeriod           - UC-50: Thu ky chot ky OPEN -> CLOSED. Tra ve ky da chot (cung dang voi …
- *  101  returnRoyaltyPeriod          - UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do
- *  106  lockRoyaltyPeriod            - UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao phieu chi
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  getRoyaltyRates()               UC-55: tat ca phien ban don gia nhuan but (royalty_rates), moi nhat t… [GET /api/royalty-rates]
+ *   33  createRoyaltyRate()             UC-55: them don gia moi [POST /api/royalty-rates]
+ *   38  getMediaFactors()               UC-56: he so cua tung loai anh/video [GET /api/media-factors]
+ *   43  updateMediaFactor()             UC-56: Admin sua he so 1 loai anh/video [PUT /api/media-factors/{id}]
+ *   52  getRoyaltyPeriods()             UC-49: cac ky nhuan but, ky moi nhat truoc [GET /api/royalty-periods]
+ *   62  getPendingGradings()            UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han ch… [GET /api/royalty-gradings/pending]
+ *   71  previewRoyaltyGrading()         UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu [GET /api/royalty-gradings/preview?articleId={encodeURIComponentarticleId}]
+ *   81  completeRoyaltyGrading()        UC-47 buoc 5: Thu ky bam Hoan tat -> luu phieu, anh/video, dong tien … [POST /api/royalty-gradings]
+ *   91  getRoyaltyPeriodDetail()        UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNot… [GET /api/royalty-periods/{periodId}]
+ *   96  closeRoyaltyPeriod()            UC-50: Thu ky chot ky OPEN -> CLOSED [POST /api/royalty-periods/{periodId}/close]
+ *  101  returnRoyaltyPeriod()           UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do (… [POST /api/royalty-periods/{periodId}/return]
+ *  106  lockRoyaltyPeriod()             UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho m… [POST /api/royalty-periods/{periodId}/lock]
  */
 import { goiApi } from './goiApi.js'
 

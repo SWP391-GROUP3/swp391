@@ -25,8 +25,8 @@ import java.time.LocalDateTime;
  *   ADJUSTMENT co originalLine, amount co the am (BR-RY-06)
  * Tong cac dong ARTICLE cua 1 phieu phai bang DUNG grading.amount (GBR-10).
  *
- * MUC LUC (so dong)
- *   40  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   40  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_lines")

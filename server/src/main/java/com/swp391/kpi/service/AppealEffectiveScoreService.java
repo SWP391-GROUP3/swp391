@@ -8,6 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
+/**
+ * Tinh diem hieu luc cua bai: diem phieu goc da cong bo, hoac diem da chot sau khieu nai.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           repository / service duoc inject
+ *   26  getEffectiveScore()             Ben goi cung cap diem cua phieu goc da cong bo; appeal dang xu ly khong doi diem nay
+ */
 @Service @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AppealEffectiveScoreService {

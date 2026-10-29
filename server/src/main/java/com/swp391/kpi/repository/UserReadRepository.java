@@ -7,9 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   17  field                        - cac truong du lieu
- *   19  findAll()
+ * Repository truy van bang cua entity ? (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong du lieu
+ *   21  findAll()                       tim tat ca
  */
 @Repository
 @RequiredArgsConstructor

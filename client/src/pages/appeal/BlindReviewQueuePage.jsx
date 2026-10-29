@@ -5,6 +5,20 @@ import { layPhieuChamCheo } from '../../api/crossReviewApi.js'
 import '../../styles/QualityReportPage.css'
 import './ReviewWorkflow.css'
 
+/**
+ * Man BTV xem cac phieu cham lai mu va cham cheo duoc giao (UC-36, UC-40), chia theo trang thai; bam
+ * vao phieu de mo trang cham.
+ *
+ * MO TRANG NAY TAI: /re-reviews
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  BlindReviewQueuePage()          blind review queue page
+ *   25    useEffect                     tai du lieu khi mo trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   39  link [# {phieu.id} · {phieu.title}]  mo trang {duongDan}{phieu.id} (khong co route)
+ */
+
 export default function BlindReviewQueuePage() {
   const [duLieu, setDuLieu] = useState(null)
   const [loi, setLoi] = useState('')

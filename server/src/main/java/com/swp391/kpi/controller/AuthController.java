@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * API dang nhap (UC-69). Duong dan nay duoc mo cho nguoi chua dang nhap (SecurityConfig).
  *
- * MUC LUC (so dong)
- *   27  field                        - service duoc inject
- *   31  login()                      - POST /api/auth/login body: { "login": "an.nv@toasoan.vn", "password": "…
+ * MUC LUC (so dong - ten - tac dung)
+ *   27  field                           service duoc inject
+ *   31  login()                         dang nhap [POST /api/auth/login]
  */
 @RestController
 @RequestMapping("/api/auth")

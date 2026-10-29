@@ -36,13 +36,15 @@ import java.util.Optional;
  * Service thuc hien tong hop KPI tu dong (Aggregation Job) va cung cap
  * du lieu cho bang KPI toan ban (Department KPI Board - UC-61).
  *
- * MUC LUC (so dong)
- *   51  hang so                      - hang so dung trong file
- *   52  field                        - repository / service duoc inject
- *   68  aggregateMonthlyKpi()        - Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggreg…
- *  151  getDepartmentDashboard()     - Lay du lieu tong the cho bang theo doi KPI toan ban (UC-61: Department …
- *  256  getReporterKpiDetail()       - Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60).
- *  390  validatePeriod()
+ * MUC LUC (so dong - ten - tac dung)
+ *   53  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   54  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   70  aggregateMonthlyKpi()           Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggregation Job)
+ *  153  getDepartmentDashboard()        Lay du lieu tong the cho bang theo doi KPI toan ban (UC-61: Department KPI Board)
+ *  258  getReporterKpiDetail()          Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60)
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  392  validatePeriod()                kiem tra period
  */
 @Service
 @RequiredArgsConstructor

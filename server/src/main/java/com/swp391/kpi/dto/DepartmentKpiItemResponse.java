@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 /**
  * DTO dai dien cho 1 dong phong vien tren Dashboard KPI cua ban bien tap (UC-61).
  *
- * MUC LUC (so dong)
- *   19  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

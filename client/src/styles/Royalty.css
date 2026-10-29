@@ -4,16 +4,27 @@
    tieu de + the trang chua form/bang (giong "Bai cua toi").
    Tien to class: .royalty__ . Mau chi dung bien --fm-* (lay tu file Figma).
 
-   MUC LUC (so dong)
-     19  tieu de, bo cuc dau trang
-     33  The trang trang (Figma: nen trang, vien nhat, bo goc)
-     59  Form them don gia: cac o nam ngang, man hep thi xuong dong
-    105  Bang
-    191  Bo loc danh sach bai cho cham
-    208  Nhan han chi: qua han do, sap toi han cam, con lai xam
-    222  Man cham: 2 cot (cong thuc ben trai, tong tien ben phai), man hep thi 1 cot
-    230  man hinh hep (@media)
-    289  Bang ke ky: 3 so tong o tren
+   MUC LUC (so dong - khoi CSS)
+     30  tieu de, bo cuc dau trang
+     44  The trang trang (Figma: nen trang, vien nhat, bo goc)
+     70  Form them don gia: cac o nam ngang, man hep thi xuong dong
+    114  Nut chinh dung class chung .nut-chinh-fm (index.css)
+    116  Bang
+    119  Bang dung class chung .bang-fm (index.css)
+    121  Cot so (tien, he so, so bai): can phai, chu so thang hang
+    144  Ghi chu Ke toan khi tra ky (UC-52): chu nho mau hong duoi trang thai
+    151  Nhan "Dang ap dung" / "Sap ap dung" cua don gia
+    181  Iter 2: bai cho cham (UC46), cham nhuan but (UC47, 48), bang ke ky (UC50)
+    185  Link quay lai o tren tieu de
+    195  Chu phu nho (ten tac gia duoi tieu de bai, ly do khong tinh tien...)
+    202  Bo loc danh sach bai cho cham
+    219  Nhan han chi: qua han do, sap toi han cam, con lai xam
+    233  Man cham: 2 cot (cong thuc ben trai, tong tien ben phai), man hep thi 1 cot
+    241  man hinh hep (@media)
+    288  Dong tong / dong ket qua trong bang cong thuc
+    296  O ten bai: cac cot khac khong xuong dong nen cot nay bi ep hep > dat do rong toi thieu.
+    300  Bang ke ky: 3 so tong o tren
+    319  Ke toan kiem tra ky (UC-52, 53) va ly do cham lai: o ly do chiem ca hang
    =========================================================================== */
 
 .royalty__header { margin-bottom: 20px; }

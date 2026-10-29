@@ -22,6 +22,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Nghiep vu ho so BTV (UC-42): danh sach BTV, chi so chat luong (dung lai phep tinh UC-41, chi doc),
+ * lich su cham.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   46  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   47  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   56  getEditors()                    lay editors
+ *   70  getProfile()                    lay profile
+ *   97  getHistory()                    lay history
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  122  requireEditor()                 bat buoc editor
+ *  135  normalizePeriod()               normalize period
+ *  143  inPeriod()                      in period
+ *  147  calculateDeviation()            tinh deviation
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

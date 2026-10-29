@@ -10,13 +10,18 @@ import '../../styles/ReporterKpiDetails.css'
  * Danh cho Truong ban bien tap theo doi cac bai viet da xuat ban, ty le quy doi
  * dong tac gia (0.6 / 0.4), diem chat luong va luot xem tich luy.
  *
- * MUC LUC (so dong)
- *   21  ReporterKpiDetails           - Man hinh Chi tiet KPI cua mot phong vien (UC-62: View Reporter KPI Deta…
- *   33    useEffect                  - tai du lieu khi mo trang
- *   39    taiChiTietKpi()
- *   53    doiNam()
- *   57    doiThang()
- *   61    quayLaiBangChung()
+ * MO TRANG NAY TAI: /kpi-board/:reporterId
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  ReporterKpiDetails()            xem tom tat dau file
+ *   38    useEffect                     tai du lieu khi mo trang
+ *   44    taiChiTietKpi()               tai chi tiet kpi
+ *   58    doiNam()                      doi nam
+ *   62    doiThang()                    doi thang
+ *   66    quayLaiBangChung()            quay lai bang chung
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   79  [← Quay lai Bang KPI Ban]       quayLaiBangChung() -> chuyen sang /kpi-board?year={nam}&month={thang} (DepartmentKpiDashboard)
  */
 export default function ReporterKpiDetails({ nguoiDung }) {
   const { reporterId } = useParams()

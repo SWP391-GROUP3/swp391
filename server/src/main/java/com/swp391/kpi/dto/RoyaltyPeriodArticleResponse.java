@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 /**
  * 1 bai da cham trong bang ke ky (UC-50): he so va tien cua bai.
  *
- * MUC LUC (so dong)
- *   22  field                        - cac truong tra ve cho giao dien
- *   34  from()                       - title lay qua service BF-01; mediaAmount service cong tu cac dong MEDIA…
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  field                           cac truong tra ve cho giao dien
+ *   34  from()                          title lay qua service BF-01; mediaAmount service cong tu cac dong MEDIA cua phieu
  */
 @Getter
 @Setter

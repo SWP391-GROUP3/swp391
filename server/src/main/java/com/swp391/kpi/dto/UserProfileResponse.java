@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
  * Ho so cua nguoi dang dang nhap (man "Hồ sơ của tôi").
  * KHONG tra passwordHash.
  *
- * MUC LUC (so dong)
- *   21  field                        - cac truong tra ve cho giao dien
- *   32  from()                       - Goi trong transaction cua service (role la LAZY)
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong tra ve cho giao dien
+ *   32  from()                          Goi trong transaction cua service (role la LAZY)
  */
 @Getter
 @Setter

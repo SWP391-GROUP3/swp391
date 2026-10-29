@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 /**
  * DTO nhận dữ liệu khi Trưởng ban điều chỉnh chỉ tiêu đã giao (UC-59 Alternative Flow A2).
  *
- * MUC LUC (so dong)
- *   24  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

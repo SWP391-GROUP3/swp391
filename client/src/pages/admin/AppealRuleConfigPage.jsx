@@ -3,12 +3,22 @@ import { getActiveConfig, getAllConfigs, createConfig } from '../../api/appealRu
 import '../../styles/AppealRuleConfig.css'
 
 /**
- * MUC LUC (so dong)
- *   14  AppealRuleConfigPage
- *   32    useEffect                  - tai du lieu khi mo trang
- *   36    taiDuLieu()
- *   56    handleOpenModal()
- *   72    handleFormSubmit()
+ * Man Admin cau hinh luat khieu nai (UC-44): xem cau hinh dang ap dung, lich su cac lan doi va them
+ * cau hinh moi (so ngay duoc khieu nai, nguong chenh diem...).
+ *
+ * MO TRANG NAY TAI: /appeal-rules
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  AppealRuleConfigPage()          appeal rule config page
+ *   42    useEffect                     tai du lieu khi mo trang
+ *   46    taiDuLieu()                   tai du lieu
+ *   66    handleOpenModal()             xu ly open modal
+ *   82    handleFormSubmit()            xu ly form submit
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  117  [+ Tao phien ban cau hinh moi]  handleOpenModal() -> tren trang: form, dong/xoa form error, mo kiem tra modal open
+ *  224  form, nut [Dang luu... / Luu cau hinh]  handleFormSubmit() -> goi POST /api/appeal-rule-configs, GET /api/appeal-rule-configs/active, GET /api/appeal-rule-configs
+ *  274  [Huy]                           tren trang: dong/xoa kiem tra modal open
  */
 
 export default function AppealRuleConfigPage() {

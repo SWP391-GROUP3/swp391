@@ -4,10 +4,10 @@ import { layToken } from '../auth/phienDangNhap.js'
 /**
  * API client cho chuc nang nhap so lieu doc gia tu CSV va xem nhat ky (UC-63, BF-05).
  *
- * MUC LUC (so dong)
- *   12  taiLenCsvDocGia              - Gui file CSV len server de import
- *   20  layNhatKyImport              - Lay danh sach lich su cac lan import (co phan trang)
- *   27  taiFileCsvMau                - Tai file CSV mau cho so lieu doc gia
+ * MUC LUC (so dong - ten - tac dung)
+ *   16  taiLenCsvDocGia()               Gui file CSV len server de import so lieu doc gia (UC-63) [POST /api/reader-imports]
+ *   28  layNhatKyImport()               Lay danh sach lich su cac lan import co phan trang (UC-63) [GET /api/reader-imports/logs?page={page}&size={size}]
+ *   35  taiFileCsvMau()                 Tai file CSV mau ve may nguoi dung [GET /api/reader-imports/template]
  */
 
 /**

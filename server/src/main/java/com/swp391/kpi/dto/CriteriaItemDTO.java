@@ -15,9 +15,9 @@ import java.math.BigDecimal;
 /**
  * DTO dữ liệu của 1 tiêu chí thành phần trong bộ tiêu chí.
  *
- * MUC LUC (so dong)
- *   28  field                        - cac truong tra ve cho giao dien
- *   40  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong - ten - tac dung)
+ *   28  field                           cac truong tra ve cho giao dien
+ *   40  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

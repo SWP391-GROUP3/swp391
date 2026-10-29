@@ -12,6 +12,19 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * API Truong ban quan ly khieu nai (UC-36, UC-43): hang cho, chi tiet, BTV hop le, phan cong / giao
+ * lai cham mu, giao cham lan 2.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           service duoc inject
+ *   35  getQueue()                      lay queue [GET /api/appeals]
+ *   45  getDetail()                     lay detail [GET /api/appeals/{id}]
+ *   52  getCandidates()                 lay candidates [GET /api/appeals/{id}/reviewer-candidates]
+ *   59  assign()                        phan cong [POST /api/appeals/{id}/assign]
+ *   66  reassign()                      phan cong lai [POST /api/appeals/{id}/reassign]
+ *   73  assignSecond()                  phan cong second [POST /api/appeals/{id}/assign-second]
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/appeals")

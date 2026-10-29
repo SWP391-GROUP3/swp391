@@ -19,6 +19,18 @@ import java.util.List;
 import java.util.Optional;
 
 // Service xu ly lan cham diem cua BTV (UC-22, BR-SC-03, BR-SC-06)
+/**
+ * Nghiep vu lan cham cua BTV (UC-22...28, BR-SC-03, BR-SC-06): mo phieu va chup bo tieu chi ACTIVE,
+ * doi the loai truoc khi cham, luu diem nhap, nop quyet dinh.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   38  field                           repository / service duoc inject
+ *   53  openScoringAttempt()            Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
+ *  141  getLatestAttemptByArticle()     Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
+ *  181  changeCategory()                BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
+ *  257  saveDraftScores()               BTV luu diem tung tieu chi va tinh tong diem theo trong so (UC-24, UC-25, BR-SC-06, BR-SC-07)
+ *  336  submitDecision()                BTV nop phieu cham voi 1 trong 3 quyet dinh: ACCEPT, REVISION, REJECT (UC-26, UC-27, UC-28)
+ */
 @Service
 @RequiredArgsConstructor
 public class ScoringAttemptService {

@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * MUC LUC (so dong)
- *   23  field                        - cac truong tra ve cho giao dien
+ * DTO client gui len API. Dung o: AppealRuleConfigController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

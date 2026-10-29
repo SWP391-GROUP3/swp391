@@ -23,12 +23,18 @@ const TAI_KHOAN_MAU = [
 /**
  * Man dang nhap (UC-69). Nhap email HOAC ten dang nhap + mat khau.
  *
- * MUC LUC (so dong)
- *   10  MAT_KHAU_MAU                 - Tai khoan mau - chep tu database/data.sql, mat khau chung 123456.
- *   11  TAI_KHOAN_MAU
- *   33  Login                        - Man dang nhap (UC-69). Nhap email HOAC ten dang nhap + mat khau.
- *   40    chonTaiKhoanMau()          - Bam 1 tai khoan mau -> dien san ca 2 o, chi con bam "Dang nhap"
- *   46    guiForm()
+ * MO TRANG NAY TAI: /login
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  MAT_KHAU_MAU                    Tai khoan mau - chep tu database/data.sql, mat khau chung 123456
+ *   11  TAI_KHOAN_MAU                   hang so
+ *   39  Login()                         xem tom tat dau file
+ *   46    chonTaiKhoanMau()             Bam 1 tai khoan mau -> dien san ca 2 o, chi con bam "Dang nhap"
+ *   52    guiForm()                     gui form
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   76  form, nut [Dang vao… / Dang nhap]  guiForm() -> goi POST /api/auth/login; bao len component cha (onDangNhap)
+ *  119  [{tk.username} {tk.email} {tk.vaiTro}]  chonTaiKhoanMau() Bam 1 tai khoan mau -> dien san ca 2 o, chi con bam "Dang nhap" -> tren trang: ten dang nhap, mat khau, dong/xoa loi
  */
 export default function Login({ onDangNhap }) {
   const [tenDangNhap, setTenDangNhap] = useState('')

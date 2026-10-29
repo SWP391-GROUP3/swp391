@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * MUC LUC (so dong)
- *   18  field                        - cac truong tra ve cho giao dien
+ * DTO client gui len API. Dung o: AppealService.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

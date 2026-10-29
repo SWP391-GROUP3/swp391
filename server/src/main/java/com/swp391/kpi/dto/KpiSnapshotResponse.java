@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
  * DTO phan hoi thong tin KPI snapshot (UC-66, UC-67).
  * Map tay bang ham from() theo quy uoc AGENTS.md muc 3.4.
  *
- * MUC LUC (so dong)
- *   23  field                        - cac truong tra ve cho giao dien
- *   34  from()                       - doi entity sang DTO (map tay, AGENTS 3.4)
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           cac truong tra ve cho giao dien
+ *   34  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

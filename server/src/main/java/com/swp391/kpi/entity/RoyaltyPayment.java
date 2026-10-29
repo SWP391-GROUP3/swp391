@@ -24,8 +24,8 @@ import java.time.LocalDateTime;
  *   nguoc lai:           paidAmount = 0,              debtOut = debtIn - gross (no chuyen ky sau)
  * CHECK ck_royalty_payments_status: UNPAID thi paidBy/paidAt NULL, PAID thi phai co ca hai.
  *
- * MUC LUC (so dong)
- *   38  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   39  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_payments")

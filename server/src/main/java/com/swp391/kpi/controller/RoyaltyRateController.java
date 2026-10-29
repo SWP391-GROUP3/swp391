@@ -21,10 +21,10 @@ import java.util.List;
 /**
  * API don gia nhuan but cho man Unit Price List (UC-55, Ke toan).
  *
- * MUC LUC (so dong)
- *   34  field                        - service duoc inject
- *   38  getAllRates()                - GET /api/royalty-rates: lich su don gia, moi nhat len dau
- *   45  createRate()                 - POST /api/royalty-rates: them don gia moi
+ * MUC LUC (so dong - ten - tac dung)
+ *   34  field                           service duoc inject
+ *   38  getAllRates()                   lay tat ca rates [GET /api/royalty-rates]
+ *   45  createRate()                    tao rate [POST /api/royalty-rates]
  */
 @RestController
 @RequestMapping("/api/royalty-rates")

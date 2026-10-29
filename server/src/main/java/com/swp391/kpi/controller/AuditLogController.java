@@ -17,9 +17,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   29  field                        - service duoc inject
- *   32  getLogs()
+ * API nhat ky cham (UC-45): lay nhat ky theo bo loc.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  field                           service duoc inject
+ *   34  getLogs()                       lay logs [GET /api/audit-logs]
  */
 @RestController
 @RequestMapping("/api/audit-logs")

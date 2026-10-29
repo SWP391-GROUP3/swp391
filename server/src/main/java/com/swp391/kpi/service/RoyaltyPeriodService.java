@@ -41,29 +41,31 @@ import java.util.TreeMap;
 /**
  * Ky nhuan but: danh sach ky (UC-49), chot ky (UC-50), Ke toan tra ky (UC-52) va khoa ky (UC-53).
  *
- * MUC LUC (so dong)
- *   72  hang so                      - hang so dung trong file
- *   75  field                        - repository / service duoc inject
- *   90  getAllPeriods()              - Cac ky moi nhat len dau, kem tong tien va so bai da cham.
- *  105  getPeriodDetail()            - UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung ng…
- *  122  closePeriod()                - UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan,
- *  149  returnPeriod()               - UC-52: Ke toan tra ky CLOSED ve OPEN kem ghi chu bat buoc, bao Thu ky
- *  176  lockPeriod()                 - UC-53: Ke toan khoa ky CLOSED -> LOCKED, moi nguoi 1 phieu chi UNPAID
- *  211  loadDebtFromPreviousPeriod() - No chuyen tiep = debt_out tren phieu chi cua ky thang truoc (GBR-12)
- *  234  groupLinesByUser()           - Gom dong tien theo nguoi nhan
- *  247  createPayment()              - 1 phieu chi UNPAID cho 1 nguoi, gan cac dong tien vao phieu
- *  271  checkAllArticlesOfMonthGraded() - UC-50 E1 (nhom chot 18/10/2026): con bai da dang tu truoc toi het thang…
- *  287  createNextPeriodIfMissing()  - Chot ky thang N thi tu tao ky thang N+1 (OPEN) neu chua co, de Thu ky c…
- *  305  keepLatestVersions()         - Bang ke chi giu phien ban cham moi nhat cua moi bai
- *  317  buildArticleRows()           - Moi phieu cham 1 dong: tien bai + tong tien anh cua phieu (cong tu dong…
- *  338  buildPersonRows()            - Moi nguoi 1 dong: cong cac dong tien cua nguoi do theo loai. TreeMap ->…
- *  354  addLineAmount()
- *  365  loadArticleTitles()          - Tieu de bai, lay qua service BF-01 (khong query bang articles)
- *  374  loadUserNames()              - Ho ten nguoi nhan tien, lay qua service luong admin (khong query bang u…
- *  382  sumAmount()
- *  391  countArticles()              - 1 bai cham lai nhieu phien ban van tinh 1 bai
- *  399  findPeriod()
- *  405  label()                      - Vd "9/2026"
+ * MUC LUC (so dong - ten - tac dung)
+ *   74  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   77  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   92  getAllPeriods()                 Cac ky moi nhat len dau, kem tong tien va so bai da cham
+ *  107  getPeriodDetail()               UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung nguoi
+ *  124  closePeriod()                   UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan, roi tu tao ky thang sau de cham tiep (…
+ *  151  returnPeriod()                  UC-52 / UC-53 A1: Ke toan tra ky CLOSED ve OPEN kem ghi chu bat buoc (BR-RY-07), bao Thu ky sua roi chot lai …
+ *  178  lockPeriod()                    UC-53: Ke toan khoa ky CLOSED -> LOCKED (BR-RY-07)
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  213  loadDebtFromPreviousPeriod()    No chuyen tiep = debt_out tren phieu chi cua ky thang truoc (GBR-12, UC-53 A2)
+ *  236  groupLinesByUser()              Gom dong tien theo nguoi nhan
+ *  249  createPayment()                 1 phieu chi UNPAID cho 1 nguoi; gross = tong dong tien, tien chi va no tinh bang RoyaltyPaymentCalculator (ph…
+ *  273  checkAllArticlesOfMonthGraded()  UC-50 E1 (nhom chot 18/10/2026): con bai da dang tu truoc toi het thang cua ky ma chua cham thi chua cho chot
+ *  289  createNextPeriodIfMissing()     Chot ky thang N thi tu tao ky thang N+1 (OPEN) neu chua co, de Thu ky cham tiep duoc (UC-47 E1 can ky OPEN)
+ *  307  keepLatestVersions()            Cham lai trong ky OPEN tao phien ban moi cung ky (dong tien ban cu da xoa), nen bang ke chi giu phien ban moi…
+ *  319  buildArticleRows()              Moi phieu cham 1 dong: tien bai + tong tien anh cua phieu (cong tu dong MEDIA)
+ *  340  buildPersonRows()               Moi nguoi 1 dong: cong cac dong tien cua nguoi do theo loai
+ *  356  addLineAmount()                 them line amount
+ *  367  loadArticleTitles()             Tieu de bai, lay qua service BF-01 (khong query bang articles)
+ *  376  loadUserNames()                 Ho ten nguoi nhan tien, lay qua service luong admin (khong query bang users)
+ *  384  sumAmount()                     sum amount
+ *  393  countArticles()                 1 bai cham lai nhieu phien ban van tinh 1 bai
+ *  401  findPeriod()                    tim period
+ *  407  label()                         Vd "9/2026"
  */
 @Service
 @RequiredArgsConstructor

@@ -14,24 +14,26 @@ import '../../styles/ArticleDetail.css'
  * lich su trang thai. Tac gia chinh rut duoc bai dang "Da nop" (UC-11, BR-IN-08):
  * server tra canWithdraw de biet co hien nut hay khong.
  *
+ * MO TRANG NAY TAI: /my-articles/:id
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   36  ArticleDetail()                 UC-02 - Chi tiet bai: noi dung, khai bao, tac gia + trang thai xac nhan, lich su trang thai
- *   49    useEffect                     Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
- *   65    handleConfirmWithdraw()       Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ban moi
- *   81    runAction()                   Goi 1 API thao tac (nop bai, dong y, tu choi) roi thay du lieu bai bang ban moi server tra ve
+ *   38  ArticleDetail()                 xem tom tat dau file
+ *   51    useEffect                     Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
+ *   67    handleConfirmWithdraw()       Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ban moi
+ *   83    runAction()                   Goi 1 API thao tac (nop bai, dong y, tu choi) roi thay du lieu bai bang ban moi server tra ve
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  104  [< Bai cua toi]                 quay ve trang /my-articles (MyArticles)
- *  125  [Sua bai] / [Sua va nop lai]    chi hien khi canEdit -> mo trang /my-articles/:id/edit (ArticleEditor, UC-03/UC-10)
- *  131  [Nop bai]                       chi hien khi canSubmit -> POST /api/articles/{id}/submit (UC-05), cap nhat lai trang
- *  136  [Rut bai]                       chi hien khi canWithdraw -> mo hop hoi lai ngay ben duoi (UC-11)
- *  165  [Tu choi]                       chi hien khi canRespond -> mo o nhap ly do tu choi (UC-12 A1)
- *  169  [Dong y]                        dong tac gia dong y -> POST /api/articles/{id}/co-author/accept (UC-12)
- *  176  [Huy] (o ly do)                 dong o nhap ly do, khong gui gi
- *  180  [Gui tu choi]                   POST /api/articles/{id}/co-author/reject kem ly do -> bai ve Nhap
- *  196  [Huy] (hop rut bai)             dong hop hoi, khong rut
- *  199  [Xac nhan rut bai]              POST /api/articles/{id}/withdraw -> bai ve Nhap (BR-IN-08)
- *  208  khoi diem theo tieu chi         khong phai nut: component cua BF-02 (UC-34), chi hien khi bai SCORE_PUBLISHED / PUBLISHED
+ *  106  [< Bai cua toi]                 quay ve trang /my-articles (MyArticles)
+ *  127  [Sua bai] / [Sua va nop lai]    chi hien khi canEdit -> mo trang /my-articles/:id/edit (ArticleEditor, UC-03/UC-10)
+ *  133  [Nop bai]                       chi hien khi canSubmit -> POST /api/articles/{id}/submit (UC-05), cap nhat lai trang
+ *  138  [Rut bai]                       chi hien khi canWithdraw -> mo hop hoi lai ngay ben duoi (UC-11)
+ *  167  [Tu choi]                       chi hien khi canRespond -> mo o nhap ly do tu choi (UC-12 A1)
+ *  171  [Dong y]                        dong tac gia dong y -> POST /api/articles/{id}/co-author/accept (UC-12)
+ *  178  [Huy] (o ly do)                 dong o nhap ly do, khong gui gi
+ *  182  [Gui tu choi]                   POST /api/articles/{id}/co-author/reject kem ly do -> bai ve Nhap
+ *  198  [Huy] (hop rut bai)             dong hop hoi, khong rut
+ *  201  [Xac nhan rut bai]              POST /api/articles/{id}/withdraw -> bai ve Nhap (BR-IN-08)
+ *  210  khoi diem theo tieu chi         khong phai nut: component cua BF-02 (UC-34), chi hien khi bai SCORE_PUBLISHED / PUBLISHED
  */
 export default function ArticleDetail() {
   const { id } = useParams()

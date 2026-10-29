@@ -7,20 +7,20 @@ import { goiApi } from './goiApi.js'
  * ApiResponse, loi thi nem Error kem message tieng Viet server tra ve.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   30  getMyArticles()                 UC-01: bai cua toi, sua gan nhat len dau
- *   39  getArticleDetail()              UC-02: chi tiet 1 bai (noi dung, tac gia, lich su trang thai)
- *   44  withdrawArticle()               UC-11: rut bai da nop ve Nhap
- *   53  getMyStatusCounts()             3 ham cho trang chu Phong vien (gop y nhom truong muc C4), dang du lieu giong ham tuong ung trong reporterHom…
- *   58  getMyRevisionRequests()         Trang chu PV: bai bi tra ve can sua, kem ghi chu lan tra gan nhat
- *   63  getMyCoAuthorInvites()          Trang chu PV + trang UC-12: loi moi dong tac gia dang cho minh tra loi
- *   70  getGenres()                     UC-03: danh sach the loai dang dung (API dung chung cua admin - GET /api/genres)
- *   75  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia
- *   83  createArticle()                 UC-03 + UC-04: tao ban nhap
- *   88  updateArticle()                 UC-03 + UC-04: sua ban nhap (cung dang du lieu voi createArticle)
- *   93  submitArticle()                 UC-05: nop bai Nhap
- *   98  resubmitArticle()               UC-10: nop lai bai bi tra ve
- *  103  acceptCoAuthorship()            UC-12: dong tac gia dong y
- *  108  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do
+ *   30  getMyArticles()                 UC-01: bai cua toi, sua gan nhat len dau [GET /api/articles?{params}]
+ *   39  getArticleDetail()              UC-02: chi tiet 1 bai (noi dung, tac gia, lich su trang thai) [GET /api/articles/{articleId}]
+ *   44  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{articleId}/withdraw]
+ *   53  getMyStatusCounts()             3 ham cho trang chu Phong vien (gop y nhom truong muc C4), dang du li… [GET /api/articles/status-counts]
+ *   58  getMyRevisionRequests()         Trang chu PV: bai bi tra ve can sua, kem ghi chu lan tra gan nhat [GET /api/articles/revision-requests]
+ *   63  getMyCoAuthorInvites()          Trang chu PV + trang UC-12: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
+ *   70  getGenres()                     UC-03: danh sach the loai dang dung (API dung chung cua admin - GET /… [GET /api/genres]
+ *   75  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia [GET /api/articles/co-author-candidates]
+ *   83  createArticle()                 UC-03 + UC-04: tao ban nhap [POST /api/articles]
+ *   88  updateArticle()                 UC-03 + UC-04: sua ban nhap (cung dang du lieu voi createArticle) [PUT /api/articles/{articleId}]
+ *   93  submitArticle()                 UC-05: nop bai Nhap [POST /api/articles/{articleId}/submit]
+ *   98  resubmitArticle()               UC-10: nop lai bai bi tra ve [POST /api/articles/{articleId}/resubmit]
+ *  103  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{articleId}/co-author/accept]
+ *  108  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{articleId}/co-author/reject]
  */
 
 /**

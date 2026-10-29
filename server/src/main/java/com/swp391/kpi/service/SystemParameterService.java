@@ -13,9 +13,9 @@ import java.util.Map;
  * Cung cap tham so he thong cho cac luong. Luong khac goi service nay,
  * khong goi thang SystemParameterRepository (AGENTS.md muc 2).
  *
- * MUC LUC (so dong)
- *   24  field                        - repository / service duoc inject
- *   28  getValuesByFlow()            - Moi tham so cua 1 luong (cot flow, vd "BF-04") thanh Map param_key -> p…
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  field                           repository / service duoc inject
+ *   28  getValuesByFlow()               Moi tham so cua 1 luong (cot flow, vd "BF-04") thanh Map param_key -> param_value
  */
 @Service
 @RequiredArgsConstructor

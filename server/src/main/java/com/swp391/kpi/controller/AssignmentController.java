@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   28  field                        - service duoc inject
- *   34  assignArticle()              - Trưởng ban giao bài viết cho BTV chấm chất lượng (UC-18, UC-20).
- *   43  getAssignmentByArticleId()   - Lấy thông tin phân công của bài viết.
- *   53  getAssignmentsByEditorId()   - Lấy danh sách bài viết được giao của một BTV (Hàng việc BTV - UC-21).
- *   62  getEditorWorkload()          - Xem khối lượng công việc của một BTV (số bài đang giữ - UC-19).
+ * API phan cong bai cho BTV (UC-18...20): giao bai, xem phan cong theo bai / theo BTV, khoi luong viec
+ * cua tung BTV.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           service duoc inject
+ *   38  assignArticle()                 Truong ban giao bai viet cho BTV cham chat luong (UC-18, UC-20) [POST /api/assignments]
+ *   47  getAssignmentByArticleId()      Lay thong tin phan cong cua bai viet [GET /api/assignments/article/{articleId}]
+ *   57  getAssignmentsByEditorId()      Lay danh sach bai viet duoc giao cua mot BTV (Hang viec BTV - UC-21) [GET /api/assignments/editor/{editorId}]
+ *   66  getEditorWorkload()             Xem khoi luong cong viec cua mot BTV (so bai dang giu - UC-… [GET /api/assignments/editor/{editorId}/workload]
  */
 @RestController
 @RequestMapping("/api/assignments")

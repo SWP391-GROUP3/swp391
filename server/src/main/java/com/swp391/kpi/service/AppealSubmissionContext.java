@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   18  field                        - repository / service duoc inject
+ * Goi du lieu (bai, diem, tieu chi) ma AppealService can khi kiem tra 1 khieu nai.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           repository / service duoc inject
  */
 @Getter
 @Setter

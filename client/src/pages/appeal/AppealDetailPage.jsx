@@ -6,6 +6,24 @@ import '../../styles/QualityReportPage.css'
 import './AppealManagementPage.css'
 import './AppealDetailPage.css'
 
+/**
+ * Man Truong ban xem chi tiet 1 khieu nai (UC-36): bai, tieu chi va ly do khieu nai; phan cong / giao
+ * lai BTV cham mu, mo trang so sanh diem.
+ *
+ * MO TRANG NAY TAI: /appeals/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   27  AppealDetailPage()              appeal detail page
+ *   42    useEffect                     tai du lieu khi mo trang
+ *   50    luuPhanCong()                 luu phan cong
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   78  link [← Quay lai danh sach]     mo trang /appeals{location.state?.danhSach ? `?${location.state.danh… (AppealManagementPage)
+ *   95  link [So sanh & chot diem]      mo trang /appeals/{id}/comparison (AppealComparisonPage)
+ *   96  form, nut [Dang luu… / Phan cong / Giao lai]  luuPhanCong() -> hoi xac nhan; goi POST /api/appeals/{id}/reassign, POST /api/appeals/{id}/assign
+ *  107  link [Xem nhat ky khieu nai]    mo trang /audit-logs?appealId={id} (AuditLogPage)
+ */
+
 export default function AppealDetailPage() {
   const { id } = useParams()
   const location = useLocation()

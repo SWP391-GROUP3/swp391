@@ -10,15 +10,28 @@ import { BT_TIEU_CHI, BT_DANH_SACH, BT_THEM, BT_THONG_TIN, BT_DAU_TICH, BT_DAU_X
 import '../../styles/Flow2.css'
 
 /**
- * MUC LUC (so dong)
- *   24  CriteriaManagement
- *   45    useEffect                  - tai du lieu khi mo trang
- *   49    loadCategoryData()
- *   76    handleAddCriterion()
- *   83    handleRemoveCriterion()
- *   91    handleCriterionChange()
- *   97    handleCreateNewVersion()
- *  134    handleActivate()
+ * Man quan ly bo tieu chi cham (UC-14...17): xem phien ban bo tieu chi theo the loai, tao phien ban
+ * moi voi danh sach tieu chi va trong so.
+ *
+ * MO TRANG NAY TAI: /criteria-sets, /criteria-sets/:id
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   37  CriteriaManagement()            criteria management
+ *   58    useEffect                     tai du lieu khi mo trang
+ *   62    loadCategoryData()            tai category data
+ *   89    handleAddCriterion()          xu ly add criterion
+ *   96    handleRemoveCriterion()       xu ly remove criterion
+ *  104    handleCriterionChange()       xu ly criterion change
+ *  110    handleCreateNewVersion()      xu ly create new version
+ *  147    handleActivate()              xu ly activate
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  182  [Tai lai]                       xu ly tren trang
+ *  203  [{BT_DAU_TICH} Kich hoat (ACTIVE) ngay]  handleActivate() -> goi PUT /api/criteria-sets/{versionId}/activate, GET /api/criteria-sets/category/{categoryId}/active, GET /api/criteria-sets/category/{cate…
+ *  300  [{BT_DAU_TICH} Kich hoat (ACTIVE)]  handleActivate() -> goi PUT /api/criteria-sets/{versionId}/activate, GET /api/criteria-sets/category/{categoryId}/active, GET /api/criteria-sets/category/{cate…
+ *  319  form, nut [Luu Phien ban Moi]   handleCreateNewVersion() -> goi POST /api/criteria-sets, GET /api/criteria-sets/category/{categoryId}/active, GET /api/criteria-sets/category/{categoryId}
+ *  373  [{BT_DAU_X}]                    handleRemoveCriterion() -> tren trang: criteria list
+ *  387  [{BT_THEM} Them tieu chi]       handleAddCriterion() -> tren trang: criteria list
  */
 
 export default function CriteriaManagement({ nguoiDung }) {

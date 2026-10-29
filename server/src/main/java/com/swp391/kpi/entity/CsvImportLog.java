@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
  * Nhat ky moi lan nhap file CSV so lieu doc gia (bang csv_import_logs).
  * Thuoc so huu cua luong kpi (BF-05).
  *
- * MUC LUC (so dong)
- *   27  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "csv_import_logs")

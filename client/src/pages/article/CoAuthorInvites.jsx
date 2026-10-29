@@ -8,13 +8,15 @@ import '../../styles/CoAuthorInvites.css'
  * UC-12 - "Xac nhan dong tac gia": bai dang cho nguoi dung xac nhan ty le dong tac gia,
  * sap het han xep truoc. Bam tieu de de mo chi tiet bai (UC-02), nut Dong y / Tu choi nam o do.
  *
+ * MO TRANG NAY TAI: /co-author-invites
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   19  CoAuthorInvites()               UC-12 - "Xac nhan dong tac gia": bai dang cho nguoi dung xac nhan ty le dong tac gia, sap het han xep truoc
- *   23    useEffect                     tai du lieu khi mo trang
- *   39    deadlineText()                Han xac nhan 3 ngay (BR-IN-06): hien so ngay con lai cho de thay
+ *   21  CoAuthorInvites()               xem tom tat dau file
+ *   25    useEffect                     tai du lieu khi mo trang
+ *   41    deadlineText()                Han xac nhan 3 ngay (BR-IN-06): hien so ngay con lai cho de thay
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   82  [ten bai] trong bang            mo /my-articles/:id (ArticleDetail): xem bai va bam Dong y / Tu choi o do (UC-12)
+ *   84  [ten bai] trong bang            mo /my-articles/:id (ArticleDetail): xem bai va bam Dong y / Tu choi o do (UC-12)
  */
 export default function CoAuthorInvites() {
   const [invites, setInvites] = useState(null)   // null = dang tai

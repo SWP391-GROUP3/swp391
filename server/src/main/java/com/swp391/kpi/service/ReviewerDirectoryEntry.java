@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * MUC LUC (so dong)
- *   14  field                        - repository / service duoc inject
+ * Thong tin gon cua 1 BTV (id, ho ten, ban) dung trong BF-03.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   16  field                           repository / service duoc inject
  */
 @Getter
 @AllArgsConstructor

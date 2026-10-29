@@ -18,13 +18,22 @@ const RECALC_REASON_MAX = 500   // = cot royalty_gradings.recalc_reason NVARCHAR
  * Mo tu bang ke voi ?chamLai=1 la cham lai (nhom chot 27/10/2026): bat buoc ly do,
  * phieu moi vao cung ky voi phieu cu, chi duoc khi ky do con mo.
  *
- * MUC LUC (so dong)
- *   29  RoyaltyGrading               - UC-47, UC-48 - "Cham nhuan but" 1 bai (Thu ky toa soan).
- *   41    useEffect                  - Tinh truoc he so va tien khi mo trang (xem truoc, chua luu)
- *   50    handleComplete()
- *  162  FormulaCard                  - Cac buoc cong thuc (BR-RY-01..03): server tinh, man hinh chi hien de Th…
- *  189  AuthorCard                   - Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong, ta…
- *  215  MediaCard                   - UC-48: tung anh/video. Anh khong tinh tien (nguon ngoai, tai su dung) h…
+ * MO TRANG NAY TAI: /royalty-grading/:articleId
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   10  RECALC_REASON_MAX               hang so
+ *   38  RoyaltyGrading()                xem tom tat dau file
+ *   50    useEffect                     Tinh truoc he so va tien khi mo trang (xem truoc, chua luu)
+ *   59    handleComplete()              xu ly complete
+ *  171  FormulaCard()                   Cac buoc cong thuc (BR-RY-01..03): server tinh, man hinh chi hien de Thu ky kiem tra
+ *  198  AuthorCard()                    Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong, tac gia chinh nhan phan du
+ *  224  MediaCard()                     UC-48: tung anh/video
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   97  link [{backLink.label}]         mo trang {backLink.to} (trang lay tu du lieu)
+ *  148  link [Xem bang ke ky]           mo trang /royalty-periods/{grading.periodId} (RoyaltyPeriodDetail)
+ *  149  link [Cham bai khac]            mo trang /royalty-grading (RoyaltyPendingList)
+ *  154  [Dang luu… / Luu cham lai / Hoan tat cha…]  handleComplete() -> hoi xac nhan; goi POST /api/royalty-gradings
  */
 export default function RoyaltyGrading() {
   const { articleId } = useParams()

@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 /**
  * 1 bai da dang CHUA cham nhuan but, cho man Pending Grading List (UC-46).
  *
- * MUC LUC (so dong)
- *   20  field                        - cac truong tra ve cho giao dien
- *   34  from()                       - Map tay DTO cua BF-01 -> DTO cua BF-04 (AGENTS.md muc 3.4), them 3 so l…
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           cac truong tra ve cho giao dien
+ *   34  from()                          Map tay DTO cua BF-01 -> DTO cua BF-04 (AGENTS.md muc 3.4), them 3 so lieu han chi
  */
 @Getter
 @Setter

@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
  * Ket qua KPI thang cua phong vien.
  * DRAFT = so tam, tinh lai duoc; FINALIZED = da chot, bat bien (BR-KPI-06).
  *
- * MUC LUC (so dong)
- *   35  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   35  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "kpi_snapshots")

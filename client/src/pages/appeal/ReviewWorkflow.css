@@ -1,3 +1,12 @@
+/* ===========================================================================
+   CSS dung chung cho cac man cham lai mu / cham cheo / so sanh diem cua BF-03 (tien to
+   .luong-qc__). Mau dung bien --fm-*.
+
+   MUC LUC (so dong - khoi CSS)
+     10  tieu de, bo cuc dau trang
+     33  man hinh hep (@media)
+   =========================================================================== */
+
 .luong-qc { color: var(--fm-chu); }
 .luong-qc a { color: var(--fm-chu); }
 .luong-qc button {

@@ -39,7 +39,7 @@ import java.util.Map;
  * de ghi kem 1 dong article_status_logs (AGENTS.md muc 2).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   66  hang so                         ten tham so, ten hanh dong, gioi han... (khong viet so ma trong code)
+ *   66  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *   73  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
  *   86  getMyArticles()                 UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau
@@ -53,7 +53,7 @@ import java.util.Map;
  *  ---- Ham phu (private, chi dung trong file) ----
  *  250  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
  *  256  isAuthor()                      Tac gia chinh (articles.author_id) hoac co dong trong article_authors
- *  273  changeStatus()                  doi articles.status va ghi 1 dong article_status_logs trong cung transaction (AGENTS muc 2)
+ *  273  changeStatus()                  doi status
  *  292  toDetailResponse()              Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
  *  337  loadGenreNames()                Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
  *  346  loadUserNames()                 Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien

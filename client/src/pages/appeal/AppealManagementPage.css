@@ -1,3 +1,11 @@
+/* ===========================================================================
+   CSS dung chung cho man Quan ly khieu nai va Chi tiet khieu nai. Tien to class rieng, mau dung
+   bien --fm-*.
+
+   MUC LUC (so dong - khoi CSS)
+     10  tieu de, bo cuc dau trang
+   =========================================================================== */
+
 .quan-ly-kn button,
 .chi-tiet-kn button {
   padding: 8px 12px;

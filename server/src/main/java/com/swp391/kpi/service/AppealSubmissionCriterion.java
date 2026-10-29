@@ -6,8 +6,10 @@ import lombok.Getter;
 import java.math.BigDecimal;
 
 /**
- * MUC LUC (so dong)
- *   16  field                        - repository / service duoc inject
+ * 1 tieu chi trong goi du lieu khieu nai: ma tieu chi, diem, trong so.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   18  field                           repository / service duoc inject
  */
 @Getter
 @AllArgsConstructor

@@ -9,8 +9,8 @@ import lombok.Setter;
  * Ke toan tra ky da chot ve cho Thu ky (UC-52): bat buoc ghi chu
  * (cot royalty_periods.return_note NVARCHAR(1000), CHECK ck_royalty_periods_returned).
  *
- * MUC LUC (so dong)
- *   21  field                        - ghi chu Ke toan gui len
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

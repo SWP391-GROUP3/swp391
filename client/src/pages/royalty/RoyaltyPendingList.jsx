@@ -11,11 +11,16 @@ import '../../styles/Royalty.css'
  * Trang chu Thu ky mo /royalty-grading?sapToiHan=1 de chi xem bai sap toi han.
  * Bam "Cham" -> man cham nhuan but (UC-47, UC-48).
  *
- * MUC LUC (so dong)
- *   20  RoyaltyPendingList           - UC-46 - "Cham nhuan but" (Thu ky toa soan): bai da dang chua cham nhuan…
- *   28    useEffect                  - tai du lieu khi mo trang
- *  129  DeadlineBadge                - Han chi + so ngay con lai. Qua han: do; sap toi han (nearDeadline): cam…
- *  139  uniqueValues                 - Cac gia tri khac nhau cua 1 truong (vd ten ban), xep theo ABC, de lam o…
+ * MO TRANG NAY TAI: /royalty-grading
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   25  RoyaltyPendingList()            xem tom tat dau file
+ *   33    useEffect                     tai du lieu khi mo trang
+ *  134  DeadlineBadge()                 Han chi + so ngay con lai
+ *  144  uniqueValues()                  Cac gia tri khac nhau cua 1 truong (vd ten ban), xep theo ABC, de lam o chon loc
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  120  link [Cham]                     mo trang /royalty-grading/{article.articleId} (RoyaltyGrading)
  */
 export default function RoyaltyPendingList() {
   const [searchParams] = useSearchParams()

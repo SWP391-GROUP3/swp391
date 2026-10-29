@@ -14,8 +14,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   29  field                        - cac cot cua bang (khop schema.sql)
+ * Entity anh xa bang reviewer_deviation_indices trong schema.sql. Chi dung trong service, khong tra
+ * thang ra API.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "reviewer_deviation_indices")

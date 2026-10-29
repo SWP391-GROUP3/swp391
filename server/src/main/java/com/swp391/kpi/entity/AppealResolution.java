@@ -7,8 +7,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   17  field                        - cac cot cua bang (khop schema.sql)
+ * Entity anh xa bang appeal_resolutions trong schema.sql. Chi dung trong service, khong tra thang ra
+ * API.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity @Table(name = "appeal_resolutions")
 @Getter @Setter @NoArgsConstructor

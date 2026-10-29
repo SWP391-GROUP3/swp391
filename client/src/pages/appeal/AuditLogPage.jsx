@@ -5,12 +5,20 @@ import { dinhDangThoiGian } from './appealFormat.js'
 import '../../styles/QualityReportPage.css'
 
 /**
- * MUC LUC (so dong)
- *   16  AuditLogPage                 - reset noi dung theo pham vi URL
- *   23  AuditLogContent
- *   38    useEffect                  - tai du lieu khi mo trang
- *   46    locNhatKy()
- *   56    doiBoLoc()
+ * Man nhat ky cham (UC-45): bang thao tac cham / khieu nai (ai, luc nao, gia tri truoc - sau), loc
+ * theo khoang ngay va loai thao tac.
+ *
+ * MO TRANG NAY TAI: /audit-logs
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  AuditLogPage()                  audit log page
+ *   33  AuditLogContent()               audit log content
+ *   48    useEffect                     tai du lieu khi mo trang
+ *   56    locNhatKy()                   loc nhat ky
+ *   66    doiBoLoc()                    doi bo loc
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   78  form, nut [Loc nhat ky]         locNhatKy() -> goi GET duongDan
  */
 
 export default function AuditLogPage() {

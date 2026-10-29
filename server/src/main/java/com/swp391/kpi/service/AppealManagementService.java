@@ -15,6 +15,31 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Nghiep vu Truong ban quan ly khieu nai (UC-36, UC-43): hang cho, chi tiet, BTV hop le (khong phai
+ * nguoi cham goc), phan cong, giao lai, giao cham lan 2.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   47  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   48  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   61  getQueue()                      lay queue
+ *   91  getDetail()                     lay detail
+ *   96  getCandidates()                 lay candidates
+ *  102  assign()                        phan cong
+ *  118  assignSecond()                  phan cong second
+ *  143  reassign()                      phan cong lai
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  129  requiresSecond()                requires second
+ *  164  scopedAppeal()                  scoped appeal
+ *  179  currentAttempt()                current attempt
+ *  187  candidates()                    candidates
+ *  214  requireCandidate()              bat buoc candidate
+ *  224  addHistoricalReviewer()         them historical reviewer
+ *  234  assignmentJson()                assignment json
+ *  243  response()                      response
+ *  267  badRequest()                    bad request
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

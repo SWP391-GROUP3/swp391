@@ -8,6 +8,13 @@ import './ArticleScoreCard.css'
  * Component hiển thị Bảng điểm đánh giá chất lượng theo từng tiêu chí (UC-34).
  * Dành cho Phóng viên (tác giả chính & đồng tác giả) xem điểm khi bài đã SCORE_PUBLISHED hoặc PUBLISHED.
  * Kết nối luồng BF-02 sang BF-03 (cửa sổ 7 ngày khiếu nại).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  ArticleScoreCard()              xem tom tat dau file
+ *   24    useEffect                     tai du lieu khi mo trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  120  link [Gui khieu nai diem nay]   mo trang /my-appeals/new?articleId={articleId} (AppealCreatePage)
  */
 export default function ArticleScoreCard({ articleId }) {
   const [phieuCham, setPhieuCham] = useState(null)

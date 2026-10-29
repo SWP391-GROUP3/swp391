@@ -27,15 +27,15 @@ import java.util.List;
 /**
  * Controller cung cấp REST API cho chức năng cấu hình định mức & giao chỉ tiêu tháng (UC-58, UC-59).
  *
- * MUC LUC (so dong)
- *   45  field                        - service duoc inject
- *   52  getBenchmarks()              - Lấy danh sách định mức chuẩn theo ngạch phóng viên (UC-58).
- *   62  updateBenchmarks()           - Cập nhật danh sách định mức chuẩn theo ngạch phóng viên (UC-58).
- *   74  getTargets()                 - Lấy danh sách chỉ tiêu theo kỳ (năm và tháng) (UC-59).
- *   87  getTargetById()              - Lấy chi tiết một chỉ tiêu theo ID.
- *   97  createTarget()               - Giao chỉ tiêu tháng mới cho phóng viên (UC-59).
- *  112  updateTarget()               - Điều chỉnh chỉ tiêu đã giao (UC-59 Nhánh ngoại lệ A2).
- *  125  deleteTarget()               - Xoá chỉ tiêu KPI.
+ * MUC LUC (so dong - ten - tac dung)
+ *   45  field                           service duoc inject
+ *   52  getBenchmarks()                 Lay danh sach dinh muc chuan theo ngach phong vien (UC-58) [GET /api/kpi-targets/benchmarks]
+ *   62  updateBenchmarks()              Cap nhat danh sach dinh muc chuan theo ngach phong vien (UC-58) [PUT /api/kpi-targets/benchmarks]
+ *   74  getTargets()                    Lay danh sach chi tieu theo ky (nam va thang) (UC-59) [GET /api/kpi-targets]
+ *   87  getTargetById()                 Lay chi tiet mot chi tieu theo ID [GET /api/kpi-targets/{id}]
+ *   97  createTarget()                  Giao chi tieu thang moi cho phong vien (UC-59) [POST /api/kpi-targets]
+ *  112  updateTarget()                  Dieu chinh chi tieu da giao (UC-59 Nhanh ngoai le A2) [PUT /api/kpi-targets/{id}]
+ *  125  deleteTarget()                  Xoa chi tieu KPI. [DELETE /api/kpi-targets/{id}]
  */
 @RestController
 @RequestMapping("/api/kpi-targets")

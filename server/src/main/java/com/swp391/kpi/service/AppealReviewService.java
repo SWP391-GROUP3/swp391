@@ -15,6 +15,25 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Nghiep vu cham lai mu va chot khieu nai (UC-37...39): hang cho va phieu cua BTV, luu / nop phieu, so
+ * sanh diem va chot ket qua theo luat chenh lech.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   40  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   54  getEffectiveScore()             lay effective score
+ *   67  getQueue()                      lay queue
+ *   72  getCard()                       lay card
+ *   80  save()                          luu
+ *   98  getComparison()                 lay comparison
+ *  103  finalizeAppeal()                chot appeal
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  132  comparison()                    comparison
+ *  152  scopedAppeal()                  scoped appeal
+ *  162  lockedAppeal()                  locked appeal
+ *  169  encode()                        encode
+ */
 @Service @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AppealReviewService {

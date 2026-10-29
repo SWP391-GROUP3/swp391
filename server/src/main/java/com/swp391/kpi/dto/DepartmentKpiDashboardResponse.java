@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * DTO tong the tra ve cho man hinh Department KPI Board (UC-61).
  *
- * MUC LUC (so dong)
- *   18  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   18  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

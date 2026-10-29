@@ -8,10 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   19  field                        - cac truong du lieu
- *   21  findSubmitted()
- *   34  findCriteria()
+ * Repository truy van bang cua entity ? (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong du lieu
+ *   23  findSubmitted()                 tim submitted
+ *   36  findCriteria()                  tim criteria
  */
 @Repository
 @RequiredArgsConstructor

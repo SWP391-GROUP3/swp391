@@ -34,12 +34,14 @@ import java.util.Optional;
  * Tuan thu luat BR-KPI-03 (ghi de ban ghi trung article_id va record_date)
  * va luu nhat ky thuc thi vao bang csv_import_logs.
  *
- * MUC LUC (so dong)
- *   38  field                        - repository va service duoc inject
- *   46  importCsv()                  - doc file CSV, validate va cap nhat database
- *  156  getImportLogs()              - lay danh sach lich su cac lan import co phan trang
- *  175  getSampleCsvTemplate()       - tra ve noi dung file CSV mau
- *  185  normalizeHeader()            - lam sach ten tieu de cot (bo BOM va khoang trang)
+ * MUC LUC (so dong - ten - tac dung)
+ *   50  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   61  importCsv()                     Nhap so lieu doc gia tu file CSV (UC-63, BR-KPI-03)
+ *  238  getImportLogs()                 Lay danh sach nhat ky import theo thu tu thoi gian moi nhat giam dan
+ *  258  getSampleCsvTemplate()          Mau CSV chuan de nguoi dung tai ve tham khao
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  268  normalizeHeader()               Bo ky tu BOM va khoang trang o dau/cuoi tieu de cot
  */
 @Service
 @RequiredArgsConstructor

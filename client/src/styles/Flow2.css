@@ -5,16 +5,23 @@
    Tien to class: .bf02__ . Mau chi dung bien --fm-* (index.css).
    Bang dung .bang-fm, nut dung .nut-chinh-fm / .nut-nhe, nhan dung .nhan-tt.
 
-   MUC LUC (so dong)
-     20  tieu de, bo cuc dau trang
-     26  Dau trang: ten luong + nguoi dang nhap
-     55  Thanh tab (kieu chip loc cua "Bai cua toi")
-     89  The trang chua noi dung moi tab
-    138  Hang dieu khien: nhan + o nhap + nut nam ngang
-    210  Bang
-    237  Thong tin, goi y
-    274  Tong trong so / tong diem
-    350  man hinh hep (@media)
+   MUC LUC (so dong - khoi CSS)
+     27  tieu de, bo cuc dau trang
+     33  Dau trang: ten luong + nguoi dang nhap
+     62  Thanh tab (kieu chip loc cua "Bai cua toi")
+     96  The trang chua noi dung moi tab
+    129  Khung phu nen xam ben trong the (phien ban ACTIVE, form giao viec)
+    137  Khung vien trang ben trong the (danh sach phien ban)
+    145  Hang dieu khien: nhan + o nhap + nut nam ngang
+    175  O nhap bi loi (diem < 50, thieu nhan xet)
+    202  Form giao viec: 2 cot, man hep xep doc
+    217  Bang
+    236  To nen dong: dang chon / dang ap dung / thieu nhan xet
+    244  Thong tin, goi y
+    254  Hop thong tin co nut ben phai (vua tao ban DRAFT)
+    281  Tong trong so / tong diem
+    314  Icon chung (components/common/Icon.jsx)
+    357  man hinh hep (@media)
    =========================================================================== */
 
 .bf02 {

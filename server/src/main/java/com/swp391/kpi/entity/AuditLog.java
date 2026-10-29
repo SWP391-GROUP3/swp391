@@ -14,8 +14,10 @@ import org.hibernate.annotations.Nationalized;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   30  field                        - cac cot cua bang (khop schema.sql)
+ * Entity anh xa bang audit_logs trong schema.sql. Chi dung trong service, khong tra thang ra API.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @org.hibernate.annotations.Immutable

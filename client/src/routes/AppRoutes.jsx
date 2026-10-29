@@ -115,15 +115,76 @@ const KHUNG_THEO_VAI_TRO = {
  * chi nhom do ton tai, nen cung la "/main" nhung moi vai tro thay trang chu
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
  *
- * MUC LUC (so dong)
- *   48  TRANG_PV_CHUA_LAM            - Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day,
- *   53  TRANG_BTV_CHUA_LAM
- *   61  TRANG_TK_CHUA_LAM            - Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
- *   63  TRANG_TB_CHUA_LAM
- *   77  TRANG_KT_CHUA_LAM
- *   81  TRANG_ADMIN_CHUA_LAM
- *   96  KHUNG_THEO_VAI_TRO           - Moi vai tro co khung trang (menu) rieng, khai bao o day:
- *  122  AppRoutes                    - Khai bao toan bo route cua app (AGENTS.md muc 4: route moi them o day).
+ * MUC LUC (so dong - ten - tac dung)
+ *   61  TRANG_PV_CHUA_LAM               Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day, tam hien ComingSoon
+ *   66  TRANG_BTV_CHUA_LAM              hang so
+ *   75  TRANG_TK_CHUA_LAM               Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
+ *   77  TRANG_TB_CHUA_LAM               hang so
+ *   86  TRANG_KT_CHUA_LAM               hang so
+ *   90  TRANG_ADMIN_CHUA_LAM            hang so
+ *  102  KHUNG_THEO_VAI_TRO              Moi vai tro co khung trang (menu) rieng, khai bao o day: Layout = khung + menu, TrangChu = trang hien o /main…
+ *  189  AppRoutes()                     xem tom tat dau file
+ *
+ * DUONG DAN -> TRANG (so dong - path - component)
+ *  199  /                               chuyen tiep -> /main
+ *  202  /login                          chuyen tiep -> /main hoac Login (tuy da dang nhap chua)
+ *  225  /main                           TrangChu
+ *  226  /calculator                     ScoreCalculatorTester
+ *  227  /flow2                          Flow2Dashboard
+ *  230  /profile                        UserProfile
+ *  233  /my-appeals                     MyAppealsPage
+ *  234  /my-appeals/new                 AppealCreatePage
+ *  236  /my-articles                    MyArticles
+ *  237  /my-articles/:id                ArticleDetail
+ *  239  /my-articles/new                ArticleEditor
+ *  240  /my-articles/:id/edit           ArticleEditor
+ *  242  /co-author-invites              CoAuthorInvites
+ *  244  /my-kpi                         PersonalKpiProgress
+ *  250  /assigned-articles              EditorTaskQueue
+ *  251  /re-reviews                     BlindReviewQueuePage
+ *  252  /re-reviews/:id                 BlindReviewPage
+ *  253  /cross-review-tasks/:id         BlindReviewPage
+ *  254  /assigned-articles/:articleId   ScoringSheet
+ *  255  /flow2-dashboard                Flow2Dashboard
+ *  261  /assignments                    AssignmentQueue
+ *  263  /score-approvals                ScoreApprovalQueue
+ *  264  /score-approvals/:id            ScoreApprovalQueue
+ *  265  /publishing                     PublishingQueue
+ *  267  /appeals                        AppealManagementPage
+ *  268  /appeals/:id                    AppealDetailPage
+ *  269  /appeals/:id/comparison         AppealComparisonPage
+ *  270  /cross-reviews                  CrossReviewBatchPage
+ *  271  /cross-reviews/:id              CrossReviewBatchDetailPage
+ *  273  /flow2-dashboard                Flow2Dashboard
+ *  275  /kpi-board                      DepartmentKpiDashboard
+ *  276  /kpi-board/:reporterId          ReporterKpiDetails
+ *  277  /kpi-targets                    MonthlyTargetSetting
+ *  278  /kpi-benchmarks                 KpiBenchmarksConfig
+ *  284  /royalty-grading                RoyaltyPendingList
+ *  285  /royalty-grading/:articleId     RoyaltyGrading
+ *  286  /royalty-periods                RoyaltyPeriods
+ *  287  /royalty-periods/:id            RoyaltyPeriodDetail
+ *  294  /royalty-periods                RoyaltyPeriods
+ *  295  /royalty-periods/:id            RoyaltyPeriodDetail
+ *  296  /royalty-rates                  RoyaltyRates
+ *  302  /criteria-sets                  CriteriaManagement
+ *  303  /criteria-sets/:id              CriteriaManagement
+ *  304  /flow2-dashboard                Flow2Dashboard
+ *  306  /appeal-rules                   AppealRuleConfigPage
+ *  307  /kpi-benchmarks                 KpiBenchmarksConfig
+ *  308  /media-factors                  MediaFactors
+ *  309  /reader-imports                 ReaderDataImport
+ *  315  /reviewers                      ReviewerDeviationPage
+ *  316  /reviewers/:id                  ReviewerProfilePage
+ *  317  /reviewer-deviations            ReviewerDeviationPage
+ *  318  /audit-logs                     AuditLogPage
+ *  336  /main                           RequireRole
+ *  346  *                               chuyen tiep -> /
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  199  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
+ *  206  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
+ *  346  tu chuyen trang (Navigate)      chuyen sang / (Navigate)
  */
 export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)

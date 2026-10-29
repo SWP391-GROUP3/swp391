@@ -8,6 +8,13 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO tra ve cho giao dien. Dung o: ScoringAttemptService.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  field                           cac truong tra ve cho giao dien
+ *   30  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ */
 @Getter
 @Setter
 @NoArgsConstructor

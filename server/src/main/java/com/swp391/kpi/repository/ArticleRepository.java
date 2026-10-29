@@ -11,12 +11,16 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
+ * Repository truy van bang cua entity Article (Spring Data JPA). Chi service cung luong goi.
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   26  findMyArticles()                Bai ma nguoi dung la tac gia chinh hoac dong tac gia (UC-01)
- *   31  findMyArticlesByStatuses()      Nhu tren nhung chi lay bai co trang thai nam trong danh sach statuses
- *   38  findMyArticleStatuses()         Trang thai cua moi bai cua nguoi dung, de dem so bai theo trang thai (trang chu PV)
- *   41  findByAuthorIdAndStatusOrderByUpdatedAtDesc()  Bai cua tac gia chinh dang o 1 trang thai (vd bai bi tra ve REVISION_REQUESTED)
- *   57  findPublishedRows()             Cho BF-04 (UC-46): moi bai PUBLISHED, dang som nhat len dau (gan han chi nhat)
+ *   30  findMyArticles()                Bai ma nguoi dung la tac gia chinh hoac dong tac gia (UC-01)
+ *   35  findMyArticlesByStatuses()      Nhu tren nhung chi lay bai co trang thai nam trong danh sach statuses
+ *   42  findMyArticleStatuses()         Trang thai cua moi bai cua nguoi dung, de dem so bai theo trang thai (trang chu PV)
+ *   45  findByAuthorIdAndStatusOrderByUpdatedAtDesc()  Bai cua tac gia chinh dang o 1 trang thai (vd bai bi tra ve REVISION_REQUESTED)
+ *   48  findByStatusOrderByUpdatedAtDesc()  Tim danh sach bai theo trang thai (BF-02 UC-29)
+ *   51  findByStatusAndSectionIdOrderByUpdatedAtDesc()  Tim danh sach bai theo trang thai va ban chuyen mon (BF-02 UC-29)
+ *   67  findPublishedRows()             Cho BF-04 (UC-46): moi bai PUBLISHED, dang som nhat len dau (gan han chi nhat)
  */
 public interface ArticleRepository extends JpaRepository<Article, Integer> {
 

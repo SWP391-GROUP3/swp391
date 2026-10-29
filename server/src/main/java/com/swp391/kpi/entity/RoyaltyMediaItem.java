@@ -20,8 +20,8 @@ import java.math.BigDecimal;
  * (trung anh da tung duoc tra nhuan but) thi KHONG tao dong.
  * UNIQUE(grading_id, attachment_id): 1 anh chi tinh 1 lan trong 1 phieu.
  *
- * MUC LUC (so dong)
- *   35  field                        - cac cot cua bang (khop schema.sql)
+ * MUC LUC (so dong - ten - tac dung)
+ *   35  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "royalty_media_items")

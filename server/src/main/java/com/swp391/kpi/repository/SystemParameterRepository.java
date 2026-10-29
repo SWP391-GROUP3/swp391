@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * Doc bang system_parameters.
  *
- * MUC LUC (so dong)
- *   17  findByFlow()                 - Moi tham so cua 1 luong, vd findByFlow("BF-04")
+ * MUC LUC (so dong - ten - tac dung)
+ *   17  findByFlow()                    Moi tham so cua 1 luong, vd findByFlow("BF-04")
  */
 public interface SystemParameterRepository extends JpaRepository<SystemParameter, Integer> {
 

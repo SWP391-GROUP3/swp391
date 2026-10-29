@@ -16,13 +16,21 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * MUC LUC (so dong)
- *   29  field                        - repository / service duoc inject
- *   37  refresh()
- *  106  getPeriods()
- *  119  inScope()
- *  124  inPeriod()
- *  128  addDifference()
+ * Tinh lai va luu bang reviewer_deviation_indices theo ky / theo ban (UC-41), co khoa de khong chay
+ * trung.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   37  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   47  lockWorkflow()                  ponytail: khoa ghi BF03 toan DB; tach tong hop rieng khi so luong ghi tang cao
+ *   59  refresh()                       lam moi
+ *   67  refreshSection()                Chi workflow BF03 da kiem tra quyen duoc goi; khong co endpoint nhan sectionId tu client
+ *  141  getPeriods()                    lay periods
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *   73  calculatePeriod()               tinh period
+ *  154  inScope()                       in scope
+ *  159  inPeriod()                      in period
+ *  163  addDifference()                 them difference
  */
 @Service @RequiredArgsConstructor
 public class ReviewerDeviationRefreshService {

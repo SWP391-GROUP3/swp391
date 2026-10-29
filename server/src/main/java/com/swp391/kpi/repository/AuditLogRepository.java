@@ -9,15 +9,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   24  save()
- *   29  WHERE()
- *   30  AND()
- *   31  AND()
- *   32  AND()
- *   33  AND()
- *   34  AND()
- *   37  search()
+ * Repository truy van bang cua entity ? (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   26  save()                          luu
+ *   31  WHERE()                         hang so
+ *   32  AND()                           hang so
+ *   33  AND()                           hang so
+ *   34  AND()                           hang so
+ *   35  AND()                           hang so
+ *   36  AND()                           hang so
+ *   39  search()                        tim
  */
 public interface AuditLogRepository extends Repository<AuditLog, Integer> {
 

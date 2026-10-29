@@ -7,6 +7,12 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * DTO client gui len API. Dung o: CrossReviewController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
+ */
 @Getter @Setter
 public class CrossReviewBatchCreateRequest {
     @NotBlank(message = "Tên đợt không được để trống") @Size(max = 100, message = "Tên đợt tối đa 100 ký tự")

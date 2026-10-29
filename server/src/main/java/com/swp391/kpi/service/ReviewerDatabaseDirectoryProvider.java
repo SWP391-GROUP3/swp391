@@ -4,9 +4,11 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * MUC LUC (so dong)
- *   13  field                        - repository / service duoc inject
- *   15  findEditor()
+ * Ban lay du lieu tu DB cho ReviewerDirectoryProvider: tim thong tin 1 BTV.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   15  field                           repository / service duoc inject
+ *   17  findEditor()                    tim editor
  */
 @Service @RequiredArgsConstructor
 public class ReviewerDatabaseDirectoryProvider implements ReviewerDirectoryProvider {

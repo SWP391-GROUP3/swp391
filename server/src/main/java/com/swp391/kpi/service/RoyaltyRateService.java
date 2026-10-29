@@ -20,11 +20,11 @@ import java.util.Optional;
  * Chi co XEM va THEM: khong co sua/xoa, vi don gia cu phai giu nguyen
  * de bai dang truoc do van tinh theo gia cu (BR-RY-03).
  *
- * MUC LUC (so dong)
- *   33  hang so                      - hang so dung trong file
- *   36  field                        - repository / service duoc inject
- *   41  getAllRates()                - Lich su don gia, moi nhat len dau
- *   51  createRate()                 - Them don gia moi: Ke toan nhap luong co so + ngay hieu luc, he thong tu…
+ * MUC LUC (so dong - ten - tac dung)
+ *   33  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   36  field                           repository / service duoc inject
+ *   41  getAllRates()                   Lich su don gia, moi nhat len dau
+ *   51  createRate()                    Them don gia moi: Ke toan nhap luong co so + ngay hieu luc, he thong tu tinh don gia
  */
 @Service
 @RequiredArgsConstructor

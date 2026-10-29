@@ -7,6 +7,12 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * DTO client gui len API. Dung o: AppealReviewController, CrossReviewController.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *  (khong co ham - chi khai bao du lieu)
+ */
 @Getter @Setter
 public class AppealScorecardRequest {
     @NotNull(message = "Danh sách điểm không được để trống")

@@ -4,11 +4,13 @@
    Bo cuc giong chi tiet bai: cot trai noi dung, cot phai khai bao + tac gia + nut.
 
    MUC LUC (so dong - khoi CSS)
-     14  tieu de, bo cuc dau trang
-     63  Luoi 2 cot
-     96  Tac gia va ty le
-    137  Nut luu / nop
-    145  man hinh hep (@media)
+     16  tieu de, bo cuc dau trang
+     55  Nhan xet cua BTV khi tra bai (UC-10)
+     65  Luoi 2 cot
+     98  Tac gia va ty le
+    139  Nut luu / nop
+    146  Man hinh hep: 2 cot thanh 1 cot
+    147  man hinh hep (@media)
    =========================================================================== */
 
 .article-editor__back {

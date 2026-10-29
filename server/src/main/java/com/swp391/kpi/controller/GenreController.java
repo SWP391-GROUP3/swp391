@@ -15,9 +15,9 @@ import java.util.List;
  * API doc the loai bai (luong admin). Moi vai tro da dang nhap deu goi duoc
  * (SecurityConfig: anyRequest().authenticated()), vd o chon the loai o man soan bai (UC-03).
  *
- * MUC LUC (so dong)
- *   27  field                        - service duoc inject
- *   31  getActiveGenres()            - GET /api/genres: cac the loai dang dung, xep theo ten
+ * MUC LUC (so dong - ten - tac dung)
+ *   27  field                           service duoc inject
+ *   31  getActiveGenres()               lay active genres [GET /api/genres]
  */
 @RestController
 @RequestMapping("/api/genres")

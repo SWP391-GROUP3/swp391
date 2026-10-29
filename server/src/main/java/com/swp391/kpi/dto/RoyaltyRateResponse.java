@@ -10,9 +10,9 @@ import java.time.LocalDate;
 /**
  * 1 dong trong bang lich su don gia tra ve cho man Unit Price List (UC-55).
  *
- * MUC LUC (so dong)
- *   21  field                        - cac truong tra ve cho giao dien
- *   28  from()                       - Map tay entity -> DTO (AGENTS.md muc 3.4)
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong tra ve cho giao dien
+ *   28  from()                          Map tay entity -> DTO (AGENTS.md muc 3.4)
  */
 @Getter
 @Setter

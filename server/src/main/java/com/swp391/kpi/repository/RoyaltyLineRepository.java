@@ -9,9 +9,9 @@ import java.util.List;
  * Doc/ghi bang royalty_lines (dong tien cua tung nguoi trong ky).
  * UC-47/48 chi dung save() co san de ghi dong ARTICLE / MEDIA.
  *
- * MUC LUC (so dong)
- *   19  findByPeriodId()             - Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi …
- *   24  deleteByGradingId()          - Cham lai trong ky OPEN: xoa dong tien cua phien ban cu (ky chua khoa)
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  findByPeriodId()                Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi (UC-50)
+ *   24  deleteByGradingId()             Cham lai trong ky OPEN (nhom chot 27/10/2026): xoa dong tien cua phien ban cu
  */
 public interface RoyaltyLineRepository extends JpaRepository<RoyaltyLine, Integer> {
 

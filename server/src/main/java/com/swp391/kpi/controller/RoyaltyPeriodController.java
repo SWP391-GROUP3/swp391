@@ -23,13 +23,13 @@ import java.util.List;
  * API ky nhuan but: danh sach ky (UC-49), bang ke ky va chot ky (UC-50), tra ky (UC-52), khoa ky (UC-53).
  * Xem: Thu ky va Ke toan. Chot ky: chi Thu ky. Tra / khoa ky: chi Ke toan (luat trong SecurityConfig).
  *
- * MUC LUC (so dong)
- *   39  field                        - service duoc inject
- *   43  getAllPeriods()              - GET /api/royalty-periods: cac ky moi nhat len dau, kem tong tien va so …
- *   50  getPeriodDetail()            - GET /api/royalty-periods/{id}: bang ke ky (UC-50 buoc 1): bai da cham +…
- *   57  closePeriod()                - POST /api/royalty-periods/{id}/close: Thu ky chot ky OPEN -> CLOSED (UC…
- *   67  returnPeriod()               - POST /api/royalty-periods/{id}/return: Ke toan tra ky CLOSED ve OPEN (UC-52)
- *   78  lockPeriod()                - POST /api/royalty-periods/{id}/lock: Ke toan khoa ky, tao phieu chi (UC-53)
+ * MUC LUC (so dong - ten - tac dung)
+ *   39  field                           service duoc inject
+ *   43  getAllPeriods()                 lay tat ca periods [GET /api/royalty-periods]
+ *   50  getPeriodDetail()               lay period detail [GET /api/royalty-periods/{id}]
+ *   57  closePeriod()                   chot period [POST /api/royalty-periods/{id}/close]
+ *   67  returnPeriod()                  tra ve period [POST /api/royalty-periods/{id}/return]
+ *   78  lockPeriod()                    khoa period [POST /api/royalty-periods/{id}/lock]
  */
 @RestController
 @RequestMapping("/api/royalty-periods")

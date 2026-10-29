@@ -8,10 +8,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   18  field                        - cac truong du lieu
- *   20  findPublishedByAuthorId()
- *   28  findById()
+ * Repository truy van bang cua entity ? (Spring Data JPA). Chi service cung luong goi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           cac truong du lieu
+ *   25  isAuthor()                      kiem tra author
+ *   32  findVersion()                   tim version
+ *   38  findPublishedByAuthorId()       tim published theo author id
+ *   46  findById()                      tim theo id
  */
 @Repository
 @RequiredArgsConstructor

@@ -10,16 +10,28 @@ import {
 /**
  * Màn hình Cấu hình Định mức Chuẩn (UC-58) & Giao Chỉ tiêu KPI Tháng (UC-59).
  *
- * MUC LUC (so dong)
- *   24  MonthlyTargetSetting         - Màn hình Cấu hình Định mức Chuẩn (UC-58) & Giao Chỉ tiêu KPI Tháng (UC-…
- *   42    useEffect                  - Tải định mức chuẩn khi mở trang
- *   49    useEffect                  - Tải danh sách chỉ tiêu theo tháng
- *   53    taiDanhSachChiTieu()
- *   67    moModalThemMoi()
- *   77    moModalSua()
- *   87    apDungDinhMuc()
- *   92    xuLyLuuForm()
- *  129    xuLyXoa()
+ * MO TRANG NAY TAI: /kpi-targets
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   36  MonthlyTargetSetting()          xem tom tat dau file
+ *   54    useEffect                     Tai dinh muc chuan khi mo trang
+ *   61    useEffect                     Tai danh sach chi tieu theo thang
+ *   65    taiDanhSachChiTieu()          tai danh sach chi tieu
+ *   79    moModalThemMoi()              mo modal them moi
+ *   89    moModalSua()                  mo modal sua
+ *   99    apDungDinhMuc()               ap dung dinh muc
+ *  104    xuLyLuuForm()                 xu ly luu form
+ *  141    xuLyXoa()                     xu ly xoa
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  163  [+ Giao chi tieu moi]           moModalThemMoi() -> tren trang: dong/xoa dang sua id, dong/xoa form reporter id, form min published
+ *  201  [Tai lai]                       taiDanhSachChiTieu() -> goi GET /api/kpi-targets?year={nam}&month={thang}
+ *  247  [Sua]                           moModalSua() -> tren trang: dang sua id, form reporter id, form min published
+ *  254  [Xoa]                           xuLyXoa() -> hoi xac nhan; goi DELETE /api/kpi-targets/{id}, GET /api/kpi-targets?year={nam}&month={thang}
+ *  276  [✕]                             tren trang: dong/xoa hien modal
+ *  282  form, nut [Dang luu... / Cap nhat / Giao chi t…]  xuLyLuuForm() -> goi PUT /api/kpi-targets/{id}, POST /api/kpi-targets, GET /api/kpi-targets?year={nam}&month={thang}
+ *  292  [{dm.levelName} ( {dm.defaultMinPublishe…]  apDungDinhMuc() -> tren trang: form min published, form min avg score
+ *  349  [Huy]                           tren trang: dong/xoa hien modal
  */
 export default function MonthlyTargetSetting({ nguoiDung }) {
   const [nam, setNam] = useState(2026)

@@ -22,6 +22,29 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Phieu cham phuc vu khieu nai (BF-03 dung du lieu BF-02): tao / giao lai ban nhap cham mu, luu phieu,
+ * lay phieu so sanh, dem phieu cho.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   52  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   62  lockReviewSnapshots()           khoa review snapshots
+ *   67  getAttemptReference()           lay attempt reference
+ *   74  getAssignedTasks()              lay assigned tasks
+ *   85  getOwnedScorecard()             lay owned scorecard
+ *   96  getComparisonCard()             Chi goi tu service da kiem tra quyen Head hoac chu phieu; khong mo endpoint chung
+ *  113  saveScorecard()                 luu scorecard
+ *  150  createSecondDraft()             tao second draft
+ *  172  getArticleAttempts()            lay article attempts
+ *  177  getPendingCount()               lay pending count
+ *  182  createDraft()                   tao draft
+ *  206  reassignDraft()                 phan cong lai draft
+ *  225  requireOwnedDraft()             bat buoc owned draft
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  233  lockedDraft()                   locked draft
+ *  245  snapshot()                      snapshot
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

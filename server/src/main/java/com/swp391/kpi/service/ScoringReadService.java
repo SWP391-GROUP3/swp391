@@ -10,12 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   24  field                        - repository / service duoc inject
- *   26  getSubmittedAttempts()
- *   28  getAttempt()
- *   35  getPublishedAttempt()
- *   45  getCriteria()
+ * Ham doc phieu cham cho luong khac (BF-03, BF-05): cac lan cham da nop, phieu da cong bo, tieu chi
+ * cua phieu.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   27  field                           repository / service duoc inject
+ *   29  getSubmittedAttempts()          lay submitted attempts
+ *   31  getAttempt()                    lay attempt
+ *   38  getPublishedAttempt()           lay published attempt
+ *   48  getCriteria()                   lay criteria
  */
 @Service
 @RequiredArgsConstructor

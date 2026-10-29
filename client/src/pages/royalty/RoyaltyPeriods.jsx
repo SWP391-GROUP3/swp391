@@ -12,9 +12,14 @@ import '../../styles/Royalty.css'
  * Moi thang 1 ky: trang thai (BR-RY-07), so bai da cham, tong tien cac dong trong ky.
  * Bam "Xem bang ke" -> trang chi tiet ky (UC-50/51, lam o Iter 2).
  *
- * MUC LUC (so dong)
- *   19  RoyaltyPeriods               - UC-49 - "Ky nhuan but" (Thu ky toa soan va Ke toan dung chung 1 trang).
- *   23    useEffect                  - tai du lieu khi mo trang
+ * MO TRANG NAY TAI: /royalty-periods
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   24  RoyaltyPeriods()                xem tom tat dau file
+ *   28    useEffect                     tai du lieu khi mo trang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   81  link [Xem bang ke]              mo trang /royalty-periods/{period.id} (RoyaltyPeriodDetail)
  */
 export default function RoyaltyPeriods() {
   const [periods, setPeriods] = useState(null)   // null = dang tai

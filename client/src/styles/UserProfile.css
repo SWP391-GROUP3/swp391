@@ -4,12 +4,14 @@
    cac man BF-04), nut xanh duong Figma, nut phu .nut-nhe.
    Tien to class: .ho-so__ . Mau chi dung bien --fm-*.
 
-   MUC LUC (so dong)
-     15  tieu de, bo cuc dau trang
-     60  Dau the: avatar lon + ten + vai tro + nut Sua
-     95  Danh sach thong tin (chi doc)
-    110  Form
-    157  man hinh hep (@media)
+   MUC LUC (so dong - khoi CSS)
+     17  tieu de, bo cuc dau trang
+     38  2 the canh nhau, man hep thi xep doc
+     62  Dau the: avatar lon + ten + vai tro + nut Sua
+     97  Danh sach thong tin (chi doc)
+    112  Form
+    157  Nut chinh dung class chung .nut-chinh-fm (index.css)
+    159  man hinh hep (@media)
    =========================================================================== */
 
 .ho-so__dau { margin-bottom: 20px; }

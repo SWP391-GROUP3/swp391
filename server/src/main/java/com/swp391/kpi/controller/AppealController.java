@@ -21,12 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * MUC LUC (so dong)
- *   36  field                        - service duoc inject
- *   39  getEligibleArticles()
- *   47  submitAppeal()
- *   57  getMyAppeals()
- *   65  getEligibility()
+ * API khieu nai cua Phong vien (UC-35): bai co the khieu nai, kiem tra dieu kien, gui khieu nai, xem
+ * khieu nai cua toi.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   39  field                           service duoc inject
+ *   42  getEligibleArticles()           lay eligible articles [GET /api/appeals/eligible-articles]
+ *   50  submitAppeal()                  nop appeal [POST /api/appeals]
+ *   60  getMyAppeals()                  lay my appeals [GET /api/appeals/mine]
+ *   68  getEligibility()                lay eligibility [GET /api/articles/{articleId}/appeal-eligibility]
  */
 @RestController
 @RequestMapping("/api")

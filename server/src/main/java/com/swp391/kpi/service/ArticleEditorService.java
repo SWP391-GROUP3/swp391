@@ -43,7 +43,7 @@ import java.util.Optional;
  * Doi articles.status luon goi ArticleService.updateArticleStatus() de ghi kem article_status_logs.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   73  hang so                         ten tham so, ten hanh dong, gioi han... (khong viet so ma trong code)
+ *   73  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *   86  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
  *  103  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia (Phong vien dang ACTIVE, tru chinh minh)

@@ -9,10 +9,10 @@ import PendingList from '../../components/common/PendingList.jsx'
  * Thu tu: loi moi dong tac gia truoc (han 3 ngay, gap nhat), roi bai bi tra
  * ve, cuoi cung la bai con han khieu nai.
  *
- * MUC LUC (so dong)
- *   17  gopDanhSachViec              - Gop 3 loai viec server tra ve thanh 1 danh sach de ve chung 1 kieu.
- *   66  TodoCard                     - Khoi "Cho xu ly" o cot trai trang chu Phong vien: tai du lieu roi giao …
- *   70    useEffect                  - tai du lieu khi mo trang
+ * MUC LUC (so dong - ten - tac dung)
+ *   17  gopDanhSachViec()               xem tom tat dau file
+ *   66  TodoCard()                      Khoi "Cho xu ly" o cot trai trang chu Phong vien: tai du lieu roi giao cho PendingList ve
+ *   70    useEffect                     tai du lieu khi mo trang
  */
 function gopDanhSachViec(duLieu) {
   const danhSach = []

@@ -17,15 +17,22 @@ const TEN_TRANG_THAI = {
  *
  * - onCapNhatNguoiDung: bao App.jsx ten/email moi de thanh tren doi theo ngay
  *
- * MUC LUC (so dong)
- *    8  TEN_TRANG_THAI
- *   30  UserProfile                  - "Hồ sơ của tôi" - moi vai tro, mo tu menu avatar o thanh tren.
- *   37    useEffect                  - Luon tai lai tu server (khong dung ban luu trong phien) de thay du lieu…
- *   45    luuXong()
- *   52    batDauSua()
- *   98  ProfileDetails               - Bang thong tin chi doc.
- *  115  EditProfileForm              - Form sua ho ten + email. Server kiem lai (@Valid + email trung).
- *  121    guiForm()
+ * MO TRANG NAY TAI: /profile
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *    8  TEN_TRANG_THAI                  hang so
+ *   37  UserProfile()                   xem tom tat dau file
+ *   44    useEffect                     Luon tai lai tu server (khong dung ban luu trong phien) de thay du lieu moi nhat
+ *   52    luuXong()                     luu xong
+ *   59    batDauSua()                   bat dau sua
+ *  105  ProfileDetails()                Bang thong tin chi doc
+ *  122  EditProfileForm()               Form sua ho ten + email
+ *  128    guiForm()                     gui form
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   84  [Sua ho so]                     batDauSua() -> tren trang: dong/xoa thong bao, mo dang sua
+ *  148  form, nut [Dang luu… / Luu thay doi]  guiForm() -> goi PUT /api/users/me; bao len component cha (onLuuXong)
+ *  172  [Huy]                           onHuy() -> bao len component cha (onHuy)
  */
 export default function UserProfile({ onCapNhatNguoiDung }) {
   const [hoSo, setHoSo] = useState(null)        // null = dang tai

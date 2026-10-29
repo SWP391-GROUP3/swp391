@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * DTO phan hoi ket qua sau khi thuc hien import file CSV (UC-63).
  *
- * MUC LUC (so dong)
- *   18  field                        - cac truong thong ke va danh sach canh bao/loi
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

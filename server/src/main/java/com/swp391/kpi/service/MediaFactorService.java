@@ -17,10 +17,10 @@ import java.util.List;
  * Sua he so chi anh huong cac lan cham SAU do: phieu cham cu da chep he so
  * vao royalty_media_items.factor nen khong doi theo.
  *
- * MUC LUC (so dong)
- *   29  field                        - repository / service duoc inject
- *   33  getAllMediaFactors()         - Danh sach loai anh/video va he so
- *   43  updateFactor()               - Admin sua he so cua 1 loai anh/video
+ * MUC LUC (so dong - ten - tac dung)
+ *   29  field                           repository / service duoc inject
+ *   33  getAllMediaFactors()            Danh sach loai anh/video va he so
+ *   43  updateFactor()                  Admin sua he so cua 1 loai anh/video
  */
 @Service
 @RequiredArgsConstructor

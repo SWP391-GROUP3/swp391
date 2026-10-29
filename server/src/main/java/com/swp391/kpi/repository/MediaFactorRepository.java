@@ -9,9 +9,9 @@ import java.util.Optional;
 /**
  * Doc/ghi bang media_factors (he so anh/video, UC-56).
  *
- * MUC LUC (so dong)
- *   19  findAllByOrderByMediaKindAsc() - Danh sach loai anh/video, xep theo ten loai
- *   22  findByMediaKind()            - He so cua 1 loai anh/video (PHOTO / GRAPHIC / VIDEO), dung khi cham anh…
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  findAllByOrderByMediaKindAsc()  Danh sach loai anh/video, xep theo ten loai
+ *   22  findByMediaKind()               He so cua 1 loai anh/video (PHOTO / GRAPHIC / VIDEO), dung khi cham anh (UC-48)
  */
 public interface MediaFactorRepository extends JpaRepository<MediaFactor, Integer> {
 

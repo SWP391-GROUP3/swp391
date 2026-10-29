@@ -5,6 +5,29 @@ import { formatDate } from '../../utils/formatDate.js'
 import './PublishingQueue.css'
 import '../../styles/Flow2.css'
 
+/**
+ * Man Truong ban duyet dang bai (UC-33): danh sach bai da cong bo diem cho dang, tim kiem, xem chi
+ * tiet va duyet dang (PUBLISHED).
+ *
+ * MO TRANG NAY TAI: /publishing
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   31  PublishingQueue()               publishing queue
+ *   44    useEffect                     tai du lieu khi mo trang
+ *   48    taiDanhSach()                 tai danh sach
+ *   61    moModalKiemDuyet()            mo modal kiem duyet
+ *   75    dongModal()                   dong modal
+ *   81    xuLyDuyetDang()               xu ly duyet dang
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  130  [Dang tai... / Lam moi]         taiDanhSach() -> goi GET /api/score-approvals/publishing{query}
+ *  240  [Kiem duyet & Dang]             moModalKiemDuyet() -> goi GET /api/articles/{articleId}
+ *  259  [vung nen ngoai hop thoai]      dongModal() -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
+ *  266  []                              dongModal() -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
+ *  325  [Dong]                          dongModal() -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
+ *  333  [Dang duyet xuat ban... / Duyet xuat ban]  xuLyDuyetDang() -> goi POST /api/score-approvals/article/{articleId}/publish, GET /api/score-approvals/publishing{query}
+ */
+
 export default function PublishingQueue({ nguoiDung }) {
   const [danhSach, setDanhSach] = useState([])
   const [dangTai, setDangTai] = useState(false)

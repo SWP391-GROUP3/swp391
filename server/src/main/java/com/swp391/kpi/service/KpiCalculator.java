@@ -9,13 +9,13 @@ import java.util.List;
  * tinh diem trung binh chat luong va xet dat/khong dat (PASS/NOT_PASS).
  * Class tinh toan thuan: khong doc DB, khong co @Service (AGENTS.md muc 3.1, 3.9).
  *
- * MUC LUC (so dong)
- *   22  hang so                      - hang so dung trong file
- *   28  ArticleKpiItem()             - DTO chua thong tin 1 bai viet cua phong vien trong ky phuc vu tinh KPI.
- *   39  calculateConvertedArticles() - Tinh tong so bai viet quy doi (BR-KPI-02 & GBR-13).
- *   57  calculateExactConvertedArticles() - Tinh tong so bai viet quy doi dang so thap phan chinh xac (dung cho hie…
- *   77  calculateAverageScore()      - Tinh diem trung binh chat luong cua phong vien trong ky (BR-KPI-02).
- *  104  evaluatePassStatus()         - Xac dinh ket qua KPI theo quy tac nhi phan PASS / NOT_PASS (BR-KPI-05).
+ * MUC LUC (so dong - ten - tac dung)
+ *   22  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   28  ArticleKpiItem()                DTO chua thong tin 1 bai viet cua phong vien trong ky phuc vu tinh KPI
+ *   39  calculateConvertedArticles()    Tinh tong so bai viet quy doi (BR-KPI-02 & GBR-13)
+ *   57  calculateExactConvertedArticles()  Tinh tong so bai viet quy doi dang so thap phan chinh xac (dung cho hien thi Dashboard)
+ *   77  calculateAverageScore()         Tinh diem trung binh chat luong cua phong vien trong ky (BR-KPI-02)
+ *  104  evaluatePassStatus()            Xac dinh ket qua KPI theo quy tac nhi phan PASS / NOT_PASS (BR-KPI-05)
  */
 public class KpiCalculator {
 

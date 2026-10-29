@@ -13,8 +13,8 @@ import java.util.List;
  * Dung cho ca XEM TRUOC (gradingId = null, chua luu) va sau khi HOAN TAT (co gradingId).
  * Service tu gan tung truong (khong co from() vi so lieu tinh tu nhieu nguon).
  *
- * MUC LUC (so dong)
- *   23  field                        - cac truong tra ve cho giao dien
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

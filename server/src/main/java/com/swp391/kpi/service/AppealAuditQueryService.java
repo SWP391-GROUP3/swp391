@@ -14,15 +14,23 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * MUC LUC (so dong)
- *   29  field                        - repository / service duoc inject
- *   39  getLogs()
- *   70  findArticle()
- *   85  matchesAppeal()
- *   98  matchesEditor()
- *  107  cannotView()
- *  113  forbidden()
- *  117  blankToNull()
+ * Doc nhat ky cham / khieu nai cho man UC-45, kiem tra quyen nguoi xem va bo loc ngay.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   37  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   48  getLogs()                       lay logs
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *   80  findArticle()                   tim article
+ *   96  findBatchArticle()              tim batch article
+ *  103  articleFromSnapshot()           article from snapshot
+ *  113  canViewBatchLog()               can view batch log
+ *  121  matchesAppeal()                 matches appeal
+ *  134  matchesEditor()                 matches editor
+ *  147  hasReviewer()                   kiem tra co reviewer
+ *  155  cannotView()                    cannot view
+ *  161  forbidden()                     forbidden
+ *  165  blankToNull()                   blank to null
  */
 @Service @RequiredArgsConstructor
 public class AppealAuditQueryService {

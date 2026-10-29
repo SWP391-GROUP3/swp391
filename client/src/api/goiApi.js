@@ -12,10 +12,10 @@ import { layToken, xoaPhien } from '../auth/phienDangNhap.js'
  *        goiApi('/api/royalty-rates', { method: 'POST', body: { baseSalary: 2340000 } })
  * @returns phan "data" cua ApiResponse
  *
- * MUC LUC (so dong)
- *   20  goiApi                       - Ham goi API dung chung cho MOI file trong src/api/ (thay cho fetch truc…
- *   52  docJson                      - Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} d…
- *   61  chuLoi                       - Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh.
+ * MUC LUC (so dong - ten - tac dung)
+ *   20  goiApi()                        xem tom tat dau file [GET duongDan]
+ *   57  docJson()                       Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} de khong vo
+ *   66  chuLoi()                        Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh
  */
 export async function goiApi(duongDan, tuyChon = {}) {
   const headers = {}

@@ -8,10 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 /**
- * MUC LUC (so dong)
- *   19  field                        - repository / service duoc inject
- *   23  notifyHeads()
- *   40  notifyRole()                 - Bao cho moi nguoi dang ACTIVE cua 1 vai tro (roles.code, vd "ACCOUNTANT…
+ * Tao thong bao (bang notifications, dung chung): gui cho 1 nguoi, cho Truong ban hoac cho ca 1 vai
+ * tro.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   23  field                           repository / service duoc inject
+ *   27  notifyUser()                    bao user
+ *   38  notifyHeads()                   bao heads
+ *   55  notifyRole()                    Bao cho moi nguoi dang ACTIVE cua 1 vai tro (roles.code, vd "ACCOUNTANT")
  */
 @Service
 @RequiredArgsConstructor

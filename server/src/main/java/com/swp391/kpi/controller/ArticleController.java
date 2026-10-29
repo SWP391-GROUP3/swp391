@@ -36,7 +36,7 @@ import java.util.List;
  *
  * MUC LUC (so dong - ten - tac dung)
  *   58  field                           service duoc inject
- *   67  getMyArticles()                 UC-01: bai cua toi. Loc nhieu trang thai ngan bang dau phay, khong truyen = tat ca. [GET /api/articles?status=ASSIGNED,PENDING_APPROVAL&page=0&size=10]
+ *   67  getMyArticles()                 UC-01: bai cua toi. Loc nhieu trang thai ngan bang dau phay, khong truyen = tat ca. [GET /api/articles]
  *   82  getMyStatusCounts()             Trang chu Phong vien: so bai theo tung trang thai [GET /api/articles/status-counts]
  *   94  getMyRevisionRequests()         Trang chu Phong vien: bai bi tra ve can sua kem ghi chu moi nhat [GET /api/articles/revision-requests]
  *  106  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]

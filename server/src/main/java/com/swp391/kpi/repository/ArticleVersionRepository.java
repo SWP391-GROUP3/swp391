@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 /**
+ * Repository truy van bang cua entity ArticleVersion (Spring Data JPA). Chi service cung luong goi.
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   18  findFirstByArticleIdAndKindOrderByVersionNoDesc()  Ban moi nhat cua bai theo loai
- *   21  findFirstByArticleIdOrderByVersionNoDesc()  Ban moi nhat cua bai, moi loai (de lay so version_no tiep theo khi nop)
+ *   20  findFirstByArticleIdAndKindOrderByVersionNoDesc()  Ban moi nhat cua bai theo loai
+ *   23  findFirstByArticleIdOrderByVersionNoDesc()  Ban moi nhat cua bai, moi loai (de lay so version_no tiep theo khi nop)
  */
 public interface ArticleVersionRepository extends JpaRepository<ArticleVersion, Integer> {
 

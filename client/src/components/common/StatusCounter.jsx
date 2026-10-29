@@ -12,8 +12,11 @@ import '../../styles/StatusCounter.css'
  * - hienTong: false khi cac nhom chong len nhau / khac don vi (cong lai vo nghia)
  * - loi:      chu bao loi khi tai that bai
  *
- * MUC LUC (so dong)
- *   18  StatusCounter                - Cot dem so luong ben phai trang chu (kieu cot "To do" cua Figma):
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  StatusCounter()                 xem tom tat dau file
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   43  link [{nhom.nhan} {nhom.so}]    mo trang {nhom.duongDan} (trang lay tu du lieu)
  */
 export default function StatusCounter({ tieuDe, cacNhom, donVi = 'bài', hienTong = true, loi }) {
   const idTieuDe = useId()
