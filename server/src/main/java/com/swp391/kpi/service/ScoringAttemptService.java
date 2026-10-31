@@ -64,14 +64,19 @@ public class ScoringAttemptService {
         Optional<ScoringAttempt> openAttemptOpt = scoringAttemptRepository
                 .findTopByArticleIdOrderByAttemptNoDesc(articleId);
 
-        // Neu da co attempt chua nop (submitted_at == null), tra ve de tiep tuc cham
-        if (openAttemptOpt.isPresent() && openAttemptOpt.get().getSubmittedAt() == null) {
-            ScoringAttempt openAttempt = openAttemptOpt.get();
-            List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(openAttempt.getId());
-            List<ScoringAttemptDetailResponse> detailResponses = details.stream()
-                    .map(ScoringAttemptDetailResponse::from)
-                    .toList();
-            return ScoringAttemptResponse.from(openAttempt, detailResponses, article.getTitle(), article.getContent());
+        // Neu da co attempt:
+        // 1. Chua nop (submitted_at == null): tra ve de tiep tuc cham.
+        // 2. Hoac bai viet khong con o trang thai ASSIGNED (vd dang PENDING_APPROVAL, SCORE_PUBLISHED, PUBLISHED...):
+        //    tra ve phieu cham da nop de xem lai (read-only), tuyet doi khong tao attempt moi lam ghi de ket qua.
+        if (openAttemptOpt.isPresent()) {
+            ScoringAttempt latestAttempt = openAttemptOpt.get();
+            if (latestAttempt.getSubmittedAt() == null || (article.getStatus() != null && article.getStatus() != ArticleStatus.ASSIGNED)) {
+                List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(latestAttempt.getId());
+                List<ScoringAttemptDetailResponse> detailResponses = details.stream()
+                        .map(ScoringAttemptDetailResponse::from)
+                        .toList();
+                return ScoringAttemptResponse.from(latestAttempt, detailResponses, article.getTitle(), article.getContent());
+            }
         }
 
         // Lay the loai de tim bo tieu chi ACTIVE
