@@ -1,3 +1,4 @@
+
 package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.CriteriaItemDTO;
@@ -21,15 +22,20 @@ import java.util.Optional;
 
 /**
  * Service xử lý nghiệp vụ Quản lý bộ tiêu chí chấm (Luồng BF-02 / Admin).
- * Thực thi các Use Cases: UC-14, UC-15, UC-16, UC-17 và Business Rules: BR-QA-01, 02, 03.
+ * Thực thi các Use Cases: UC-14, UC-15, UC-16, UC-17 và Business Rules:
+ * BR-QA-01, 02, 03.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   37  field                           repository / service duoc inject
- *   40  CriteriaSetService()            ham khoi tao
- *   50  getVersionsByCategory()         Lay toan bo danh sach phien ban bo tieu chi cua mot the loai (UC-14)
- *   67  getActiveVersionByCategory()    Lay phien ban bo tieu chi dang ACTIVE cua mot the loai (BR-QA-03)
- *   82  createDraftVersion()            Tao phien ban bo tieu chi moi o trang thai DRAFT (UC-15, UC-16)
- *  143  activateVersion()               Kich hoat mot phien ban DRAFT thanh ACTIVE (UC-17, BR-QA-03)
+ * 37 field repository / service duoc inject
+ * 40 CriteriaSetService() ham khoi tao
+ * 50 getVersionsByCategory() Lay toan bo danh sach phien ban bo tieu chi cua
+ * mot the loai (UC-14)
+ * 67 getActiveVersionByCategory() Lay phien ban bo tieu chi dang ACTIVE cua mot
+ * the loai (BR-QA-03)
+ * 82 createDraftVersion() Tao phien ban bo tieu chi moi o trang thai DRAFT
+ * (UC-15, UC-16)
+ * 143 activateVersion() Kich hoat mot phien ban DRAFT thanh ACTIVE (UC-17,
+ * BR-QA-03)
  */
 @Service
 public class CriteriaSetService {
@@ -37,7 +43,8 @@ public class CriteriaSetService {
     private final CriteriaSetVersionRepository criteriaSetVersionRepository;
     private final CriteriaRepository criteriaRepository;
 
-    public CriteriaSetService(CriteriaSetVersionRepository criteriaSetVersionRepository, CriteriaRepository criteriaRepository) {
+    public CriteriaSetService(CriteriaSetVersionRepository criteriaSetVersionRepository,
+            CriteriaRepository criteriaRepository) {
         this.criteriaSetVersionRepository = criteriaSetVersionRepository;
         this.criteriaRepository = criteriaRepository;
     }
@@ -48,7 +55,8 @@ public class CriteriaSetService {
      */
     @Transactional(readOnly = true)
     public List<CriteriaSetVersionResponse> getVersionsByCategory(Integer categoryId) {
-        List<CriteriaSetVersion> versions = criteriaSetVersionRepository.findByCategoryIdOrderByVersionNoDesc(categoryId);
+        List<CriteriaSetVersion> versions = criteriaSetVersionRepository
+                .findByCategoryIdOrderByVersionNoDesc(categoryId);
         List<CriteriaSetVersionResponse> responses = new ArrayList<>();
 
         for (CriteriaSetVersion v : versions) {
@@ -67,9 +75,11 @@ public class CriteriaSetService {
     public CriteriaSetVersionResponse getActiveVersionByCategory(Integer categoryId) {
         CriteriaSetVersion activeVersion = criteriaSetVersionRepository
                 .findByCategoryIdAndStatus(categoryId, CriteriaSetStatus.ACTIVE)
-                .orElseThrow(() -> new NotFoundException("Thể loại này hiện chưa có bộ tiêu chí nào ở trạng thái ACTIVE"));
+                .orElseThrow(
+                        () -> new NotFoundException("Thể loại này hiện chưa có bộ tiêu chí nào ở trạng thái ACTIVE"));
 
-        List<Criteria> criteriaList = criteriaRepository.findByCriteriaSetVersionIdOrderBySortOrderAsc(activeVersion.getId());
+        List<Criteria> criteriaList = criteriaRepository
+                .findByCriteriaSetVersionIdOrderBySortOrderAsc(activeVersion.getId());
         return CriteriaSetVersionResponse.from(activeVersion, criteriaList);
     }
 
@@ -97,7 +107,8 @@ public class CriteriaSetService {
         }
 
         if (totalWeight.compareTo(new BigDecimal("100.00")) != 0) {
-            throw new BusinessException("Tổng trọng số của tất cả các tiêu chí phải chính xác bằng 100.00%. Hiện tại: " + totalWeight + "%");
+            throw new BusinessException("Tổng trọng số của tất cả các tiêu chí phải chính xác bằng 100.00%. Hiện tại: "
+                    + totalWeight + "%");
         }
 
         // BR-QA-02: Xác định version_no kế tiếp
@@ -154,7 +165,8 @@ public class CriteriaSetService {
 
         // Chuyển phiên bản ACTIVE cũ thành RETIRED (nếu có)
         // Bắt buộc dùng saveAndFlush để ghi ngay trạng thái RETIRED xuống Database,
-        // tránh vi phạm Unique Filtered Index 'uq_criteria_set_versions_active' khi kích hoạt bản mới
+        // tránh vi phạm Unique Filtered Index 'uq_criteria_set_versions_active' khi
+        // kích hoạt bản mới
         Optional<CriteriaSetVersion> currentActive = criteriaSetVersionRepository
                 .findByCategoryIdAndStatus(versionToActivate.getCategoryId(), CriteriaSetStatus.ACTIVE);
 
@@ -170,7 +182,8 @@ public class CriteriaSetService {
         versionToActivate.setActivatedAt(LocalDateTime.now());
 
         CriteriaSetVersion activated = criteriaSetVersionRepository.saveAndFlush(versionToActivate);
-        List<Criteria> criteriaList = criteriaRepository.findByCriteriaSetVersionIdOrderBySortOrderAsc(activated.getId());
+        List<Criteria> criteriaList = criteriaRepository
+                .findByCriteriaSetVersionIdOrderBySortOrderAsc(activated.getId());
 
         return CriteriaSetVersionResponse.from(activated, criteriaList);
     }
