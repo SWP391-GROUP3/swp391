@@ -384,6 +384,23 @@ public class ScoringAttemptService {
             throw new BusinessException("Quyết định không hợp lệ: " + decision);
         }
 
+        // Tinh tong diem neu chua co de thoa man check constraint ck_scoring_attempts_submitted
+        if (attempt.getTotalScore() == null) {
+            List<ScoringAttemptDetail> currentDetails = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
+            BigDecimal total = BigDecimal.ZERO;
+            if (currentDetails != null && !currentDetails.isEmpty()) {
+                for (ScoringAttemptDetail d : currentDetails) {
+                    BigDecimal score = d.getScore() != null ? d.getScore() : BigDecimal.ZERO;
+                    BigDecimal weight = (d.getCriterion() != null && d.getCriterion().getWeight() != null)
+                            ? d.getCriterion().getWeight()
+                            : BigDecimal.ZERO;
+                    BigDecimal contribution = score.multiply(weight).divide(new BigDecimal("100.00"), 4, RoundingMode.HALF_UP);
+                    total = total.add(contribution);
+                }
+            }
+            attempt.setTotalScore(total.setScale(2, RoundingMode.HALF_UP));
+        }
+
         attempt.setDecision(decision);
         attempt.setDecisionNote(decisionNote);
         attempt.setSubmittedAt(LocalDateTime.now());

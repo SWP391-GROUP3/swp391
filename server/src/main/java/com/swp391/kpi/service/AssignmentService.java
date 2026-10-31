@@ -3,6 +3,7 @@ package com.swp391.kpi.service;
 import com.swp391.kpi.dto.AssignmentCreateRequest;
 import com.swp391.kpi.dto.AssignmentResponse;
 import com.swp391.kpi.dto.EditorWorkloadDTO;
+import com.swp391.kpi.entity.ArticleStatus;
 import com.swp391.kpi.entity.Assignment;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.repository.AssignmentRepository;
@@ -31,6 +32,7 @@ import java.util.Optional;
 public class AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
+    private final ArticleService articleService;
 
     /**
      * Trưởng ban phân công một bài viết cho một BTV chấm chất lượng (UC-18, UC-20, BR-QA-04).
@@ -48,6 +50,15 @@ public class AssignmentService {
         if (request.getAssignedBy() == null) {
             throw new BusinessException("Mã người giao bài không được để trống");
         }
+
+        // Cập nhật trạng thái bài viết sang ASSIGNED và ghi log lịch sử (UC-20)
+        articleService.updateArticleStatus(
+                request.getArticleId(),
+                ArticleStatus.ASSIGNED,
+                request.getAssignedBy(),
+                "ASSIGN",
+                "Phân công cho Biên tập viên #" + request.getEditorId()
+        );
 
         // Kiểm tra xem bài đã có phân công chưa (BR-QA-04)
         Assignment assignment = assignmentRepository.findByArticleId(request.getArticleId())
