@@ -129,6 +129,10 @@ class BF03Iteration1IT {
                     score, deviation, status, submitted_at) VALUES (?, ?, 9, ?, 65, -5, 'DONE', ?)
                 """, batchId, fixture.articleId, fixture.attemptId, now);
         entityManager.clear();
+        // Bao cao chi doc: phai bam "Tinh lai" (POST refresh) thi chi so moi duoc luu.
+        String month = now.toLocalDate().withDayOfMonth(1).toString();
+        mvc.perform(post("/api/reports/reviewer-deviations/refresh").header("Authorization", bearer(5))
+                .param("period", month)).andExpect(status().isOk());
         String response = mvc.perform(get("/api/reports/reviewer-deviations")
                 .header("Authorization", bearer(5)).param("period", now.toLocalDate().withDayOfMonth(1).toString())
                 .param("editorId", reviewer.toString()))
@@ -140,8 +144,8 @@ class BF03Iteration1IT {
         assertEquals(100.0, data.get(0).path("overturnRate").asDouble());
         assertEquals(1, data.get(0).path("appealCount").asInt());
         // Chay lai de chung minh update cung chi so, khong tao trung.
-        mvc.perform(get("/api/reports/reviewer-deviations").header("Authorization", bearer(5))
-                .param("period", now.toLocalDate().withDayOfMonth(1).toString())).andExpect(status().isOk());
+        mvc.perform(post("/api/reports/reviewer-deviations/refresh").header("Authorization", bearer(5))
+                .param("period", month)).andExpect(status().isOk());
         assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM reviewer_deviation_indices WHERE editor_id=? AND period=?",
                 Integer.class, reviewer, now.toLocalDate().withDayOfMonth(1)));
     }

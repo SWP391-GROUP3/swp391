@@ -38,6 +38,9 @@ public class ReviewerDeviationService {
             Integer currentUserId
     ) {
         var user = userReadService.requireActive(currentUserId, "ADMIN", "HEAD_OF_DEPARTMENT");
+        if (period != null && period.getDayOfMonth() != 1)
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "Kỳ báo cáo phải là ngày đầu tháng.");
         if ("HEAD_OF_DEPARTMENT".equals(user.role())) {
             if (user.sectionId() == null || (sectionId != null && !sectionId.equals(user.sectionId())))
                 throw new org.springframework.web.server.ResponseStatusException(

@@ -117,7 +117,13 @@ public class AppealService {
         appeal.setRuleConfigId(ruleConfig.getId());
         appeal.setStatus(AppealStatus.SUBMITTED);
         appeal.setSubmittedAt(LocalDateTime.now(clock));
-        Appeal savedAppeal = appealRepository.save(appeal);
+        Appeal savedAppeal;
+        try {
+            savedAppeal = appealRepository.save(appeal);
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            // Hai request cung luc: UNIQUE(appeals.article_id) chan cai den sau, tra dung cau cua UC-35 E2.
+            throw new BusinessException("Mỗi bài viết chỉ được khiếu nại một lần.");
+        }
 
         List<AppealCriterion> savedCriteria = saveCriteria(savedAppeal, request.getCriteria());
         notificationService.notifyHeads(savedAppeal.getArticleId(),
