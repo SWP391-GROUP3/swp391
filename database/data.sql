@@ -1,4 +1,4 @@
-﻿-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Dữ liệu mẫu
    Chạy SAU schema.sql. Chỉ dùng để dev và demo.
@@ -476,6 +476,151 @@ Tác giả có thể đề nghị xem xét tiêu chí tính thời sự và giá
 END TRY
 BEGIN CATCH
     IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+GO
+
+/* ==========================================================================
+   DỮ LIỆU MẪU CHO LUỒNG BF-02: PHÂN CÔNG, ĐÁNH GIÁ CHẤT LƯỢNG & DUYỆT ĐIỂM
+   ========================================================================== */
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- 1. Bài viết ASSIGNED cho BTV Lê Hoàng Cường (cuong.lh - id=3) để chấm bài
+    IF NOT EXISTS (SELECT 1 FROM articles WHERE title = N'[BF02] Đổi mới mô hình kinh doanh xanh cho doanh nghiệp vừa và nhỏ')
+    BEGIN
+        DECLARE @bf02_art1 INT, @bf02_ver1 INT;
+        INSERT INTO articles (author_id, section_id, declared_category_id, category_id, title, content, declared_nature, status, created_at, updated_at, submitted_at)
+        VALUES (1, 1, 2, 2, N'[BF02] Đổi mới mô hình kinh doanh xanh cho doanh nghiệp vừa và nhỏ', N'Nội dung phân tích thực trạng chuyển đổi xanh của các doanh nghiệp trên địa bàn...', 'ORIGINAL', 'ASSIGNED', DATEADD(HOUR, -5, SYSDATETIME()), DATEADD(HOUR, -3, SYSDATETIME()), DATEADD(HOUR, -4, SYSDATETIME()));
+        SET @bf02_art1 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, responded_at)
+        VALUES (@bf02_art1, 1, 100.00, 'ACCEPTED', DATEADD(HOUR, -4, SYSDATETIME()));
+
+        INSERT INTO article_versions (article_id, version_no, kind, title, content, created_by, created_at)
+        VALUES (@bf02_art1, 1, 'SUBMISSION', N'[BF02] Đổi mới mô hình kinh doanh xanh cho doanh nghiệp vừa và nhỏ', N'Nội dung phân tích thực trạng chuyển đổi xanh của các doanh nghiệp trên địa bàn...', 1, DATEADD(HOUR, -4, SYSDATETIME()));
+
+        INSERT INTO assignments (article_id, editor_id, assigned_by, assigned_at, was_suggested)
+        VALUES (@bf02_art1, 3, 5, DATEADD(HOUR, -3, SYSDATETIME()), 0);
+
+        INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at)
+        VALUES (@bf02_art1, 1, 'SUBMIT', 'DRAFT', 'SUBMITTED', N'Tác giả nộp bài', DATEADD(HOUR, -4, SYSDATETIME())),
+               (@bf02_art1, 5, 'ASSIGN', 'SUBMITTED', 'ASSIGNED', N'Trưởng ban phân công cho BTV Lê Hoàng Cường', DATEADD(HOUR, -3, SYSDATETIME()));
+    END;
+
+    -- 2. Bài viết ASSIGNED cho BTV Ngô Thu Giang (giang.nt - id=9) để chấm bài
+    IF NOT EXISTS (SELECT 1 FROM articles WHERE title = N'[BF02] Khảo sát chất lượng nước ngầm tại các khu công nghiệp trọng điểm')
+    BEGIN
+        DECLARE @bf02_art2 INT, @bf02_ver2 INT;
+        INSERT INTO articles (author_id, section_id, declared_category_id, category_id, title, content, declared_nature, status, created_at, updated_at, submitted_at)
+        VALUES (2, 1, 3, 3, N'[BF02] Khảo sát chất lượng nước ngầm tại các khu công nghiệp trọng điểm', N'Khảo sát thực tế lấy mẫu nước ngầm tại các khu công nghiệp ven đô...', 'ORIGINAL', 'ASSIGNED', DATEADD(HOUR, -6, SYSDATETIME()), DATEADD(HOUR, -2, SYSDATETIME()), DATEADD(HOUR, -5, SYSDATETIME()));
+        SET @bf02_art2 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, responded_at)
+        VALUES (@bf02_art2, 2, 100.00, 'ACCEPTED', DATEADD(HOUR, -5, SYSDATETIME()));
+
+        INSERT INTO article_versions (article_id, version_no, kind, title, content, created_by, created_at)
+        VALUES (@bf02_art2, 1, 'SUBMISSION', N'[BF02] Khảo sát chất lượng nước ngầm tại các khu công nghiệp trọng điểm', N'Khảo sát thực tế lấy mẫu nước ngầm tại các khu công nghiệp ven đô...', 2, DATEADD(HOUR, -5, SYSDATETIME()));
+
+        INSERT INTO assignments (article_id, editor_id, assigned_by, assigned_at, was_suggested)
+        VALUES (@bf02_art2, 9, 5, DATEADD(HOUR, -2, SYSDATETIME()), 1);
+
+        INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at)
+        VALUES (@bf02_art2, 2, 'SUBMIT', 'DRAFT', 'SUBMITTED', N'Tác giả nộp bài', DATEADD(HOUR, -5, SYSDATETIME())),
+               (@bf02_art2, 5, 'ASSIGN', 'SUBMITTED', 'ASSIGNED', N'Trưởng ban phân công cho BTV Ngô Thu Giang', DATEADD(HOUR, -2, SYSDATETIME()));
+    END;
+
+    -- 3. Bài viết PENDING_APPROVAL (chờ Trưởng ban duyệt điểm)
+    IF NOT EXISTS (SELECT 1 FROM articles WHERE title = N'[BF02] Đẩy mạnh ứng dụng công nghệ số trong nông nghiệp công nghệ cao')
+    BEGIN
+        DECLARE @bf02_art3 INT, @bf02_ver3 INT, @bf02_asg3 INT, @bf02_att3 INT;
+        INSERT INTO articles (author_id, section_id, declared_category_id, category_id, title, content, declared_nature, status, created_at, updated_at, submitted_at)
+        VALUES (1, 1, 2, 2, N'[BF02] Đẩy mạnh ứng dụng công nghệ số trong nông nghiệp công nghệ cao', N'Nội dung ứng dụng IoT và dữ liệu lớn trong canh tác...', 'ORIGINAL', 'PENDING_APPROVAL', DATEADD(HOUR, -8, SYSDATETIME()), DATEADD(MINUTE, -30, SYSDATETIME()), DATEADD(HOUR, -7, SYSDATETIME()));
+        SET @bf02_art3 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, responded_at)
+        VALUES (@bf02_art3, 1, 100.00, 'ACCEPTED', DATEADD(HOUR, -7, SYSDATETIME()));
+
+        INSERT INTO article_versions (article_id, version_no, kind, title, content, created_by, created_at)
+        VALUES (@bf02_art3, 1, 'SUBMISSION', N'[BF02] Đẩy mạnh ứng dụng công nghệ số trong nông nghiệp công nghệ cao', N'Nội dung ứng dụng IoT và dữ liệu lớn trong canh tác...', 1, DATEADD(HOUR, -7, SYSDATETIME()));
+        SET @bf02_ver3 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO assignments (article_id, editor_id, assigned_by, assigned_at, was_suggested)
+        VALUES (@bf02_art3, 3, 5, DATEADD(HOUR, -6, SYSDATETIME()), 0);
+        SET @bf02_asg3 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO scoring_attempts (article_id, version_id, assignment_id, appeal_id, reviewer_id, attempt_no, attempt_type, criteria_set_version_id, category_id, total_score, decision, decision_note, replaces_attempt_id, is_cross_department, opened_at, submitted_at)
+        VALUES (@bf02_art3, @bf02_ver3, @bf02_asg3, NULL, 3, 1, 'INITIAL', 2, 2, 86.50, 'ACCEPT', N'Bài viết công phu, giải pháp thực tiễn cao.', NULL, 0, DATEADD(HOUR, -2, SYSDATETIME()), DATEADD(MINUTE, -30, SYSDATETIME()));
+        SET @bf02_att3 = CAST(SCOPE_IDENTITY() AS INT);
+
+        -- Thể loại 2 (Tin sâu): criterion 5 (weight 40%), 6 (weight 35%), 7 (weight 25%)
+        INSERT INTO scoring_attempt_details (scoring_attempt_id, criterion_id, score, comment)
+        VALUES (@bf02_att3, 5, 85.00, N'Dữ liệu thực tế xác thực'),
+               (@bf02_att3, 6, 88.00, N'Tính thời sự cao'),
+               (@bf02_att3, 7, 87.00, N'Trình bày trực quan, sinh động');
+
+        INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at)
+        VALUES (@bf02_art3, 1, 'SUBMIT', 'DRAFT', 'SUBMITTED', N'Tác giả nộp bài', DATEADD(HOUR, -7, SYSDATETIME())),
+               (@bf02_art3, 5, 'ASSIGN', 'SUBMITTED', 'ASSIGNED', N'Trưởng ban phân công BTV Lê Hoàng Cường', DATEADD(HOUR, -6, SYSDATETIME())),
+               (@bf02_art3, 3, 'SUBMIT_SCORE', 'ASSIGNED', 'PENDING_APPROVAL', N'BTV nộp phiếu chấm điểm với quyết định ACCEPT (86.50 điểm)', DATEADD(MINUTE, -30, SYSDATETIME()));
+    END;
+
+    -- 4. Bài viết SUBMITTED (chờ Trưởng ban phân công BTV)
+    IF NOT EXISTS (SELECT 1 FROM articles WHERE title = N'[BF02] Giải pháp thoát nước và chống ngập úng đô thị mùa mưa')
+    BEGIN
+        DECLARE @bf02_art4 INT;
+        INSERT INTO articles (author_id, section_id, declared_category_id, category_id, title, content, declared_nature, status, created_at, updated_at, submitted_at)
+        VALUES (1, 1, 3, 3, N'[BF02] Giải pháp thoát nước và chống ngập úng đô thị mùa mưa', N'Khảo sát thực tế các điểm nghẽn hệ thống thoát nước mùa mưa lũ...', 'ORIGINAL', 'SUBMITTED', DATEADD(HOUR, -3, SYSDATETIME()), DATEADD(HOUR, -1, SYSDATETIME()), DATEADD(HOUR, -1, SYSDATETIME()));
+        SET @bf02_art4 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, responded_at)
+        VALUES (@bf02_art4, 1, 100.00, 'ACCEPTED', DATEADD(HOUR, -1, SYSDATETIME()));
+
+        INSERT INTO article_versions (article_id, version_no, kind, title, content, created_by, created_at)
+        VALUES (@bf02_art4, 1, 'SUBMISSION', N'[BF02] Giải pháp thoát nước và chống ngập úng đô thị mùa mưa', N'Khảo sát thực tế các điểm nghẽn hệ thống thoát nước mùa mưa lũ...', 1, DATEADD(HOUR, -1, SYSDATETIME()));
+
+        INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at)
+        VALUES (@bf02_art4, 1, 'SUBMIT', 'DRAFT', 'SUBMITTED', N'Tác giả nộp bài chờ phân công', DATEADD(HOUR, -1, SYSDATETIME()));
+    END;
+
+    -- 5. Bài viết REVISION_REQUESTED (BTV đã trả về yêu cầu sửa, để PV test Sửa và nộp lại)
+    IF NOT EXISTS (SELECT 1 FROM articles WHERE title = N'[BF02] Phát triển du lịch cộng đồng gắn với bảo tồn di sản văn hóa')
+    BEGIN
+        DECLARE @bf02_art5 INT, @bf02_ver5 INT, @bf02_asg5 INT, @bf02_att5 INT;
+        INSERT INTO articles (author_id, section_id, declared_category_id, category_id, title, content, declared_nature, status, created_at, updated_at, submitted_at)
+        VALUES (1, 1, 2, 2, N'[BF02] Phát triển du lịch cộng đồng gắn với bảo tồn di sản văn hóa', N'Bài viết về mô hình homestay sinh thái tại vùng cao...', 'ORIGINAL', 'REVISION_REQUESTED', DATEADD(HOUR, -10, SYSDATETIME()), DATEADD(HOUR, -2, SYSDATETIME()), DATEADD(HOUR, -9, SYSDATETIME()));
+        SET @bf02_art5 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO article_authors (article_id, user_id, share_percent, confirm_status, responded_at)
+        VALUES (@bf02_art5, 1, 100.00, 'ACCEPTED', DATEADD(HOUR, -9, SYSDATETIME()));
+
+        INSERT INTO article_versions (article_id, version_no, kind, title, content, created_by, created_at)
+        VALUES (@bf02_art5, 1, 'SUBMISSION', N'[BF02] Phát triển du lịch cộng đồng gắn với bảo tồn di sản văn hóa', N'Bài viết về mô hình homestay sinh thái tại vùng cao...', 1, DATEADD(HOUR, -9, SYSDATETIME()));
+        SET @bf02_ver5 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO assignments (article_id, editor_id, assigned_by, assigned_at, was_suggested)
+        VALUES (@bf02_art5, 3, 5, DATEADD(HOUR, -8, SYSDATETIME()), 0);
+        SET @bf02_asg5 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO scoring_attempts (article_id, version_id, assignment_id, appeal_id, reviewer_id, attempt_no, attempt_type, criteria_set_version_id, category_id, total_score, decision, decision_note, replaces_attempt_id, is_cross_department, opened_at, submitted_at)
+        VALUES (@bf02_art5, @bf02_ver5, @bf02_asg5, NULL, 3, 1, 'INITIAL', 2, 2, 45.00, 'REVISION', N'Cần bổ sung phỏng vấn người dân bản địa và cập nhật số liệu quý 3/2026.', NULL, 0, DATEADD(HOUR, -4, SYSDATETIME()), DATEADD(HOUR, -2, SYSDATETIME()));
+        SET @bf02_att5 = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO scoring_attempt_details (scoring_attempt_id, criterion_id, score, comment)
+        VALUES (@bf02_att5, 5, 40.00, N'Thiếu số liệu kiểm chứng từ ban quản lý di sản'),
+               (@bf02_att5, 6, 50.00, N'Tính thời sự trung bình'),
+               (@bf02_att5, 7, 46.40, N'Văn phong cần chỉnh sửa lại cho súc tích');
+
+        INSERT INTO article_status_logs (article_id, actor_id, action, from_status, to_status, note, created_at)
+        VALUES (@bf02_art5, 1, 'SUBMIT', 'DRAFT', 'SUBMITTED', N'Tác giả nộp bài', DATEADD(HOUR, -9, SYSDATETIME())),
+               (@bf02_art5, 5, 'ASSIGN', 'SUBMITTED', 'ASSIGNED', N'Trưởng ban phân công BTV Lê Hoàng Cường', DATEADD(HOUR, -8, SYSDATETIME())),
+               (@bf02_art5, 3, 'RETURN', 'ASSIGNED', 'REVISION_REQUESTED', N'Cần bổ sung phỏng vấn người dân bản địa và cập nhật số liệu quý 3/2026.', DATEADD(HOUR, -2, SYSDATETIME()));
+    END;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
     THROW;
 END CATCH;
 GO

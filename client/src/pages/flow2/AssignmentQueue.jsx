@@ -30,7 +30,7 @@ import '../../styles/Flow2.css'
 export default function AssignmentQueue({ nguoiDung }) {
   // Danh sách bài viết chờ phân công (SUBMITTED) khớp 100% với Database
   const [articles] = useState([
-    { id: 13, title: '[BF02] Khảo sát chất lượng nước ngầm tại các khu công nghiệp trọng điểm', author: 'Nguyễn Văn An', category: 'Bài phản ánh', categoryId: 3, submittedAt: '31/10/2026 13:00' },
+
     { id: 4, title: 'Điều tra đường dây buôn lậu khoáng sản qua biên giới', author: 'Nguyễn Văn An', category: 'Phóng sự điều tra', categoryId: 6, submittedAt: '13/10/2026 08:30' },
     { id: 3, title: 'Giá xăng giảm lần thứ ba liên tiếp', author: 'Nguyễn Văn An', category: 'Tin sâu / Thời sự', categoryId: 2, submittedAt: '27/09/2026 08:00' },
     { id: 5, title: 'Bình luận: Cơ hội và thách thức của AI trong tác nghiệp phóng viên', author: 'Trần Thị Bình', category: 'Bình luận', categoryId: 5, submittedAt: '13/10/2026 10:00' }
