@@ -21,8 +21,12 @@ class ReviewerProfileServiceTest {
     private final AppealResolutionRepository resolutions = mock(AppealResolutionRepository.class);
     private final CrossReviewTaskRepository cross = mock(CrossReviewTaskRepository.class);
     private final ScoringAppealService appealScores = mock(ScoringAppealService.class);
+    // Dung ban that de kiem tra ho so va bao cao cung mot cach tinh (chi doc, khong goi indices/jdbc).
+    private final ReviewerDeviationRefreshService deviations = new ReviewerDeviationRefreshService(
+            users, scores, appeals, resolutions, cross, mock(ReviewerDeviationRepository.class),
+            mock(org.springframework.jdbc.core.JdbcTemplate.class));
     private final ReviewerProfileService service = new ReviewerProfileService(
-            users, scores, assignments, articles, appeals, resolutions, cross, appealScores);
+            users, scores, assignments, articles, cross, appealScores, deviations);
     private final LocalDate month = LocalDate.of(2026, 10, 1);
 
     @BeforeEach void setUp() {

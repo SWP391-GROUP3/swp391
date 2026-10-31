@@ -17,7 +17,8 @@ import java.util.Optional;
  *
  * MUC LUC (so dong - ten - tac dung)
  *   26  field                           repository / service duoc inject
- *   32  getReport()                     lay report
+ *   32  getReport()                     lay report (chi doc)
+ *      recalculate()                   tinh lai va luu chi so
  */
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,8 @@ public class ReviewerDeviationService {
     private final UserReadService userReadService;
     private final ReviewerDeviationRefreshService refreshService;
 
-    @Transactional
+    // Chi doc bang chi so da luu: khong tinh lai, khong khoa he thong. Muon tinh lai thi goi recalculate().
+    @Transactional(readOnly = true)
     public List<ReviewerDeviationResponse> getReport(
             LocalDate period,
             Integer editorId,
@@ -42,16 +44,11 @@ public class ReviewerDeviationService {
                         org.springframework.http.HttpStatus.FORBIDDEN, "Bạn không có quyền xem báo cáo của ban này.");
             sectionId = user.sectionId();
         }
-        java.util.Map<LocalDate, java.util.Set<Integer>> validComparisons = new java.util.HashMap<>();
-        java.util.Set<LocalDate> periods = period == null ? refreshService.getPeriods() : java.util.Set.of(period);
-        for (LocalDate month : periods) validComparisons.put(month, refreshService.refresh(month, currentUserId));
         List<ReviewerDeviationIndex> indices =
                 reviewerDeviationRepository.findAllByOrderByPeriodDescEditorIdAsc();
         List<ReviewerDeviationResponse> result = new ArrayList<>();
 
         for (ReviewerDeviationIndex index : indices) {
-            if (!validComparisons.getOrDefault(index.getPeriod(), java.util.Set.of()).contains(index.getEditorId()))
-                continue;
             if (period != null && !period.equals(index.getPeriod())) {
                 continue;
             }
@@ -75,5 +72,12 @@ public class ReviewerDeviationService {
             ));
         }
         return result;
+    }
+
+    // Tinh lai chi so 1 ky (hoac moi ky neu period null) roi luu; chi Admin / Truong ban.
+    @Transactional
+    public void recalculate(LocalDate period, Integer currentUserId) {
+        java.util.Set<LocalDate> periods = period == null ? refreshService.getPeriods() : java.util.Set.of(period);
+        for (LocalDate month : periods) refreshService.refresh(month, currentUserId);
     }
 }

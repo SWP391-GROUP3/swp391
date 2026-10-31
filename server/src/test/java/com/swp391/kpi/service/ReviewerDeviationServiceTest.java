@@ -37,14 +37,12 @@ class ReviewerDeviationServiceTest {
                 reviewerDeviationRepository,
                 reviewerDirectoryProvider, userReadService, refreshService
         );
-        when(userReadService.requireActive(8, "ADMIN", "HEAD_OF_DEPARTMENT")).thenReturn(
+        org.mockito.Mockito.lenient().when(userReadService.requireActive(8, "ADMIN", "HEAD_OF_DEPARTMENT")).thenReturn(
                 new com.swp391.kpi.dto.UserAccessResponse(8, "Admin", "ADMIN", null, null, "ACTIVE"));
     }
 
     @Test
     void getReportAddsReviewerInformationAndFiltersBySection() {
-        when(refreshService.getPeriods()).thenReturn(java.util.Set.of(LocalDate.of(2026, 9, 1)));
-        when(refreshService.refresh(LocalDate.of(2026, 9, 1), 8)).thenReturn(java.util.Set.of(3, 9));
         ReviewerDeviationIndex first = index(1, 3, new BigDecimal("4.25"));
         ReviewerDeviationIndex second = index(2, 9, new BigDecimal("7.50"));
         when(reviewerDeviationRepository.findAllByOrderByPeriodDescEditorIdAsc())
@@ -60,6 +58,23 @@ class ReviewerDeviationServiceTest {
         assertEquals("Lê Hoàng Cường", result.get(0).getEditorName());
         assertEquals("Ban Thời sự", result.get(0).getSectionName());
         assertEquals(new BigDecimal("4.25"), result.get(0).getAvgDeviation());
+        // Mo bao cao chi doc: khong tinh lai, khong khoa he thong.
+        org.mockito.Mockito.verifyNoInteractions(refreshService);
+    }
+
+    @Test
+    void recalculateRefreshesOnlyTheRequestedMonth() {
+        LocalDate month = LocalDate.of(2026, 9, 1);
+        reviewerDeviationService.recalculate(month, 8);
+        org.mockito.Mockito.verify(refreshService).refresh(month, 8);
+        org.mockito.Mockito.verify(refreshService, org.mockito.Mockito.never()).getPeriods();
+    }
+
+    @Test
+    void recalculateWithoutMonthRefreshesEveryKnownMonth() {
+        when(refreshService.getPeriods()).thenReturn(java.util.Set.of(LocalDate.of(2026, 9, 1)));
+        reviewerDeviationService.recalculate(null, 8);
+        org.mockito.Mockito.verify(refreshService).refresh(LocalDate.of(2026, 9, 1), 8);
     }
 
     @Test
