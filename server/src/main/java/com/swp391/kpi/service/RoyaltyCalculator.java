@@ -15,21 +15,22 @@ import java.util.Map;
  * vao constructor, KHONG viet cung so trong class nay.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   36  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   39  field                           repository / service duoc inject
+ *   37  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   40  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   49  RoyaltyCalculator()             params: param_key -> param_value, lay tu bang system_parameters
- *   61  unitPrice()                     Don gia 1 he so = luong co so x UNIT_PRICE_PERCENT / 100, bo phan le duoi 1 dong (UC-55)
- *   67  suggestedFactor()               He so goi y = he so chuan cua the loai x diem / 100 (BR-RY-01, nhom da doi: nhan thang diem thay cho chia bac…
- *   76  effectiveSaturationRate()       Ty le bao hoa (%) dung de tinh tien (GBR-09): - bai khong thuoc su kien (articleSaturationRate = null) -> 100…
- *   89  natureRate()                    Ty le % theo tinh chat bai (BR-RY-02), lay tu system_parameters NATURE_RATE_..
- *  100  finalFactor()                   He so cuoi = he so x ty le bao hoa / 100 x ty le tinh chat / 100, toi thieu MIN_FINAL_FACTOR (BR-RY-02)
- *  109  calculateAmount()               Tien = he so x don gia, lam tron XUONG ve boi so ROUNDING_UNIT (1.000d)
- *  117  splitAmount()                   Chia tien bai cho cac tac gia (GBR-10)
+ *   50  RoyaltyCalculator()             params: param_key -> param_value, lay tu bang system_parameters
+ *   62  unitPrice()                     Don gia 1 he so = luong co so x UNIT_PRICE_PERCENT / 100, bo phan le duoi 1 dong (UC-55)
+ *   68  suggestedFactor()               He so goi y = he so chuan cua the loai x diem / 100 (BR-RY-01, nhom da doi: nhan thang diem thay cho chia bac…
+ *   77  effectiveSaturationRate()       Ty le bao hoa (%) dung de tinh tien (GBR-09): - bai khong thuoc su kien (articleSaturationRate = null) -> 100…
+ *   92  saturationRateByRank()          Doi hang cua bai trong su kien ra ty le bao hoa (GBR-09): moi bac k_limit bai, 100 -> 80 -> 60
+ *  108  natureRate()                    Ty le % theo tinh chat bai (BR-RY-02), lay tu system_parameters NATURE_RATE_..
+ *  119  finalFactor()                   He so cuoi = he so x ty le bao hoa / 100 x ty le tinh chat / 100, toi thieu MIN_FINAL_FACTOR (BR-RY-02)
+ *  128  calculateAmount()               Tien = he so x don gia, lam tron XUONG ve boi so ROUNDING_UNIT (1.000d)
+ *  136  splitAmount()                   Chia tien bai cho cac tac gia (GBR-10)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  138  roundDown()                     Lam tron XUONG ve boi so cua ROUNDING_UNIT: chia ra so "nghin dong", bo phan le, nhan lai
- *  145  checkSharesAddUpTo100()         Tong % cac tac gia phai dung 100 (BF-01 da kiem luc nop bai, day la lop chan cuoi de khong bao gio chia sai t…
- *  158  readDecimal()                   Lay 1 tham so dang so
+ *  157  roundDown()                     Lam tron XUONG ve boi so cua ROUNDING_UNIT: chia ra so "nghin dong", bo phan le, nhan lai
+ *  164  checkSharesAddUpTo100()         Tong % cac tac gia phai dung 100 (BF-01 da kiem luc nop bai, day la lop chan cuoi de khong bao gio chia sai t…
+ *  177  readDecimal()                   Lay 1 tham so dang so
  */
 public class RoyaltyCalculator {
 
@@ -82,6 +83,24 @@ public class RoyaltyCalculator {
             return ONE_HUNDRED;
         }
         return articleSaturationRate;
+    }
+
+    // Doi hang cua bai trong su kien ra ty le bao hoa (%) de BF-01 khoa luc nop bai (GBR-09, BR-IN-03).
+    // Nhom chot 01/11/2026: moi bac kLimit bai (events.k_limit).
+    // Vd kLimit = 10: hang 1..10 -> 100, hang 11..20 -> level2Rate (80), tu 21 -> level3Rate (60).
+    // Ham static vi 2 ty le doc rieng tu system_parameters (SATURATION_RATE_LEVEL_2/3), khong can constructor.
+    public static BigDecimal saturationRateByRank(int rank, int kLimit, BigDecimal level2Rate, BigDecimal level3Rate) {
+        if (rank < 1 || kLimit < 1) {
+            throw new IllegalArgumentException("Hạng của bài và k_limit của sự kiện phải từ 1 trở lên.");
+        }
+        int level2End = kLimit * 2;  // bac 2 ket thuc sau 2 x kLimit bai
+        if (rank <= kLimit) {
+            return ONE_HUNDRED;
+        }
+        if (rank <= level2End) {
+            return level2Rate;
+        }
+        return level3Rate;
     }
 
     // Ty le % theo tinh chat bai (BR-RY-02), lay tu system_parameters NATURE_RATE_...

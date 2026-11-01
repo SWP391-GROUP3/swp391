@@ -249,4 +249,35 @@ class RoyaltyCalculatorTest {
 
         assertEquals("Tổng tỷ lệ chia của các tác giả phải bằng 100%, đang là 90", ex.getMessage());
     }
+
+    // ---------------------------------------------------- bao hoa theo hang (GBR-09)
+
+    private static final BigDecimal LEVEL_2 = new BigDecimal("80");  // giong SATURATION_RATE_LEVEL_2 trong data.sql
+    private static final BigDecimal LEVEL_3 = new BigDecimal("60");  // giong SATURATION_RATE_LEVEL_3
+
+    @Test
+    void saturationRateIsFullForFirstKLimitArticles() {
+        assertSameValue("100", RoyaltyCalculator.saturationRateByRank(1, 10, LEVEL_2, LEVEL_3));
+        assertSameValue("100", RoyaltyCalculator.saturationRateByRank(10, 10, LEVEL_2, LEVEL_3));
+    }
+
+    @Test
+    void saturationRateDropsToLevel2FromRankKPlus1To2K() {
+        assertSameValue("80", RoyaltyCalculator.saturationRateByRank(11, 10, LEVEL_2, LEVEL_3));
+        assertSameValue("80", RoyaltyCalculator.saturationRateByRank(20, 10, LEVEL_2, LEVEL_3));
+    }
+
+    @Test
+    void saturationRateDropsToLevel3FromRank2KPlus1() {
+        assertSameValue("60", RoyaltyCalculator.saturationRateByRank(21, 10, LEVEL_2, LEVEL_3));
+        assertSameValue("60", RoyaltyCalculator.saturationRateByRank(100, 10, LEVEL_2, LEVEL_3));
+    }
+
+    @Test
+    void saturationRateThrowsWhenRankIsBelowOne() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> RoyaltyCalculator.saturationRateByRank(0, 10, LEVEL_2, LEVEL_3));
+
+        assertEquals("Hạng của bài và k_limit của sự kiện phải từ 1 trở lên.", ex.getMessage());
+    }
 }
