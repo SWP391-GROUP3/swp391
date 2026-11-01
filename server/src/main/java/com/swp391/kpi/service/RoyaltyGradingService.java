@@ -52,29 +52,30 @@ import java.util.Set;
  * goi may tinh va luu ket qua.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   83  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   89  field                           repository / service duoc inject
+ *   84  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   90  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *  107  getPendingArticles()            UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap toi han
- *  133  previewGrading()                UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi
- *  156  completeGrading()               UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien cua tung nguoi vao ky dang…
+ *  108  getPendingArticles()            UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap toi han
+ *  134  previewGrading()                UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi
+ *  157  completeGrading()               UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien cua tung nguoi vao ky dang…
+ *  197  hasMediaBeenPaid()              BF-01 goi (BR-IN-05): anh da tung duoc tra nhuan but chua (co dong royalty_media_items)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  193  checkCanRegrade()               Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky, UC-52); phien ban…
- *  208  calculate()                     Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
- *  246  findSaturationRate()            Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100; co su kien thi RoyaltyCalculator xe…
- *  258  splitArticleAmount()            Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d, tac gia chinh nhan phan con lai
- *  277  gradeMedia()                    UC-48: cham tung anh/video
- *  297  findNoRoyaltyReason()           Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05): - lay tu nguon ngoai - trung (DU…
- *  310  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
- *  316  sumMediaAmount()                sum media amount
- *  325  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
- *  332  findOpenPeriod()                tim open period
- *  336  fillPeriod()                    fill period
- *  346  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)
- *  373  saveArticleLines()              Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
- *  384  saveMediaItemsAndLines()        Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh
- *  404  newLine()                       new line
- *  420  readInt()                       Lay 1 tham so so nguyen
+ *  204  checkCanRegrade()               Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky, UC-52); phien ban…
+ *  219  calculate()                     Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
+ *  257  findSaturationRate()            Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100; co su kien thi RoyaltyCalculator xe…
+ *  269  splitArticleAmount()            Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d, tac gia chinh nhan phan con lai
+ *  288  gradeMedia()                    UC-48: cham tung anh/video
+ *  308  findNoRoyaltyReason()           Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05): - lay tu nguon ngoai - trung (DU…
+ *  321  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
+ *  327  sumMediaAmount()                sum media amount
+ *  336  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
+ *  343  findOpenPeriod()                tim open period
+ *  347  fillPeriod()                    fill period
+ *  357  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)
+ *  384  saveArticleLines()              Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
+ *  395  saveMediaItemsAndLines()        Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh
+ *  415  newLine()                       new line
+ *  431  readInt()                       Lay 1 tham so so nguyen
  */
 @Service
 @RequiredArgsConstructor
@@ -185,6 +186,16 @@ public class RoyaltyGradingService {
         result.setGradingId(grading.getId());
         fillPeriod(result, period);
         return result;
+    }
+
+    // ------------------------------------------------------------ BF-01 goi
+
+    // BR-IN-05, UC-05 A3: anh nay DA TUNG duoc tra nhuan but chua (co dong trong royalty_media_items).
+    // BF-01 goi khi kiem trung anh: anh moi trung voi anh da tra tien = tai su dung, hien 0 d.
+    // Trung voi anh chua tung tra tien thi van duoc tinh (comment bang article_attachments).
+    @Transactional(readOnly = true)
+    public boolean hasMediaBeenPaid(Integer attachmentId) {
+        return royaltyMediaItemRepository.existsByAttachmentId(attachmentId);
     }
 
     // Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky,
