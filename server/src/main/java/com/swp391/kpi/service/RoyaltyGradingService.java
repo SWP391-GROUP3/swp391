@@ -4,6 +4,8 @@ import com.swp391.kpi.dto.ArticlePublishedResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyAttachmentResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyAuthorResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyInfoResponse;
+import com.swp391.kpi.dto.RoyaltyEstimateItemResponse;
+import com.swp391.kpi.dto.RoyaltyEstimateResponse;
 import com.swp391.kpi.dto.RoyaltyGradingAuthorResponse;
 import com.swp391.kpi.dto.RoyaltyGradingCreateRequest;
 import com.swp391.kpi.dto.RoyaltyGradingMediaResponse;
@@ -52,30 +54,34 @@ import java.util.Set;
  * goi may tinh va luu ket qua.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   84  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   90  field                           repository / service duoc inject
+ *   90  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   99  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *  108  getPendingArticles()            UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap toi han
- *  134  previewGrading()                UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi
- *  157  completeGrading()               UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien cua tung nguoi vao ky dang…
- *  197  hasMediaBeenPaid()              BF-01 goi (BR-IN-05): anh da tung duoc tra nhuan but chua (co dong royalty_media_items)
+ *  117  getPendingArticles()            UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap toi han
+ *  143  previewGrading()                UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi
+ *  166  completeGrading()               UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien cua tung nguoi vao ky dang…
+ *  206  hasMediaBeenPaid()              BF-01 goi (BR-IN-05): anh da tung duoc tra nhuan but chua (co dong royalty_media_items)
+ *  215  estimateRoyalty()               BF-01 goi (UC-09): uoc tinh tien phan bai viet truoc khi nop o 3 muc diem 100 / 80 / 50, khong luu gi
  *  ---- Ham phu (private, chi dung trong file) ----
- *  204  checkCanRegrade()               Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky, UC-52); phien ban…
- *  219  calculate()                     Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
- *  257  findSaturationRate()            Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100; co su kien thi RoyaltyCalculator xe…
- *  269  splitArticleAmount()            Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d, tac gia chinh nhan phan con lai
- *  288  gradeMedia()                    UC-48: cham tung anh/video
- *  308  findNoRoyaltyReason()           Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05): - lay tu nguon ngoai - trung (DU…
- *  321  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
- *  327  sumMediaAmount()                sum media amount
- *  336  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
- *  343  findOpenPeriod()                tim open period
- *  347  fillPeriod()                    fill period
- *  357  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)
- *  384  saveArticleLines()              Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
- *  395  saveMediaItemsAndLines()        Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh
- *  415  newLine()                       new line
- *  431  readInt()                       Lay 1 tham so so nguyen
+ *  245  checkCanRegrade()               Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky, UC-52); phien ban…
+ *  260  calculate()                     Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
+ *  298  findSaturationRate()            Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100; co su kien thi RoyaltyCalculator xe…
+ *  310  splitArticleAmount()            Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d, tac gia chinh nhan phan con lai
+ *  329  gradeMedia()                    UC-48: cham tung anh/video
+ *  349  findNoRoyaltyReason()           Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05): - lay tu nguon ngoai - trung (DU…
+ *  362  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
+ *  368  sumMediaAmount()                sum media amount
+ *  377  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
+ *  385  findRateOnDate()                UC-09: don gia hieu luc tai 1 ngay (uoc tinh dung hom nay)
+ *  392  findExemptScore()               UC-09: muc diem duoc mien giam bao hoa cua su kien; bai khong thuoc su kien -> null
+ *  405  parseNature()                   UC-09: doi tinh chat bai (chuoi BF-01 truyen vao) sang enum, sai thi bao loi
+ *  416  findOpenPeriod()                tim open period
+ *  420  fillPeriod()                    fill period
+ *  430  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)
+ *  457  saveArticleLines()              Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
+ *  468  saveMediaItemsAndLines()        Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh
+ *  488  newLine()                       new line
+ *  504  readInt()                       Lay 1 tham so so nguyen
  */
 @Service
 @RequiredArgsConstructor
@@ -86,6 +92,9 @@ public class RoyaltyGradingService {
     private static final String HASH_DUPLICATE = "DUPLICATE";  // trung y het file anh da co
     private static final String HASH_SIMILAR = "SIMILAR";      // dhash gan giong anh da co
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    // UC-09: bai chua co diem nen uoc tinh o 3 muc diem gia dinh (nhom chot 01/11/2026), diem cao len dau
+    private static final List<BigDecimal> ESTIMATE_SCORES =
+            List.of(new BigDecimal("100"), new BigDecimal("80"), new BigDecimal("50"));
 
     private final RoyaltyGradingRepository royaltyGradingRepository;
     private final RoyaltyMediaItemRepository royaltyMediaItemRepository;
@@ -196,6 +205,38 @@ public class RoyaltyGradingService {
     @Transactional(readOnly = true)
     public boolean hasMediaBeenPaid(Integer attachmentId) {
         return royaltyMediaItemRepository.existsByAttachmentId(attachmentId);
+    }
+
+    // UC-09: uoc tinh nhuan but phan bai viet TRUOC khi nop, khong luu gi. BF-01 truyen gia tri
+    // cua ban nhap vao (khong doc bang articles). Cung cong thuc luc cham that (BR-RY-01..03),
+    // tinh o tung muc diem ESTIMATE_SCORES; don gia lay theo hom nay vi bai chua dang.
+    // saturationRate = ty le BF-01 se khoa luc nop (null = khong thuoc su kien). Chua tinh anh/video.
+    @Transactional(readOnly = true)
+    public RoyaltyEstimateResponse estimateRoyalty(Integer categoryId, String nature, Integer eventId,
+                                                   BigDecimal saturationRate) {
+        RoyaltyNature royaltyNature = parseNature(nature);
+        BigDecimal baseFactor = genreService.getBaseFactor(categoryId);
+        BigDecimal unitPrice = findRateOnDate(LocalDate.now()).getAmount();
+        BigDecimal exemptScore = findExemptScore(eventId, saturationRate);
+        RoyaltyCalculator calculator = new RoyaltyCalculator(systemParameterService.getValuesByFlow(ROYALTY_FLOW));
+
+        List<RoyaltyEstimateItemResponse> items = new ArrayList<>();
+        for (BigDecimal score : ESTIMATE_SCORES) {
+            BigDecimal suggestedFactor = calculator.suggestedFactor(baseFactor, score);                    // BR-RY-01
+            BigDecimal rate = calculator.effectiveSaturationRate(score, saturationRate, exemptScore);      // GBR-09
+            BigDecimal finalFactor = calculator.finalFactor(suggestedFactor, rate, royaltyNature);         // BR-RY-02
+            BigDecimal amount = calculator.calculateAmount(finalFactor, unitPrice);                        // BR-RY-03
+            items.add(RoyaltyEstimateItemResponse.of(score, suggestedFactor, rate, finalFactor, amount));
+        }
+
+        RoyaltyEstimateResponse response = new RoyaltyEstimateResponse();
+        response.setCategoryId(categoryId);
+        response.setBaseFactor(baseFactor);
+        response.setNature(royaltyNature);
+        response.setNatureRate(calculator.natureRate(royaltyNature));
+        response.setUnitPrice(unitPrice);
+        response.setItems(items);
+        return response;
     }
 
     // Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky,
@@ -338,6 +379,38 @@ public class RoyaltyGradingService {
         return royaltyRateRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(publishDate)
                 .orElseThrow(() -> new BusinessException("Chưa có đơn giá nhuận bút hiệu lực tại ngày đăng "
                         + publishDate.format(DATE_FORMAT) + "."));
+    }
+
+    // UC-09: don gia hieu luc tai 1 ngay (uoc tinh dung hom nay); chua co thi khong uoc tinh duoc
+    private RoyaltyRate findRateOnDate(LocalDate date) {
+        return royaltyRateRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(date)
+                .orElseThrow(() -> new BusinessException("Chưa có đơn giá nhuận bút hiệu lực tại ngày "
+                        + date.format(DATE_FORMAT) + ", chưa ước tính được."));
+    }
+
+    // UC-09: muc diem duoc mien giam bao hoa cua su kien (GBR-09); bai khong thuoc su kien -> null
+    private BigDecimal findExemptScore(Integer eventId, BigDecimal saturationRate) {
+        if (saturationRate == null) {
+            return null;
+        }
+        if (eventId == null) {
+            throw new BusinessException("Bài có tỷ lệ bão hòa thì phải chọn sự kiện.");
+        }
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy sự kiện có ID: " + eventId));
+        return event.getExemptScore();
+    }
+
+    // UC-09: doi tinh chat bai (chuoi BF-01 truyen vao) sang enum; sai thi bao loi tieng Viet
+    private static RoyaltyNature parseNature(String nature) {
+        if (nature == null) {
+            throw new BusinessException("Chưa chọn tính chất bài.");
+        }
+        try {
+            return RoyaltyNature.valueOf(nature);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Tính chất bài không hợp lệ: " + nature);
+        }
     }
 
     private Optional<RoyaltyPeriod> findOpenPeriod() {
