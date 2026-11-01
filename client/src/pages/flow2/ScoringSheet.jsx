@@ -71,26 +71,38 @@ export default function ScoringSheet({ nguoiDung, articleIdProp, onBack }) {
   const [decisionNote, setDecisionNote] = useState('')
 
   useEffect(() => {
+    let ignore = false
+
+    async function loadScoringSheet() {
+      setLoading(true)
+      setError('')
+      setSuccess('')
+      try {
+        const data = await moPhieuCham(articleId)
+        if (!ignore) {
+          setAttempt(data)
+          setDetails(data.details || [])
+          setNewCategoryId(data.categoryId || 1)
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError('Lỗi tải phiếu chấm: ' + err.message)
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false)
+        }
+      }
+    }
+
     if (articleId) {
       loadScoringSheet()
     }
-  }, [articleId])
 
-  async function loadScoringSheet() {
-    setLoading(true)
-    setError('')
-    setSuccess('')
-    try {
-      const data = await moPhieuCham(articleId)
-      setAttempt(data)
-      setDetails(data.details || [])
-      setNewCategoryId(data.categoryId || 1)
-    } catch (err) {
-      setError('Lỗi tải phiếu chấm: ' + err.message)
-    } finally {
-      setLoading(false)
+    return () => {
+      ignore = true
     }
-  }
+  }, [articleId])
 
   // Tinh tong diem truc tiep tren UI (UC-25)
   const calculatedTotalScore = details.reduce((sum, item) => {

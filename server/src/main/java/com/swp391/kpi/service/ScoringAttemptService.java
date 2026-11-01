@@ -50,7 +50,7 @@ public class ScoringAttemptService {
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
     @Transactional
-    public ScoringAttemptResponse openScoringAttempt(Integer articleId, Integer reviewerId) {
+    public synchronized ScoringAttemptResponse openScoringAttempt(Integer articleId, Integer reviewerId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
 
