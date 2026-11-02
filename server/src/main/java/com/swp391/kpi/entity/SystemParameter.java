@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDateTime;
+
 /**
  * Tham so he thong dang key-value (bang system_parameters), vd NATURE_RATE_TRANSLATION = 70.
  * Code doc theo param_key, khong viet cung so trong Java.
- * Hien chi anh xa cac cot can de DOC; cot unit, updated_by, updated_at them khi lam man Admin sua tham so.
+ * Admin sua 5 tham so nhap bai cua BF-01 o UC-13 (SystemParameterService), ghi lai ai sua va luc nao.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   30  field                           cac cot cua bang (khop schema.sql)
+ *   32  field                           cac cot cua bang (khop schema.sql)
  */
 @Entity
 @Table(name = "system_parameters")
@@ -34,5 +36,13 @@ public class SystemParameter {
     @Nationalized               // cot NVARCHAR
     private String paramValue;  // luu dang chu, code tu doi sang so
 
+    @Nationalized               // cot NVARCHAR(20)
+    private String unit;        // don vi hien thi: người, ngày, %, bit... NULL = khong co
+
     private String flow;        // luong dung tham so: BF-01 ... BF-05, NULL = dung chung
+
+    // FK toi users: de Integer. Admin sua lan cuoi; NULL = du lieu mau / migration, chua ai sua
+    private Integer updatedBy;
+
+    private LocalDateTime updatedAt;  // DATETIME2, DB mac dinh SYSDATETIME() luc them
 }
