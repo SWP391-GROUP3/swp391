@@ -94,17 +94,7 @@ public class ScoringAttemptService {
         // Lay ban nop moi nhat cua bai viet
         ArticleVersion articleVersion = articleVersionRepository
                 .findFirstByArticleIdAndKindOrderByVersionNoDesc(articleId, ArticleVersionKind.SUBMISSION)
-                .orElseGet(() -> {
-                    ArticleVersion fallback = new ArticleVersion();
-                    fallback.setArticleId(articleId);
-                    fallback.setVersionNo(1);
-                    fallback.setKind(ArticleVersionKind.SUBMISSION);
-                    fallback.setTitle(article.getTitle());
-                    fallback.setContent(article.getContent());
-                    fallback.setCreatedBy(article.getAuthorId());
-                    fallback.setCreatedAt(LocalDateTime.now());
-                    return articleVersionRepository.save(fallback);
-                });
+                .orElseThrow(() -> new BusinessException("Bài viết chưa có bản nộp nào"));
 
         int nextAttemptNo = openAttemptOpt.map(a -> a.getAttemptNo() + 1).orElse(1);
         AttemptType attemptType = (nextAttemptNo == 1) ? AttemptType.INITIAL : AttemptType.RESCORE;
@@ -179,6 +169,51 @@ public class ScoringAttemptService {
         });
 
         return res;
+    }
+
+    /**
+     * Lay lan cham gan nhat cua mot bai viet kem kiem tra quyen nguoi dung (UC-30, UC-34).
+     */
+    @Transactional(readOnly = true)
+    public ScoringAttemptResponse getLatestAttemptForUser(Integer articleId, Integer currentUserId) {
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng với ID: " + currentUserId));
+        RoleCode roleCode = user.getRole() != null ? user.getRole().getCode() : null;
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+
+        // ADMIN va Truong ban luon co quyen xem
+        if (RoleCode.ADMIN.equals(roleCode) || RoleCode.HEAD_OF_DEPARTMENT.equals(roleCode)) {
+            return getLatestAttemptByArticle(articleId);
+        }
+
+        // BTV phai la nguoi duoc phan cong bai viet hoac la nguoi cham
+        if (RoleCode.EDITOR.equals(roleCode)) {
+            Assignment assignment = assignmentRepository.findByArticleId(articleId).orElse(null);
+            boolean isAssignedEditor = assignment != null && assignment.getEditorId().equals(currentUserId);
+
+            ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId).orElse(null);
+            boolean isReviewer = attempt != null && currentUserId.equals(attempt.getReviewerId());
+
+            if (!isAssignedEditor && !isReviewer) {
+                throw new BusinessException("Bạn không được phân công biên tập bài viết này");
+            }
+            return getLatestAttemptByArticle(articleId);
+        }
+
+        // Tac gia cua bai viet
+        if (article.getAuthorId().equals(currentUserId)) {
+            // Chi duoc xem khi diem da cong bo hoac bai bi tra ve / tu choi
+            ArticleStatus status = article.getStatus();
+            if (status == ArticleStatus.SCORE_PUBLISHED || status == ArticleStatus.PUBLISHED
+                    || status == ArticleStatus.REVISION_REQUESTED || status == ArticleStatus.REJECTED) {
+                return getLatestAttemptByArticle(articleId);
+            }
+            throw new BusinessException("Điểm đánh giá của bài viết đang chờ phê duyệt, chưa được công bố");
+        }
+
+        throw new BusinessException("Bạn không có quyền xem thông tin phiếu chấm của bài viết này");
     }
 
     // BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
