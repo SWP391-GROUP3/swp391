@@ -7,8 +7,10 @@ import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.swp391.kpi.dto.*;
 import java.math.RoundingMode;
@@ -197,7 +199,7 @@ public class ScoringAttemptService {
             boolean isReviewer = attempt != null && currentUserId.equals(attempt.getReviewerId());
 
             if (!isAssignedEditor && !isReviewer) {
-                throw new BusinessException("Bạn không được phân công biên tập bài viết này");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không được phân công biên tập bài viết này");
             }
             return getLatestAttemptByArticle(articleId);
         }
@@ -210,10 +212,10 @@ public class ScoringAttemptService {
                     || status == ArticleStatus.REVISION_REQUESTED || status == ArticleStatus.REJECTED) {
                 return getLatestAttemptByArticle(articleId);
             }
-            throw new BusinessException("Điểm đánh giá của bài viết đang chờ phê duyệt, chưa được công bố");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Điểm đánh giá của bài viết đang chờ phê duyệt, chưa được công bố");
         }
 
-        throw new BusinessException("Bạn không có quyền xem thông tin phiếu chấm của bài viết này");
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem thông tin phiếu chấm của bài viết này");
     }
 
     // BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
