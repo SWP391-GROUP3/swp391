@@ -39,8 +39,8 @@ import java.nio.charset.StandardCharsets;
  *  ---- Ham public (controller / luong khac goi) ----
  *   55  securityFilterChain()           security filter chain
  *  ---- Ham phu (private, chi dung trong file) ----
- *  101  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
- *  112  writeError()                    Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
+ *  103  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
+ *  114  writeError()                    Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
  */
 @Configuration
 @RequiredArgsConstructor
@@ -77,6 +77,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/royalty-gradings/**").hasRole("EDITORIAL_SECRETARY")
                         // BF-05: chi Admin nhap so lieu doc gia tu CSV va xem nhat ky (UC-63)
                         .requestMatchers("/api/reader-imports/**").hasRole("ADMIN")
+                        // Admin: xem / sua tham so nhap bai cua BF-01 (UC-13)
+                        .requestMatchers("/api/system-parameters/**").hasRole("ADMIN")
                         // BF-01: chi Phong vien tao / sua / nop / rut bai, xac nhan dong tac gia (UC-03, 05, 10, 11, 12).
                         // GET de nguyen vi luong khac cung doc qua /api/articles (vd BF-03 appeal-eligibility).
                         .requestMatchers(HttpMethod.POST, "/api/articles/**").hasRole("REPORTER")
