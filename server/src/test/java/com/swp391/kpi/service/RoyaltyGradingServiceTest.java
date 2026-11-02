@@ -4,6 +4,7 @@ import com.swp391.kpi.dto.ArticlePublishedResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyAttachmentResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyAuthorResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyInfoResponse;
+import com.swp391.kpi.dto.RoyaltyEstimateResponse;
 import com.swp391.kpi.dto.RoyaltyGradingCreateRequest;
 import com.swp391.kpi.dto.RoyaltyGradingMediaResponse;
 import com.swp391.kpi.dto.RoyaltyGradingResponse;
@@ -332,6 +333,76 @@ class RoyaltyGradingServiceTest {
     // ----------------------------------------------------------- du lieu gia
 
     // Bai da dang gia cho UC-46, chi can id va ngay dang (dang luc 9 gio sang)
+    // ------------------------------------------------------------------ UC-09
+
+    @Test
+    void estimateRoyaltyCalculatesArticleAmountAtThreeScoreLevels() {
+        stubEstimate();
+
+        RoyaltyEstimateResponse result = royaltyGradingService.estimateRoyalty(3, "ORIGINAL", null, null);
+
+        assertMoney("234000", result.getUnitPrice());
+        assertEquals(3, result.getItems().size());
+        // 5.00 x 100 / 100 = 5.00 -> 5.00 x 234.000 = 1.170.000
+        assertMoney("100", result.getItems().get(0).getScore());
+        assertMoney("5.00", result.getItems().get(0).getFinalFactor());
+        assertMoney("1170000", result.getItems().get(0).getAmount());
+        // 5.00 x 80 / 100 = 4.00 -> 936.000
+        assertMoney("936000", result.getItems().get(1).getAmount());
+        // 5.00 x 50 / 100 = 2.50 -> 585.000
+        assertMoney("585000", result.getItems().get(2).getAmount());
+    }
+
+    @Test
+    void estimateRoyaltyAppliesSaturationOnlyBelowExemptScore() {
+        stubEstimate();
+        Event storm = new Event();
+        storm.setId(1);
+        storm.setExemptScore(new BigDecimal("90"));
+        when(eventRepository.findById(1)).thenReturn(Optional.of(storm));
+
+        RoyaltyEstimateResponse result = royaltyGradingService.estimateRoyalty(3, "ORIGINAL", 1, new BigDecimal("80"));
+
+        // diem 100 >= 90 -> mien giam: 5.00 -> 1.170.000
+        assertMoney("100", result.getItems().get(0).getSaturationRate());
+        assertMoney("1170000", result.getItems().get(0).getAmount());
+        // diem 80 < 90 -> 4.00 x 80% = 3.20 -> 748.800 -> lam tron xuong 748.000
+        assertMoney("80", result.getItems().get(1).getSaturationRate());
+        assertMoney("748000", result.getItems().get(1).getAmount());
+    }
+
+    @Test
+    void estimateRoyaltyFailsWhenNatureIsInvalid() {
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> royaltyGradingService.estimateRoyalty(3, "PHONG_SU", null, null));
+
+        assertEquals("Tính chất bài không hợp lệ: PHONG_SU", ex.getMessage());
+    }
+
+    @Test
+    void estimateRoyaltyFailsWhenNoUnitPriceToday() {
+        when(genreService.getBaseFactor(3)).thenReturn(new BigDecimal("5.00"));
+        when(royaltyRateRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate.now()))
+                .thenReturn(Optional.empty());
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> royaltyGradingService.estimateRoyalty(3, "ORIGINAL", null, null));
+
+        assertTrue(ex.getMessage().startsWith("Chưa có đơn giá nhuận bút hiệu lực tại ngày"));
+    }
+
+    // Du lieu chuan cho uoc tinh: Bai phan anh (he so chuan 5.00), don gia 234.000 hieu luc hom nay
+    private void stubEstimate() {
+        RoyaltyRate rate = new RoyaltyRate();
+        rate.setId(1);
+        rate.setAmount(new BigDecimal("234000"));
+        rate.setEffectiveFrom(LocalDate.of(2026, 1, 1));
+        when(genreService.getBaseFactor(3)).thenReturn(new BigDecimal("5.00"));
+        when(royaltyRateRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate.now()))
+                .thenReturn(Optional.of(rate));
+        when(systemParameterService.getValuesByFlow("BF-04")).thenReturn(royaltyParams());
+    }
+
     private static ArticlePublishedResponse publishedArticle(Integer id, LocalDate publishedDate) {
         ArticlePublishedResponse article = new ArticlePublishedResponse();
         article.setId(id);

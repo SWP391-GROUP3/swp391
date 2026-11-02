@@ -12,6 +12,7 @@
  *   64  layBangKpiBan()                 Lay du lieu bang KPI toan ban theo nam va thang (UC-61) [GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}]
  *   71  tongHopKpiThang()               Kich hoat job tong hop so lieu KPI tu dong cho ky (Automated Aggregat… [POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}]
  *   78  layChiTietKpiPhongVien()        Lay chi tiet KPI cua mot phong vien theo chu ky thang (UC-62, UC-60) [GET /api/kpi-snapshots/reporters/{reporterId}/details?year={nam}&month={thang}]
+ *   85  layBaoCaoTheLoai()              Lay bao cao muc do quan tam the loai & chi phi nhuan but (UC-64) [GET /api/kpi-reports/genres?year={nam}&month={thang}]
  */
 import { goiApi } from './goiApi.js'
 
@@ -77,5 +78,19 @@ export async function tongHopKpiThang(nam, thang) {
  */
 export async function layChiTietKpiPhongVien(reporterId, nam, thang) {
   return goiApi(`/api/kpi-snapshots/reporters/${reporterId}/details?year=${nam}&month=${thang}`)
+}
+
+/**
+ * Lấy báo cáo mức độ quan tâm thể loại & chi phí nhuận bút (UC-64).
+ */
+export async function layBaoCaoTheLoai(nam, thang) {
+  let url = '/api/kpi-reports/genres'
+  const params = []
+  if (nam) params.push(`year=${nam}`)
+  if (thang) params.push(`month=${thang}`)
+  if (params.length > 0) {
+    url += `?${params.join('&')}`
+  }
+  return goiApi(url)
 }
 
