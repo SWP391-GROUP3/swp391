@@ -46,6 +46,10 @@ INSERT INTO users (username, email, password_hash, full_name, role_id, section_i
     ('hung.dq',  'hung.dq@toasoan.vn',  '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Đỗ Quốc Hưng',   1, 2),     -- 7 PV Kinh tế
     ('admin',    'admin@toasoan.vn',    '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Quản trị viên',  6, NULL),  -- 8 Admin
     ('giang.nt', 'giang.nt@toasoan.vn', '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'Ngô Thu Giang',  2, 2);     -- 9 BTV Kinh tế
+/* BTV thu nghiem cham mu (BF-03), cung mat khau 123456 nhu cac tai khoan mau tren. */
+INSERT INTO users (username, email, password_hash, full_name, role_id, section_id) VALUES
+    ('test.bt1', 'test.bt1@toasoan.vn', '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'BTV Thời sự 1 (test)', 2, 1),   -- 10 BTV thử nghiệm
+    ('test.bt2', 'test.bt2@toasoan.vn', '$2a$10$zT84pKtOEfx1vO6h97AqFOHNBfoNNwgMDQAm5018jtLCVHsZU5HPm', N'BTV Thời sự 2 (test)', 2, 1);   -- 11 BTV thử nghiệm
 
 INSERT INTO genres (code, name, nd_group, base_factor) VALUES
     ('TIN_VAN',   N'Tin vắn',           N'Tin',                    1.00),   -- 1

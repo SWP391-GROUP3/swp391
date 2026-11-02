@@ -17,7 +17,7 @@ import { layToken, xoaPhien } from '../auth/phienDangNhap.js'
  *   57  docJson()                       Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} de khong vo
  *   66  chuLoi()                        Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh
  */
-export async function goiApi(duongDan, tuyChon = {}) {
+export async function goiApi(duongDan, tuyChon = {}) { // [CHUNG 4 LUONG] buoc 4: gan token Bearer, doi loi server thanh Error tieng Viet
   const headers = {}
   const isFormData = typeof FormData !== 'undefined' && tuyChon.body instanceof FormData
   if (tuyChon.body !== undefined && !isFormData) {

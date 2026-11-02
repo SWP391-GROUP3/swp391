@@ -56,7 +56,7 @@ public class AppealManagementController {
     }
 
     @PostMapping("/{id}/assign")
-    public ResponseEntity<ApiResponse<AppealManagementResponse>> assign(@PathVariable Integer id,
+    public ResponseEntity<ApiResponse<AppealManagementResponse>> assign(@PathVariable Integer id, // [LUONG 2 - PHAN CONG] buoc 4/6 controller
             @Valid @RequestBody AppealAssignRequest request, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(ApiResponse.success("Phân công chấm mù thành công",
                 service.assign(id, request, Integer.valueOf(jwt.getSubject()))));
@@ -70,7 +70,7 @@ public class AppealManagementController {
     }
 
     @PostMapping("/{id}/assign-second")
-    public ResponseEntity<ApiResponse<AppealManagementResponse>> assignSecond(@PathVariable Integer id,
+    public ResponseEntity<ApiResponse<AppealManagementResponse>> assignSecond(@PathVariable Integer id, // [LUONG 4 - SO SANH & CHOT] nhanh S2 controller
             @Valid @RequestBody AppealAssignRequest request, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(ApiResponse.success("Phân công S2 thành công",
                 service.assignSecond(id, request, Integer.valueOf(jwt.getSubject()))));

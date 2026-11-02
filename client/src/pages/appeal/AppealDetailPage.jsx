@@ -64,7 +64,7 @@ export default function AppealDetailPage() {
     setThongBao({ id, loi: '', thanhCong: '' })
     try {
       if (giaoLai) await giaoLaiKhieuNai(id, { attemptId: phieu.id, expectedReviewerId: phieu.reviewerId, reviewerId, reason })
-      else await phanCongKhieuNai(id, reviewerId, reason)
+      else await phanCongKhieuNai(id, reviewerId, reason) // [LUONG 2 - PHAN CONG] buoc 2/6 bam "Phan cong" (nhanh tren la "Giao lai")
       setThongBao({ id, loi: '', thanhCong: giaoLai ? 'Giao lại thành công.' : 'Phân công thành công.' })
       form.reset()
       setLanTai((cu) => cu + 1)

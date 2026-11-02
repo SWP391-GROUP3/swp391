@@ -1,12 +1,9 @@
 package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.*;
-import com.swp391.kpi.entity.AppealStatus;
 import com.swp391.kpi.entity.CrossReviewTask;
 import com.swp391.kpi.entity.CrossReviewTaskStatus;
 import com.swp391.kpi.exception.NotFoundException;
-import com.swp391.kpi.repository.AppealRepository;
-import com.swp391.kpi.repository.AppealResolutionRepository;
 import com.swp391.kpi.repository.CrossReviewTaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -48,10 +44,9 @@ public class ReviewerProfileService {
     private final ScoringReadService scoringReadService;
     private final AssignmentService assignmentService;
     private final ArticleReadService articleReadService;
-    private final AppealRepository appealRepository;
-    private final AppealResolutionRepository resolutionRepository;
     private final CrossReviewTaskRepository crossReviewTaskRepository;
     private final ScoringAppealService scoringAppealService;
+    private final ReviewerDeviationRefreshService deviationService;
 
     public List<ReviewerDirectoryResponse> getEditors(Integer currentUserId) {
         var user = userReadService.requireActive(currentUserId, "ADMIN", "HEAD_OF_DEPARTMENT");
@@ -91,7 +86,7 @@ public class ReviewerProfileService {
         return new ReviewerProfileResponse(editor.id(), editor.fullName(), editor.sectionId(),
                 editor.sectionName(), editor.status(), month, activeArticles, pendingCrossReviews,
                 scoringAppealService.getPendingCount(editorId),
-                calculateDeviation(editor, month, tasks), history);
+                calculateDeviation(editor, month), history);
     }
 
     public Page<ReviewerScoringHistoryResponse> getHistory(Integer editorId, LocalDate period,
@@ -144,48 +139,10 @@ public class ReviewerProfileService {
         return time != null && time.toLocalDate().withDayOfMonth(1).equals(period);
     }
 
-    private ReviewerDeviationResponse calculateDeviation(UserAccessResponse editor, LocalDate period,
-            List<CrossReviewTask> tasks) {
-        Map<Integer, ScoringReadResponse> byId = new HashMap<>();
-        int workload = 0;
-        for (var attempt : scoringReadService.getSubmittedAttempts()) {
-            byId.put(attempt.id(), attempt);
-            if (editor.id().equals(attempt.reviewerId()) && !"APPEAL".equals(attempt.attemptType())
-                    && inPeriod(attempt.submittedAt(), period)) workload++;
-        }
-        List<BigDecimal> differences = new ArrayList<>();
-        for (var task : tasks) {
-            var original = byId.get(task.getOriginalScoringId());
-            if (task.getStatus() == CrossReviewTaskStatus.DONE && inPeriod(task.getSubmittedAt(), period)
-                    && original != null && editor.id().equals(original.reviewerId())) {
-                differences.add(task.getScore().subtract(original.totalScore()));
-            }
-        }
-        int appealCount = 0;
-        int overturned = 0;
-        for (var resolution : resolutionRepository.findAll()) {
-            if (!inPeriod(resolution.getFinalizedAt(), period)) continue;
-            var appeal = appealRepository.findById(resolution.getAppealId()).orElse(null);
-            if (appeal == null || appeal.getStatus() != AppealStatus.RESOLVED) continue;
-            var original = byId.get(appeal.getScoringAttemptId());
-            if (original == null || !editor.id().equals(original.reviewerId())) continue;
-            BigDecimal effective = resolution.getEffectiveScore();
-            if (effective == null) {
-                var effectiveAttempt = byId.get(resolution.getEffectiveAttemptId());
-                if (effectiveAttempt == null) continue;
-                effective = effectiveAttempt.totalScore();
-            }
-            BigDecimal difference = effective.subtract(original.totalScore());
-            differences.add(difference);
-            appealCount++;
-            if (difference.signum() != 0) overturned++;
-        }
-        if (differences.isEmpty()) return null;
-        // UC42 chi doc: tai dung phep tinh UC41, khong ghi bang chi so khi mo ho so.
-        var index = new ReviewerDeviationCalculator().calculate(differences, appealCount, overturned, workload);
-        index.setEditorId(editor.id());
-        index.setPeriod(period);
-        index.setLastUpdated(LocalDateTime.now());
+    private ReviewerDeviationResponse calculateDeviation(UserAccessResponse editor, LocalDate period) {
+        // UC42 chi doc: dung chung phep tinh UC41, khong ghi bang chi so khi mo ho so.
+        var index = deviationService.computeIndexes(period, "ADMIN", null).get(editor.id());
+        if (index == null) return null;
         return ReviewerDeviationResponse.from(index, editor.fullName(), editor.sectionId(), editor.sectionName());
     }
 }

@@ -93,7 +93,7 @@ public class ScoringAppealService {
     }
 
     // Chi goi tu service da kiem tra quyen Head hoac chu phieu; khong mo endpoint chung.
-    public AppealBlindScorecardResponse getComparisonCard(Integer id) {
+    public AppealBlindScorecardResponse getComparisonCard(Integer id) { // [LUONG 3 - CHAM MU] "MU" nam o day: chi doc diem cua DUNG phieu nay, khong co S0 / ten nguoi cham cu (luong 4 cung dung ham nay)
         var attempt = attempts.findById(id).orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm."));
         var version = articles.getVersion(attempt.getArticleId(), attempt.getVersionId());
         var scores = details.findByScoringAttemptId(id);
@@ -110,7 +110,7 @@ public class ScoringAppealService {
     }
 
     @Transactional
-    public AppealBlindScorecardResponse saveScorecard(Integer id, Integer reviewerId, AppealScorecardRequest request, boolean submit) {
+    public AppealBlindScorecardResponse saveScorecard(Integer id, Integer reviewerId, AppealScorecardRequest request, boolean submit) { // [LUONG 3 - CHAM MU] buoc 6/7 service: dung chu phieu? doi chieu tieu chi -> server tinh tong -> ghi diem -> (nop) dong dau submittedAt
         users.requireActive(reviewerId, "EDITOR");
         var attempt = lockedDraft(id);
         if (!reviewerId.equals(attempt.getReviewerId()))
@@ -134,12 +134,12 @@ public class ScoringAppealService {
             replacement.add(detail);
         }
         if (!incoming.isEmpty()) throw new BusinessException("Tiêu chí không thuộc bộ tiêu chí của phiếu chấm.");
-        var total = new AppealScoreCalculator().weightedTotal(calculation, submit);
+        var total = new AppealScoreCalculator().weightedTotal(calculation, submit); // [LUONG 3 - CHAM MU] 6a: TONG DIEM do SERVER tinh, khong tin con so client gui
         var oldDetails = details.findByScoringAttemptId(id);
         String before = snapshot(attempt, oldDetails, null);
         details.deleteAll(oldDetails); details.flush(); details.saveAll(replacement);
         attempt.setTotalScore(total); attempt.setDecision(null); attempt.setDecisionNote(null);
-        if (submit) attempt.setSubmittedAt(java.time.LocalDateTime.now());
+        if (submit) attempt.setSubmittedAt(java.time.LocalDateTime.now()); // [LUONG 3 - CHAM MU] 6b: chi nut "Nop" moi dong dau nop (khoa phieu); "Luu nhap" thi chua
         audit.log(reviewerId, submit ? "SUBMIT_SCORE" : "SAVE_DRAFT", "appeals", attempt.getAppealId(),
                 before, snapshot(attempt, replacement, null));
         attempts.flush();
@@ -147,7 +147,7 @@ public class ScoringAppealService {
     }
 
     @Transactional
-    public ScoringAppealAttemptResponse createSecondDraft(Integer appealId, Integer articleId,
+    public ScoringAppealAttemptResponse createSecondDraft(Integer appealId, Integer articleId, // [LUONG 4 - SO SANH & CHOT] nhanh S2: tao phieu S2 trong, nguoi cham khac S0 va S1
             Integer originalId, Integer reviewerId, boolean crossDepartment) {
         var originals = attempts.findByArticleIdOrderByAttemptNoAsc(articleId);
         ScoringAttempt first = null;
@@ -179,7 +179,7 @@ public class ScoringAppealService {
     }
 
     @Transactional
-    public ScoringAppealAttemptResponse createDraft(Integer appealId, Integer articleId,
+    public ScoringAppealAttemptResponse createDraft(Integer appealId, Integer articleId, // [LUONG 2 - PHAN CONG] buoc 6/6 tao phieu cham TRONG (chua co diem), copy bo tieu chi tu phieu goc S0
             Integer originalId, Integer reviewerId, boolean crossDepartment) {
         var original = attempts.findLockedById(originalId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm gốc."));
@@ -203,7 +203,7 @@ public class ScoringAppealService {
     }
 
     @Transactional
-    public ScoringAppealAttemptResponse reassignDraft(Integer appealId, Integer articleId, Integer attemptId,
+    public ScoringAppealAttemptResponse reassignDraft(Integer appealId, Integer articleId, Integer attemptId, // [LUONG 2 - PHAN CONG] nhanh phu "Giao lai": luu ban nhap cu vao audit roi xoa diem nhap, doi nguoi
             Integer expectedReviewerId, Integer reviewerId, boolean crossDepartment, String reason, Integer actorId) {
         var draft = lockedDraft(attemptId);
         if (!appealId.equals(draft.getAppealId()) || !articleId.equals(draft.getArticleId())
@@ -230,7 +230,7 @@ public class ScoringAppealService {
         return ScoringAppealAttemptResponse.from(draft);
     }
 
-    private ScoringAttempt lockedDraft(Integer id) {
+    private ScoringAttempt lockedDraft(Integer id) { // [LUONG 2,3 - KHOA] lay phieu CO KHOA dong, refresh sau khi khoa; phieu da nop thi khong doi duoc
         var draft = attempts.findLockedById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm."));
         // Query co khoa khong tu nap lai entity da cache trong cung transaction.

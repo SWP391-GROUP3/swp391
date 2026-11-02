@@ -47,7 +47,7 @@ public class AppealController {
     }
 
     @PostMapping("/appeals")
-    public ResponseEntity<ApiResponse<AppealResponse>> submitAppeal(
+    public ResponseEntity<ApiResponse<AppealResponse>> submitAppeal( // [LUONG 1 - GUI KHIEU NAI] buoc 5/6 controller: lay userId tu token, goi 1 ham service, KHONG co if nghiep vu
             @Valid @RequestBody AppealCreateRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         Integer currentUserId = Integer.valueOf(jwt.getSubject());

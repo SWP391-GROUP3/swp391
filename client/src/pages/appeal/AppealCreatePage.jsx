@@ -99,7 +99,7 @@ export default function AppealCreatePage() {
 
     setDangGui(true)
     try {
-      await guiKhieuNai(articleId, criteria)
+      await guiKhieuNai(articleId, criteria) // [LUONG 1 - GUI KHIEU NAI] buoc 2/6 bam "Gui khieu nai" -> goi ham API
       navigate('/my-appeals', { state: { thongBao: 'Gửi khiếu nại thành công.' } })
     } catch (error) {
       setLoi(error.message)

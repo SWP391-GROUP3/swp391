@@ -14,6 +14,8 @@ const TAI_KHOAN_MAU = [
   { username: 'hung.dq',  email: 'hung.dq@toasoan.vn',  vaiTro: 'Phóng viên (Kinh tế)' },
   { username: 'cuong.lh', email: 'cuong.lh@toasoan.vn', vaiTro: 'Biên tập viên (Thời sự)' },
   { username: 'giang.nt', email: 'giang.nt@toasoan.vn', vaiTro: 'Biên tập viên (Kinh tế)' },
+  { username: 'test.bt1', email: 'test.bt1@toasoan.vn', vaiTro: 'Biên tập viên (Thời sự, test chấm mù)' },
+  { username: 'test.bt2', email: 'test.bt2@toasoan.vn', vaiTro: 'Biên tập viên (Thời sự, test chấm mù)' },
   { username: 'duc.vm',   email: 'duc.vm@toasoan.vn',   vaiTro: 'Trưởng ban (Thời sự)' },
   { username: 'dung.pt',  email: 'dung.pt@toasoan.vn',  vaiTro: 'Thư ký toà soạn' },
   { username: 'chi.hl',   email: 'chi.hl@toasoan.vn',   vaiTro: 'Kế toán' },
