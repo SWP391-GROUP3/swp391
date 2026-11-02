@@ -1,0 +1,275 @@
+/* ===========================================================================
+   SWP391 - BF-05: Báo cáo mức độ quan tâm thể loại & chi phí nhuận bút (UC-64)
+   Tuân thủ biến màu Figma (--fm-*). Tiền tố class: .bc-the-loai__
+   =========================================================================== */
+
+.bc-the-loai {
+  padding: 24px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* Header & Controls */
+.bc-the-loai__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.bc-the-loai__tieu-de {
+  margin: 0 0 6px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fm-chu);
+}
+
+.bc-the-loai__mo-ta {
+  margin: 0;
+  color: var(--fm-chu-nhat);
+  font-size: 14px;
+}
+
+.bc-the-loai__bo-loc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bc-the-loai__select {
+  padding: 8px 14px;
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  background-color: var(--fm-the);
+  color: var(--fm-chu);
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.bc-the-loai__select:focus {
+  border-color: var(--fm-chinh);
+}
+
+.bc-the-loai__btn-tai-lai {
+  padding: 8px 16px;
+  background-color: var(--fm-chinh);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bc-the-loai__btn-tai-lai:hover:not(:disabled) {
+  background-color: var(--fm-chinh-dam);
+}
+
+.bc-the-loai__btn-tai-lai:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Cards tong quan */
+.bc-the-loai__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.bc-the-loai__card {
+  background-color: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.bc-the-loai__card-nhan {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fm-chu-nhat);
+  margin-bottom: 8px;
+}
+
+.bc-the-loai__card-gia-tri {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fm-chu);
+}
+
+.bc-the-loai__card-gia-tri--chinh {
+  color: var(--fm-chinh);
+}
+
+.bc-the-loai__card-phu {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+  margin-top: 4px;
+}
+
+/* Thanh tim kiem & Bo loc nhanh */
+.bc-the-loai__thanh-cong-cu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bc-the-loai__tim-kiem {
+  padding: 8px 14px;
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+  background-color: var(--fm-the);
+  color: var(--fm-chu);
+  font-size: 14px;
+  min-width: 260px;
+  outline: none;
+}
+
+.bc-the-loai__tim-kiem:focus {
+  border-color: var(--fm-chinh);
+}
+
+.bc-the-loai__ghi-chu-luat {
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+  background-color: var(--fm-chon);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+/* Bang du lieu */
+.bc-the-loai__bang-khung {
+  background-color: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.bc-the-loai__bang {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.bc-the-loai__bang th {
+  background-color: #fafbfc;
+  color: var(--fm-chu-nhat);
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--fm-vien);
+  white-space: nowrap;
+}
+
+.bc-the-loai__bang td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--fm-vien);
+  color: var(--fm-chu);
+  vertical-align: middle;
+}
+
+.bc-the-loai__bang tr:last-child td {
+  border-bottom: none;
+}
+
+.bc-the-loai__bang tr:hover {
+  background-color: var(--fm-chon);
+}
+
+/* Thong tin the loai */
+.bc-the-loai__ten-the-loai {
+  font-weight: 600;
+  color: var(--fm-chu);
+  margin-bottom: 2px;
+}
+
+.bc-the-loai__ma-the-loai {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+}
+
+/* Huy hieu & Canh bao */
+.bc-the-loai__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bc-the-loai__badge--tot {
+  background-color: var(--fm-tot-nen);
+  color: var(--fm-tot);
+  border: 1px solid var(--fm-tot-vien);
+}
+
+.bc-the-loai__badge--canh-bao {
+  background-color: var(--fm-chu-y-nen);
+  color: var(--fm-chu-y);
+  border: 1px solid #fedf89;
+}
+
+.bc-the-loai__badge--nguy-co {
+  background-color: var(--fm-loi-nen);
+  color: var(--fm-loi);
+  border: 1px solid var(--fm-loi-vien);
+}
+
+.bc-the-loai__badge--phu {
+  background-color: #f2f4f7;
+  color: #344054;
+  border: 1px solid #eaecf0;
+}
+
+/* Gia tri so */
+.bc-the-loai__so-chinh {
+  font-weight: 600;
+}
+
+.bc-the-loai__so-phu {
+  font-size: 12px;
+  color: var(--fm-chu-nhat);
+  margin-top: 2px;
+}
+
+.bc-the-loai__khong-co-so {
+  color: var(--fm-chu-nhat);
+  font-style: italic;
+}
+
+/* Thong bao loi & dang tai */
+.bc-the-loai__dang-tai,
+.bc-the-loai__trong {
+  padding: 48px;
+  text-align: center;
+  color: var(--fm-chu-nhat);
+  font-size: 15px;
+}
+
+.bc-the-loai__loi {
+  background-color: var(--fm-loi-nen);
+  color: var(--fm-loi);
+  border: 1px solid var(--fm-loi-vien);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
