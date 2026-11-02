@@ -173,6 +173,10 @@ public class KpiAggregationService {
 
         // 2. Chay tong hop du lieu KPI moi nhat cho ky
         List<KpiSnapshot> draftSnapshots = aggregateMonthlyKpi(year, month);
+        if (draftSnapshots.isEmpty()) {
+            throw new BusinessException("Không có dữ liệu KPI để chốt cho kỳ " + month + "/" + year + ".");
+        }
+        Integer auditEntityId = null;
 
         // 3. Lay chi tieu de xet PASS / NOT_PASS
         List<KpiTarget> targets = kpiTargetRepository.findByTargetYearAndTargetMonth(year, month);
@@ -198,6 +202,12 @@ public class KpiAggregationService {
             snapshot.setFinalizedAt(now);
 
             KpiSnapshot saved = kpiSnapshotRepository.save(snapshot);
+            if (saved == null || saved.getId() == null) {
+                throw new BusinessException("Không thể ghi snapshot KPI vì dữ liệu snapshot chưa có ID hợp lệ.");
+            }
+            if (auditEntityId == null) {
+                auditEntityId = saved.getId();
+            }
             responseSnapshots.add(KpiSnapshotResponse.from(saved));
 
             // Kiem tra PASS / NOT_PASS theo BR-KPI-05
@@ -223,10 +233,6 @@ public class KpiAggregationService {
         }
 
         // 5. Ghi nhat ky kiem toan AuditLog
-        if (draftSnapshots.isEmpty()) {
-                throw new BusinessException("Kỳ KPI Tháng " + month + "/" + year + " đã được khóa và chốt kết quả bất biến, không thể chốt lại.");
-        }
-        Integer auditEntityId = draftSnapshots.get(0).getId();
         auditService.log(
                 finalizedBy,
                 "FINALIZE_KPI",

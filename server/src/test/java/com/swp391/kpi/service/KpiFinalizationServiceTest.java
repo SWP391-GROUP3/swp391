@@ -130,4 +130,32 @@ class KpiFinalizationServiceTest {
         verify(notificationService).notifyUser(eq(10), isNull(), anyString());
         verify(auditService).log(eq(headUserId), eq("FINALIZE_KPI"), eq("kpi_snapshots"), eq(100), anyString(), anyString());
     }
+
+    @Test
+    @DisplayName("Không ghi audit khi snapshot được lưu nhưng không có ID")
+    void testFinalizeRejectsSnapshotWithoutId() {
+        when(kpiSnapshotRepository.findByPeriodYearAndPeriodMonth(year, month))
+                .thenReturn(Collections.emptyList());
+
+        User reporter = new User();
+        reporter.setId(10);
+        Role reporterRole = new Role();
+        reporterRole.setCode(RoleCode.REPORTER);
+        reporter.setRole(reporterRole);
+        when(userRepository.findAll()).thenReturn(Collections.singletonList(reporter));
+        when(kpiTargetRepository.findByTargetYearAndTargetMonth(year, month))
+                .thenReturn(Collections.emptyList());
+        when(articleRepository.findAll()).thenReturn(Collections.emptyList());
+        when(kpiSnapshotRepository.findByReporterIdAndPeriodYearAndPeriodMonth(10, year, month))
+                .thenReturn(Optional.empty());
+        when(kpiSnapshotRepository.save(any(KpiSnapshot.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                kpiAggregationService.finalizeMonthlyKpi(year, month, headUserId, Collections.emptyMap())
+        );
+
+        assertTrue(ex.getMessage().contains("snapshot KPI"));
+        verify(auditService, never()).log(any(), any(), any(), any(), any(), any());
+    }
+
 }
