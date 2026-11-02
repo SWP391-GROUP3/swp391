@@ -28,4 +28,7 @@ public interface ReaderInteractionRepository extends JpaRepository<ReaderInterac
 
     @Query("SELECT r.articleId, SUM(r.pageViews) FROM ReaderInteraction r WHERE r.articleId IN :articleIds GROUP BY r.articleId")
     List<Object[]> sumPageViewsByArticleIds(@Param("articleIds") List<Integer> articleIds);
+
+    @Query("SELECT MAX(r.recordDate) FROM ReaderInteraction r")
+    LocalDate findMaxRecordDate();
 }

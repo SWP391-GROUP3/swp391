@@ -36,6 +36,8 @@ import DepartmentKpiDashboard from '../pages/kpi/DepartmentKpiDashboard.jsx'
 import ReporterKpiDetails from '../pages/kpi/ReporterKpiDetails.jsx'
 import PersonalKpiProgress from '../pages/kpi/PersonalKpiProgress.jsx'
 import GenrePopularityReport from '../pages/kpi/GenrePopularityReport.jsx'
+import TrendingEventsReport from '../pages/kpi/TrendingEventsReport.jsx'
+import MonthlyKpiFinalization from '../pages/kpi/MonthlyKpiFinalization.jsx'
 import AppealRuleConfigPage from '../pages/admin/AppealRuleConfigPage.jsx'
 import RoyaltyPeriods from '../pages/royalty/RoyaltyPeriods.jsx'
 import RoyaltyPeriodDetail from '../pages/royalty/RoyaltyPeriodDetail.jsx'
@@ -277,6 +279,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/kpi-targets" element={<MonthlyTargetSetting nguoiDung={nguoiDung} />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
               <Route path="/kpi-reports" element={<GenrePopularityReport nguoiDung={nguoiDung} />} />
+              <Route path="/kpi-trending" element={<TrendingEventsReport nguoiDung={nguoiDung} />} />
+              <Route path="/kpi-finalization" element={<MonthlyKpiFinalization nguoiDung={nguoiDung} />} />
             </>
           )}
           {vaiTro === 'EDITORIAL_SECRETARY' && (

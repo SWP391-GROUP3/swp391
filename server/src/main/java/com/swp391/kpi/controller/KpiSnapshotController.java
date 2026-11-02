@@ -2,15 +2,21 @@ package com.swp391.kpi.controller;
 
 import com.swp391.kpi.dto.ApiResponse;
 import com.swp391.kpi.dto.DepartmentKpiDashboardResponse;
+import com.swp391.kpi.dto.KpiFinalizeRequest;
+import com.swp391.kpi.dto.KpiFinalizeResponse;
 import com.swp391.kpi.dto.KpiSnapshotResponse;
 import com.swp391.kpi.dto.ReporterKpiDetailResponse;
 import com.swp391.kpi.entity.KpiSnapshot;
 import com.swp391.kpi.service.KpiAggregationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,5 +82,21 @@ public class KpiSnapshotController {
             responseList.add(KpiSnapshotResponse.from(s));
         }
         return ResponseEntity.ok(ApiResponse.success("Tổng hợp dữ liệu KPI chu kỳ thành công", responseList));
+    }
+
+    /**
+     * Chot ky KPI thang va luu snapshot bat bien (UC-66: Finalize Monthly KPI).
+     * POST /api/kpi-snapshots/finalize
+     */
+    @PostMapping("/finalize")
+    public ResponseEntity<ApiResponse<KpiFinalizeResponse>> finalizeMonthlyKpi(
+            @Valid @RequestBody KpiFinalizeRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        KpiFinalizeResponse response = kpiAggregationService.finalizeMonthlyKpi(
+                request.getYear(), request.getMonth(), currentUserId, request.getReporterNotes()
+        );
+        return ResponseEntity.ok(ApiResponse.success("Chốt kỳ KPI tháng thành công", response));
     }
 }

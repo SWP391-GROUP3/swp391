@@ -109,6 +109,14 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
           >
             {dangTongHop ? 'Đang tổng hợp...' : '⚡ Chạy tổng hợp tự động'}
           </button>
+
+          <Link
+            to="/kpi-finalization"
+            className="bang-kpi-ban__btn-tong-hop"
+            style={{ textDecoration: 'none', backgroundColor: '#e2f0d9', borderColor: '#b9e2b4', color: '#1f6f1a' }}
+          >
+            🔒 Chốt KPI tháng →
+          </Link>
         </div>
       </div>
 
