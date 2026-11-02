@@ -171,6 +171,44 @@ class ScoringAttemptServiceTest {
     }
 
     @Test
+    @DisplayName("Mở phiếu chấm của bài viết đã nộp đang chờ duyệt (PENDING_APPROVAL) trả về attempt đã nộp, không tạo attempt mới")
+    void testOpenScoringAttempt_SubmittedArticlePendingApproval_ReturnsSubmittedAttemptWithoutCreatingNew() {
+        article.setStatus(ArticleStatus.PENDING_APPROVAL);
+
+        ScoringAttempt submittedAttempt = new ScoringAttempt();
+        submittedAttempt.setId(503);
+        submittedAttempt.setArticleId(10);
+        submittedAttempt.setReviewerId(3);
+        submittedAttempt.setAttemptNo(1);
+        submittedAttempt.setAttemptType(AttemptType.INITIAL);
+        submittedAttempt.setDecision(ScoringDecision.ACCEPT);
+        submittedAttempt.setTotalScore(new BigDecimal("88.00"));
+        submittedAttempt.setSubmittedAt(LocalDateTime.now().minusMinutes(5));
+
+        ScoringAttemptDetail detail = new ScoringAttemptDetail();
+        detail.setId(603);
+        detail.setScoringAttempt(submittedAttempt);
+        detail.setCriterion(criterion1);
+        detail.setScore(new BigDecimal("88.00"));
+
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10))
+                .thenReturn(Optional.of(submittedAttempt));
+        when(scoringAttemptDetailRepository.findByScoringAttemptId(503))
+                .thenReturn(List.of(detail));
+
+        ScoringAttemptResponse res = scoringAttemptService.openScoringAttempt(10, 3);
+
+        assertNotNull(res);
+        assertEquals(503, res.getId());
+        assertEquals(new BigDecimal("88.00"), res.getTotalScore());
+        assertEquals(ScoringDecision.ACCEPT, res.getDecision());
+        assertNotNull(res.getSubmittedAt());
+        verify(scoringAttemptRepository, never()).save(any(ScoringAttempt.class));
+    }
+
+    @Test
     @DisplayName("Ném BusinessException khi BTV khác cố mở bài không được phân công cho mình")
     void testOpenScoringAttempt_WrongReviewer_ThrowsException() {
         when(articleRepository.findById(10)).thenReturn(Optional.of(article));

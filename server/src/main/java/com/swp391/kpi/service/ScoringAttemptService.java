@@ -7,8 +7,10 @@ import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.swp391.kpi.dto.*;
 import java.math.RoundingMode;
@@ -50,7 +52,7 @@ public class ScoringAttemptService {
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
     @Transactional
-    public ScoringAttemptResponse openScoringAttempt(Integer articleId, Integer reviewerId) {
+    public synchronized ScoringAttemptResponse openScoringAttempt(Integer articleId, Integer reviewerId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
 
@@ -64,14 +66,19 @@ public class ScoringAttemptService {
         Optional<ScoringAttempt> openAttemptOpt = scoringAttemptRepository
                 .findTopByArticleIdOrderByAttemptNoDesc(articleId);
 
-        // Neu da co attempt chua nop (submitted_at == null), tra ve de tiep tuc cham
-        if (openAttemptOpt.isPresent() && openAttemptOpt.get().getSubmittedAt() == null) {
-            ScoringAttempt openAttempt = openAttemptOpt.get();
-            List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(openAttempt.getId());
-            List<ScoringAttemptDetailResponse> detailResponses = details.stream()
-                    .map(ScoringAttemptDetailResponse::from)
-                    .toList();
-            return ScoringAttemptResponse.from(openAttempt, detailResponses, article.getTitle(), article.getContent());
+        // Neu da co attempt:
+        // 1. Chua nop (submitted_at == null): tra ve de tiep tuc cham.
+        // 2. Hoac bai viet khong con o trang thai ASSIGNED (vd dang PENDING_APPROVAL, SCORE_PUBLISHED, PUBLISHED...):
+        //    tra ve phieu cham da nop de xem lai (read-only), tuyet doi khong tao attempt moi lam ghi de ket qua.
+        if (openAttemptOpt.isPresent()) {
+            ScoringAttempt latestAttempt = openAttemptOpt.get();
+            if (latestAttempt.getSubmittedAt() == null || (article.getStatus() != null && article.getStatus() != ArticleStatus.ASSIGNED)) {
+                List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(latestAttempt.getId());
+                List<ScoringAttemptDetailResponse> detailResponses = details.stream()
+                        .map(ScoringAttemptDetailResponse::from)
+                        .toList();
+                return ScoringAttemptResponse.from(latestAttempt, detailResponses, article.getTitle(), article.getContent());
+            }
         }
 
         // Lay the loai de tim bo tieu chi ACTIVE
@@ -89,17 +96,7 @@ public class ScoringAttemptService {
         // Lay ban nop moi nhat cua bai viet
         ArticleVersion articleVersion = articleVersionRepository
                 .findFirstByArticleIdAndKindOrderByVersionNoDesc(articleId, ArticleVersionKind.SUBMISSION)
-                .orElseGet(() -> {
-                    ArticleVersion fallback = new ArticleVersion();
-                    fallback.setArticleId(articleId);
-                    fallback.setVersionNo(1);
-                    fallback.setKind(ArticleVersionKind.SUBMISSION);
-                    fallback.setTitle(article.getTitle());
-                    fallback.setContent(article.getContent());
-                    fallback.setCreatedBy(article.getAuthorId());
-                    fallback.setCreatedAt(LocalDateTime.now());
-                    return articleVersionRepository.save(fallback);
-                });
+                .orElseThrow(() -> new BusinessException("Bài viết chưa có bản nộp nào"));
 
         int nextAttemptNo = openAttemptOpt.map(a -> a.getAttemptNo() + 1).orElse(1);
         AttemptType attemptType = (nextAttemptNo == 1) ? AttemptType.INITIAL : AttemptType.RESCORE;
@@ -174,6 +171,51 @@ public class ScoringAttemptService {
         });
 
         return res;
+    }
+
+    /**
+     * Lay lan cham gan nhat cua mot bai viet kem kiem tra quyen nguoi dung (UC-30, UC-34).
+     */
+    @Transactional(readOnly = true)
+    public ScoringAttemptResponse getLatestAttemptForUser(Integer articleId, Integer currentUserId) {
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng với ID: " + currentUserId));
+        RoleCode roleCode = user.getRole() != null ? user.getRole().getCode() : null;
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+
+        // ADMIN va Truong ban luon co quyen xem
+        if (RoleCode.ADMIN.equals(roleCode) || RoleCode.HEAD_OF_DEPARTMENT.equals(roleCode)) {
+            return getLatestAttemptByArticle(articleId);
+        }
+
+        // BTV phai la nguoi duoc phan cong bai viet hoac la nguoi cham
+        if (RoleCode.EDITOR.equals(roleCode)) {
+            Assignment assignment = assignmentRepository.findByArticleId(articleId).orElse(null);
+            boolean isAssignedEditor = assignment != null && assignment.getEditorId().equals(currentUserId);
+
+            ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId).orElse(null);
+            boolean isReviewer = attempt != null && currentUserId.equals(attempt.getReviewerId());
+
+            if (!isAssignedEditor && !isReviewer) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không được phân công biên tập bài viết này");
+            }
+            return getLatestAttemptByArticle(articleId);
+        }
+
+        // Tac gia cua bai viet
+        if (article.getAuthorId().equals(currentUserId)) {
+            // Chi duoc xem khi diem da cong bo hoac bai bi tra ve / tu choi
+            ArticleStatus status = article.getStatus();
+            if (status == ArticleStatus.SCORE_PUBLISHED || status == ArticleStatus.PUBLISHED
+                    || status == ArticleStatus.REVISION_REQUESTED || status == ArticleStatus.REJECTED) {
+                return getLatestAttemptByArticle(articleId);
+            }
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Điểm đánh giá của bài viết đang chờ phê duyệt, chưa được công bố");
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xem thông tin phiếu chấm của bài viết này");
     }
 
     // BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
@@ -377,6 +419,23 @@ public class ScoringAttemptService {
             articleService.updateArticleStatus(articleId, ArticleStatus.REJECTED, editorId, "REJECT", decisionNote);
         } else {
             throw new BusinessException("Quyết định không hợp lệ: " + decision);
+        }
+
+        // Tinh tong diem neu chua co de thoa man check constraint ck_scoring_attempts_submitted
+        if (attempt.getTotalScore() == null) {
+            List<ScoringAttemptDetail> currentDetails = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
+            BigDecimal total = BigDecimal.ZERO;
+            if (currentDetails != null && !currentDetails.isEmpty()) {
+                for (ScoringAttemptDetail d : currentDetails) {
+                    BigDecimal score = d.getScore() != null ? d.getScore() : BigDecimal.ZERO;
+                    BigDecimal weight = (d.getCriterion() != null && d.getCriterion().getWeight() != null)
+                            ? d.getCriterion().getWeight()
+                            : BigDecimal.ZERO;
+                    BigDecimal contribution = score.multiply(weight).divide(new BigDecimal("100.00"), 4, RoundingMode.HALF_UP);
+                    total = total.add(contribution);
+                }
+            }
+            attempt.setTotalScore(total.setScale(2, RoundingMode.HALF_UP));
         }
 
         attempt.setDecision(decision);

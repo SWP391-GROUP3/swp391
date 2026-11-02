@@ -77,8 +77,10 @@ public class ScoringAttemptController {
     // Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
     @GetMapping("/article/{articleId}/latest")
     public ResponseEntity<ApiResponse<ScoringAttemptResponse>> getLatestAttempt(
-            @PathVariable Integer articleId) {
-        ScoringAttemptResponse response = scoringAttemptService.getLatestAttemptByArticle(articleId);
+            @PathVariable Integer articleId,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        ScoringAttemptResponse response = scoringAttemptService.getLatestAttemptForUser(articleId, currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin phiếu chấm thành công", response));
     }
 }

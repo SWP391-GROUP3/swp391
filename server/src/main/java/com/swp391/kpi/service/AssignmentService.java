@@ -3,14 +3,23 @@ package com.swp391.kpi.service;
 import com.swp391.kpi.dto.AssignmentCreateRequest;
 import com.swp391.kpi.dto.AssignmentResponse;
 import com.swp391.kpi.dto.EditorWorkloadDTO;
+import com.swp391.kpi.dto.PendingAssignmentResponse;
+import com.swp391.kpi.entity.Article;
+import com.swp391.kpi.entity.ArticleStatus;
 import com.swp391.kpi.entity.Assignment;
+import com.swp391.kpi.entity.Genre;
+import com.swp391.kpi.entity.User;
 import com.swp391.kpi.exception.BusinessException;
+import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.AssignmentRepository;
+import com.swp391.kpi.repository.GenreRepository;
+import com.swp391.kpi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +40,43 @@ import java.util.Optional;
 public class AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
+    private final ArticleService articleService;
+    private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
+    private final GenreRepository genreRepository;
+
+    /**
+     * Lấy danh sách bài viết SUBMITTED cho Trưởng ban phân công (UC-18).
+     */
+    @Transactional(readOnly = true)
+    public List<PendingAssignmentResponse> getPendingAssignments(Integer sectionId) {
+        List<Article> articles = (sectionId != null)
+                ? articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.SUBMITTED, sectionId)
+                : articleRepository.findByStatusOrderByUpdatedAtDesc(ArticleStatus.SUBMITTED);
+
+        List<PendingAssignmentResponse> result = new ArrayList<>();
+        for (Article art : articles) {
+            String authorName = (art.getAuthorId() != null)
+                    ? userRepository.findById(art.getAuthorId()).map(User::getFullName).orElse("Tác giả #" + art.getAuthorId())
+                    : "Chưa rõ";
+
+            Integer catId = art.getCategoryId() != null ? art.getCategoryId() : art.getDeclaredCategoryId();
+            String catName = (catId != null)
+                    ? genreRepository.findById(catId).map(Genre::getName).orElse("Thể loại #" + catId)
+                    : "Chưa phân loại";
+
+            result.add(new PendingAssignmentResponse(
+                    art.getId(),
+                    art.getTitle(),
+                    authorName,
+                    catName,
+                    catId,
+                    art.getSubmittedAt(),
+                    art.getSectionId()
+            ));
+        }
+        return result;
+    }
 
     /**
      * Trưởng ban phân công một bài viết cho một BTV chấm chất lượng (UC-18, UC-20, BR-QA-04).
@@ -48,6 +94,15 @@ public class AssignmentService {
         if (request.getAssignedBy() == null) {
             throw new BusinessException("Mã người giao bài không được để trống");
         }
+
+        // Cập nhật trạng thái bài viết sang ASSIGNED và ghi log lịch sử (UC-20)
+        articleService.updateArticleStatus(
+                request.getArticleId(),
+                ArticleStatus.ASSIGNED,
+                request.getAssignedBy(),
+                "ASSIGN",
+                "Phân công cho Biên tập viên #" + request.getEditorId()
+        );
 
         // Kiểm tra xem bài đã có phân công chưa (BR-QA-04)
         Assignment assignment = assignmentRepository.findByArticleId(request.getArticleId())

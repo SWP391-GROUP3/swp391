@@ -4,6 +4,7 @@ import com.swp391.kpi.dto.ApiResponse;
 import com.swp391.kpi.dto.AssignmentCreateRequest;
 import com.swp391.kpi.dto.AssignmentResponse;
 import com.swp391.kpi.dto.EditorWorkloadDTO;
+import com.swp391.kpi.dto.PendingAssignmentResponse;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.service.AssignmentService;
 import jakarta.validation.Valid;
@@ -30,6 +31,16 @@ import java.util.List;
 public class AssignmentController {
 
     private final AssignmentService assignmentService;
+
+    /**
+     * Lấy danh sách bài viết SUBMITTED cho Trưởng ban phân công (UC-18).
+     */
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse<List<PendingAssignmentResponse>>> getPendingAssignments(
+            @RequestParam(required = false) Integer sectionId) {
+        List<PendingAssignmentResponse> list = assignmentService.getPendingAssignments(sectionId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách bài chờ phân công thành công", list));
+    }
 
     /**
      * Trưởng ban giao bài viết cho BTV chấm chất lượng (UC-18, UC-20).
