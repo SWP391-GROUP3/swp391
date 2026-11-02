@@ -55,8 +55,12 @@ const MENU_TRUONG_BAN = [
         icon: <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="4" /><circle cx="12" cy="12" r=".6" /></> },
       { path: '/kpi-benchmarks', nhan: 'Định mức chuẩn',                 // UC-58
         icon: <><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></> },
-      { path: '/kpi-reports', nhan: 'Báo cáo',                           // UC-64, 65, 68
+      { path: '/kpi-reports', nhan: 'Báo cáo',                           // UC-64
         icon: <><path d="M6 3h9l4 4v14H6V3Z" /><path d="M15 3v4h4" /><path d="M9 17v-3M12 17v-6M15 17v-4" /></> },
+      { path: '/kpi-trending', nhan: 'Sự kiện xu hướng',                 // UC-65
+        icon: <><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></> },
+      { path: '/kpi-finalization', nhan: 'Chốt KPI tháng',               // UC-66
+        icon: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></> },
     ],
   },
 ]

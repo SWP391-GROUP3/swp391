@@ -4,6 +4,7 @@ import com.swp391.kpi.dto.KpiBenchmarkConfigDto;
 import com.swp391.kpi.dto.KpiTargetCreateRequest;
 import com.swp391.kpi.dto.KpiTargetResponse;
 import com.swp391.kpi.dto.KpiTargetUpdateRequest;
+import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.KpiTarget;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
@@ -35,6 +36,7 @@ import java.util.List;
 public class KpiTargetService {
 
     private final KpiTargetRepository kpiTargetRepository;
+    private final UserReadService userReadService;
 
     /**
      * Lấy danh sách chỉ tiêu theo kỳ (năm và tháng) cho màn hình UC-59.
@@ -89,6 +91,31 @@ public class KpiTargetService {
      */
     @Transactional
     public KpiTargetResponse createTarget(KpiTargetCreateRequest request, Integer setByUserId) {
+        UserAccessResponse reporter = null;
+        List<UserAccessResponse> users = userReadService.getUsers();
+        for (UserAccessResponse user : users) {
+            if (user.id().equals(request.getReporterId())) {
+                reporter = user;
+                break;
+            }
+        }
+
+        if (reporter == null) {
+            throw new NotFoundException(
+                    "Không tìm thấy người dùng có ID phóng viên: " + request.getReporterId()
+            );
+        }
+        if (!"REPORTER".equals(reporter.role())) {
+            throw new BusinessException(
+                    "Người dùng ID " + request.getReporterId() + " không phải phóng viên"
+            );
+        }
+        if (!"ACTIVE".equals(reporter.status())) {
+            throw new BusinessException(
+                    "Phóng viên ID " + request.getReporterId() + " không hoạt động"
+            );
+        }
+
         // Kiểm tra xem đã có chỉ tiêu trong kỳ này chưa (BR-KPI-01)
         boolean exists = kpiTargetRepository.existsByReporterIdAndTargetYearAndTargetMonth(
                 request.getReporterId(),

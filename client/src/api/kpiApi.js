@@ -13,6 +13,8 @@
  *   71  tongHopKpiThang()               Kich hoat job tong hop so lieu KPI tu dong cho ky (Automated Aggregat… [POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}]
  *   78  layChiTietKpiPhongVien()        Lay chi tiet KPI cua mot phong vien theo chu ky thang (UC-62, UC-60) [GET /api/kpi-snapshots/reporters/{reporterId}/details?year={nam}&month={thang}]
  *   85  layBaoCaoTheLoai()              Lay bao cao muc do quan tam the loai & chi phi nhuan but (UC-64) [GET /api/kpi-reports/genres?year={nam}&month={thang}]
+ *   97  layBaoCaoSuKienXuHuong()        Lay bao cao su kien xu huong va phat hien tang dot bien (UC-65) [GET /api/kpi-reports/trending-events?anchorDate={ngay}]
+ *  108  chotKpiThang()                  Chot ky KPI thang va luu snapshot bat bien (UC-66) [POST /api/kpi-snapshots/finalize]
  */
 import { goiApi } from './goiApi.js'
 
@@ -93,4 +95,25 @@ export async function layBaoCaoTheLoai(nam, thang) {
   }
   return goiApi(url)
 }
+
+/**
+ * Lấy báo cáo sự kiện xu hướng và phát hiện tăng đột biến (UC-65).
+ */
+export async function layBaoCaoSuKienXuHuong(anchorDate) {
+  let url = '/api/kpi-reports/trending-events'
+  if (anchorDate) {
+    url += `?anchorDate=${anchorDate}`
+  }
+  return goiApi(url)
+}
+
+/**
+ * Chốt kỳ KPI tháng và lưu snapshot bất biến (UC-66).
+ * body: { year, month, reporterNotes }
+ */
+export async function chotKpiThang(duLieu) {
+  return goiApi('/api/kpi-snapshots/finalize', { method: 'POST', body: duLieu })
+}
+
+
 

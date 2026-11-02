@@ -1,6 +1,8 @@
 package com.swp391.kpi.service;
 import com.swp391.kpi.dto.DepartmentKpiDashboardResponse;
 import com.swp391.kpi.dto.DepartmentKpiItemResponse;
+import com.swp391.kpi.dto.KpiFinalizeResponse;
+import com.swp391.kpi.dto.KpiSnapshotResponse;
 import com.swp391.kpi.dto.KpiSnapshotResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -60,6 +62,8 @@ public class KpiAggregationService {
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ReaderInteractionRepository readerInteractionRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
+    private final AuditService auditService;
     private final AppealEffectiveScoreService appealEffectiveScoreService;  // BF-03: diem hieu luc cua bai
 
     // Dung may tinh toan thuan KpiCalculator (AGENTS.md muc 3.1)
@@ -152,6 +156,111 @@ public class KpiAggregationService {
             result.add(KpiSnapshotResponse.from(saved));
         }
         return result;
+    }
+
+    /**
+     * Chot ky KPI thang va luu snapshot bat bien (UC-66, BR-KPI-06).
+     * Dieu kien nghiep vu:
+     * - Neu ky da co snapshot o trang thai FINALIZED -> chan khong cho chot lai (E1: Period Already Finalized).
+     * - Tinh toan xep loai PASS / NOT_PASS theo chi tieu (BR-KPI-05).
+     * - Chuyen trang thai snapshot sang FINALIZED, luu nguoi chot va thoi diem chot.
+     * - Gui thong bao ket qua cho tung phong vien (UC-67).
+     * - Ghi nhat ky he thong audit_logs.
+     */
+    @Transactional
+    public KpiFinalizeResponse finalizeMonthlyKpi(Short year, Byte month, Integer finalizedBy, Map<Integer, String> reporterNotes) {
+        validatePeriod(year, month);
+
+        // 1. Kiem tra xem ky da tung duoc chot truoc do chua (E1)
+        List<KpiSnapshot> existingSnapshots = kpiSnapshotRepository.findByPeriodYearAndPeriodMonth(year, month);
+        for (KpiSnapshot s : existingSnapshots) {
+            if (s.getStatus() == KpiSnapshotStatus.FINALIZED) {
+                throw new BusinessException("Kỳ KPI Tháng " + month + "/" + year + " đã được khóa và chốt kết quả bất biến, không thể chốt lại.");
+            }
+        }
+
+        // 2. Chay tong hop du lieu KPI moi nhat cho ky
+        List<KpiSnapshot> draftSnapshots = aggregateMonthlyKpi(year, month);
+        if (draftSnapshots.isEmpty()) {
+            throw new BusinessException("Không có dữ liệu KPI để chốt cho kỳ " + month + "/" + year + ".");
+        }
+        Integer auditEntityId = null;
+
+        // 3. Lay chi tieu de xet PASS / NOT_PASS
+        List<KpiTarget> targets = kpiTargetRepository.findByTargetYearAndTargetMonth(year, month);
+        Map<Integer, KpiTarget> targetMap = new HashMap<>();
+        for (KpiTarget t : targets) {
+            targetMap.put(t.getReporterId(), t);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        List<KpiSnapshotResponse> responseSnapshots = new ArrayList<>();
+        int passCount = 0;
+        int notPassCount = 0;
+
+        for (KpiSnapshot snapshot : draftSnapshots) {
+            // Gan ghi chu danh gia tu Truong ban neu co
+            if (reporterNotes != null && reporterNotes.containsKey(snapshot.getReporterId())) {
+                snapshot.setNotes(reporterNotes.get(snapshot.getReporterId()));
+            }
+
+            // Chuyen trang thai sang FINALIZED bat bien (BR-KPI-06)
+            snapshot.setStatus(KpiSnapshotStatus.FINALIZED);
+            snapshot.setFinalizedBy(finalizedBy);
+            snapshot.setFinalizedAt(now);
+
+            KpiSnapshot saved = kpiSnapshotRepository.save(snapshot);
+            if (saved == null || saved.getId() == null) {
+                throw new BusinessException("Không thể ghi snapshot KPI vì dữ liệu snapshot chưa có ID hợp lệ.");
+            }
+            if (auditEntityId == null) {
+                auditEntityId = saved.getId();
+            }
+            responseSnapshots.add(KpiSnapshotResponse.from(saved));
+
+            // Kiem tra PASS / NOT_PASS theo BR-KPI-05
+            KpiTarget target = targetMap.get(snapshot.getReporterId());
+            int minPublished = target != null ? target.getMinPublished() : 0;
+            BigDecimal minAvgScore = target != null ? target.getMinAvgScore() : BigDecimal.ZERO;
+            boolean isPass = kpiCalculator.evaluatePassStatus(
+                    snapshot.getActualArticles(), snapshot.getActualAvgScore(), minPublished, minAvgScore
+            );
+
+            if (isPass) {
+                passCount++;
+            } else {
+                notPassCount++;
+            }
+
+            // 4. Gui thong bao cho phong vien (UC-66 buoc 4, UC-67)
+            String resultText = isPass ? "ĐẠT (PASS)" : "CHƯA ĐẠT (NOT_PASS)";
+            String msg = String.format("Kết quả KPI Tháng %d/%d của bạn đã được chốt chính thức: %s. Số bài quy đổi: %d, Điểm TB: %s.",
+                    month, year, resultText, snapshot.getActualArticles(),
+                    snapshot.getActualAvgScore() != null ? snapshot.getActualAvgScore() : "—");
+            notificationService.notifyUser(snapshot.getReporterId(), null, msg);
+        }
+
+        // 5. Ghi nhat ky kiem toan AuditLog
+        auditService.log(
+                finalizedBy,
+                "FINALIZE_KPI",
+                "kpi_snapshots",
+                auditEntityId,
+                "DRAFT",
+                String.format("FINALIZED kỳ %d/%d: %d phóng viên (Đạt: %d, Chưa đạt: %d)", month, year, draftSnapshots.size(), passCount, notPassCount)
+        );
+
+        KpiFinalizeResponse response = new KpiFinalizeResponse();
+        response.setYear(year);
+        response.setMonth(month);
+        response.setTotalReporters(draftSnapshots.size());
+        response.setPassCount(passCount);
+        response.setNotPassCount(notPassCount);
+        response.setFinalizedBy(finalizedBy);
+        response.setFinalizedAt(now);
+        response.setSnapshots(responseSnapshots);
+
+        return response;
     }
 
     /**
