@@ -112,10 +112,10 @@ class RoyaltyPaymentServiceTest {
     @Test
     void myRoyaltiesGroupsLinesOfOnePeriodWithItsVoucher() {
         RoyaltyPeriod period = period(RoyaltyPeriodStatus.LOCKED);
-        when(royaltyLineRepository.findByUserIdOrderByCreatedAtDesc(REPORTER_ID)).thenReturn(List.of(
+        when(royaltyLineRepository.findMyLines(REPORTER_ID)).thenReturn(List.of(
                 line(period, 11, RoyaltyLineType.ARTICLE, "580000"),
                 line(period, 12, RoyaltyLineType.MEDIA, "234000")));
-        when(royaltyPaymentRepository.findByUserId(REPORTER_ID)).thenReturn(List.of(unpaid(period)));
+        when(royaltyPaymentRepository.findMyPayments(REPORTER_ID)).thenReturn(List.of(unpaid(period)));
         when(articlePublishedService.getPublishedArticles()).thenReturn(List.of(article(11, "Bài A"), article(12, "Bài B")));
         when(userReadService.getUserNames()).thenReturn(Map.of(REPORTER_ID, "Phóng viên A"));
 

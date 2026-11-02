@@ -2,6 +2,8 @@ package com.swp391.kpi.repository;
 
 import com.swp391.kpi.entity.RoyaltyLine;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -10,9 +12,9 @@ import java.util.List;
  * UC-47/48 chi dung save() co san de ghi dong ARTICLE / MEDIA.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   19  findByPeriodId()                Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi (UC-50)
- *   24  deleteByGradingId()             Cham lai trong ky OPEN (nhom chot 27/10/2026): xoa dong tien cua phien ban cu
- *   27  findByUserIdOrderByCreatedAtDesc() UC-57: moi dong tien cua 1 nguoi qua moi ky
+ *   22  findByPeriodId()                Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi (UC-50)
+ *   27  deleteByGradingId()             Cham lai trong ky OPEN (nhom chot 27/10/2026): xoa dong tien cua phien ban cu
+ *   34  findMyLines()                  UC-57: moi dong tien cua 1 nguoi qua moi ky, nap san ky + phieu cham (JOIN FETCH)
  */
 public interface RoyaltyLineRepository extends JpaRepository<RoyaltyLine, Integer> {
 
@@ -24,6 +26,10 @@ public interface RoyaltyLineRepository extends JpaRepository<RoyaltyLine, Intege
     // Spring tu viet cau DELETE tu ten ham; service goi phai co @Transactional.
     void deleteByGradingId(Integer gradingId);
 
-    // UC-57: moi dong tien cua 1 nguoi (bai, anh, dieu chinh) qua moi ky, moi nhat len dau
-    List<RoyaltyLine> findByUserIdOrderByCreatedAtDesc(Integer userId);
+    // UC-57: moi dong tien cua 1 nguoi (bai, anh, dieu chinh) qua moi ky, moi nhat len dau.
+    // JOIN FETCH nap luon ky va phieu cham trong cung 1 cau SQL; neu khong, moi lan goi
+    // line.getPeriod() / line.getGrading() lai chay them 1 cau (loi N+1).
+    @Query("SELECT l FROM RoyaltyLine l JOIN FETCH l.period JOIN FETCH l.grading"
+            + " WHERE l.userId = :userId ORDER BY l.createdAt DESC")
+    List<RoyaltyLine> findMyLines(@Param("userId") Integer userId);
 }

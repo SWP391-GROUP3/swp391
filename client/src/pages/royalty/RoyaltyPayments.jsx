@@ -17,16 +17,16 @@ const PAYABLE_STATUSES = ['LOCKED', 'PAID']
  * MO TRANG NAY TAI: /royalty-payments (co the kem ?periodId=)
  *
  * MUC LUC (so dong - ten - tac dung)
- *    9  PAYABLE_STATUSES                hang so
- *   30  RoyaltyPayments()               xem tom tat dau file
- *   39    useEffect                     tai danh sach ky da khoa khi mo trang, chon san ky trong ?periodId
+ *   10  PAYABLE_STATUSES                hang so
+ *   31  RoyaltyPayments()               xem tom tat dau file
+ *   40    useEffect                     tai danh sach ky da khoa khi mo trang, chon san ky trong ?periodId
  *   58    useEffect                     doi ky -> tai phieu chi cua ky do
- *   73    handlePay()                   ghi nhan da chi 1 phieu, tai lai phieu va trang thai ky
+ *   70    handlePay()                   ghi nhan da chi 1 phieu, chi thay dong do; phieu cuoi moi tai lai ky
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  116  o chon [Ky]                     doi ?periodId -> tai phieu chi cua ky moi
- *  136  link [Xem bang ke]              mo trang /royalty-periods/{periodId} (RoyaltyPeriodDetail)
- *  175  [Ghi nhan da chi]               handlePay() -> hoi xac nhan; goi POST /api/royalty-payments/{id}/pay
+ *  124  o chon [Ky]                     doi ?periodId -> tai phieu chi cua ky moi
+ *  141  link [Xem bang ke]              mo trang /royalty-periods/{periodId} (RoyaltyPeriodDetail)
+ *  183  [Ghi nhan da chi]              handlePay() -> hoi xac nhan; goi POST /api/royalty-payments/{id}/pay
  */
 export default function RoyaltyPayments() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -77,13 +77,18 @@ export default function RoyaltyPayments() {
     setPayError('')
     setSuccessMessage('')
     try {
-      await recordRoyaltyPayment(payment.id)
-      // Tai lai phieu chi va danh sach ky: phieu cuoi chi xong thi ky doi sang PAID
-      const [updatedPayments, allPeriods] = await Promise.all([getRoyaltyPayments(periodId), getRoyaltyPeriods()])
+      // Server tra ve phieu vua chi -> chi thay dung dong do, khong tai lai ca danh sach
+      const saved = await recordRoyaltyPayment(payment.id)
+      const updatedPayments = payments.map((item) => (item.id === saved.id ? saved : item))
       setPayments(updatedPayments)
-      setPeriods(allPeriods.filter((period) => PAYABLE_STATUSES.includes(period.status)))
-      const periodNowPaid = allPeriods.some((period) => String(period.id) === periodId && period.status === 'PAID')
-      setSuccessMessage(periodNowPaid
+
+      const isLastPayment = updatedPayments.every((item) => item.status === 'PAID')
+      if (isLastPayment) {
+        // Phieu cuoi chi xong thi server da chuyen ky sang PAID (BR-RY-07): tai lai danh sach ky
+        const allPeriods = await getRoyaltyPeriods()
+        setPeriods(allPeriods.filter((period) => PAYABLE_STATUSES.includes(period.status)))
+      }
+      setSuccessMessage(isLastPayment
         ? 'Đã chi xong toàn bộ phiếu. Kỳ đã chuyển sang "Đã chi trả" và phóng viên đã được báo.'
         : `Đã ghi nhận chi cho ${payment.fullName || `người dùng #${payment.userId}`}.`)
     } catch (err) {
