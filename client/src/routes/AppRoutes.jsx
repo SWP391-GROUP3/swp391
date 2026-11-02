@@ -43,6 +43,8 @@ import RoyaltyPendingList from '../pages/royalty/RoyaltyPendingList.jsx'
 import RoyaltyGrading from '../pages/royalty/RoyaltyGrading.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
+import RoyaltyPayments from '../pages/royalty/RoyaltyPayments.jsx'
+import MyRoyalties from '../pages/royalty/MyRoyalties.jsx'
 import ReaderDataImport from '../pages/admin/ReaderDataImport.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
 import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
@@ -59,10 +61,8 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  * tam hien ComingSoon. Lam xong trang nao thi bo dong do khoi mang
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
-const TRANG_PV_CHUA_LAM = [
-  { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
-  { path: '/my-royalties', ten: 'Nhuận bút' },              // UC-57
-]
+// Phong vien: UC-57 Nhuan but da lam (Quang, 02/11/2026) -> mang rong
+const TRANG_PV_CHUA_LAM = []
 
 const TRANG_BTV_CHUA_LAM = [
   { path: '/assigned-articles/:id', ten: 'Chấm bài' },               // UC-22…28
@@ -83,9 +83,8 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
 ]
 
-const TRANG_KT_CHUA_LAM = [
-  { path: '/royalty-payments', ten: 'Chi trả nhuận bút' },       // UC-54
-]
+// Ke toan: UC-54 Chi tra nhuan but da lam (Quang, 02/11/2026) -> mang rong
+const TRANG_KT_CHUA_LAM = []
 
 const TRANG_ADMIN_CHUA_LAM = [
   { path: '/users', ten: 'Tài khoản' },
@@ -242,6 +241,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/co-author-invites" element={<CoAuthorInvites />} />
               {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
               <Route path="/my-kpi" element={<PersonalKpiProgress nguoiDung={nguoiDung} />} />
+              {/* BF-04 (Quang): UC-57 nhuan but cua toi */}
+              <Route path="/my-royalties" element={<MyRoyalties />} />
             </>
           )}
           {vaiTro === 'EDITOR' && (
@@ -295,6 +296,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/royalty-periods" element={<RoyaltyPeriods />} />
               <Route path="/royalty-periods/:id" element={<RoyaltyPeriodDetail nguoiDung={nguoiDung} />} />
               <Route path="/royalty-rates" element={<RoyaltyRates />} />
+              {/* BF-04 (Quang): UC-54 ghi nhan chi tra phieu chi */}
+              <Route path="/royalty-payments" element={<RoyaltyPayments />} />
             </>
           )}
           {vaiTro === 'ADMIN' && (

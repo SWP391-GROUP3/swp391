@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import {
   layDinhMucChuan,
   layChiTieuTheoThang,
@@ -34,8 +35,8 @@ import {
  *  349  [Huy]                           tren trang: dong/xoa hien modal
  */
 export default function MonthlyTargetSetting({ nguoiDung }) {
-  const [nam, setNam] = useState(2026)
-  const [thang, setThang] = useState(9)
+  const [nam, setNam] = useState(namHienTai())
+  const [thang, setThang] = useState(thangHienTai())
   const [danhSach, setDanhSach] = useState([])
   const [dinhMucChuan, setDinhMucChuan] = useState([])
   const [dangTai, setDangTai] = useState(false)

@@ -1,5 +1,6 @@
 package com.swp391.kpi.service;
 
+import com.swp391.kpi.dto.AppealEffectiveAttemptResponse;
 import com.swp391.kpi.dto.ArticlePublishedResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyAttachmentResponse;
 import com.swp391.kpi.dto.ArticleRoyaltyAuthorResponse;
@@ -11,7 +12,6 @@ import com.swp391.kpi.dto.RoyaltyGradingCreateRequest;
 import com.swp391.kpi.dto.RoyaltyGradingMediaResponse;
 import com.swp391.kpi.dto.RoyaltyGradingResponse;
 import com.swp391.kpi.dto.RoyaltyPendingArticleResponse;
-import com.swp391.kpi.dto.ScoringReadResponse;
 import com.swp391.kpi.entity.Event;
 import com.swp391.kpi.entity.MediaFactor;
 import com.swp391.kpi.entity.RoyaltyGrading;
@@ -65,23 +65,23 @@ import java.util.Set;
  *  ---- Ham phu (private, chi dung trong file) ----
  *  245  checkCanRegrade()               Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky, UC-52); phien ban…
  *  260  calculate()                     Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
- *  298  findSaturationRate()            Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100; co su kien thi RoyaltyCalculator xe…
- *  310  splitArticleAmount()            Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d, tac gia chinh nhan phan con lai
- *  329  gradeMedia()                    UC-48: cham tung anh/video
- *  349  findNoRoyaltyReason()           Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05): - lay tu nguon ngoai - trung (DU…
- *  362  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
- *  368  sumMediaAmount()                sum media amount
- *  377  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
- *  385  findRateOnDate()                UC-09: don gia hieu luc tai 1 ngay (uoc tinh dung hom nay)
- *  392  findExemptScore()               UC-09: muc diem duoc mien giam bao hoa cua su kien; bai khong thuoc su kien -> null
- *  405  parseNature()                   UC-09: doi tinh chat bai (chuoi BF-01 truyen vao) sang enum, sai thi bao loi
- *  416  findOpenPeriod()                tim open period
- *  420  fillPeriod()                    fill period
- *  430  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)
- *  457  saveArticleLines()              Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
- *  468  saveMediaItemsAndLines()        Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh
- *  488  newLine()                       new line
- *  504  readInt()                       Lay 1 tham so so nguyen
+ *  302  findSaturationRate()            Ty le bao hoa dung de tinh tien (GBR-09): bai khong thuoc su kien -> 100; co su kien thi RoyaltyCalculator xe…
+ *  314  splitArticleAmount()            Chia tien bai cho cac tac gia (GBR-10): dong tac gia lam tron xuong 1.000d, tac gia chinh nhan phan con lai
+ *  333  gradeMedia()                    UC-48: cham tung anh/video
+ *  353  findNoRoyaltyReason()           Ly do anh/video KHONG duoc tinh tien; null = duoc tinh (BR-RY-04, BR-IN-05): - lay tu nguon ngoai - trung (DU…
+ *  366  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
+ *  372  sumMediaAmount()                sum media amount
+ *  381  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
+ *  389  findRateOnDate()                UC-09: don gia hieu luc tai 1 ngay (uoc tinh dung hom nay)
+ *  396  findExemptScore()               UC-09: muc diem duoc mien giam bao hoa cua su kien; bai khong thuoc su kien -> null
+ *  409  parseNature()                   UC-09: doi tinh chat bai (chuoi BF-01 truyen vao) sang enum, sai thi bao loi
+ *  420  findOpenPeriod()                tim open period
+ *  424  fillPeriod()                    fill period
+ *  434  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)
+ *  461  saveArticleLines()              Moi tac gia 1 dong ARTICLE; tong cac dong = dung tien phan bai viet (GBR-10)
+ *  472  saveMediaItemsAndLines()        Moi anh/video duoc tinh tien: 1 dong royalty_media_items + 1 dong MEDIA cho tac gia anh
+ *  492  newLine()                       new line
+ *  508  readInt()                       Lay 1 tham so so nguyen
  */
 @Service
 @RequiredArgsConstructor
@@ -104,7 +104,7 @@ public class RoyaltyGradingService {
     private final MediaFactorRepository mediaFactorRepository;
     private final EventRepository eventRepository;
     private final ArticlePublishedService articlePublishedService;  // service cua BF-01, khong query bang articles
-    private final ScoringReadService scoringReadService;            // service cua BF-02: diem da duyet
+    private final AppealEffectiveScoreService appealEffectiveScoreService;  // BF-03: diem hieu luc (S0 hoac sau khieu nai)
     private final GenreService genreService;                        // luong admin: he so chuan the loai
     private final SystemParameterService systemParameterService;
     private final AuditService auditService;
@@ -258,8 +258,12 @@ public class RoyaltyGradingService {
 
     // Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
     private RoyaltyGradingResponse calculate(ArticleRoyaltyInfoResponse article, RoyaltyRate rate) {
-        ScoringReadResponse attempt = scoringReadService.getPublishedAttempt(article.getId());  // diem da duyet
-        BigDecimal score = attempt.totalScore();
+        // Diem hieu luc (BR-QC-10): diem S0 da duyet, hoac diem Truong ban chot sau khieu nai (BF-03)
+        AppealEffectiveAttemptResponse effective = appealEffectiveScoreService.getEffectiveAttempt(article.getId());
+        if (effective == null) {
+            throw new BusinessException("Bài chưa có điểm chất lượng được công bố, chưa chấm nhuận bút được.");
+        }
+        BigDecimal score = effective.score();
         BigDecimal baseFactor = genreService.getBaseFactor(article.getCategoryId());
         RoyaltyCalculator calculator = new RoyaltyCalculator(systemParameterService.getValuesByFlow(ROYALTY_FLOW));
         BigDecimal unitPrice = rate.getAmount();
@@ -275,7 +279,7 @@ public class RoyaltyGradingService {
         response.setArticleId(article.getId());
         response.setTitle(article.getTitle());
         response.setPublishedAt(article.getPublishedAt());
-        response.setScoringAttemptId(attempt.id());
+        response.setScoringAttemptId(effective.attemptId());
         response.setScoreUsed(score);
         response.setCategoryId(article.getCategoryId());
         response.setBaseFactor(baseFactor);

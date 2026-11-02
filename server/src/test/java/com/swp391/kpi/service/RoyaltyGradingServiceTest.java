@@ -9,7 +9,7 @@ import com.swp391.kpi.dto.RoyaltyGradingCreateRequest;
 import com.swp391.kpi.dto.RoyaltyGradingMediaResponse;
 import com.swp391.kpi.dto.RoyaltyGradingResponse;
 import com.swp391.kpi.dto.RoyaltyPendingArticleResponse;
-import com.swp391.kpi.dto.ScoringReadResponse;
+import com.swp391.kpi.dto.AppealEffectiveAttemptResponse;
 import com.swp391.kpi.entity.Event;
 import com.swp391.kpi.entity.MediaFactor;
 import com.swp391.kpi.entity.RoyaltyGrading;
@@ -77,7 +77,7 @@ class RoyaltyGradingServiceTest {
     @Mock private MediaFactorRepository mediaFactorRepository;
     @Mock private EventRepository eventRepository;
     @Mock private ArticlePublishedService articlePublishedService;
-    @Mock private ScoringReadService scoringReadService;
+    @Mock private AppealEffectiveScoreService appealEffectiveScoreService;
     @Mock private GenreService genreService;
     @Mock private SystemParameterService systemParameterService;
     @Mock private AuditService auditService;
@@ -209,6 +209,32 @@ class RoyaltyGradingServiceTest {
                 () -> royaltyGradingService.previewGrading(ARTICLE_ID));
 
         assertTrue(error.getMessage().contains("12/10/2026"));
+    }
+
+    // Q-A2: khieu nai da RESOLVED -> phieu nhuan but dung diem Truong ban chot va lan cham S1/S2 (BR-QC-10)
+    @Test
+    void previewGradingUsesScoreConfirmedAfterAppeal() {
+        stubArticle(royaltyArticle(null, null));
+        when(appealEffectiveScoreService.getEffectiveAttempt(ARTICLE_ID))
+                .thenReturn(new AppealEffectiveAttemptResponse(9, new BigDecimal("90.00"), true));
+
+        RoyaltyGradingResponse preview = royaltyGradingService.previewGrading(ARTICLE_ID);
+
+        assertEquals(Integer.valueOf(9), preview.getScoringAttemptId());
+        assertMoney("90", preview.getScoreUsed());
+        // 5.00 x 90 / 100 = 4.50
+        assertMoney("4.50", preview.getSuggestedFactor());
+    }
+
+    @Test
+    void previewGradingFailsWhenScoreNotPublished() {
+        stubArticle(royaltyArticle(null, null));
+        when(appealEffectiveScoreService.getEffectiveAttempt(ARTICLE_ID)).thenReturn(null);
+
+        BusinessException error = assertThrows(BusinessException.class,
+                () -> royaltyGradingService.previewGrading(ARTICLE_ID));
+
+        assertTrue(error.getMessage().contains("chưa có điểm"));
     }
 
     @Test
@@ -446,8 +472,8 @@ class RoyaltyGradingServiceTest {
         photo.setFactor(new BigDecimal("1.00"));
 
         lenient().when(articlePublishedService.getArticleForRoyalty(ARTICLE_ID)).thenReturn(article);
-        lenient().when(scoringReadService.getPublishedAttempt(ARTICLE_ID)).thenReturn(new ScoringReadResponse(
-                3, ARTICLE_ID, 3, "INITIAL", new BigDecimal("82.50"), PUBLISHED_AT, PUBLISHED_AT));
+        lenient().when(appealEffectiveScoreService.getEffectiveAttempt(ARTICLE_ID)).thenReturn(
+                new AppealEffectiveAttemptResponse(3, new BigDecimal("82.50"), false));
         lenient().when(genreService.getBaseFactor(3)).thenReturn(new BigDecimal("5.00"));
         lenient().when(systemParameterService.getValuesByFlow("BF-04")).thenReturn(royaltyParams());
         lenient().when(royaltyRateRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(

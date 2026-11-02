@@ -72,6 +72,22 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.errors.title").value("Tiêu đề không được để trống"));
     }
 
+    @Test
+    void returns400WhenCalculatorRejectsInput() throws Exception {
+        mockMvc.perform(get("/fake/illegal-argument"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Tiêu chí đạt dưới 50 điểm bắt buộc phải nhập nhận xét lý do!"));
+    }
+
+    @Test
+    void returns500WithVietnameseMessageWhenSystemParameterMissing() throws Exception {
+        mockMvc.perform(get("/fake/illegal-state"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Thiếu tham số hệ thống: ROUNDING_UNIT"));
+    }
+
     // Controller gia chi dung trong test: moi API co tinh nem ra mot loai loi
     @RestController
     @RequestMapping("/fake")
@@ -90,6 +106,16 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/unauthorized")
         public String unauthorized() {
             throw new UnauthorizedException("Email/tên đăng nhập hoặc mật khẩu không đúng.");
+        }
+
+        @GetMapping("/illegal-argument")
+        public String illegalArgument() {
+            throw new IllegalArgumentException("Tiêu chí đạt dưới 50 điểm bắt buộc phải nhập nhận xét lý do!");
+        }
+
+        @GetMapping("/illegal-state")
+        public String illegalState() {
+            throw new IllegalStateException("Thiếu tham số hệ thống: ROUNDING_UNIT");
         }
 
         @PostMapping("/validate")

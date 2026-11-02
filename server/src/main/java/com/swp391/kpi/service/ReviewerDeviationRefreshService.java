@@ -65,7 +65,7 @@ public class ReviewerDeviationRefreshService {
     // Chi workflow BF03 da kiem tra quyen duoc goi; khong co endpoint nhan sectionId tu client.
     @Transactional
     public Set<Integer> refreshSection(LocalDate period, Integer sectionId) {
-        if (sectionId == null) throw new IllegalArgumentException("Missing department");
+        if (sectionId == null) throw new IllegalArgumentException("Thiếu ban của bài viết, không tính được chỉ số độ lệch.");
         lockWorkflow();
         return calculatePeriod(period, "HEAD_OF_DEPARTMENT", sectionId);
     }

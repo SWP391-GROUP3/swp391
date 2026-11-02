@@ -2,7 +2,6 @@ package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.CsvImportLogResponse;
 import com.swp391.kpi.dto.CsvImportResultResponse;
-import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.CsvImportLog;
 import com.swp391.kpi.entity.ReaderInteraction;
 import com.swp391.kpi.exception.BusinessException;
@@ -77,7 +76,8 @@ public class CsvImportService {
                     lines.add(line.trim());
                 }
             }
-        } catch (Exception e) {
+        } catch (java.io.IOException e) {
+            // Chi bat loi doc file; loi lap trinh khac de GlobalExceptionHandler xu ly, khong che di
             throw new BusinessException("Lỗi khi đọc file CSV: " + e.getMessage());
         }
 
@@ -237,13 +237,8 @@ public class CsvImportService {
     @Transactional(readOnly = true)
     public Page<CsvImportLogResponse> getImportLogs(Pageable pageable) {
         // Lay thong tin user de map ten nguoi thuc hien
-        Map<Integer, String> userNames = new HashMap<>();
-        try {
-            for (UserAccessResponse user : userReadService.getUsers()) {
-                userNames.put(user.id(), user.fullName());
-            }
-        } catch (Exception ignored) {
-        }
+        // Ho ten nguoi nhap file; khong nuot loi im lang nua (loi doc user se bao ra ngoai)
+        Map<Integer, String> userNames = userReadService.getUserNames();
 
         Page<CsvImportLog> logs = csvImportLogRepository.findAllByOrderByImportedAtDesc(pageable);
         return logs.map(log -> {

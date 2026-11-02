@@ -6,7 +6,6 @@ import com.swp391.kpi.dto.RoyaltyPeriodArticleResponse;
 import com.swp391.kpi.dto.RoyaltyPeriodDetailResponse;
 import com.swp391.kpi.dto.RoyaltyPeriodPersonResponse;
 import com.swp391.kpi.dto.RoyaltyPeriodResponse;
-import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.RoyaltyGrading;
 import com.swp391.kpi.entity.RoyaltyLine;
 import com.swp391.kpi.entity.RoyaltyLineType;
@@ -372,13 +371,9 @@ public class RoyaltyPeriodService {
         return titles;
     }
 
-    // Ho ten nguoi nhan tien, lay qua service luong admin (khong query bang users)
+    // Ho ten nguoi nhan tien, lay qua service doc nguoi dung (khong query bang users)
     private Map<Integer, String> loadUserNames() {
-        Map<Integer, String> names = new HashMap<>();
-        for (UserAccessResponse user : userReadService.getUsers()) {
-            names.put(user.id(), user.fullName());
-        }
-        return names;
+        return userReadService.getUserNames();
     }
 
     private static BigDecimal sumAmount(List<RoyaltyLine> lines) {

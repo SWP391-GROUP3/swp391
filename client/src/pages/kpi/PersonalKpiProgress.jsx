@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { danhSachNam, namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { layChiTietKpiPhongVien } from '../../api/kpiApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
@@ -17,8 +18,8 @@ import '../../styles/PersonalKpiProgress.css'
  *   32    taiKpiCaNhan()                tai kpi ca nhan
  */
 export default function PersonalKpiProgress({ nguoiDung }) {
-  const [nam, setNam] = useState(2026)
-  const [thang, setThang] = useState(9)
+  const [nam, setNam] = useState(namHienTai())
+  const [thang, setThang] = useState(thangHienTai())
   const [duLieu, setDuLieu] = useState(null)
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
@@ -63,8 +64,7 @@ export default function PersonalKpiProgress({ nguoiDung }) {
             value={nam}
             onChange={(e) => setNam(Number(e.target.value))}
           >
-            <option value={2025}>Năm 2025</option>
-            <option value={2026}>Năm 2026</option>
+            {danhSachNam().map((n) => <option key={n} value={n}>Năm {n}</option>)}
             <option value={2027}>Năm 2027</option>
           </select>
 

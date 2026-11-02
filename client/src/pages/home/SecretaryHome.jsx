@@ -26,8 +26,9 @@ function gopDanhSachViec(duLieu) {
   const danhSach = []
   const ky = duLieu.openPeriod
 
-  // UC-52: Ke toan tra ky ve kem ghi chu -> Thu ky sua roi gui lai (UC-50)
-  if (ky.returnNote) {
+  // UC-52: Ke toan tra ky ve kem ghi chu -> Thu ky sua roi gui lai (UC-50).
+  // Chua co ky nao dang mo (vd vua chot ky, ky sau chua co) thi ky = null.
+  if (ky && ky.returnNote) {
     danhSach.push({
       khoa: `tra-ky-${ky.periodId}`,
       loai: 'Kế toán trả kỳ',
@@ -59,10 +60,12 @@ function gopDanhSachViec(duLieu) {
 
 /** Cac o dem ben phai. 2 o dau chong nhau (sap toi han nam trong cho cham) nen khong hien tong. */
 function taoCacNhom(duLieu) {
+  const ky = duLieu.openPeriod   // null khi chua co ky dang mo
   return [
     { nhan: 'Chờ chấm nhuận bút', mau: 'xanh-duong', so: duLieu.counts.pendingGrading, duongDan: '/royalty-grading' },
     { nhan: 'Sắp tới hạn chi',    mau: 'hong',       so: duLieu.counts.nearDeadline,   duongDan: '/royalty-grading?sapToiHan=1' },
-    { nhan: 'Đã chấm trong kỳ',   mau: 'xanh-la',    so: duLieu.openPeriod.gradedCount, duongDan: `/royalty-periods/${duLieu.openPeriod.periodId}` },
+    { nhan: 'Đã chấm trong kỳ',   mau: 'xanh-la',    so: ky ? ky.gradedCount : 0,
+      duongDan: ky ? `/royalty-periods/${ky.periodId}` : '/royalty-periods' },
   ]
 }
 
@@ -116,8 +119,9 @@ export default function SecretaryHome({ nguoiDung }) {
           { nhan: 'Bài đã chấm', giaTri: ky.gradedCount },
           { nhan: 'Bài chưa chấm', giaTri: duLieu.counts.pendingGrading, canhBao: duLieu.counts.pendingGrading > 0 },
           { nhan: 'Tổng tiền tạm tính', giaTri: formatMoney(ky.totalAmount) },
-        ] : []}
-        lienKet={ky ? { to: `/royalty-periods/${ky.periodId}`, chu: 'Xem bảng kê' } : null}
+        ] : (duLieu ? [{ nhan: 'Kỳ đang mở', giaTri: 'Chưa có kỳ nào đang mở', canhBao: true }] : [])}
+        lienKet={ky ? { to: `/royalty-periods/${ky.periodId}`, chu: 'Xem bảng kê' }
+                    : { to: '/royalty-periods', chu: 'Xem các kỳ' }}
       />
     </HomeFrame>
   )

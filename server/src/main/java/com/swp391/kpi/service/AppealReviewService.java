@@ -119,7 +119,7 @@ public class AppealReviewService {
         appeal.setStatus(AppealStatus.RESOLVED); appeal.setResolvedAt(resolution.getFinalizedAt());
         Map<String, Object> event = new LinkedHashMap<>();
         event.put("status", "RESOLVED"); event.put("effectiveScore", proposed.effectiveScore()); event.put("rule", proposed.rule());
-        event.put("effectiveAttemptId", current.id()); event.put("downstreamStatus", "PENDING_INTEGRATION");
+        event.put("effectiveAttemptId", current.id()); event.put("downstreamStatus", "EFFECTIVE_SCORE_READY"); // BF-04/BF-05 doc diem nay qua AppealEffectiveScoreService
         audit.log(userId, "FINALIZE", "appeals", id, "{\"status\":\"IN_REVIEW\"}", encode(event));
         var article = articles.getArticle(appeal.getArticleId());
         notifications.notifyUser(appeal.getAppellantId(), article.id(), "Khiếu nại #" + id + " đã được xác nhận. Điểm hiệu lực: " + proposed.effectiveScore() + ".");
