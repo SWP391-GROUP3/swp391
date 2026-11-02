@@ -6,7 +6,6 @@ import com.swp391.kpi.dto.RoyaltyPeriodArticleResponse;
 import com.swp391.kpi.dto.RoyaltyPeriodDetailResponse;
 import com.swp391.kpi.dto.RoyaltyPeriodPersonResponse;
 import com.swp391.kpi.dto.RoyaltyPeriodResponse;
-import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.RoyaltyGrading;
 import com.swp391.kpi.entity.RoyaltyLine;
 import com.swp391.kpi.entity.RoyaltyLineType;
@@ -103,9 +102,7 @@ class RoyaltyPeriodServiceTest {
                 line(article5, 2, RoyaltyLineType.ARTICLE, "386000"),
                 line(article5, 2, RoyaltyLineType.MEDIA, "234000")));
         when(articlePublishedService.getPublishedArticles()).thenReturn(List.of(published(1, "Bai 1"), published(5, "Bai 5")));
-        when(userReadService.getUsers()).thenReturn(List.of(
-                new UserAccessResponse(1, "Nguyen Van An", "REPORTER", 1, "Ban Thoi su", "ACTIVE"),
-                new UserAccessResponse(2, "Tran Thi Binh", "REPORTER", 1, "Ban Thoi su", "ACTIVE")));
+        when(userReadService.getUserNames()).thenReturn(java.util.Map.of(1, "Nguyen Van An", 2, "Tran Thi Binh"));
 
         RoyaltyPeriodDetailResponse detail = royaltyPeriodService.getPeriodDetail(1);
 
@@ -351,8 +348,7 @@ class RoyaltyPeriodServiceTest {
         when(royaltyLineRepository.findByPeriodId(1)).thenReturn(List.of(
                 line(version2, 1, RoyaltyLineType.ARTICLE, "1050000")));
         when(articlePublishedService.getPublishedArticles()).thenReturn(List.of(published(5, "Bai 5")));
-        when(userReadService.getUsers()).thenReturn(List.of(
-                new UserAccessResponse(1, "Nguyen Van An", "REPORTER", 1, "Ban Thoi su", "ACTIVE")));
+        when(userReadService.getUserNames()).thenReturn(java.util.Map.of(1, "Nguyen Van An"));
 
         RoyaltyPeriodDetailResponse detail = royaltyPeriodService.getPeriodDetail(1);
 

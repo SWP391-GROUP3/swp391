@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Ham doc nguoi dung cho luong khac: kiem tra tai khoan dang hoat dong, lay danh sach nguoi dung (ho
@@ -16,7 +18,8 @@ import java.util.List;
  * MUC LUC (so dong - ten - tac dung)
  *   25  field                           repository / service duoc inject
  *   27  requireActive()                 bat buoc active
- *   41  getUsers()                      lay users
+ *   43  getUsers()                      lay users
+ *   48  getUserNames()                  ho ten theo id (BF-04 dung de hien ten nguoi nhan tien)
  */
 @Service
 @RequiredArgsConstructor
@@ -40,5 +43,14 @@ public class UserReadService {
 
     public List<UserAccessResponse> getUsers() {
         return repository.findAll();
+    }
+
+    // Ho ten theo id nguoi dung, de cac man hinh tien hien ten thay vi so id
+    public Map<Integer, String> getUserNames() {
+        Map<Integer, String> names = new HashMap<>();
+        for (UserAccessResponse user : repository.findAll()) {
+            names.put(user.id(), user.fullName());
+        }
+        return names;
     }
 }

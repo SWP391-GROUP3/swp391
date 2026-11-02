@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { layViTien } from '../api/reporterHomeApi.js'
+import { getUnpaidRoyaltyTotal } from '../api/royaltyApi.js'
 import { formatMoney } from '../utils/formatMoney.js'
 import Icon from '../components/common/Icon.jsx'
 import AppLayout from './AppLayout.jsx'
@@ -21,9 +21,9 @@ import '../styles/ReporterLayout.css'
  *   34  menu [Soan bai moi]             mo trang /my-articles/new (ArticleEditor)
  *   36  menu [Xac nhan dong tac gia]    mo trang /co-author-invites (CoAuthorInvites)
  *   38  menu [Khieu nai diem]           mo trang /my-appeals (MyAppealsPage)
- *   40  menu [Nhuan but]                mo trang /my-royalties (ComingSoon - chua lam "Nhuan but")
+ *   40  menu [Nhuan but]                mo trang /my-royalties (MyRoyalties)
  *   42  menu [KPI ca nhan]              mo trang /my-kpi (PersonalKpiProgress)
- *   66  link [{loiVi}. / So du vi: {formatMoney(soDu)}]  mo trang /my-royalties (ComingSoon - chua lam "Nhuan but")
+ *   67  link [{loiVi}. / Nhuan but chua nhan: {formatMoney(soDu)}]  mo trang /my-royalties (MyRoyalties)
  */
 const MENU_PHONG_VIEN = [
   {
@@ -55,18 +55,19 @@ function ChipViTien() {
   useEffect(() => {
     let conHienThi = true   // tranh setState sau khi component da bi go
 
-    layViTien()
-      .then((duLieu) => { if (conHienThi) setSoDu(duLieu.balance) })
-      .catch(() => { if (conHienThi) setLoiVi('Không tải được số dư ví') })
+    // Khong co bang so du vi: chip hien tong nhuan but chua nhan (UC-57, tinh trong royaltyApi)
+    getUnpaidRoyaltyTotal()
+      .then((tong) => { if (conHienThi) setSoDu(tong) })
+      .catch(() => { if (conHienThi) setLoiVi('Không tải được nhuận bút') })
 
     return () => { conHienThi = false }
   }, [])
 
   return (
-    <Link to="/my-royalties" className="khung-pv__vi" title={loiVi || 'Số dư ví'}>
+    <Link to="/my-royalties" className="khung-pv__vi" title={loiVi || 'Nhuận bút chưa nhận'}>
       <Icon><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M16 12.5h5" /></Icon>
       {/* Loi cung dua vao chu an, de trinh doc man hinh doc duoc (title thi khong) */}
-      <span className="an-di">{loiVi ? `${loiVi}.` : 'Số dư ví:'}</span>
+      <span className="an-di">{loiVi ? `${loiVi}.` : 'Nhuận bút chưa nhận:'}</span>
       <span className="khung-pv__vi-so">{formatMoney(soDu)}</span>
     </Link>
   )

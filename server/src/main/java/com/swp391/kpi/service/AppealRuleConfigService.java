@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,12 @@ import java.util.List;
  *   35  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
  *   43  getActiveConfig()               Lay cau hinh khiieu nai dang co hieu luc tinh den ngay hom nay
- *   53  getActiveConfigEntity()         Ham noi bo de cac service khac trong luong appeal lay entity cau hinh dang ap dung
- *   63  getAllConfigs()                 Lay danh sach tat ca cac phien ban cau hinh de Admin theo doi lich su (UC-44 Normal Flow 1)
- *   78  createConfig()                  Tao phien ban cau hinh moi theo ngay hieu luc (UC-44)
+ *   54  getActiveConfigEntity()         Ham noi bo de cac service khac trong luong appeal lay entity cau hinh dang ap dung
+ *   66  getAppealDeadline()             Han khieu nai = luc cong bo diem + so ngay cua cau hinh dang ap dung (BR-QC-01); BF-02 goi
+ *   75  getAllConfigs()                 Lay danh sach tat ca cac phien ban cau hinh de Admin theo doi lich su (UC-44 Normal Flow 1)
+ *   90  createConfig()                  Tao phien ban cau hinh moi theo ngay hieu luc (UC-44)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  110  toAuditValue()                  doi sang audit value
+ *  122  toAuditValue()                  doi sang audit value
  */
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,17 @@ public class AppealRuleConfigService {
         return appealRuleConfigRepository
                 .findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate.now())
                 .orElseThrow(() -> new NotFoundException("Chưa có cấu hình khiếu nại nào đang có hiệu lực"));
+    }
+
+    /**
+     * Han khieu nai = thoi diem cong bo diem + appeal_window_days cua cau hinh dang ap dung (BR-QC-01).
+     * BF-02 goi ham nay de man hinh diem (UC-34) hien cung han voi man khieu nai cua BF-03.
+     * Chua cong bo diem (announcedAt null) thi chua co han.
+     */
+    @Transactional(readOnly = true)
+    public LocalDateTime getAppealDeadline(LocalDateTime announcedAt) {
+        if (announcedAt == null) return null;
+        return announcedAt.plusDays(getActiveConfigEntity().getAppealWindowDays());
     }
 
     /**

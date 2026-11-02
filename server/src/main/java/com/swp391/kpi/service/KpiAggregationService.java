@@ -1,6 +1,9 @@
 package com.swp391.kpi.service;
 import com.swp391.kpi.dto.DepartmentKpiDashboardResponse;
 import com.swp391.kpi.dto.DepartmentKpiItemResponse;
+import com.swp391.kpi.dto.KpiSnapshotResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import com.swp391.kpi.dto.ReporterKpiArticleItemResponse;
 import com.swp391.kpi.dto.ReporterKpiDetailResponse;
 import com.swp391.kpi.entity.Article;
@@ -40,11 +43,11 @@ import java.util.Optional;
  *   53  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *   54  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   70  aggregateMonthlyKpi()           Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggregation Job)
+ *   71  aggregateMonthlyKpi()           Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggregation Job)
  *  153  getDepartmentDashboard()        Lay du lieu tong the cho bang theo doi KPI toan ban (UC-61: Department KPI Board)
  *  258  getReporterKpiDetail()          Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  392  validatePeriod()                kiem tra period
+ *  395  validatePeriod()                kiem tra period
  */
 @Service
 @RequiredArgsConstructor
@@ -57,6 +60,7 @@ public class KpiAggregationService {
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ReaderInteractionRepository readerInteractionRepository;
     private final UserRepository userRepository;
+    private final AppealEffectiveScoreService appealEffectiveScoreService;  // BF-03: diem hieu luc cua bai
 
     // Dung may tinh toan thuan KpiCalculator (AGENTS.md muc 3.1)
     private final KpiCalculator kpiCalculator = new KpiCalculator();
@@ -67,7 +71,7 @@ public class KpiAggregationService {
      * Neu ban ghi da FINALIZED thi giu nguyen (BR-KPI-06).
      */
     @Transactional
-    public List<KpiSnapshot> aggregateMonthlyKpi(Short year, Byte month) {
+    public List<KpiSnapshotResponse> aggregateMonthlyKpi(Short year, Byte month) {
         validatePeriod(year, month);
 
         // 1. Lay tat ca phong vien co chi tieu KPI trong ky hoac tat ca users co role REPORTER
@@ -81,7 +85,7 @@ public class KpiAggregationService {
         List<User> allUsers = userRepository.findAll();
         List<User> reporters = new ArrayList<>();
         for (User u : allUsers) {
-            if (u.getRole() != null && (u.getRole().getCode() == RoleCode.REPORTER || "REPORTER".equals(String.valueOf(u.getRole().getCode())))) {
+            if (isReporter(u)) {
                 reporters.add(u);
             }
         }
@@ -103,13 +107,12 @@ public class KpiAggregationService {
         // 3. Gom nhom cac bai viet theo tung phong vien kem share_percent (BR-KPI-02)
         Map<Integer, List<KpiCalculator.ArticleKpiItem>> reporterArticlesMap = new HashMap<>();
         for (Article article : publishedArticlesInPeriod) {
+            // Diem hieu luc cua bai (BR-KPI-02, BR-QC-10): S0 da duyet hoac diem chot sau khieu nai
+            BigDecimal effectiveScore = appealEffectiveScoreService.getEffectiveScore(article.getId());
             List<ArticleAuthor> authors = articleAuthorRepository.findByArticleIdOrderBySharePercentDesc(article.getId());
             for (ArticleAuthor author : authors) {
                 Integer reporterId = author.getUserId();
                 BigDecimal share = author.getSharePercent() != null ? author.getSharePercent() : ONE_HUNDRED;
-                
-                // Diem chat luong bai viet tam thoi mac dinh hoac lay tu he thong
-                BigDecimal effectiveScore = null;
 
                 reporterArticlesMap.computeIfAbsent(reporterId, k -> new ArrayList<>())
                         .add(new KpiCalculator.ArticleKpiItem(article.getId(), share, effectiveScore));
@@ -143,7 +146,12 @@ public class KpiAggregationService {
             savedSnapshots.add(kpiSnapshotRepository.save(snapshot));
         }
 
-        return savedSnapshots;
+        // Doi entity sang DTO o day, controller khong cam entity (AGENTS.md muc 3.2)
+        List<KpiSnapshotResponse> result = new ArrayList<>();
+        for (KpiSnapshot saved : savedSnapshots) {
+            result.add(KpiSnapshotResponse.from(saved));
+        }
+        return result;
     }
 
     /**
@@ -157,7 +165,7 @@ public class KpiAggregationService {
         List<User> allUsers = userRepository.findAll();
         Map<Integer, User> reporterUserMap = new HashMap<>();
         for (User u : allUsers) {
-            if (u.getRole() != null && (u.getRole().getCode() == RoleCode.REPORTER || "REPORTER".equals(String.valueOf(u.getRole().getCode())))) {
+            if (isReporter(u)) {
                 reporterUserMap.put(u.getId(), u);
             }
         }
@@ -255,8 +263,16 @@ public class KpiAggregationService {
      * diem chat luong va luot xem tich luy tu doc gia.
      */
     @Transactional(readOnly = true)
-    public ReporterKpiDetailResponse getReporterKpiDetail(Integer reporterId, Short year, Byte month) {
+    public ReporterKpiDetailResponse getReporterKpiDetail(Integer reporterId, Short year, Byte month,
+                                                          Integer currentUserId) {
         validatePeriod(year, month);
+
+        // Phong vien chi xem duoc KPI cua chinh minh (UC-60); Truong ban xem duoc moi phong vien (UC-62)
+        User viewer = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy người dùng với ID: " + currentUserId));
+        if (isReporter(viewer) && !viewer.getId().equals(reporterId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn chỉ xem được KPI của chính mình.");
+        }
 
         User reporter = userRepository.findById(reporterId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phóng viên với ID: " + reporterId));
@@ -319,8 +335,8 @@ public class KpiAggregationService {
                 Integer views = pageViewsMap.getOrDefault(a.getId(), 0);
                 totalViews += views;
 
-                // Diem chat luong (neu co snapshot thi lay diem snapshot, hoac tam de null neu chua cham)
-                BigDecimal score = snapshotOpt.map(KpiSnapshot::getActualAvgScore).orElse(null);
+                // Diem hieu luc cua tung bai (BR-QC-10); bai chua cong bo diem thi null
+                BigDecimal score = appealEffectiveScoreService.getEffectiveScore(a.getId());
 
                 ReporterKpiArticleItemResponse item = new ReporterKpiArticleItemResponse();
                 item.setArticleId(a.getId());
@@ -345,7 +361,9 @@ public class KpiAggregationService {
         KpiSnapshotStatus snapshotStatus;
         String notes = null;
 
-        if (snapshotOpt.isPresent()) {
+        // Snapshot FINALIZED la bat bien (BR-KPI-06) nen hien dung so da chot.
+        // Snapshot DRAFT chi la so tam, nen tinh truc tiep tu bai viet de luon khop diem moi nhat.
+        if (snapshotOpt.isPresent() && snapshotOpt.get().getStatus() == KpiSnapshotStatus.FINALIZED) {
             KpiSnapshot snap = snapshotOpt.get();
             actualArticles = snap.getActualArticles();
             exactActualArticles = kpiCalculator.calculateExactConvertedArticles(kpiItems);
@@ -357,6 +375,7 @@ public class KpiAggregationService {
             exactActualArticles = kpiCalculator.calculateExactConvertedArticles(kpiItems);
             actualAvgScore = kpiCalculator.calculateAverageScore(kpiItems);
             snapshotStatus = KpiSnapshotStatus.DRAFT;
+            notes = snapshotOpt.map(KpiSnapshot::getNotes).orElse(null);
         }
 
         BigDecimal progressPercent = BigDecimal.ZERO;
@@ -387,6 +406,11 @@ public class KpiAggregationService {
         detail.setArticles(articleResponses);
 
         return detail;
+    }
+
+    // Nguoi dung co vai tro Phong vien khong (roles.code = REPORTER)
+    private static boolean isReporter(User user) {
+        return user.getRole() != null && user.getRole().getCode() == RoleCode.REPORTER;
     }
 
     private void validatePeriod(Short year, Byte month) {

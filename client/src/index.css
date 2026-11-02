@@ -69,6 +69,14 @@
   --chinh:     var(--fm-chinh);
   --chinh-dam: var(--fm-chinh-dam);
   --do:        var(--fm-loi);
+
+  /* Ten tieng Anh ma CSS cac trang KPI / nhap CSV (BF-05) dang dung. Truoc day chua khai bao
+     nen luon roi ve ma hex du phong; nay tro sang mau Figma cho dong bo. */
+  --fm-primary:        var(--fm-chinh);
+  --fm-primary-hover:  var(--fm-chinh-dam);
+  --fm-border:         var(--fm-vien);
+  --fm-text-primary:   var(--fm-chu);
+  --fm-text-secondary: var(--fm-chu-nhat);
 }
 
 * { box-sizing: border-box; }

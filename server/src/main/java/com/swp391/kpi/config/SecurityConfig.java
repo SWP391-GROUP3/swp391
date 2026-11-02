@@ -73,8 +73,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/royalty-periods/*/lock").hasRole("ACCOUNTANT")
                         // BF-04: ky nhuan but co tong tien, chi Thu ky va Ke toan xem (UC-49, UC-50)
                         .requestMatchers("/api/royalty-periods/**").hasAnyRole("EDITORIAL_SECRETARY", "ACCOUNTANT")
+                        // BF-04: nhuan but cua toi (UC-57): ai da dang nhap cung xem duoc phan tien cua chinh minh.
+                        // Phai dat TRUOC luat /api/royalty-payments/** ben duoi.
+                        .requestMatchers(HttpMethod.GET, "/api/royalty-payments/me").authenticated()
+                        // BF-04: chi Ke toan xem phieu chi theo ky va ghi nhan da chi (UC-54)
+                        .requestMatchers("/api/royalty-payments/**").hasRole("ACCOUNTANT")
                         // BF-04: cham nhuan but chi Thu ky toa soan (UC-46, 47, 48)
                         .requestMatchers("/api/royalty-gradings/**").hasRole("EDITORIAL_SECRETARY")
+                        // BF-05: dinh muc chuan KPI (UC-58): Truong ban va Admin. Phai dat TRUOC /api/kpi-targets/**
+                        .requestMatchers("/api/kpi-targets/benchmarks/**").hasAnyRole("HEAD_OF_DEPARTMENT", "ADMIN")
+                        // BF-05: dat chi tieu thang (UC-59), bang KPI ban + tong hop (UC-61), bao cao the loai (UC-64): Truong ban
+                        .requestMatchers("/api/kpi-targets/**").hasRole("HEAD_OF_DEPARTMENT")
+                        .requestMatchers("/api/kpi-snapshots/dashboard", "/api/kpi-snapshots/aggregate").hasRole("HEAD_OF_DEPARTMENT")
+                        .requestMatchers("/api/kpi-reports/**").hasRole("HEAD_OF_DEPARTMENT")
+                        // BF-05: chi tiet KPI 1 phong vien (UC-60, 62): PV xem cua minh (service kiem), Truong ban xem moi PV
+                        .requestMatchers("/api/kpi-snapshots/reporters/**").hasAnyRole("REPORTER", "HEAD_OF_DEPARTMENT")
                         // BF-05: chi Admin nhap so lieu doc gia tu CSV va xem nhat ky (UC-63)
                         .requestMatchers("/api/reader-imports/**").hasRole("ADMIN")
                         // Admin: xem / sua tham so nhap bai cua BF-01 (UC-13)

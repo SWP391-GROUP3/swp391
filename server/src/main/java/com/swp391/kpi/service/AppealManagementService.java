@@ -239,7 +239,7 @@ public class AppealManagementService {
         value.put("reviewerId", attempt.reviewerId()); value.put("crossDepartment", attempt.crossDepartment());
         value.put("reason", reason == null ? null : reason.trim());
         try { return json.writeValueAsString(value); }
-        catch (com.fasterxml.jackson.core.JsonProcessingException ex) { throw new IllegalStateException(ex); }
+        catch (com.fasterxml.jackson.core.JsonProcessingException ex) { throw new IllegalStateException("Không thể ghi nhật ký phân công khiếu nại.", ex); }
     }
 
     private AppealManagementResponse response(Appeal appeal, ArticleReadResponse article,

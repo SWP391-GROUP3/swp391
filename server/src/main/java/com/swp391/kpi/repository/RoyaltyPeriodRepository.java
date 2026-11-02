@@ -37,7 +37,7 @@ public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, In
     Optional<RoyaltyPeriod> findByPeriodYearAndPeriodMonth(Short periodYear, Byte periodMonth);
 
     // Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines.
-    // Dung SQL thuong (nativeQuery) vi entity RoyaltyLine chua co, Iter2 moi lam.
+    // Dung SQL thuong (nativeQuery) cho gon: chi can 1 con so tong, khong can nap entity.
     @Query(value = "SELECT COALESCE(SUM(amount), 0) FROM royalty_lines WHERE period_id = :periodId",
             nativeQuery = true)
     BigDecimal sumLineAmountByPeriodId(@Param("periodId") Integer periodId);

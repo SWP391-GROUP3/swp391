@@ -84,17 +84,19 @@ Backend **chia theo tầng** (mục 3.1): mọi luồng dùng chung các thư m�
 
 Package gốc: `com.swp391.kpi`
 
-| Luồng | Tiền tố tên class | Bảng sở hữu |
-|---|---|---|
-| Dùng chung — **sửa phải báo cả nhóm** | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications`, `audit_logs` |
-| `admin` — Nền tảng / Admin **[ĐỀ XUẤT: chia người phụ trách]** | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors`, `system_parameters` |
-| `article` — BF-01 Viết & nộp bài | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs`, `duplication_checks`, `duplication_matches` |
-| `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng (UC-33) | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval`, `Publishing` | `assignments`, `category_change_logs`, `criteria_set_versions`, `criteria`, `scoring_attempts`, `scoring_attempt_details`, `score_approvals` |
-| `appeal` — BF-03 Khiếu nại & kiểm soát chất lượng chấm | `Appeal`, `CrossReview`, `ReviewerDeviation` | `appeals`, `appeal_criteria`, `appeal_resolutions`, `appeal_rule_configs`, `cross_review_batches`, `cross_review_tasks`, `reviewer_deviation_indices` |
-| `royalty` — BF-04 Chấm & chi nhuận bút | `Royalty`, `Event` | `royalty_rates`, `events`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_payments`, `royalty_lines` |
-| `kpi` — BF-05 KPI & báo cáo | `Kpi`, `CsvImport`, `ReaderInteraction` | `kpi_targets`, `kpi_snapshots`, `csv_import_logs`, `reader_interactions` |
+| Luồng | Người phụ trách (từ 02/11/2026) | Tiền tố tên class | Bảng sở hữu |
+|---|---|---|---|
+| Dùng chung — **sửa phải báo cả nhóm** | Quang: `exception/`, `config/`, `data.sql`, `index.css`, `goiApi.js`. Minh: `AppRoutes.jsx`, `components/common/`, `utils/` | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications`, `audit_logs` |
+| `admin` — Nền tảng / Admin | Minh | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors`, `system_parameters` |
+| `article` — BF-01 Viết & nộp bài | Minh | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs`, `duplication_checks`, `duplication_matches` |
+| `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng (UC-33) | Minh (nhận lại từ Dương) | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval`, `Publishing` | `assignments`, `category_change_logs`, `criteria_set_versions`, `criteria`, `scoring_attempts`, `scoring_attempt_details`, `score_approvals` |
+| `appeal` — BF-03 Khiếu nại & kiểm soát chất lượng chấm | Quang (nhận lại từ Vũ) | `Appeal`, `CrossReview`, `ReviewerDeviation` | `appeals`, `appeal_criteria`, `appeal_resolutions`, `appeal_rule_configs`, `cross_review_batches`, `cross_review_tasks`, `reviewer_deviation_indices` |
+| `royalty` — BF-04 Chấm & chi nhuận bút | Quang | `Royalty`, `Event` | `royalty_rates`, `events`, `royalty_periods`, `royalty_gradings`, `royalty_media_items`, `royalty_payments`, `royalty_lines` |
+| `kpi` — BF-05 KPI & báo cáo | Quang (nhận lại từ Khang) | `Kpi`, `CsvImport`, `ReaderInteraction` | `kpi_targets`, `kpi_snapshots`, `csv_import_logs`, `reader_interactions` |
 
 Cột **Tiền tố** và **Bảng sở hữu** lấy theo danh sách bảng ở đầu `schema.sql`. Thêm bảng hoặc tiền tố mới → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
+
+**Từ 02/11/2026 nhóm chỉ còn Quang và Minh** (Dương, Vũ, Khang đã giao lại code). Việc cụ thể của từng người trước demo 04/11 nằm ở `docs/KE_HOACH_THU4_QUANG.md` và `docs/KE_HOACH_THU4_MINH.md`. Mở phiên AI mới thì đọc file của người đang làm.
 
 **Không** tạo package theo luồng (`com.swp391.kpi.royalty`...) và **không** tạo thư mục con theo luồng bên trong tầng (`entity/royalty/`...).
 
@@ -334,5 +336,5 @@ Yêu cầu còn mơ hồ hoặc có nhiều cách hiểu → hỏi tiếp, **kh�
 | 2 | Tên luồng BF-03 | **Đã chốt:** `appeal` (khiếu nại, chấm mù theo SRS). Duyệt đăng UC-33 thuộc `assessment` |
 | 3 | Đăng nhập | **Đã làm:** Spring Security + JWT (mục 3.8). Bỏ header `X-User-Id` |
 | 4 | Thư viện frontend | `axios` + Ant Design |
-| 5 | Ai làm luồng `admin` + đăng nhập? | Chưa có |
+| 5 | Ai làm luồng `admin` + đăng nhập? | **Đã chốt (02/11):** `admin` → Minh; đăng nhập đã làm xong, file dùng chung trong `config/` do Quang giữ |
 | 6 | Ai là chủ DB? | Chưa có |
