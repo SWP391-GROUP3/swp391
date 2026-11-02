@@ -101,7 +101,7 @@ public class AppealManagementService {
     }
 
     @Transactional
-    public AppealManagementResponse assign(Integer id, AppealAssignRequest request, Integer userId) {
+    public AppealManagementResponse assign(Integer id, AppealAssignRequest request, Integer userId) { // [LUONG 2 - PHAN CONG] buoc 5/6 service: dung ban? dang cho phan cong? nguoi chon co hop le? -> tao phieu -> IN_REVIEW
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.SUBMITTED)
             throw new BusinessException("Khiếu nại không còn chờ phân công.");
@@ -117,7 +117,7 @@ public class AppealManagementService {
     }
 
     @Transactional
-    public AppealManagementResponse assignSecond(Integer id, AppealAssignRequest request, Integer userId) {
+    public AppealManagementResponse assignSecond(Integer id, AppealAssignRequest request, Integer userId) { // [LUONG 4 - SO SANH & CHOT] nhanh S2: chi giao khi S1 da nop va lech > T (requiresSecond)
         var appeal = scopedAppeal(id, userId, true);
         if (!requiresSecond(appeal)) throw new BusinessException("Khiếu nại chưa cần S2 hoặc đã được giao S2.");
         var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false);
@@ -142,7 +142,7 @@ public class AppealManagementService {
     }
 
     @Transactional
-    public AppealManagementResponse reassign(Integer id, AppealReassignRequest request, Integer userId) {
+    public AppealManagementResponse reassign(Integer id, AppealReassignRequest request, Integer userId) { // [LUONG 2 - PHAN CONG] nhanh phu "Giao lai" (UC-43): chi giao lai phieu CHUA nop, co kiem tra expectedReviewerId
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.IN_REVIEW)
             throw new BusinessException("Chỉ giao lại khiếu nại đang chấm.");
@@ -163,7 +163,7 @@ public class AppealManagementService {
         return response(appeal, articles.getArticle(appeal.getArticleId()), updated, true, userNames());
     }
 
-    private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) {
+    private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) { // [LUONG 2 - PHAN CONG] 5a: chi Truong ban DUNG BAN cua bai moi duoc thao tac (+ khoa dong khi lock=true)
         var head = users.requireActive(userId, "HEAD_OF_DEPARTMENT");
         if (lock) deviations.lockWorkflow();
         var appeal = (lock ? appeals.findLockedById(id) : appeals.findById(id))
@@ -186,7 +186,7 @@ public class AppealManagementService {
         return current;
     }
 
-    private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) {
+    private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) { // [LUONG 2 - PHAN CONG] 5b: danh sach BTV hop le: loai nguoi da cham bai nay, uu tien cung ban
         var current = currentAttempt(appeal);
         if (appeal.getStatus() == AppealStatus.RESOLVED
                 || (current != null && current.submittedAt() != null && !requiresSecond(appeal)))
@@ -213,7 +213,7 @@ public class AppealManagementService {
         return result;
     }
 
-    private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign) {
+    private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign) { // [LUONG 2 - PHAN CONG] 5c: chon nguoi ngoai danh sach 5b thi bi tu choi; khac ban/giao lai bat buoc co ly do
         for (var candidate : candidates(appeal)) {
             if (!candidate.reviewerId().equals(id)) continue;
             if ((candidate.crossDepartment() || reassign) && (reason == null || reason.isBlank()))

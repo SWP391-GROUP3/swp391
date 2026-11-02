@@ -103,7 +103,7 @@ public class AppealService {
     }
 
     @Transactional
-    public AppealResponse submitAppeal(AppealCreateRequest request, Integer currentUserId) {
+    public AppealResponse submitAppeal(AppealCreateRequest request, Integer currentUserId) { // [LUONG 1 - GUI KHIEU NAI] buoc 6/6 service: kiem tra -> luu appeals -> luu appeal_criteria -> bao Truong ban -> ghi audit
         userReadService.requireActive(currentUserId, "REPORTER");
         AppealSubmissionContext context = appealSubmissionDataProvider
                 .getSubmissionContext(request.getArticleId());
@@ -120,7 +120,7 @@ public class AppealService {
         Appeal savedAppeal;
         try {
             savedAppeal = appealRepository.save(appeal);
-        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) { // [LUONG 1 - GUI KHIEU NAI] 6b: bam 2 lan cung luc thi UNIQUE(appeals.article_id) cua DB chan, doi thanh cau tieng Viet
             // Hai request cung luc: UNIQUE(appeals.article_id) chan cai den sau, tra dung cau cua UC-35 E2.
             throw new BusinessException("Mỗi bài viết chỉ được khiếu nại một lần.");
         }
@@ -211,7 +211,7 @@ public class AppealService {
         validateCriteria(request.getCriteria(), context);
     }
 
-    private void validateArticleAndWindow(
+    private void validateArticleAndWindow( // [LUONG 1 - GUI KHIEU NAI] 6a: dung tac gia chinh? da cong bo diem? con trong han khieu nai?
             Integer currentUserId,
             AppealSubmissionContext context,
             AppealRuleConfig ruleConfig) {
@@ -234,7 +234,7 @@ public class AppealService {
         }
     }
 
-    private void validateCriteria(
+    private void validateCriteria( // [LUONG 1 - GUI KHIEU NAI] 6c: tieu chi chon phai thuoc phieu cham goc, moi tieu chi co ly do, khong trung
             List<AppealCriterionRequest> requestedCriteria,
             AppealSubmissionContext context) {
         if (requestedCriteria == null || requestedCriteria.isEmpty()) {

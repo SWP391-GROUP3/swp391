@@ -29,7 +29,7 @@ public class AppealScoreCalculator {
     public record Item(Integer criterionId, BigDecimal weight, BigDecimal score, String comment) {}
     public record Result(boolean requiresSecondReview, BigDecimal effectiveScore, AppealResolutionRule rule) {}
 
-    public Result compare(BigDecimal s0, BigDecimal s1, BigDecimal s2, BigDecimal threshold) {
+    public Result compare(BigDecimal s0, BigDecimal s1, BigDecimal s2, BigDecimal threshold) { // [LUONG 4 - SO SANH & CHOT] buoc 7/7 cong thuc: |S1-S0|<=T lay S1; lech hon thi cho S2; co S2 thi trung binh voi diem GAN S2 hon (bang nhau lay S2)
         requireScore(s0); requireScore(s1); requireScore(threshold);
         if (s1.subtract(s0).abs().compareTo(threshold) <= 0) {
             if (s2 != null) throw new BusinessException("Không được chấm S2 khi chênh lệch chưa vượt ngưỡng.");
@@ -43,7 +43,7 @@ public class AppealScoreCalculator {
         return result(s2, AppealResolutionRule.USE_S2_TIE);
     }
 
-    public BigDecimal weightedTotal(List<Item> items, boolean complete) {
+    public BigDecimal weightedTotal(List<Item> items, boolean complete) { // [LUONG 3 - CHAM MU] buoc 7/7 cong thuc: tong = cong(diem * trong so / 100), trong so tong phai = 100%, diem < 50 phai co nhan xet
         if (items == null || items.isEmpty()) throw new BusinessException("Bộ tiêu chí không có dữ liệu.");
         var ids = new HashSet<Integer>();
         BigDecimal weight = BigDecimal.ZERO, total = BigDecimal.ZERO;

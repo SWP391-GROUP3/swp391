@@ -231,7 +231,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           {vaiTro === 'REPORTER' && (
             <>
               <Route path="/my-appeals" element={<MyAppealsPage />} />
-              <Route path="/my-appeals/new" element={<AppealCreatePage />} />
+              <Route path="/my-appeals/new" element={<AppealCreatePage />} /> {/* [LUONG 1 - GUI KHIEU NAI] buoc 1/6 route: /my-appeals/new -> AppealCreatePage */}
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
@@ -249,7 +249,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-02 (Duong): UC-21 Bài được giao & UC-22..28 Chấm điểm */}
               <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
               <Route path="/re-reviews" element={<BlindReviewQueuePage />} />
-              <Route path="/re-reviews/:id" element={<BlindReviewPage />} />
+              <Route path="/re-reviews/:id" element={<BlindReviewPage />} /> {/* [LUONG 3 - CHAM MU] buoc 1/7 route: /re-reviews/:id -> BlindReviewPage */}
               <Route path="/cross-review-tasks/:id" element={<BlindReviewPage cheo />} />
               <Route path="/assigned-articles/:articleId" element={<ScoringSheet nguoiDung={nguoiDung} />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
@@ -265,8 +265,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/publishing" element={<PublishingQueue nguoiDung={nguoiDung} />} />
 
               <Route path="/appeals" element={<AppealManagementPage />} />
-              <Route path="/appeals/:id" element={<AppealDetailPage />} />
-              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage />} />
+              <Route path="/appeals/:id" element={<AppealDetailPage />} /> {/* [LUONG 2 - PHAN CONG] buoc 1/6 route: /appeals/:id -> AppealDetailPage */}
+              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage />} /> {/* [LUONG 4 - SO SANH & CHOT] buoc 1/7 route: /appeals/:id/comparison -> AppealComparisonPage */}
               <Route path="/cross-reviews" element={<CrossReviewBatchPage />} />
               <Route path="/cross-reviews/:id" element={<CrossReviewBatchDetailPage />} />
 

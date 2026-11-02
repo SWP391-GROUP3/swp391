@@ -7,7 +7,7 @@
  *   21  kiemTraPhieuCham()              kiem tra phieu cham
  */
 
-export function tinhTongTam(cacDong) {
+export function tinhTongTam(cacDong) { // [LUONG 3 - CHAM MU] 2c: tong TAM de nguoi cham xem truoc; con so duoc luu la con so SERVER tinh o buoc 7
   let tong = 0
   for (const dong of cacDong) {
     if (dong.score === '' || dong.score == null) return null

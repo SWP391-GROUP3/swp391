@@ -42,21 +42,21 @@ public class AppealReviewController {
         return ResponseEntity.ok(ApiResponse.success("Lấy phiếu chấm mù thành công", service.getCard(id, Integer.valueOf(jwt.getSubject()))));
     }
     @PutMapping("/api/appeal-reviews/{id}")
-    public ResponseEntity<ApiResponse<AppealBlindScorecardResponse>> draft(@PathVariable Integer id,
+    public ResponseEntity<ApiResponse<AppealBlindScorecardResponse>> draft(@PathVariable Integer id, // [LUONG 3 - CHAM MU] buoc 4/7 controller: luu nhap
             @Valid @RequestBody AppealScorecardRequest request, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(ApiResponse.success("Đã lưu nháp", service.save(id, Integer.valueOf(jwt.getSubject()), request, false)));
     }
     @PostMapping("/api/appeal-reviews/{id}/submit")
-    public ResponseEntity<ApiResponse<AppealBlindScorecardResponse>> submit(@PathVariable Integer id,
+    public ResponseEntity<ApiResponse<AppealBlindScorecardResponse>> submit(@PathVariable Integer id, // [LUONG 3 - CHAM MU] buoc 4/7 controller: nop phieu
             @Valid @RequestBody AppealScorecardRequest request, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(ApiResponse.success("Đã nộp và khóa phiếu chấm", service.save(id, Integer.valueOf(jwt.getSubject()), request, true)));
     }
     @GetMapping("/api/appeals/{id}/comparison")
-    public ResponseEntity<ApiResponse<AppealComparisonResponse>> comparison(@PathVariable Integer id, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<ApiResponse<AppealComparisonResponse>> comparison(@PathVariable Integer id, @AuthenticationPrincipal Jwt jwt) { // [LUONG 4 - SO SANH & CHOT] buoc 5/7 controller: xem so sanh
         return ResponseEntity.ok(ApiResponse.success("Lấy so sánh điểm thành công", service.getComparison(id, Integer.valueOf(jwt.getSubject()))));
     }
     @PostMapping("/api/appeals/{id}/finalize")
-    public ResponseEntity<ApiResponse<AppealComparisonResponse>> finalizeAppeal(@PathVariable Integer id,
+    public ResponseEntity<ApiResponse<AppealComparisonResponse>> finalizeAppeal(@PathVariable Integer id, // [LUONG 4 - SO SANH & CHOT] buoc 5/7 controller: chot diem
             @Valid @RequestBody AppealFinalizeRequest request, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(ApiResponse.success("Đã xác nhận điểm hiệu lực", service.finalizeAppeal(id, Integer.valueOf(jwt.getSubject()), request)));
     }

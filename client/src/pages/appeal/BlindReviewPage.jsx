@@ -53,7 +53,7 @@ function BlindReviewForm({ id, cheo }) {
     setCacDong((cu) => cu.map((dong) => dong.criterionId === criterionId ? { ...dong, [ten]: giaTri } : dong))
   }
 
-  async function luuPhieu(nop) {
+  async function luuPhieu(nop) { // [LUONG 3 - CHAM MU] buoc 2/7 bam "Luu nhap" (nop=false) hoac "Nop phieu cham" (nop=true)
     if (nop) {
       const loiNhap = kiemTraPhieuCham(cacDong)
       if (loiNhap) { setLoi(loiNhap); return }
@@ -62,7 +62,7 @@ function BlindReviewForm({ id, cheo }) {
     const criteria = cacDong.map((dong) => ({ criterionId: dong.criterionId, score: dong.score === '' ? null : Number(dong.score), comment: dong.comment }))
     setDangLuu(true); setLoi(''); setThongBao('')
     try {
-      const gui = cheo ? nopPhieuChamCheo : nop ? nopPhieuChamMu : luuNhapChamMu
+      const gui = cheo ? nopPhieuChamCheo : nop ? nopPhieuChamMu : luuNhapChamMu // [LUONG 3 - CHAM MU] 2b: chon ham API theo nut bam (cheo = phieu cham cheo UC-40, khong phai luong nay)
       const data = await gui(id, criteria)
       setPhieu(data)
       if (!cheo) setCacDong(data.criteria.map((dong) => ({ ...dong, score: dong.score ?? '', comment: dong.comment ?? '' })))
