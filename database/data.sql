@@ -82,7 +82,10 @@ INSERT INTO system_parameters (param_key, param_value, unit, flow, updated_by) V
 /* ---------- ROYALTY: danh mục ---------- */
 
 INSERT INTO events (name, start_date, end_date, window_days, k_limit, exempt_score, created_by) VALUES
-    (N'Bão số 3 năm 2026', '2026-09-05', '2026-09-20', 7, 10, 90, 4);   -- 1
+    (N'Bão số 3 năm 2026', '2026-09-05', '2026-09-20', 7, 10, 90, 4),   -- 1
+    -- 2: còn mở tới hết năm để demo ô chọn sự kiện (BR-IN-03). k_limit = 2 cho dễ thấy bão hoà:
+    --    bài 1-2 được 100%, bài 3-4 được 80%, từ bài 5 được 60% (GBR-09).
+    (N'Chuyển đổi số quốc gia 2026', '2026-10-25', '2026-12-31', 7, 2, 90, 4);
 
 /* 1 hệ số = 10% lương cơ sở 2.340.000đ. */
 INSERT INTO royalty_rates (base_salary, amount, effective_from, created_by) VALUES
