@@ -19,6 +19,7 @@ import com.swp391.kpi.repository.RoyaltyGradingRepository;
 import com.swp391.kpi.repository.RoyaltyLineRepository;
 import com.swp391.kpi.repository.RoyaltyPaymentRepository;
 import com.swp391.kpi.repository.RoyaltyPeriodRepository;
+import com.swp391.kpi.repository.RoyaltyPeriodSummaryRow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,30 +42,31 @@ import java.util.TreeMap;
  * Ky nhuan but: danh sach ky (UC-49), chot ky (UC-50), Ke toan tra ky (UC-52) va khoa ky (UC-53).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   74  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   77  field                           repository / service duoc inject
+ *   75  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   78  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   92  getAllPeriods()                 Cac ky moi nhat len dau, kem tong tien va so bai da cham
- *  107  getPeriodDetail()               UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung nguoi
- *  124  closePeriod()                   UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan, roi tu tao ky thang sau de cham tiep (…
- *  151  returnPeriod()                  UC-52 / UC-53 A1: Ke toan tra ky CLOSED ve OPEN kem ghi chu bat buoc (BR-RY-07), bao Thu ky sua roi chot lai …
- *  178  lockPeriod()                    UC-53: Ke toan khoa ky CLOSED -> LOCKED (BR-RY-07)
+ *   93  getAllPeriods()                 Cac ky moi nhat len dau, kem tong tien va so bai da cham (chi 2 cau SQL)
+ *  112  getPeriodDetail()              UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung nguoi
+ *  129  closePeriod()                  UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan, roi tu tao ky thang sau de cham tiep (…
+ *  151  returnPeriod()                 UC-52 / UC-53 A1: Ke toan tra ky CLOSED ve OPEN kem ghi chu bat buoc (BR-RY-07), bao Thu ky sua roi chot lai …
+ *  173  lockPeriod()                    UC-53: Ke toan khoa ky CLOSED -> LOCKED (BR-RY-07)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  213  loadDebtFromPreviousPeriod()    No chuyen tiep = debt_out tren phieu chi cua ky thang truoc (GBR-12, UC-53 A2)
- *  236  groupLinesByUser()              Gom dong tien theo nguoi nhan
- *  249  createPayment()                 1 phieu chi UNPAID cho 1 nguoi; gross = tong dong tien, tien chi va no tinh bang RoyaltyPaymentCalculator (ph…
- *  273  checkAllArticlesOfMonthGraded()  UC-50 E1 (nhom chot 18/10/2026): con bai da dang tu truoc toi het thang cua ky ma chua cham thi chua cho chot
- *  289  createNextPeriodIfMissing()     Chot ky thang N thi tu tao ky thang N+1 (OPEN) neu chua co, de Thu ky cham tiep duoc (UC-47 E1 can ky OPEN)
- *  307  keepLatestVersions()            Cham lai trong ky OPEN tao phien ban moi cung ky (dong tien ban cu da xoa), nen bang ke chi giu phien ban moi…
- *  319  buildArticleRows()              Moi phieu cham 1 dong: tien bai + tong tien anh cua phieu (cong tu dong MEDIA)
- *  340  buildPersonRows()               Moi nguoi 1 dong: cong cac dong tien cua nguoi do theo loai
- *  356  addLineAmount()                 them line amount
- *  367  loadArticleTitles()             Tieu de bai, lay qua service BF-01 (khong query bang articles)
- *  376  loadUserNames()                 Ho ten nguoi nhan tien, lay qua service luong admin (khong query bang users)
- *  384  sumAmount()                     sum amount
- *  393  countArticles()                 1 bai cham lai nhieu phien ban van tinh 1 bai
- *  401  findPeriod()                    tim period
- *  407  label()                         Vd "9/2026"
+ *  203  loadDebtFromPreviousPeriod()    No chuyen tiep = debt_out tren phieu chi cua ky thang truoc (GBR-12, UC-53 A2)
+ *  226  groupLinesByUser()              Gom dong tien theo nguoi nhan
+ *  239  createPayment()                1 phieu chi UNPAID cho 1 nguoi; gross = tong dong tien, tien chi va no tinh bang RoyaltyPaymentCalculator (ph…
+ *  263  checkAllArticlesOfMonthGraded()  UC-50 E1 (nhom chot 18/10/2026): con bai da dang tu truoc toi het thang cua ky ma chua cham thi chua cho chot
+ *  279  createNextPeriodIfMissing()     Chot ky thang N thi tu tao ky thang N+1 (OPEN) neu chua co, de Thu ky cham tiep duoc (UC-47 E1 can ky OPEN)
+ *  297  keepLatestVersions()            Cham lai trong ky OPEN tao phien ban moi cung ky (dong tien ban cu da xoa), nen bang ke chi giu phien ban moi…
+ *  309  buildArticleRows()              Moi phieu cham 1 dong: tien bai + tong tien anh cua phieu (cong tu dong MEDIA)
+ *  330  buildPersonRows()               Moi nguoi 1 dong: cong cac dong tien cua nguoi do theo loai
+ *  346  addLineAmount()                 them line amount
+ *  357  loadArticleTitles()             Tieu de bai, lay qua service BF-01 (khong query bang articles)
+ *  365  sumAmount()                     sum amount
+ *  374  countArticles()                 1 bai cham lai nhieu phien ban van tinh 1 bai
+ *  382  findPeriod()                    tim period
+ *  388  requireStatus()                 BR-RY-07: thao tac chi lam duoc o 1 trang thai, sai thi bao loi kem trang thai hien tai
+ *  396  toResponse()                    ky vua doi trang thai -> response kem tong tien va so bai (chot / tra / khoa ky dung chung)
+ *  403  label()                         Vd "9/2026"
  */
 @Service
 @RequiredArgsConstructor
@@ -86,14 +88,18 @@ public class RoyaltyPeriodService {
     // ------------------------------------------------------------------ UC-49
 
     // Cac ky moi nhat len dau, kem tong tien va so bai da cham.
-    // Moi ky chay them 2 cau dem: so ky it (12 ky/nam) nen chap nhan duoc.
+    // Chi 2 cau SQL du co bao nhieu ky: 1 cau lay ky, 1 cau lay tong tien + so bai cua moi ky.
     @Transactional(readOnly = true)
     public List<RoyaltyPeriodResponse> getAllPeriods() {
+        Map<Integer, RoyaltyPeriodSummaryRow> summaryByPeriod = new HashMap<>();
+        for (RoyaltyPeriodSummaryRow summary : royaltyPeriodRepository.findPeriodSummaries()) {
+            summaryByPeriod.put(summary.getPeriodId(), summary);
+        }
+
         List<RoyaltyPeriodResponse> result = new ArrayList<>();
         for (RoyaltyPeriod period : royaltyPeriodRepository.findAllByOrderByPeriodYearDescPeriodMonthDesc()) {
-            BigDecimal totalAmount = royaltyPeriodRepository.sumLineAmountByPeriodId(period.getId());
-            Integer gradedArticleCount = royaltyPeriodRepository.countGradedArticlesByPeriodId(period.getId());
-            result.add(RoyaltyPeriodResponse.from(period, totalAmount, gradedArticleCount));
+            RoyaltyPeriodSummaryRow summary = summaryByPeriod.get(period.getId());
+            result.add(RoyaltyPeriodResponse.from(period, summary.getTotalAmount(), summary.getGradedArticleCount()));
         }
         return result;
     }
@@ -122,10 +128,7 @@ public class RoyaltyPeriodService {
     @Transactional
     public RoyaltyPeriodResponse closePeriod(Integer periodId, Integer currentUserId) {
         RoyaltyPeriod period = findPeriod(periodId);
-        if (period.getStatus() != RoyaltyPeriodStatus.OPEN) {
-            throw new BusinessException("Chỉ chốt được kỳ đang mở. Kỳ " + label(period)
-                    + " đang ở trạng thái " + period.getStatus() + ".");
-        }
+        requireStatus(period, RoyaltyPeriodStatus.OPEN, "Chỉ chốt được kỳ đang mở.");
         checkAllArticlesOfMonthGraded(period);   // UC-50 E1
 
         period.setStatus(RoyaltyPeriodStatus.CLOSED);
@@ -137,9 +140,7 @@ public class RoyaltyPeriodService {
         notificationService.notifyRole(ACCOUNTANT_ROLE,
                 "Kỳ nhuận bút " + label(saved) + " đã được Thư ký chốt, chờ Kế toán kiểm tra.");
 
-        BigDecimal totalAmount = royaltyPeriodRepository.sumLineAmountByPeriodId(saved.getId());
-        Integer gradedArticleCount = royaltyPeriodRepository.countGradedArticlesByPeriodId(saved.getId());
-        return RoyaltyPeriodResponse.from(saved, totalAmount, gradedArticleCount);
+        return toResponse(saved);
     }
 
     // ------------------------------------------------------------------ UC-52
@@ -149,10 +150,7 @@ public class RoyaltyPeriodService {
     @Transactional
     public RoyaltyPeriodResponse returnPeriod(Integer periodId, String note, Integer currentUserId) {
         RoyaltyPeriod period = findPeriod(periodId);
-        if (period.getStatus() != RoyaltyPeriodStatus.CLOSED) {
-            throw new BusinessException("Chỉ trả lại được kỳ đã chốt. Kỳ " + label(period)
-                    + " đang ở trạng thái " + period.getStatus() + ".");
-        }
+        requireStatus(period, RoyaltyPeriodStatus.CLOSED, "Chỉ trả lại được kỳ đã chốt.");
 
         period.setStatus(RoyaltyPeriodStatus.OPEN);
         period.setReturnedBy(currentUserId);
@@ -164,9 +162,7 @@ public class RoyaltyPeriodService {
         notificationService.notifyRole(SECRETARY_ROLE,
                 "Kế toán đã trả lại kỳ nhuận bút " + label(saved) + ": " + saved.getReturnNote());
 
-        BigDecimal totalAmount = royaltyPeriodRepository.sumLineAmountByPeriodId(saved.getId());
-        Integer gradedArticleCount = royaltyPeriodRepository.countGradedArticlesByPeriodId(saved.getId());
-        return RoyaltyPeriodResponse.from(saved, totalAmount, gradedArticleCount);
+        return toResponse(saved);
     }
 
     // ------------------------------------------------------------------ UC-53
@@ -176,10 +172,7 @@ public class RoyaltyPeriodService {
     @Transactional
     public RoyaltyPeriodResponse lockPeriod(Integer periodId, Integer currentUserId) {
         RoyaltyPeriod period = findPeriod(periodId);
-        if (period.getStatus() != RoyaltyPeriodStatus.CLOSED) {
-            throw new BusinessException("Chỉ khoá được kỳ đã chốt. Kỳ " + label(period)
-                    + " đang ở trạng thái " + period.getStatus() + ".");
-        }
+        requireStatus(period, RoyaltyPeriodStatus.CLOSED, "Chỉ khoá được kỳ đã chốt.");
         Map<Integer, BigDecimal> debtByUser = loadDebtFromPreviousPeriod(period);
 
         Map<Integer, List<RoyaltyLine>> linesByUser = groupLinesByUser(royaltyLineRepository.findByPeriodId(periodId));
@@ -202,9 +195,7 @@ public class RoyaltyPeriodService {
         auditService.log(currentUserId, "LOCK", "royalty_periods", saved.getId(),
                 "{\"status\":\"CLOSED\"}", "{\"status\":\"LOCKED\"}");
 
-        BigDecimal totalAmount = royaltyPeriodRepository.sumLineAmountByPeriodId(saved.getId());
-        Integer gradedArticleCount = royaltyPeriodRepository.countGradedArticlesByPeriodId(saved.getId());
-        return RoyaltyPeriodResponse.from(saved, totalAmount, gradedArticleCount);
+        return toResponse(saved);
     }
 
     // No chuyen tiep = debt_out tren phieu chi cua ky thang truoc (GBR-12, UC-53 A2).
@@ -337,7 +328,7 @@ public class RoyaltyPeriodService {
 
     // Moi nguoi 1 dong: cong cac dong tien cua nguoi do theo loai. TreeMap -> xep theo id nguoi.
     private List<RoyaltyPeriodPersonResponse> buildPersonRows(List<RoyaltyLine> lines) {
-        Map<Integer, String> names = loadUserNames();
+        Map<Integer, String> names = userReadService.getUserNames();   // ho ten nguoi nhan tien
         Map<Integer, RoyaltyPeriodPersonResponse> people = new TreeMap<>();
         for (RoyaltyLine line : lines) {
             RoyaltyPeriodPersonResponse person = people.get(line.getUserId());
@@ -371,11 +362,6 @@ public class RoyaltyPeriodService {
         return titles;
     }
 
-    // Ho ten nguoi nhan tien, lay qua service doc nguoi dung (khong query bang users)
-    private Map<Integer, String> loadUserNames() {
-        return userReadService.getUserNames();
-    }
-
     private static BigDecimal sumAmount(List<RoyaltyLine> lines) {
         BigDecimal total = BigDecimal.ZERO;
         for (RoyaltyLine line : lines) {
@@ -396,6 +382,21 @@ public class RoyaltyPeriodService {
     private RoyaltyPeriod findPeriod(Integer periodId) {
         return royaltyPeriodRepository.findById(periodId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy kỳ nhuận bút có ID: " + periodId));
+    }
+
+    // BR-RY-07: moi thao tac chi lam duoc o 1 trang thai; sai thi bao kem trang thai hien tai
+    private static void requireStatus(RoyaltyPeriod period, RoyaltyPeriodStatus expected, String message) {
+        if (period.getStatus() != expected) {
+            throw new BusinessException(message + " Kỳ " + label(period)
+                    + " đang ở trạng thái " + period.getStatus() + ".");
+        }
+    }
+
+    // Ky vua doi trang thai -> response kem tong tien va so bai (dung chung cho chot / tra / khoa ky)
+    private RoyaltyPeriodResponse toResponse(RoyaltyPeriod period) {
+        BigDecimal totalAmount = royaltyPeriodRepository.sumLineAmountByPeriodId(period.getId());
+        Integer gradedArticleCount = royaltyPeriodRepository.countGradedArticlesByPeriodId(period.getId());
+        return RoyaltyPeriodResponse.from(period, totalAmount, gradedArticleCount);
     }
 
     // Vd "9/2026"

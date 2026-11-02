@@ -42,14 +42,17 @@ import java.util.Optional;
  * du lieu cho bang KPI toan ban (Department KPI Board - UC-61).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   53  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   54  field                           repository / service duoc inject
+ *   61  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   62  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   71  aggregateMonthlyKpi()           Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggregation Job)
- *  153  getDepartmentDashboard()        Lay du lieu tong the cho bang theo doi KPI toan ban (UC-61: Department KPI Board)
- *  258  getReporterKpiDetail()          Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60)
+ *   81  aggregateMonthlyKpi()           Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggregation Job)
+ *  178  finalizeMonthlyKpi()            UC-66: chot ky KPI, xet PASS / NOT_PASS, snapshot bat bien (BR-KPI-06)
+ *  277  getDepartmentDashboard()        Lay du lieu tong the cho bang theo doi KPI toan ban (UC-61: Department KPI Board)
+ *  382  getReporterKpiDetail()          Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  395  validatePeriod()                kiem tra period
+ *   91  aggregateSnapshots()            tinh va luu snapshot DRAFT, tra entity (aggregate + finalize dung chung)
+ *  528  isReporter()                    user co role REPORTER khong
+ *  532  validatePeriod()                kiem tra period
  */
 @Service
 @RequiredArgsConstructor
@@ -76,6 +79,16 @@ public class KpiAggregationService {
      */
     @Transactional
     public List<KpiSnapshotResponse> aggregateMonthlyKpi(Short year, Byte month) {
+        // Doi entity sang DTO o day, controller khong cam entity (AGENTS.md muc 3.2)
+        List<KpiSnapshotResponse> result = new ArrayList<>();
+        for (KpiSnapshot saved : aggregateSnapshots(year, month)) {
+            result.add(KpiSnapshotResponse.from(saved));
+        }
+        return result;
+    }
+
+    // Phan tinh va luu snapshot DRAFT, tra entity de finalizeMonthlyKpi chot tiep (UC-66)
+    private List<KpiSnapshot> aggregateSnapshots(Short year, Byte month) {
         validatePeriod(year, month);
 
         // 1. Lay tat ca phong vien co chi tieu KPI trong ky hoac tat ca users co role REPORTER
@@ -149,13 +162,7 @@ public class KpiAggregationService {
 
             savedSnapshots.add(kpiSnapshotRepository.save(snapshot));
         }
-
-        // Doi entity sang DTO o day, controller khong cam entity (AGENTS.md muc 3.2)
-        List<KpiSnapshotResponse> result = new ArrayList<>();
-        for (KpiSnapshot saved : savedSnapshots) {
-            result.add(KpiSnapshotResponse.from(saved));
-        }
-        return result;
+        return savedSnapshots;
     }
 
     /**
@@ -180,7 +187,7 @@ public class KpiAggregationService {
         }
 
         // 2. Chay tong hop du lieu KPI moi nhat cho ky
-        List<KpiSnapshot> draftSnapshots = aggregateMonthlyKpi(year, month);
+        List<KpiSnapshot> draftSnapshots = aggregateSnapshots(year, month);
         if (draftSnapshots.isEmpty()) {
             throw new BusinessException("Không có dữ liệu KPI để chốt cho kỳ " + month + "/" + year + ".");
         }

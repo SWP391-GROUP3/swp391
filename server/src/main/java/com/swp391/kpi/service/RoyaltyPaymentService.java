@@ -106,7 +106,7 @@ public class RoyaltyPaymentService {
         Map<Integer, String> titles = loadArticleTitles();
         Map<Integer, RoyaltyMyPeriodResponse> rowsByPeriod = new LinkedHashMap<>();
 
-        for (RoyaltyLine line : royaltyLineRepository.findByUserIdOrderByCreatedAtDesc(currentUserId)) {
+        for (RoyaltyLine line : royaltyLineRepository.findMyLines(currentUserId)) {
             RoyaltyPeriod period = line.getPeriod();
             RoyaltyMyPeriodResponse row = rowsByPeriod.get(period.getId());
             if (row == null) {
@@ -119,7 +119,7 @@ public class RoyaltyPaymentService {
 
         // Gan phieu chi vao ky; ky chi co phieu 0d (dang no, khong co dong tien) van hien
         String myName = userReadService.getUserNames().get(currentUserId);
-        for (RoyaltyPayment payment : royaltyPaymentRepository.findByUserId(currentUserId)) {
+        for (RoyaltyPayment payment : royaltyPaymentRepository.findMyPayments(currentUserId)) {
             RoyaltyPeriod period = payment.getPeriod();
             RoyaltyMyPeriodResponse row = rowsByPeriod.get(period.getId());
             if (row == null) {

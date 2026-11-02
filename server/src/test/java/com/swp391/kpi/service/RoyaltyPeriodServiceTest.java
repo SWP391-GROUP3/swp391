@@ -18,6 +18,7 @@ import com.swp391.kpi.repository.RoyaltyGradingRepository;
 import com.swp391.kpi.repository.RoyaltyLineRepository;
 import com.swp391.kpi.repository.RoyaltyPaymentRepository;
 import com.swp391.kpi.repository.RoyaltyPeriodRepository;
+import com.swp391.kpi.repository.RoyaltyPeriodSummaryRow;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -71,18 +72,23 @@ class RoyaltyPeriodServiceTest {
     @Test
     void getAllPeriodsAddsTotalAmountAndGradedArticleCount() {
         RoyaltyPeriod october = period(3, 2026, 10, RoyaltyPeriodStatus.OPEN);
-        when(royaltyPeriodRepository.findAllByOrderByPeriodYearDescPeriodMonthDesc()).thenReturn(List.of(october));
-        when(royaltyPeriodRepository.sumLineAmountByPeriodId(3)).thenReturn(new BigDecimal("1233000"));
-        when(royaltyPeriodRepository.countGradedArticlesByPeriodId(3)).thenReturn(2);
+        RoyaltyPeriod september = period(1, 2026, 9, RoyaltyPeriodStatus.LOCKED);
+        when(royaltyPeriodRepository.findAllByOrderByPeriodYearDescPeriodMonthDesc()).thenReturn(List.of(october, september));
+        when(royaltyPeriodRepository.findPeriodSummaries()).thenReturn(List.of(
+                summary(1, "2334000", 3), summary(3, "1233000", 2)));
 
         List<RoyaltyPeriodResponse> result = royaltyPeriodService.getAllPeriods();
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         RoyaltyPeriodResponse period = result.get(0);
         assertEquals(RoyaltyPeriodStatus.OPEN, period.getStatus());
         assertEquals(Byte.valueOf((byte) 10), period.getPeriodMonth());
         assertMoney("1233000", period.getTotalAmount());
         assertEquals(Integer.valueOf(2), period.getGradedArticleCount());
+        assertMoney("2334000", result.get(1).getTotalAmount());   // ghep dung ky theo id
+        // Khong con dem rieng tung ky (N+1)
+        verify(royaltyPeriodRepository, never()).sumLineAmountByPeriodId(any());
+        verify(royaltyPeriodRepository, never()).countGradedArticlesByPeriodId(any());
     }
 
     // ---------------------------------------------------- UC-50 bang ke ky
@@ -358,6 +364,15 @@ class RoyaltyPeriodServiceTest {
     }
 
     // ----------------------------------------------------------- du lieu gia
+
+    // 1 dong ket qua gia cua findPeriodSummaries() (interface projection -> tu viet class an danh)
+    private static RoyaltyPeriodSummaryRow summary(Integer periodId, String totalAmount, Integer gradedArticleCount) {
+        return new RoyaltyPeriodSummaryRow() {
+            public Integer getPeriodId() { return periodId; }
+            public BigDecimal getTotalAmount() { return new BigDecimal(totalAmount); }
+            public Integer getGradedArticleCount() { return gradedArticleCount; }
+        };
+    }
 
     private static RoyaltyPeriod period(Integer id, int year, int month, RoyaltyPeriodStatus status) {
         RoyaltyPeriod period = new RoyaltyPeriod();

@@ -14,12 +14,13 @@ import java.util.Optional;
  * Doc bang royalty_periods (ky nhuan but, UC-49).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   27  findAllByOrderByPeriodYearDescPeriodMonthDesc()  Cac ky, thang moi nhat len dau
- *   31  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc()  Ky dang o 1 trang thai, ky cu nhat len dau
- *   34  existsByPeriodYearAndPeriodMonth()  Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi tu tao ky thang sau
- *   37  findByPeriodYearAndPeriodMonth()  Ky cua 1 thang: khoa ky can tim ky thang truoc de lay no chuyen tiep (UC-53 A2)
- *   43  sumLineAmountByPeriodId()       Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines
- *   48  countGradedArticlesByPeriodId()  So bai da cham trong ky (1 bai cham lai nhieu phien ban van tinh 1 bai)
+ *   28  findAllByOrderByPeriodYearDescPeriodMonthDesc()  Cac ky, thang moi nhat len dau
+ *   32  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc()  Ky dang o 1 trang thai, ky cu nhat len dau
+ *   35  existsByPeriodYearAndPeriodMonth()  Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi tu tao ky thang sau
+ *   38  findByPeriodYearAndPeriodMonth()  Ky cua 1 thang: khoa ky can tim ky thang truoc de lay no chuyen tiep (UC-53 A2)
+ *   44  sumLineAmountByPeriodId()      Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines
+ *   49  countGradedArticlesByPeriodId()  So bai da cham trong ky (1 bai cham lai nhieu phien ban van tinh 1 bai)
+ *   59  findPeriodSummaries()           UC-49: tong tien + so bai da cham cua moi ky trong 1 cau SQL
  */
 public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, Integer> {
 
@@ -46,4 +47,14 @@ public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, In
     @Query(value = "SELECT COUNT(DISTINCT article_id) FROM royalty_gradings WHERE period_id = :periodId",
             nativeQuery = true)
     Integer countGradedArticlesByPeriodId(@Param("periodId") Integer periodId);
+
+    // UC-49: tong tien + so bai da cham cua MOI ky trong 1 cau SQL, thay vi moi ky goi
+    // 2 ham o tren (N ky -> 2N cau). Ten bi danh (AS ...) trung ten getter cua RoyaltyPeriodSummaryRow.
+    @Query(value = """
+            SELECT p.id AS periodId,
+                   COALESCE((SELECT SUM(l.amount) FROM royalty_lines l WHERE l.period_id = p.id), 0) AS totalAmount,
+                   (SELECT COUNT(DISTINCT g.article_id) FROM royalty_gradings g WHERE g.period_id = p.id) AS gradedArticleCount
+            FROM royalty_periods p
+            """, nativeQuery = true)
+    List<RoyaltyPeriodSummaryRow> findPeriodSummaries();
 }

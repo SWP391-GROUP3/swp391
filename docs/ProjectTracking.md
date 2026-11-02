@@ -200,10 +200,10 @@ Phối hợp: *Royalty Estimate* của Minh (BF1, Iter3) gọi service nhuận b
 
 | Dòng | Màn hình / chức năng | Loại | Use case | Trạng thái | Ghi chú |
 |---|---|---|---|---|---|
-| 27 | Period Statement | Screen | Review Period Statement; Return Royalty Period | To Do | Accountant: review factors and estimated totals of a closed period; return to Editorial Secretary with reason |
-| 28 | Lock Period & Royalty Calculation | Screen | Lock Royalty Period | To Do | Accountant: lock period; system calculates amounts (factor x unit price) and splits by co-author share % |
-| 29 | Royalty Payment | Screen | Record Royalty Payment | To Do | Accountant: mark each person as paid; period becomes Paid when everyone is paid |
-| 30 | My Royalties | Screen | View My Royalties | To Do | Reporter: own royalties per period (articles, share %, media amounts); needs locked period data |
+| 27 | Period Statement | Screen | Review Period Statement; Return Royalty Period | Done | Accountant: review factors and estimated totals of a closed period; return to Editorial Secretary with reason |
+| 28 | Lock Period & Royalty Calculation | Screen | Lock Royalty Period | Done | Accountant: lock period; system calculates amounts (factor x unit price) and splits by co-author share % |
+| 29 | Royalty Payment | Screen | Record Royalty Payment | Done | Accountant: mark each person as paid; period becomes Paid when everyone is paid |
+| 30 | My Royalties | Screen | View My Royalties | Done | Reporter: own royalties per period (articles, share %, media amounts); needs locked period data |
 
 ### BF5 · Khang (4)
 
