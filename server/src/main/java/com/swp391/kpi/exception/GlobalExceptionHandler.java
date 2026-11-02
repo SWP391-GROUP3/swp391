@@ -17,16 +17,20 @@ import java.util.Map;
  * Loi khac (sai URL, sai method...) de Spring tu xu ly de giu dung status.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   32  handleDataConflict()            xu ly data conflict
- *   38  handleStatus()                  xu ly status
- *   45  handleValidation()              @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
- *   56  handleNotFound()                Khong tim thay du lieu -> 404
- *   63  handleUnauthorized()            Dang nhap that bai (sai tai khoan/mat khau, tai khoan bi khoa) -> 401
- *   70  handleBusiness()                Vi pham quy tac nghiep vu -> 409
+ *   34  handleDataConflict()            xu ly data conflict
+ *   40  handleStatus()                  xu ly status
+ *   47  handleValidation()              @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
+ *   58  handleNotFound()                Khong tim thay du lieu -> 404
+ *   65  handleUnauthorized()            Dang nhap that bai (sai tai khoan/mat khau, tai khoan bi khoa) -> 401
+ *   72  handleBusiness()                Vi pham quy tac nghiep vu -> 409
+ *   81  handleIllegalArgument()         Lop tinh toan bao du lieu sai -> 400
+ *   88  handleIllegalState()            Loi cau hinh he thong (thieu tham so...) -> 500 kem cau tieng Viet
  */
 @RestControllerAdvice
 @SuppressWarnings("unused") // Cac handler duoc Spring goi qua @ExceptionHandler.
 public class GlobalExceptionHandler {
+
+    private static final String SYSTEM_ERROR_MESSAGE = "Hệ thống gặp lỗi, vui lòng thử lại hoặc báo quản trị viên.";
 
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Void>> handleDataConflict() {
@@ -70,5 +74,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(ex.getMessage(), null));
+    }
+
+    // Lop tinh toan thuan (ScoreCalculator, RoyaltyCalculator...) bao du lieu sai, vd diem < 50 thieu nhan xet -> 400.
+    // Truoc day loi nay ra 500 trang, nguoi dung khong biet sai o dau.
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), null));
+    }
+
+    // Loi cau hinh he thong (vd thieu tham so trong system_parameters) -> 500, kem cau tieng Viet de bao Admin.
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException ex) {
+        String message = ex.getMessage() != null ? ex.getMessage() : SYSTEM_ERROR_MESSAGE;
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(message, null));
     }
 }

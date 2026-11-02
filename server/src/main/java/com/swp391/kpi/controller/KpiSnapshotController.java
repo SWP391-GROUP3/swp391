@@ -6,7 +6,6 @@ import com.swp391.kpi.dto.KpiFinalizeRequest;
 import com.swp391.kpi.dto.KpiFinalizeResponse;
 import com.swp391.kpi.dto.KpiSnapshotResponse;
 import com.swp391.kpi.dto.ReporterKpiDetailResponse;
-import com.swp391.kpi.entity.KpiSnapshot;
 import com.swp391.kpi.service.KpiAggregationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +20,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Controller cung cap cac API cho Job tong hop KPI va bang theo doi KPI toan ban (UC-61).
+ * Quyen theo vai tro nam trong SecurityConfig; phong vien chi xem KPI cua minh (kiem trong service).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   35  field                           service duoc inject
- *   42  getDepartmentDashboard()        Lay du lieu bang theo doi KPI ban bien tap (UC-61: View Department KPI Boa… [GET /api/kpi-snapshots/dashboard]
- *   55  getReporterKpiDetail()          Lay chi tiet hieu suat KPI cua mot phong vien theo ch… [GET /api/kpi-snapshots/reporters/{reporterId}/details]
- *   69  triggerAggregation()            Kich hoat job tong hop KPI tu dong theo chu ky thang (Automated Aggregati… [POST /api/kpi-snapshots/aggregate]
+ *   36  field                           service duoc inject
+ *   43  getDepartmentDashboard()        Lay du lieu bang theo doi KPI ban bien tap (UC-61: View Department KPI Boa… [GET /api/kpi-snapshots/dashboard]
+ *   56  getReporterKpiDetail()          Lay chi tiet hieu suat KPI cua mot phong vien theo ch… [GET /api/kpi-snapshots/reporters/{reporterId}/details]
+ *   72  triggerAggregation()            Kich hoat job tong hop KPI tu dong theo chu ky thang (Automated Aggregati… [POST /api/kpi-snapshots/aggregate]
  */
 @RestController
 @RequestMapping("/api/kpi-snapshots")
@@ -61,9 +60,11 @@ public class KpiSnapshotController {
     public ResponseEntity<ApiResponse<ReporterKpiDetailResponse>> getReporterKpiDetail(
             @PathVariable Integer reporterId,
             @RequestParam Short year,
-            @RequestParam Byte month
+            @RequestParam Byte month,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        ReporterKpiDetailResponse data = kpiAggregationService.getReporterKpiDetail(reporterId, year, month);
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());   // nguoi dang xem, lay tu token
+        ReporterKpiDetailResponse data = kpiAggregationService.getReporterKpiDetail(reporterId, year, month, currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết KPI phóng viên thành công", data));
     }
 
@@ -76,12 +77,8 @@ public class KpiSnapshotController {
             @RequestParam Short year,
             @RequestParam Byte month
     ) {
-        List<KpiSnapshot> snapshots = kpiAggregationService.aggregateMonthlyKpi(year, month);
-        List<KpiSnapshotResponse> responseList = new ArrayList<>();
-        for (KpiSnapshot s : snapshots) {
-            responseList.add(KpiSnapshotResponse.from(s));
-        }
-        return ResponseEntity.ok(ApiResponse.success("Tổng hợp dữ liệu KPI chu kỳ thành công", responseList));
+        List<KpiSnapshotResponse> data = kpiAggregationService.aggregateMonthlyKpi(year, month);
+        return ResponseEntity.ok(ApiResponse.success("Tổng hợp dữ liệu KPI chu kỳ thành công", data));
     }
 
     /**

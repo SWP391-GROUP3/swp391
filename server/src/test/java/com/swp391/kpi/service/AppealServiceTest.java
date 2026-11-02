@@ -102,6 +102,21 @@ class AppealServiceTest {
     }
 
     @Test
+    void submitAppealTurnsDuplicateKeyRaceIntoOneAppealMessage() {
+        when(appealSubmissionDataProvider.getSubmissionContext(9)).thenReturn(validContext());
+        when(appealRuleConfigService.getActiveConfigEntity()).thenReturn(activeRule());
+        when(appealRepository.existsByArticleId(9)).thenReturn(false);
+        when(appealRepository.save(any(Appeal.class)))
+                .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uq_appeals_article"));
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> appealService.submitAppeal(validRequest(), 1));
+
+        assertEquals("Mỗi bài viết chỉ được khiếu nại một lần.", exception.getMessage());
+        verify(appealCriterionRepository, never()).saveAll(any());
+    }
+
+    @Test
     void submitAppealRejectsUserWhoIsNotMainAuthor() {
         when(appealSubmissionDataProvider.getSubmissionContext(9)).thenReturn(validContext());
         when(appealRuleConfigService.getActiveConfigEntity()).thenReturn(activeRule());

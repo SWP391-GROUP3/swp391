@@ -42,6 +42,11 @@ export function kichHoatBoTieuChi(versionId) {
   return goiApi(`/api/criteria-sets/${versionId}/activate`, { method: 'PUT' })
 }
 
+export function layDanhSachChoPhanCong(sectionId) {
+  const query = sectionId ? `?sectionId=${sectionId}` : ''
+  return goiApi(`/api/assignments/pending${query}`)
+}
+
 export function phanCongBaiViet(payload) {
   return goiApi('/api/assignments', { method: 'POST', body: payload })
 }

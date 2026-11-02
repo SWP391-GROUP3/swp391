@@ -77,7 +77,7 @@ public class AppealReviewService {
     }
 
     @Transactional
-    public AppealBlindScorecardResponse save(Integer attemptId, Integer userId, AppealScorecardRequest request, boolean submit) {
+    public AppealBlindScorecardResponse save(Integer attemptId, Integer userId, AppealScorecardRequest request, boolean submit) { // [LUONG 3 - CHAM MU] buoc 5/7 service: khoa khieu nai TRUOC khoa phieu, phai dang IN_REVIEW, goi saveScorecard, nop xong bao Truong ban
         users.requireActive(userId, "EDITOR");
         deviations.lockWorkflow();
         var ref = scoring.getAttemptReference(attemptId);
@@ -100,7 +100,7 @@ public class AppealReviewService {
     }
 
     @Transactional
-    public AppealComparisonResponse finalizeAppeal(Integer id, Integer userId, AppealFinalizeRequest request) {
+    public AppealComparisonResponse finalizeAppeal(Integer id, Integer userId, AppealFinalizeRequest request) { // [LUONG 4 - SO SANH & CHOT] buoc 6/7 service chot: tu tinh lai bang compare() -> ghi appeal_resolutions -> RESOLVED -> audit FINALIZE -> cap nhat do lech
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.IN_REVIEW || resolutions.findByAppealId(id).isPresent())
             throw new BusinessException("Khiếu nại đã được xử lý trước đó hoặc chưa được phân công.");
@@ -119,7 +119,7 @@ public class AppealReviewService {
         appeal.setStatus(AppealStatus.RESOLVED); appeal.setResolvedAt(resolution.getFinalizedAt());
         Map<String, Object> event = new LinkedHashMap<>();
         event.put("status", "RESOLVED"); event.put("effectiveScore", proposed.effectiveScore()); event.put("rule", proposed.rule());
-        event.put("effectiveAttemptId", current.id()); event.put("downstreamStatus", "PENDING_INTEGRATION");
+        event.put("effectiveAttemptId", current.id()); event.put("downstreamStatus", "EFFECTIVE_SCORE_READY"); // BF-04/BF-05 doc diem nay qua AppealEffectiveScoreService
         audit.log(userId, "FINALIZE", "appeals", id, "{\"status\":\"IN_REVIEW\"}", encode(event));
         var article = articles.getArticle(appeal.getArticleId());
         notifications.notifyUser(appeal.getAppellantId(), article.id(), "Khiếu nại #" + id + " đã được xác nhận. Điểm hiệu lực: " + proposed.effectiveScore() + ".");
@@ -129,7 +129,7 @@ public class AppealReviewService {
         return comparison(appeal);
     }
 
-    private AppealComparisonResponse comparison(Appeal appeal) {
+    private AppealComparisonResponse comparison(Appeal appeal) { // [LUONG 4 - SO SANH & CHOT] 6a: gom S0, S1, S2 + lay nguong T cua LUAT LUC GUI khieu nai (BR-QC-12), goi compare()
         var original = scoring.getComparisonCard(appeal.getScoringAttemptId());
         List<AppealBlindScorecardResponse> reviews = new ArrayList<>();
         for (var attempt : scoring.getArticleAttempts(appeal.getArticleId()))

@@ -14,6 +14,10 @@
  *   96  closeRoyaltyPeriod()            UC-50: Thu ky chot ky OPEN -> CLOSED [POST /api/royalty-periods/{periodId}/close]
  *  101  returnRoyaltyPeriod()           UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do (… [POST /api/royalty-periods/{periodId}/return]
  *  106  lockRoyaltyPeriod()             UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho m… [POST /api/royalty-periods/{periodId}/lock]
+ *  115  getRoyaltyPayments()            UC-54: phieu chi cua tung nguoi trong 1 ky [GET /api/royalty-payments?periodId=]
+ *  120  recordRoyaltyPayment()          UC-54: Ke toan ghi nhan da chi 1 phieu [POST /api/royalty-payments/{paymentId}/pay]
+ *  131  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap theo ky [GET /api/royalty-payments/me]
+ *  140  getUnpaidRoyaltyTotal()         Chip vi Phong vien: tong nhuan but chua nhan (tinh tu getMyRoyalties)
  */
 import { goiApi } from './goiApi.js'
 
@@ -105,4 +109,49 @@ export async function returnRoyaltyPeriod(periodId, note) {
 /** UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho moi nguoi. */
 export async function lockRoyaltyPeriod(periodId) {
   return goiApi(`/api/royalty-periods/${periodId}/lock`, { method: 'POST' })
+}
+
+/**
+ * UC-54: phieu chi cua tung nguoi trong 1 ky (ky da khoa moi co phieu).
+ * Moi dong: { id, periodId, userId, fullName, grossAmount, debtIn, paidAmount, debtOut,
+ *             status: "UNPAID" | "PAID", paidBy, paidAt }.
+ */
+export async function getRoyaltyPayments(periodId) {
+  return goiApi(`/api/royalty-payments?periodId=${encodeURIComponent(periodId)}`)
+}
+
+/** UC-54: Ke toan ghi nhan da chi 1 phieu. Het phieu chua chi thi ky tu sang PAID. */
+export async function recordRoyaltyPayment(paymentId) {
+  return goiApi(`/api/royalty-payments/${paymentId}/pay`, { method: 'POST' })
+}
+
+/**
+ * UC-57: nhuan but cua nguoi dang dang nhap, moi ky 1 dong, ky moi nhat truoc.
+ * Moi dong: { periodId, periodYear, periodMonth, periodStatus, totalAmount,
+ *   payment: (null khi ky chua khoa) { paidAmount, debtIn, debtOut, status, paidAt },
+ *   lines: [{ lineId, articleId, articleTitle, lineType: "ARTICLE" | "MEDIA" | "ADJUSTMENT",
+ *             sharePercent, amount }] }.
+ */
+export async function getMyRoyalties() {
+  return goiApi('/api/royalty-payments/me')
+}
+
+/**
+ * Chip vi o khung Phong vien: tong nhuan but CHUA NHAN.
+ * Ky da khoa thi lay so tien thuc chi cua phieu UNPAID; ky chua khoa thi lay tong dong tien tam tinh.
+ * Khong co bang "so du vi" (schema.sql), nen tinh tu du lieu UC-57.
+ */
+export async function getUnpaidRoyaltyTotal() {
+  const periods = await getMyRoyalties()
+  let total = 0
+  for (const period of periods) {
+    if (period.payment) {
+      if (period.payment.status === 'UNPAID') {
+        total += Number(period.payment.paidAmount)
+      }
+    } else {
+      total += Number(period.totalAmount)
+    }
+  }
+  return total
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { danhSachNam, namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { Link } from 'react-router-dom'
 import { layBangKpiBan, tongHopKpiThang } from '../../api/kpiApi.js'
 import '../../styles/DepartmentKpiDashboard.css'
@@ -20,8 +21,8 @@ import '../../styles/DepartmentKpiDashboard.css'
  *  218  link [Chi tiet →]               mo trang /kpi-board/{item.reporterId}?year={nam}&month={thang} (ReporterKpiDetails)
  */
 export default function DepartmentKpiDashboard({ nguoiDung }) {
-  const [nam, setNam] = useState(2026)
-  const [thang, setThang] = useState(9)
+  const [nam, setNam] = useState(namHienTai())
+  const [thang, setThang] = useState(thangHienTai())
   const [duLieu, setDuLieu] = useState(null)
   const [dangTai, setDangTai] = useState(false)
   const [dangTongHop, setDangTongHop] = useState(false)
@@ -87,8 +88,7 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
             value={nam}
             onChange={(e) => setNam(Number(e.target.value))}
           >
-            <option value={2025}>Năm 2025</option>
-            <option value={2026}>Năm 2026</option>
+            {danhSachNam().map((n) => <option key={n} value={n}>Năm {n}</option>)}
             <option value={2027}>Năm 2027</option>
           </select>
 

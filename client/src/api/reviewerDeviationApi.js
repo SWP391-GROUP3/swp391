@@ -5,6 +5,7 @@ import { goiApi } from './goiApi.js'
  *
  * MUC LUC (so dong - ten - tac dung)
  *   10  layBaoCaoDoLech()               lay bao cao do lech [GET duongDan]
+ *      tinhLaiBaoCaoDoLech()           tinh lai chi so [POST /api/reports/reviewer-deviations/refresh]
  */
 
 export async function layBaoCaoDoLech(boLoc = {}) {
@@ -17,4 +18,10 @@ export async function layBaoCaoDoLech(boLoc = {}) {
     ? `/api/reports/reviewer-deviations?${query.toString()}`
     : '/api/reports/reviewer-deviations'
   return goiApi(duongDan)
+}
+
+// Tinh lai va luu chi so (thang trong bo loc, de trong = moi thang).
+export async function tinhLaiBaoCaoDoLech(period) {
+  const query = period ? `?period=${period}-01` : ''
+  return goiApi(`/api/reports/reviewer-deviations/refresh${query}`, { method: 'POST' })
 }

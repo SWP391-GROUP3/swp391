@@ -163,9 +163,9 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
       <div className="duyet-diem__the">
         <div className="duyet-diem__dau">
           <div>
-            <h2 className="duyet-diem__tieu-de">Hàng chờ duyệt điểm đánh giá (BF-02)</h2>
+            <h2 className="duyet-diem__tieu-de">Hàng chờ duyệt điểm đánh giá</h2>
             <p className="duyet-diem__mo-ta">
-              Danh sách các bài viết đã được Biên tập viên chấm điểm và đang chờ Trưởng ban phê duyệt (UC-29..32)
+              Danh sách các bài viết đã được Biên tập viên chấm điểm và đang chờ Trưởng ban phê duyệt
             </p>
           </div>
           <button

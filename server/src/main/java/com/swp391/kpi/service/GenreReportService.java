@@ -7,12 +7,10 @@ import com.swp391.kpi.entity.ArticleStatus;
 import com.swp391.kpi.entity.Genre;
 import com.swp391.kpi.entity.ReaderInteraction;
 import com.swp391.kpi.entity.RoyaltyGrading;
-import com.swp391.kpi.entity.ScoringAttempt;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.GenreRepository;
 import com.swp391.kpi.repository.ReaderInteractionRepository;
 import com.swp391.kpi.repository.RoyaltyGradingRepository;
-import com.swp391.kpi.repository.ScoringAttemptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +41,7 @@ public class GenreReportService {
     private final ArticleRepository articleRepository;
     private final ReaderInteractionRepository readerInteractionRepository;
     private final RoyaltyGradingRepository royaltyGradingRepository;
-    private final ScoringAttemptRepository scoringAttemptRepository;
+    private final AppealEffectiveScoreService appealEffectiveScoreService;  // BF-03: diem hieu luc cua bai
 
     private final GenreReportCalculator calculator = new GenreReportCalculator();
 
@@ -163,19 +161,13 @@ public class GenreReportService {
 
                 // Nhuan but & diem chat luong
                 RoyaltyGrading rg = articleGradingMap.get(a.getId());
-                if (rg != null) {
-                    if (rg.getAmount() != null) {
-                        genreTotalRoyalty = genreTotalRoyalty.add(rg.getAmount());
-                    }
-                    if (rg.getScoreUsed() != null) {
-                        qualityScores.add(rg.getScoreUsed());
-                    }
-                } else {
-                    // Neu chua co phieu cham nhuan but, thu lay diem tu scoring_attempts
-                    Optional<ScoringAttempt> attemptOpt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(a.getId());
-                    if (attemptOpt.isPresent() && attemptOpt.get().getTotalScore() != null) {
-                        qualityScores.add(attemptOpt.get().getTotalScore());
-                    }
+                if (rg != null && rg.getAmount() != null) {
+                    genreTotalRoyalty = genreTotalRoyalty.add(rg.getAmount());
+                }
+                // Diem chat luong = diem hieu luc cua bai (BR-QC-10), da tinh ca ket qua khieu nai
+                BigDecimal effectiveScore = appealEffectiveScoreService.getEffectiveScore(a.getId());
+                if (effectiveScore != null) {
+                    qualityScores.add(effectiveScore);
                 }
             }
 

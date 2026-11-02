@@ -65,12 +65,36 @@ public class ReviewerDeviationRefreshService {
     // Chi workflow BF03 da kiem tra quyen duoc goi; khong co endpoint nhan sectionId tu client.
     @Transactional
     public Set<Integer> refreshSection(LocalDate period, Integer sectionId) {
-        if (sectionId == null) throw new IllegalArgumentException("Missing department");
+        if (sectionId == null) throw new IllegalArgumentException("Thiếu ban của bài viết, không tính được chỉ số độ lệch.");
         lockWorkflow();
         return calculatePeriod(period, "HEAD_OF_DEPARTMENT", sectionId);
     }
 
+    // Tinh va luu chi so cua ky; tra ve cac BTV co du lieu so sanh.
     private Set<Integer> calculatePeriod(LocalDate period, String role, Integer sectionId) {
+        var calculated = computeIndexes(period, role, sectionId);
+        var existing = indexRepository.findAllByOrderByPeriodDescEditorIdAsc();
+        for (var entry : calculated.entrySet()) {
+            ReviewerDeviationIndex target = null;
+            for (var index : existing) {
+                if (period.equals(index.getPeriod()) && entry.getKey().equals(index.getEditorId())) target = index;
+            }
+            if (target == null) target = new ReviewerDeviationIndex();
+            var value = entry.getValue();
+            target.setEditorId(value.getEditorId());
+            target.setPeriod(period);
+            target.setAvgDeviation(value.getAvgDeviation());
+            target.setAppealCount(value.getAppealCount());
+            target.setOverturnRate(value.getOverturnRate());
+            target.setWorkloadCount(value.getWorkloadCount());
+            target.setLastUpdated(value.getLastUpdated());
+            indexRepository.save(target);
+        }
+        return calculated.keySet();
+    }
+
+    // Cach tinh UC-41 duy nhat: chi doc, khong ghi DB. Bao cao va ho so BTV (UC-42) cung dung ham nay.
+    public Map<Integer, ReviewerDeviationIndex> computeIndexes(LocalDate period, String role, Integer sectionId) {
         if (period == null || period.getDayOfMonth() != 1)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kỳ báo cáo phải là ngày đầu tháng.");
         var attempts = scoringReadService.getSubmittedAttempts();
@@ -114,27 +138,18 @@ public class ReviewerDeviationRefreshService {
                 workload.merge(attempt.reviewerId(), 1, Integer::sum);
             }
         }
-        var existing = indexRepository.findAllByOrderByPeriodDescEditorIdAsc();
+        Map<Integer, ReviewerDeviationIndex> result = new HashMap<>();
         for (var entry : differences.entrySet()) {
             Integer editorId = entry.getKey();
             var calculated = new ReviewerDeviationCalculator().calculate(entry.getValue(),
                     appealCounts.getOrDefault(editorId, 0), overturned.getOrDefault(editorId, 0),
                     workload.getOrDefault(editorId, 0));
-            ReviewerDeviationIndex target = null;
-            for (var index : existing) {
-                if (period.equals(index.getPeriod()) && editorId.equals(index.getEditorId())) target = index;
-            }
-            if (target == null) target = new ReviewerDeviationIndex();
-            target.setEditorId(editorId);
-            target.setPeriod(period);
-            target.setAvgDeviation(calculated.getAvgDeviation());
-            target.setAppealCount(calculated.getAppealCount());
-            target.setOverturnRate(calculated.getOverturnRate());
-            target.setWorkloadCount(calculated.getWorkloadCount());
-            target.setLastUpdated(LocalDateTime.now());
-            indexRepository.save(target);
+            calculated.setEditorId(editorId);
+            calculated.setPeriod(period);
+            calculated.setLastUpdated(LocalDateTime.now());
+            result.put(editorId, calculated);
         }
-        return differences.keySet();
+        return result;
     }
 
     @Transactional(readOnly = true)

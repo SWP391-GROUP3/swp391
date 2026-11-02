@@ -79,6 +79,23 @@ class AppealRuleConfigServiceTest {
         verify(appealRuleConfigRepository, never()).save(any());
     }
 
+    @Test
+    void appealDeadlineAddsWindowDaysOfActiveConfig() {
+        AppealRuleConfig active = new AppealRuleConfig();
+        active.setAppealWindowDays(7);
+        when(appealRuleConfigRepository.findFirstByIsActiveTrueAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(any()))
+                .thenReturn(java.util.Optional.of(active));
+
+        java.time.LocalDateTime announcedAt = java.time.LocalDateTime.of(2026, 10, 30, 10, 0);
+
+        assertEquals(java.time.LocalDateTime.of(2026, 11, 6, 10, 0), appealRuleConfigService.getAppealDeadline(announcedAt));
+    }
+
+    @Test
+    void appealDeadlineIsNullWhenScoreNotAnnounced() {
+        assertEquals(null, appealRuleConfigService.getAppealDeadline(null));
+    }
+
     private AppealRuleConfigCreateRequest validRequest() {
         AppealRuleConfigCreateRequest request = new AppealRuleConfigCreateRequest();
         request.setAppealWindowDays(7);

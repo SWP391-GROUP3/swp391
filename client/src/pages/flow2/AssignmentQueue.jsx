@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import {
   layKhoiLuongCongViecBtv,
   layPhanCongBaiViet,
-  phanCongBaiViet
+  phanCongBaiViet,
+  layDanhSachChoPhanCong
 } from '../../api/assessmentApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_PHAN_CONG, BT_THONG_TIN, BT_BIEU_DO } from './bieuTuongBf02.jsx'
@@ -28,12 +29,9 @@ import '../../styles/Flow2.css'
  */
 
 export default function AssignmentQueue({ nguoiDung }) {
-  // Danh sách bài viết chờ phân công (SUBMITTED) khớp 100% với Database
-  const [articles] = useState([
-    { id: 4, title: 'Điều tra đường dây buôn lậu khoáng sản qua biên giới', author: 'Nguyễn Văn An', category: 'Phóng sự điều tra', categoryId: 6, submittedAt: '13/10/2026 08:30' },
-    { id: 3, title: 'Giá xăng giảm lần thứ ba liên tiếp', author: 'Nguyễn Văn An', category: 'Tin sâu / Thời sự', categoryId: 2, submittedAt: '27/09/2026 08:00' },
-    { id: 5, title: 'Bình luận: Cơ hội và thách thức của AI trong tác nghiệp phóng viên', author: 'Trần Thị Bình', category: 'Bình luận', categoryId: 5, submittedAt: '13/10/2026 10:00' }
-  ])
+  // Danh sách bài viết chờ phân công (SUBMITTED) tải động từ Database theo ban của Trưởng ban (UC-18)
+  const [articles, setArticles] = useState([])
+  const [loadingArticles, setLoadingArticles] = useState(false)
 
   // Danh sách BTV để chọn giao việc (theo data.sql: cuong.lh id=3, giang.nt id=9)
   const editors = [
@@ -42,7 +40,7 @@ export default function AssignmentQueue({ nguoiDung }) {
     { id: 4, name: 'Phạm Thu Dung (Thư ký toà soạn)', username: 'dung.pt' }
   ]
 
-  const [selectedArticleId, setSelectedArticleId] = useState(4)
+  const [selectedArticleId, setSelectedArticleId] = useState(null)
   const [selectedEditorId, setSelectedEditorId] = useState(3)
   const [wasSuggested, setWasSuggested] = useState(false)
   const [workload, setWorkload] = useState(null)
@@ -52,12 +50,42 @@ export default function AssignmentQueue({ nguoiDung }) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    loadPendingArticles()
+  }, [nguoiDung?.sectionId])
+
+  useEffect(() => {
     loadWorkload(selectedEditorId)
   }, [selectedEditorId])
 
   useEffect(() => {
-    loadCurrentAssignment(selectedArticleId)
+    if (selectedArticleId) {
+      loadCurrentAssignment(selectedArticleId)
+    } else {
+      setCurrentAssignment(null)
+    }
   }, [selectedArticleId])
+
+  async function loadPendingArticles() {
+    setLoadingArticles(true)
+    setError('')
+    try {
+      const data = await layDanhSachChoPhanCong(nguoiDung?.sectionId)
+      setArticles(data || [])
+      if (data && data.length > 0) {
+        setSelectedArticleId(prev => {
+          const tonTai = data.some(a => a.id === prev)
+          return tonTai ? prev : data[0].id
+        })
+      } else {
+        setSelectedArticleId(null)
+      }
+    } catch (err) {
+      setError('Lỗi tải danh sách bài chờ phân công: ' + err.message)
+      setArticles([])
+    } finally {
+      setLoadingArticles(false)
+    }
+  }
 
   async function loadWorkload(editorId) {
     try {
@@ -80,6 +108,11 @@ export default function AssignmentQueue({ nguoiDung }) {
 
   async function handleAssign(e) {
     e.preventDefault()
+    if (!selectedArticleId) {
+      setError('Vui lòng chọn một bài viết để phân công!')
+      return
+    }
+
     setMessage('')
     setError('')
     setLoading(true)
@@ -94,7 +127,7 @@ export default function AssignmentQueue({ nguoiDung }) {
 
       const data = await phanCongBaiViet(payload)
       setMessage(`Phân công thành công Bài #${data.articleId} cho BTV (ID: ${data.editorId})!`)
-      setCurrentAssignment(data)
+      loadPendingArticles()
       loadWorkload(selectedEditorId)
     } catch (err) {
       setError('Giao bài thất bại: ' + err.message)
@@ -103,15 +136,42 @@ export default function AssignmentQueue({ nguoiDung }) {
     }
   }
 
+  function dinhDangNgay(chuoiNgay) {
+    if (!chuoiNgay) return '—'
+    try {
+      return new Date(chuoiNgay).toLocaleString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    } catch {
+      return chuoiNgay
+    }
+  }
+
   const selectedArticle = articles.find(a => a.id === Number(selectedArticleId))
 
   return (
     <div className="bf02__the">
       {/* UC-18, UC-20; BR-QA-04: Trưởng ban phân công bài viết */}
-      <h3 className="bf02__tieu-de"><Icon>{BT_PHAN_CONG}</Icon>Hàng chờ phân công bài viết</h3>
-      <p className="bf02__mo-ta">
-        Trưởng ban chọn bài viết đã nộp và chỉ định một Biên tập viên chịu trách nhiệm chấm chất lượng (Mỗi bài chỉ có 1 BTV chính).
-      </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h3 className="bf02__tieu-de"><Icon>{BT_PHAN_CONG}</Icon>Hàng chờ phân công bài viết</h3>
+          <p className="bf02__mo-ta">
+            Trưởng ban chọn bài viết đã nộp và chỉ định một Biên tập viên chịu trách nhiệm chấm chất lượng (Mỗi bài chỉ có 1 BTV chính).
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={loadPendingArticles}
+          disabled={loadingArticles}
+          className="nut-nhe"
+        >
+          {loadingArticles ? 'Đang tải...' : 'Làm mới danh sách'}
+        </button>
+      </div>
 
       {/* Thông báo */}
       {message && <div className="thong-bao-thanh-cong">{message}</div>}
@@ -132,13 +192,27 @@ export default function AssignmentQueue({ nguoiDung }) {
             </tr>
           </thead>
           <tbody>
-            {articles.map(art => (
+            {loadingArticles && (
+              <tr>
+                <td colSpan="6" style={{ textAlign: 'center', padding: 24, color: 'var(--fm-chu-nhat)' }}>
+                  Đang tải danh sách bài chờ phân công từ hệ thống...
+                </td>
+              </tr>
+            )}
+            {!loadingArticles && articles.length === 0 && (
+              <tr>
+                <td colSpan="6" style={{ textAlign: 'center', padding: 24, color: 'var(--fm-chu-nhat)' }}>
+                  Hiện không có bài viết nào đang ở trạng thái Chờ phân công (SUBMITTED).
+                </td>
+              </tr>
+            )}
+            {!loadingArticles && articles.map(art => (
               <tr key={art.id} className={selectedArticleId === art.id ? 'bf02__dong--chon' : undefined}>
                 <td className="bf02__dam">#{art.id}</td>
                 <td>{art.title}</td>
                 <td>{art.category}</td>
                 <td>{art.author}</td>
-                <td className="bf02__nhat">{art.submittedAt}</td>
+                <td className="bf02__nhat">{dinhDangNgay(art.submittedAt)}</td>
                 <td className="bf02__giua">
                   <button
                     type="button"

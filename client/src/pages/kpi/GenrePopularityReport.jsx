@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { danhSachNam, namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { layBaoCaoTheLoai } from '../../api/kpiApi.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import { formatNumber } from '../../utils/formatNumber.js'
@@ -16,8 +17,8 @@ import './GenrePopularityReport.css'
  *   64    locDanhSachTheLoai         - Loc the loai theo tu khoa tim kiem
  */
 export default function GenrePopularityReport({ nguoiDung }) {
-  const [nam, setNam] = useState(2026)
-  const [thang, setThang] = useState(9) // Mac dinh thang 9/2026 khop data.sql
+  const [nam, setNam] = useState(namHienTai())
+  const [thang, setThang] = useState(thangHienTai())
   const [tuKhoa, setTuKhoa] = useState('')
   const [duLieu, setDuLieu] = useState(null)
   const [dangTai, setDangTai] = useState(false)
@@ -69,8 +70,7 @@ export default function GenrePopularityReport({ nguoiDung }) {
             value={nam}
             onChange={(e) => setNam(Number(e.target.value))}
           >
-            <option value={2025}>Năm 2025</option>
-            <option value={2026}>Năm 2026</option>
+            {danhSachNam().map((n) => <option key={n} value={n}>Năm {n}</option>)}
             <option value={2027}>Năm 2027</option>
           </select>
 

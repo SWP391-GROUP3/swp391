@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { layBaoCaoDoLech } from '../../api/reviewerDeviationApi.js'
+import { layBaoCaoDoLech, tinhLaiBaoCaoDoLech } from '../../api/reviewerDeviationApi.js'
 import { layDanhSachBienTapVien } from '../../api/reviewerProfileApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { formatNumber } from '../../utils/formatNumber.js'
@@ -18,9 +18,11 @@ import '../../styles/QualityReportPage.css'
  *   44    useEffect                     tai du lieu khi mo trang
  *   52    locBaoCao()                   loc bao cao
  *   62    doiBoLoc()                    doi bo loc
+ *      tinhLai()                     tinh lai chi so roi tai lai bao cao
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
  *   76  form, nut [Loc bao cao]         locBaoCao() -> goi GET duongDan
+ *      [Tinh lai chi so]            tinhLai() -> hoi xac nhan; goi POST /api/reports/reviewer-deviations/refresh roi GET lai bao cao
  *  119  link [{item.editorName}]        mo trang /reviewers/{item.editorId}?period={item.period.slice(0, 7)} (ReviewerProfilePage)
  *  140  link [{btv.editorName}]         mo trang /reviewers/{btv.editorId}{boLoc.period ? `?period=${boLoc.p… (ReviewerProfilePage)
  */
@@ -30,6 +32,7 @@ export default function ReviewerDeviationPage() {
   const [danhSach, setDanhSach] = useState(null)
   const [boLoc, setBoLoc] = useState(location.state?.boLoc ?? { period: '', editorId: '', sectionId: '' })
   const [loi, setLoi] = useState('')
+  const [dangTinh, setDangTinh] = useState(false)
   const [bienTapVien, setBienTapVien] = useState(null)
   const [loiDanhBa, setLoiDanhBa] = useState('')
 
@@ -56,6 +59,20 @@ export default function ReviewerDeviationPage() {
       setDanhSach(await layBaoCaoDoLech(boLoc))
     } catch (error) {
       setLoi(error.message)
+    }
+  }
+
+  async function tinhLai() {
+    if (!window.confirm('Tính lại chỉ số độ lệch? Thao tác này có thể làm chậm các thao tác chấm khác trong giây lát.')) return
+    setLoi('')
+    setDangTinh(true)
+    try {
+      await tinhLaiBaoCaoDoLech(boLoc.period)
+      setDanhSach(await layBaoCaoDoLech(boLoc))
+    } catch (error) {
+      setLoi(error.message)
+    } finally {
+      setDangTinh(false)
     }
   }
 
@@ -91,6 +108,9 @@ export default function ReviewerDeviationPage() {
           </select>
         </label>
         <button className="nut-nhe" type="submit">Lọc báo cáo</button>
+        <button className="nut-nhe" type="button" disabled={dangTinh} onClick={tinhLai}>
+          {dangTinh ? 'Đang tính…' : 'Tính lại chỉ số'}
+        </button>
       </form>
 
       {loi && <p className="thong-bao-loi" role="alert">{loi}</p>}

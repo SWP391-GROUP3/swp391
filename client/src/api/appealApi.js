@@ -27,7 +27,7 @@ export async function layDieuKienKhieuNai(articleId) {
   return goiApi(`/api/articles/${articleId}/appeal-eligibility`)
 }
 
-export async function guiKhieuNai(articleId, criteria) {
+export async function guiKhieuNai(articleId, criteria) { // [LUONG 1 - GUI KHIEU NAI] buoc 3/6 POST /api/appeals qua goiApi
   return goiApi('/api/appeals', { method: 'POST', body: { articleId, criteria } })
 }
 
@@ -57,7 +57,7 @@ export function layNguoiChamHopLe(id) {
   return goiApi(`/api/appeals/${id}/reviewer-candidates`)
 }
 
-export function phanCongKhieuNai(id, reviewerId, reason) {
+export function phanCongKhieuNai(id, reviewerId, reason) { // [LUONG 2 - PHAN CONG] buoc 3/6 POST /api/appeals/{id}/assign
   return goiApi(`/api/appeals/${id}/assign`, { method: 'POST', body: { reviewerId, reason } })
 }
 
@@ -67,8 +67,8 @@ export function giaoLaiKhieuNai(id, duLieu) {
 
 export function layPhieuChamMu() { return goiApi('/api/appeal-reviews') }
 export function layChiTietChamMu(id) { return goiApi(`/api/appeal-reviews/${id}`) }
-export function luuNhapChamMu(id, criteria) { return goiApi(`/api/appeal-reviews/${id}`, { method: 'PUT', body: { criteria } }) }
-export function nopPhieuChamMu(id, criteria) { return goiApi(`/api/appeal-reviews/${id}/submit`, { method: 'POST', body: { criteria } }) }
-export function laySoSanhKhieuNai(id) { return goiApi(`/api/appeals/${id}/comparison`) }
-export function phanCongLanHai(id, reviewerId, reason) { return goiApi(`/api/appeals/${id}/assign-second`, { method: 'POST', body: { reviewerId, reason } }) }
-export function chotDiemKhieuNai(id, expectedAttemptId) { return goiApi(`/api/appeals/${id}/finalize`, { method: 'POST', body: { expectedAttemptId } }) }
+export function luuNhapChamMu(id, criteria) { return goiApi(`/api/appeal-reviews/${id}`, { method: 'PUT', body: { criteria } }) } // [LUONG 3 - CHAM MU] buoc 3/7 PUT /api/appeal-reviews/{id} (luu nhap)
+export function nopPhieuChamMu(id, criteria) { return goiApi(`/api/appeal-reviews/${id}/submit`, { method: 'POST', body: { criteria } }) } // [LUONG 3 - CHAM MU] buoc 3/7 POST /api/appeal-reviews/{id}/submit (nop phieu)
+export function laySoSanhKhieuNai(id) { return goiApi(`/api/appeals/${id}/comparison`) } // [LUONG 4 - SO SANH & CHOT] buoc 4/7 GET /api/appeals/{id}/comparison
+export function phanCongLanHai(id, reviewerId, reason) { return goiApi(`/api/appeals/${id}/assign-second`, { method: 'POST', body: { reviewerId, reason } }) } // [LUONG 4 - SO SANH & CHOT] nhanh S2: POST /api/appeals/{id}/assign-second
+export function chotDiemKhieuNai(id, expectedAttemptId) { return goiApi(`/api/appeals/${id}/finalize`, { method: 'POST', body: { expectedAttemptId } }) } // [LUONG 4 - SO SANH & CHOT] buoc 4/7 POST /api/appeals/{id}/finalize

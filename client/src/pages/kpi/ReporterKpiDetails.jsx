@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { danhSachNam, namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { layChiTietKpiPhongVien } from '../../api/kpiApi.js'
 import { formatDate } from '../../utils/formatDate.js'
@@ -28,8 +29,8 @@ export default function ReporterKpiDetails({ nguoiDung }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
 
-  const nam = Number(searchParams.get('year')) || 2026
-  const thang = Number(searchParams.get('month')) || 9
+  const nam = Number(searchParams.get('year')) || namHienTai()
+  const thang = Number(searchParams.get('month')) || thangHienTai()
 
   const [duLieu, setDuLieu] = useState(null)
   const [dangTai, setDangTai] = useState(false)
@@ -99,8 +100,7 @@ export default function ReporterKpiDetails({ nguoiDung }) {
             value={nam}
             onChange={(e) => doiNam(Number(e.target.value))}
           >
-            <option value={2025}>Năm 2025</option>
-            <option value={2026}>Năm 2026</option>
+            {danhSachNam().map((n) => <option key={n} value={n}>Năm {n}</option>)}
             <option value={2027}>Năm 2027</option>
           </select>
 

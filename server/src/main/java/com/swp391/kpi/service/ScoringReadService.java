@@ -17,8 +17,9 @@ import java.util.List;
  *   27  field                           repository / service duoc inject
  *   29  getSubmittedAttempts()          lay submitted attempts
  *   31  getAttempt()                    lay attempt
- *   38  getPublishedAttempt()           lay published attempt
- *   48  getCriteria()                   lay criteria
+ *   38  getPublishedAttempt()           lay published attempt (khong co thi bao loi)
+ *   46  findPublishedAttempt()          lan cham da duyet + cong bo moi nhat cua bai; chua co thi tra null
+ *   56  getCriteria()                   lay criteria
  */
 @Service
 @RequiredArgsConstructor
@@ -36,12 +37,19 @@ public class ScoringReadService {
     }
 
     public ScoringReadResponse getPublishedAttempt(Integer articleId) {
+        ScoringReadResponse latest = findPublishedAttempt(articleId);
+        if (latest == null) throw new NotFoundException("Không tìm thấy kết quả chấm đã công bố.");
+        return latest;
+    }
+
+    // Lan cham co score_approvals APPROVED va da cong bo (announced_at) moi nhat cua bai.
+    // Lan cham APPEAL khong co dong duyet nen khong bao gio duoc chon o day.
+    public ScoringReadResponse findPublishedAttempt(Integer articleId) {
         ScoringReadResponse latest = null;
-        for (var attempt : repository.findSubmitted()) {
-            if (!articleId.equals(attempt.articleId()) || attempt.announcedAt() == null) continue;
+        for (var attempt : repository.findSubmittedByArticleId(articleId)) {
+            if (attempt.announcedAt() == null) continue;
             if (latest == null || attempt.announcedAt().isAfter(latest.announcedAt())) latest = attempt;
         }
-        if (latest == null) throw new NotFoundException("Không tìm thấy kết quả chấm đã công bố.");
         return latest;
     }
 

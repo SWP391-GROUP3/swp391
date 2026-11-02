@@ -139,6 +139,16 @@ export default function RoyaltyPeriodDetail({ nguoiDung }) {
             </div>
           )}
           {canReview && <AccountantReviewCard period={period} onDone={handleAccountantDone} />}
+          {/* UC-54: ky da khoa thi Ke toan sang trang chi tra de ghi nhan chi tung phieu */}
+          {isAccountant && ['LOCKED', 'PAID'].includes(period.status) && (
+            <div className="royalty__card">
+              <h2 className="royalty__card-title">Chi trả</h2>
+              <p className="royalty__hint">Kỳ đã khoá, phiếu chi đã được tạo cho từng người.</p>
+              <Link to={`/royalty-payments?periodId=${period.id}`} className="nut-chinh-fm">
+                {period.status === 'PAID' ? 'Xem phiếu chi' : 'Ghi nhận chi trả'}
+              </Link>
+            </div>
+          )}
           {successMessage && <p className="thong-bao-thanh-cong" role="status">{successMessage}</p>}
 
           <PeopleCard people={period.people} />

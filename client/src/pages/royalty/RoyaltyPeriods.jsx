@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { getRoyaltyPeriods } from '../../api/royaltyApi.js'
 import { formatMoney } from '../../utils/formatMoney.js'
 import { formatDate } from '../../utils/formatDate.js'
@@ -24,6 +24,12 @@ import '../../styles/Royalty.css'
 export default function RoyaltyPeriods() {
   const [periods, setPeriods] = useState(null)   // null = dang tai
   const [loadError, setLoadError] = useState('')
+  // ?status=LOCKED: trang chu Ke toan bam vao 1 nhom trang thai thi chi hien ky cua nhom do
+  const [searchParams] = useSearchParams()
+  const statusFilter = searchParams.get('status')
+  const shownPeriods = periods && statusFilter
+    ? periods.filter((period) => period.status === statusFilter)
+    : periods
 
   useEffect(() => {
     let isMounted = true
@@ -43,11 +49,16 @@ export default function RoyaltyPeriods() {
       </div>
 
       <div className="royalty__card">
+        {statusFilter && (
+          <p className="royalty__hint">
+            Đang lọc: {periodStatusLabel(statusFilter)}. <Link to="/royalty-periods" className="royalty__link">Xem tất cả kỳ</Link>
+          </p>
+        )}
         {loadError && <p className="thong-bao-loi" role="alert">{loadError}</p>}
         {!periods && !loadError && <p className="royalty__empty">Đang tải…</p>}
-        {periods && periods.length === 0 && <p className="royalty__empty">Chưa có kỳ nhuận bút nào.</p>}
+        {shownPeriods && shownPeriods.length === 0 && <p className="royalty__empty">Chưa có kỳ nhuận bút nào.</p>}
 
-        {periods && periods.length > 0 && (
+        {shownPeriods && shownPeriods.length > 0 && (
           <div className="royalty__scroll">
             <table className="bang-fm">
               <thead>
@@ -62,7 +73,7 @@ export default function RoyaltyPeriods() {
                 </tr>
               </thead>
               <tbody>
-                {periods.map((period) => (
+                {shownPeriods.map((period) => (
                   <tr key={period.id}>
                     <td className="royalty__strong royalty__nowrap">Tháng {period.periodMonth}/{period.periodYear}</td>
                     <td>

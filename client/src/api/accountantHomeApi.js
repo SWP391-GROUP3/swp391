@@ -1,37 +1,92 @@
 /**
- * ===========================================================================
- * DU LIEU GIA cho trang chu Ke toan - CHUA CO API THAT.
- * ===========================================================================
- * (Rieng don gia da co API that: royaltyApi.layDanhSachDonGia.)
- * Khi backend BF-04 xong chi can doi ruot ham thanh goiApi('/api/...'),
- * component goi ham KHONG phai sua. Trang thai dung chu trong CHECK cua schema.sql.
+ * So lieu trang chu Ke toan (BF-04), ghep tu cac API THAT cua luong royalty
+ * (khong can API rieng cho trang chu):
+ *   - getRoyaltyPeriods():      cac ky nhuan but (UC-49)
+ *   - getRoyaltyPeriodDetail(): so nguoi nhan cua ky cho duyet (UC-51)
+ *   - getRoyaltyPayments():     phieu chi cua ky da khoa (UC-54)
+ * Ten field tra ve giu nhu ban du lieu gia truoc day, nen AccountantHome.jsx dung tiep duoc.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   21  layTrangChuKeToan()             So lieu trang chu Ke toan: - periodStatusCounts: so ky nhuan but NAM … [du lieu gia (chua co API)]
+ *   23  layTrangChuKeToan()             So lieu trang chu Ke toan: so ky theo trang thai, ky cho duyet, ky cho chi
+ *   46  demKyTheoTrangThai()            So ky NAM NAY theo royalty_periods.status
+ *   60  layKyChoDuyet()                 Ky CLOSED (Thu ky da gui) kem so nguoi nhan - UC-51
+ *   76  layKyChoChi()                   Ky LOCKED kem so nguoi da chi / chua chi - UC-54
  */
-import { giaLapGoiApi } from './duLieuGia.js'
+import { getRoyaltyPayments, getRoyaltyPeriodDetail, getRoyaltyPeriods } from './royaltyApi.js'
 
 /**
  * So lieu trang chu Ke toan:
  * - periodStatusCounts: so ky nhuan but NAM NAY theo royalty_periods.status
- * - periodsToReview: ky CLOSED (Thu ky da gui) cho Ke toan duyet bang ke - UC-51
- *   personCount / totalAmount: so nguoi va tong tien cac royalty_lines cua ky
+ * - periodsToReview: ky CLOSED cho Ke toan duyet bang ke (UC-51), kem personCount / totalAmount
  * - periodsToPay: ky LOCKED con nguoi chua chi (royalty_payments.status = UNPAID) - UC-54
  */
 export async function layTrangChuKeToan() {
-  const nam = new Date().getFullYear()
-  return giaLapGoiApi({
-    periodStatusCounts: [
-      { status: 'OPEN',   count: 1 },
-      { status: 'CLOSED', count: 1 },
-      { status: 'LOCKED', count: 1 },
-      { status: 'PAID',   count: 7 },
-    ],
-    periodsToReview: [
-      { periodId: 9, periodYear: nam, periodMonth: 9, personCount: 34, totalAmount: 52300000 },
-    ],
-    periodsToPay: [
-      { periodId: 8, periodYear: nam, periodMonth: 8, personCount: 12, paidCount: 9, unpaidAmount: 8400000 },
-    ],
-  })
+  const cacKy = await getRoyaltyPeriods()
+  const kyChoDuyet = []
+  const kyDaKhoa = []
+  for (const ky of cacKy) {
+    if (ky.status === 'CLOSED') kyChoDuyet.push(ky)
+    if (ky.status === 'LOCKED') kyDaKhoa.push(ky)
+  }
+
+  // So ky it (12 ky/nam) nen goi chi tiet tung ky van nhanh
+  const [periodsToReview, periodsToPay] = await Promise.all([
+    Promise.all(kyChoDuyet.map(layKyChoDuyet)),
+    Promise.all(kyDaKhoa.map(layKyChoChi)),
+  ])
+
+  return {
+    periodStatusCounts: demKyTheoTrangThai(cacKy),
+    periodsToReview,
+    periodsToPay,
+  }
+}
+
+/** So ky NAM NAY theo royalty_periods.status, dang [{ status, count }]. */
+function demKyTheoTrangThai(cacKy) {
+  const namNay = new Date().getFullYear()
+  const soKy = {}
+  for (const ky of cacKy) {
+    if (ky.periodYear !== namNay) continue
+    soKy[ky.status] = (soKy[ky.status] || 0) + 1
+  }
+  const ketQua = []
+  for (const status of Object.keys(soKy)) {
+    ketQua.push({ status, count: soKy[status] })
+  }
+  return ketQua
+}
+
+/** Ky CLOSED (Thu ky da gui) kem so nguoi nhan tien - UC-51. */
+async function layKyChoDuyet(ky) {
+  const chiTiet = await getRoyaltyPeriodDetail(ky.id)
+  return {
+    periodId: ky.id,
+    periodYear: ky.periodYear,
+    periodMonth: ky.periodMonth,
+    personCount: chiTiet.people.length,
+    totalAmount: ky.totalAmount,
+  }
+}
+
+/** Ky LOCKED kem so nguoi da chi / chua chi va tien con phai chi - UC-54. */
+async function layKyChoChi(ky) {
+  const cacPhieu = await getRoyaltyPayments(ky.id)
+  let soDaChi = 0
+  let tienChuaChi = 0
+  for (const phieu of cacPhieu) {
+    if (phieu.status === 'PAID') {
+      soDaChi++
+    } else {
+      tienChuaChi += Number(phieu.paidAmount)
+    }
+  }
+  return {
+    periodId: ky.id,
+    periodYear: ky.periodYear,
+    periodMonth: ky.periodMonth,
+    personCount: cacPhieu.length,
+    paidCount: soDaChi,
+    unpaidAmount: tienChuaChi,
+  }
 }

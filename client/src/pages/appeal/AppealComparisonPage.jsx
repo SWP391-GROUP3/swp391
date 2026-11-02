@@ -41,7 +41,7 @@ function ComparisonContent({ id }) {
   const [dangLuu, setDangLuu] = useState(false)
   useEffect(() => {
     let conHienThi = true
-    Promise.all([laySoSanhKhieuNai(id), layNguoiChamHopLe(id)]).then(([soSanh, ungVien]) => {
+    Promise.all([laySoSanhKhieuNai(id), layNguoiChamHopLe(id)]).then(([soSanh, ungVien]) => { // [LUONG 4 - SO SANH & CHOT] buoc 2/7 mo trang: tai bang so sanh S0/S1/S2 + diem de xuat
       if (conHienThi) setKetQua({ soSanh, ungVien })
     }).catch((error) => { if (conHienThi) setLoi(error.message) })
     return () => { conHienThi = false }
@@ -68,12 +68,12 @@ function ComparisonContent({ id }) {
     const nguoi = ketQua.ungVien.find((item) => item.reviewerId === reviewerId)
     if (!nguoi || (nguoi.crossDepartment && !reason)) { setLoi('Chọn người hợp lệ và nhập lý do khi phân công khác ban.'); return }
     if (window.confirm('Phân công đợt chấm lại thứ hai và cuối cùng?'))
-      xuLy(() => phanCongLanHai(id, reviewerId, reason), 'Đã phân công S2.')
+      xuLy(() => phanCongLanHai(id, reviewerId, reason), 'Đã phân công S2.') // [LUONG 4 - SO SANH & CHOT] nhanh S2: lech > T thi giao BTV thu 3 cham (buoc 2S, xem AppealManagementService.assignSecond)
   }
 
   function xacNhan() {
     if (window.confirm(`Xác nhận điểm hiệu lực ${deXuat.effectiveScore}/100? Sau khi chốt không thể sửa kết quả khiếu nại.`))
-      xuLy(() => chotDiemKhieuNai(id, phieuCuoi.id), 'Đã xác nhận điểm hiệu lực và hoàn tất khiếu nại.')
+      xuLy(() => chotDiemKhieuNai(id, phieuCuoi.id), 'Đã xác nhận điểm hiệu lực và hoàn tất khiếu nại.') // [LUONG 4 - SO SANH & CHOT] buoc 3/7 bam "Xac nhan diem hieu luc" -> chi gui expectedAttemptId, KHONG gui diem
   }
 
   return <section className="bao-cao-qc luong-qc">

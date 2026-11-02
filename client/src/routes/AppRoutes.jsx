@@ -45,6 +45,8 @@ import RoyaltyPendingList from '../pages/royalty/RoyaltyPendingList.jsx'
 import RoyaltyGrading from '../pages/royalty/RoyaltyGrading.jsx'
 import RoyaltyRates from '../pages/royalty/RoyaltyRates.jsx'
 import MediaFactors from '../pages/royalty/MediaFactors.jsx'
+import RoyaltyPayments from '../pages/royalty/RoyaltyPayments.jsx'
+import MyRoyalties from '../pages/royalty/MyRoyalties.jsx'
 import ReaderDataImport from '../pages/admin/ReaderDataImport.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
 import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
@@ -61,10 +63,8 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
  * tam hien ComingSoon. Lam xong trang nao thi bo dong do khoi mang
  * va khai bao <Route> rieng tro toi trang that (xem phan "trang da lam" ben duoi).
  */
-const TRANG_PV_CHUA_LAM = [
-  { path: '/my-royalties',      ten: 'Nhuận bút' },              // UC-57
-  { path: '/my-royalties', ten: 'Nhuận bút' },              // UC-57
-]
+// Phong vien: UC-57 Nhuan but da lam (Quang, 02/11/2026) -> mang rong
+const TRANG_PV_CHUA_LAM = []
 
 const TRANG_BTV_CHUA_LAM = [
   { path: '/assigned-articles/:id', ten: 'Chấm bài' },               // UC-22…28
@@ -85,9 +85,8 @@ const TRANG_TB_CHUA_LAM = [
   { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
 ]
 
-const TRANG_KT_CHUA_LAM = [
-  { path: '/royalty-payments', ten: 'Chi trả nhuận bút' },       // UC-54
-]
+// Ke toan: UC-54 Chi tra nhuan but da lam (Quang, 02/11/2026) -> mang rong
+const TRANG_KT_CHUA_LAM = []
 
 const TRANG_ADMIN_CHUA_LAM = [
   { path: '/users', ten: 'Tài khoản' },
@@ -233,7 +232,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
           {vaiTro === 'REPORTER' && (
             <>
               <Route path="/my-appeals" element={<MyAppealsPage />} />
-              <Route path="/my-appeals/new" element={<AppealCreatePage />} />
+              <Route path="/my-appeals/new" element={<AppealCreatePage />} /> {/* [LUONG 1 - GUI KHIEU NAI] buoc 1/6 route: /my-appeals/new -> AppealCreatePage */}
               {/* BF-01 (Minh): UC-01 bai cua toi, UC-02 chi tiet bai (+ UC-11 rut bai) */}
               <Route path="/my-articles" element={<MyArticles nguoiDung={nguoiDung} />} />
               <Route path="/my-articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
@@ -244,6 +243,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/co-author-invites" element={<CoAuthorInvites />} />
               {/* BF-05 (Khang): UC-60 tien do KPI ca nhan, UC-67 xem ket qua chinh thuc */}
               <Route path="/my-kpi" element={<PersonalKpiProgress nguoiDung={nguoiDung} />} />
+              {/* BF-04 (Quang): UC-57 nhuan but cua toi */}
+              <Route path="/my-royalties" element={<MyRoyalties />} />
             </>
           )}
           {vaiTro === 'EDITOR' && (
@@ -251,7 +252,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-02 (Duong): UC-21 Bài được giao & UC-22..28 Chấm điểm */}
               <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
               <Route path="/re-reviews" element={<BlindReviewQueuePage />} />
-              <Route path="/re-reviews/:id" element={<BlindReviewPage />} />
+              <Route path="/re-reviews/:id" element={<BlindReviewPage />} /> {/* [LUONG 3 - CHAM MU] buoc 1/7 route: /re-reviews/:id -> BlindReviewPage */}
               <Route path="/cross-review-tasks/:id" element={<BlindReviewPage cheo />} />
               <Route path="/assigned-articles/:articleId" element={<ScoringSheet nguoiDung={nguoiDung} />} />
               <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
@@ -267,8 +268,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/publishing" element={<PublishingQueue nguoiDung={nguoiDung} />} />
 
               <Route path="/appeals" element={<AppealManagementPage />} />
-              <Route path="/appeals/:id" element={<AppealDetailPage />} />
-              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage />} />
+              <Route path="/appeals/:id" element={<AppealDetailPage />} /> {/* [LUONG 2 - PHAN CONG] buoc 1/6 route: /appeals/:id -> AppealDetailPage */}
+              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage />} /> {/* [LUONG 4 - SO SANH & CHOT] buoc 1/7 route: /appeals/:id/comparison -> AppealComparisonPage */}
               <Route path="/cross-reviews" element={<CrossReviewBatchPage />} />
               <Route path="/cross-reviews/:id" element={<CrossReviewBatchDetailPage />} />
 
@@ -299,6 +300,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/royalty-periods" element={<RoyaltyPeriods />} />
               <Route path="/royalty-periods/:id" element={<RoyaltyPeriodDetail nguoiDung={nguoiDung} />} />
               <Route path="/royalty-rates" element={<RoyaltyRates />} />
+              {/* BF-04 (Quang): UC-54 ghi nhan chi tra phieu chi */}
+              <Route path="/royalty-payments" element={<RoyaltyPayments />} />
             </>
           )}
           {vaiTro === 'ADMIN' && (

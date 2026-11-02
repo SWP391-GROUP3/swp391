@@ -70,6 +70,8 @@ public class AppealManagementService {
             catch (IllegalArgumentException ex) { throw badRequest("Trạng thái khiếu nại không hợp lệ."); }
         }
         List<AppealManagementResponse> rows = new ArrayList<>();
+        Map<Integer, String> names = userNames();
+        // shortcut: findAll() roi loc/phan trang bang Java, doi sang query co Pageable khi so khieu nai len hang tram.
         for (var appeal : appeals.findAll()) {
             var article = articles.getArticle(appeal.getArticleId());
             if (head.sectionId() == null || !head.sectionId().equals(article.sectionId())) continue;
@@ -79,7 +81,7 @@ public class AppealManagementService {
             if ((fromDate != null && day.isBefore(fromDate)) || (toDate != null && day.isAfter(toDate))) continue;
             var current = currentAttempt(appeal);
             if (reviewerId != null && (current == null || !reviewerId.equals(current.reviewerId()))) continue;
-            rows.add(response(appeal, article, current, false));
+            rows.add(response(appeal, article, current, false, names));
         }
         rows.sort(Comparator.comparing(AppealManagementResponse::submittedAt).reversed()
                 .thenComparing(AppealManagementResponse::id, Comparator.reverseOrder()));
@@ -90,7 +92,7 @@ public class AppealManagementService {
 
     public AppealManagementResponse getDetail(Integer id, Integer userId) {
         var appeal = scopedAppeal(id, userId, false);
-        return response(appeal, articles.getArticle(appeal.getArticleId()), currentAttempt(appeal), true);
+        return response(appeal, articles.getArticle(appeal.getArticleId()), currentAttempt(appeal), true, userNames());
     }
 
     public List<AppealReviewerCandidateResponse> getCandidates(Integer id, Integer userId) {
@@ -99,7 +101,7 @@ public class AppealManagementService {
     }
 
     @Transactional
-    public AppealManagementResponse assign(Integer id, AppealAssignRequest request, Integer userId) {
+    public AppealManagementResponse assign(Integer id, AppealAssignRequest request, Integer userId) { // [LUONG 2 - PHAN CONG] buoc 5/6 service: dung ban? dang cho phan cong? nguoi chon co hop le? -> tao phieu -> IN_REVIEW
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.SUBMITTED)
             throw new BusinessException("Khiếu nại không còn chờ phân công.");
@@ -111,11 +113,11 @@ public class AppealManagementService {
                 assignmentJson(attempt, request.getReason()));
         notifications.notifyUser(candidate.reviewerId(), appeal.getArticleId(),
                 "Bạn được giao phiếu chấm mù #" + attempt.id() + ".");
-        return response(appeal, articles.getArticle(appeal.getArticleId()), attempt, true);
+        return response(appeal, articles.getArticle(appeal.getArticleId()), attempt, true, userNames());
     }
 
     @Transactional
-    public AppealManagementResponse assignSecond(Integer id, AppealAssignRequest request, Integer userId) {
+    public AppealManagementResponse assignSecond(Integer id, AppealAssignRequest request, Integer userId) { // [LUONG 4 - SO SANH & CHOT] nhanh S2: chi giao khi S1 da nop va lech > T (requiresSecond)
         var appeal = scopedAppeal(id, userId, true);
         if (!requiresSecond(appeal)) throw new BusinessException("Khiếu nại chưa cần S2 hoặc đã được giao S2.");
         var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false);
@@ -123,7 +125,7 @@ public class AppealManagementService {
                 candidate.reviewerId(), candidate.crossDepartment());
         audit.log(userId, "ASSIGN", "appeals", id, null, assignmentJson(attempt, request.getReason()));
         notifications.notifyUser(candidate.reviewerId(), appeal.getArticleId(), "Bạn được giao phiếu chấm mù #" + attempt.id() + ".");
-        return response(appeal, articles.getArticle(appeal.getArticleId()), attempt, true);
+        return response(appeal, articles.getArticle(appeal.getArticleId()), attempt, true, userNames());
     }
 
     private boolean requiresSecond(Appeal appeal) {
@@ -140,7 +142,7 @@ public class AppealManagementService {
     }
 
     @Transactional
-    public AppealManagementResponse reassign(Integer id, AppealReassignRequest request, Integer userId) {
+    public AppealManagementResponse reassign(Integer id, AppealReassignRequest request, Integer userId) { // [LUONG 2 - PHAN CONG] nhanh phu "Giao lai" (UC-43): chi giao lai phieu CHUA nop, co kiem tra expectedReviewerId
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.IN_REVIEW)
             throw new BusinessException("Chỉ giao lại khiếu nại đang chấm.");
@@ -158,10 +160,10 @@ public class AppealManagementService {
         notifications.notifyUser(updated.reviewerId(), appeal.getArticleId(),
                 "Bạn được giao phiếu chấm mù #" + updated.id() + ".");
         appeals.flush();
-        return response(appeal, articles.getArticle(appeal.getArticleId()), updated, true);
+        return response(appeal, articles.getArticle(appeal.getArticleId()), updated, true, userNames());
     }
 
-    private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) {
+    private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) { // [LUONG 2 - PHAN CONG] 5a: chi Truong ban DUNG BAN cua bai moi duoc thao tac (+ khoa dong khi lock=true)
         var head = users.requireActive(userId, "HEAD_OF_DEPARTMENT");
         if (lock) deviations.lockWorkflow();
         var appeal = (lock ? appeals.findLockedById(id) : appeals.findById(id))
@@ -184,7 +186,7 @@ public class AppealManagementService {
         return current;
     }
 
-    private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) {
+    private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) { // [LUONG 2 - PHAN CONG] 5b: danh sach BTV hop le: loai nguoi da cham bai nay, uu tien cung ban
         var current = currentAttempt(appeal);
         if (appeal.getStatus() == AppealStatus.RESOLVED
                 || (current != null && current.submittedAt() != null && !requiresSecond(appeal)))
@@ -211,7 +213,7 @@ public class AppealManagementService {
         return result;
     }
 
-    private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign) {
+    private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign) { // [LUONG 2 - PHAN CONG] 5c: chon nguoi ngoai danh sach 5b thi bi tu choi; khac ban/giao lai bat buoc co ly do
         for (var candidate : candidates(appeal)) {
             if (!candidate.reviewerId().equals(id)) continue;
             if ((candidate.crossDepartment() || reassign) && (reason == null || reason.isBlank()))
@@ -237,13 +239,12 @@ public class AppealManagementService {
         value.put("reviewerId", attempt.reviewerId()); value.put("crossDepartment", attempt.crossDepartment());
         value.put("reason", reason == null ? null : reason.trim());
         try { return json.writeValueAsString(value); }
-        catch (com.fasterxml.jackson.core.JsonProcessingException ex) { throw new IllegalStateException(ex); }
+        catch (com.fasterxml.jackson.core.JsonProcessingException ex) { throw new IllegalStateException("Không thể ghi nhật ký phân công khiếu nại.", ex); }
     }
 
     private AppealManagementResponse response(Appeal appeal, ArticleReadResponse article,
-            ScoringAppealAttemptResponse attempt, boolean withCriteria) {
-        String appellant = "Người dùng #" + appeal.getAppellantId();
-        for (var user : users.getUsers()) if (user.id().equals(appeal.getAppellantId())) appellant = user.fullName();
+            ScoringAppealAttemptResponse attempt, boolean withCriteria, Map<Integer, String> names) {
+        String appellant = names.getOrDefault(appeal.getAppellantId(), "Người dùng #" + appeal.getAppellantId());
         List<AppealCriterionResponse> items = new ArrayList<>();
         if (withCriteria) {
             var originalCriteria = scores.getCriteria(appeal.getScoringAttemptId());
@@ -262,6 +263,13 @@ public class AppealManagementService {
         return new AppealManagementResponse(appeal.getId(), article.id(), article.title(), article.sectionId(),
                 appeal.getAppellantId(), appellant, appeal.getStatus().name(), appeal.getSubmittedAt(), deadline,
                 deadline != null && LocalDateTime.now().isAfter(deadline), attempt, items);
+    }
+
+    // Doc bang users 1 lan cho ca danh sach thay vi 1 lan moi dong.
+    private Map<Integer, String> userNames() {
+        Map<Integer, String> names = new HashMap<>();
+        for (var user : users.getUsers()) names.put(user.id(), user.fullName());
+        return names;
     }
 
     private ResponseStatusException badRequest(String message) {

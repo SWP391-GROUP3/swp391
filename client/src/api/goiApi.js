@@ -10,14 +10,15 @@ import { layToken, xoaPhien } from '../auth/phienDangNhap.js'
  *
  * Dung:  goiApi('/api/royalty-rates')
  *        goiApi('/api/royalty-rates', { method: 'POST', body: { baseSalary: 2340000 } })
- * @returns phan "data" cua ApiResponse
+ *        goiApi('/api/reader-imports/template', { taiFile: true })   -> tra Blob de luu file
+ * @returns phan "data" cua ApiResponse (hoac Blob khi taiFile)
  *
  * MUC LUC (so dong - ten - tac dung)
  *   20  goiApi()                        xem tom tat dau file [GET duongDan]
  *   57  docJson()                       Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} de khong vo
  *   66  chuLoi()                        Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh
  */
-export async function goiApi(duongDan, tuyChon = {}) {
+export async function goiApi(duongDan, tuyChon = {}) { // [CHUNG 4 LUONG] buoc 4: gan token Bearer, doi loi server thanh Error tieng Viet
   const headers = {}
   const isFormData = typeof FormData !== 'undefined' && tuyChon.body instanceof FormData
   if (tuyChon.body !== undefined && !isFormData) {
@@ -42,6 +43,11 @@ export async function goiApi(duongDan, tuyChon = {}) {
     const loi = new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
     loi.status = res.status
     throw loi
+  }
+
+  // Tai file (vd CSV mau): goi voi { taiFile: true } thi tra Blob, loi van doc message JSON nhu thuong
+  if (tuyChon.taiFile && res.ok) {
+    return res.blob()
   }
 
   const json = await docJson(res)
