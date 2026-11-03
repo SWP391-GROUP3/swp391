@@ -25,17 +25,18 @@ import java.util.*;
  * trung.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   42  field                           repository / service duoc inject
+ *   43  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   52  lockWorkflow()                  ponytail: khoa ghi BF03 toan DB; tach tong hop rieng khi so luong ghi tang cao
- *   64  refresh()                       lam moi
- *   72  refreshSection()                Chi workflow BF03 da kiem tra quyen duoc goi; khong co endpoint nhan sectionId tu client
- *  146  getPeriods()                    lay periods
+ *   53  lockWorkflow()                  ponytail: khoa ghi BF03 toan DB; tach tong hop rieng khi so luong ghi tang cao
+ *   65  refresh()                       lam moi
+ *   73  refreshSection()                Chi workflow BF03 da kiem tra quyen duoc goi; khong co endpoint nhan sectionId tu client
+ *  103  computeIndexes()                Cach tinh UC-41 duy nhat: chi doc, khong ghi DB
+ *  162  getPeriods()                    lay periods
  *  ---- Ham phu (private, chi dung trong file) ----
- *   78  calculatePeriod()               tinh period
- *  159  inScope()                       in scope
- *  164  inPeriod()                      in period
- *  168  addDifference()                 them difference
+ *   80  calculatePeriod()               Tinh va luu chi so cua ky; tra ve cac BTV co du lieu so sanh
+ *  175  inScope()                       in scope
+ *  180  inPeriod()                      in period
+ *  184  addDifference()                 them difference
  */
 @Service @RequiredArgsConstructor
 public class ReviewerDeviationRefreshService {

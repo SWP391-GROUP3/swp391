@@ -1,4 +1,13 @@
-/* Style cho man hinh Chot KPI thang (UC-66) */
+/* ===========================================================================
+   Style cho man hinh Chot KPI thang (UC-66)
+
+   MUC LUC (so dong - khoi CSS)
+     11  tieu de, bo cuc dau trang
+     98  Thong bao
+    119  Banner da chot hoac dang mo
+    139  The thong ke
+    177  Bang
+   =========================================================================== */
 .chot-kpi {
   padding: 24px 32px;
   background-color: var(--fm-nen, #eef2f5);

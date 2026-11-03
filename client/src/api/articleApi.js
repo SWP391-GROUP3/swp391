@@ -6,30 +6,35 @@ import { goiApi } from './goiApi.js'
  * token dang nhap (server biet ai dang thao tac tu token), tra ve phan "data" cua
  * ApiResponse, loi thi nem Error kem message tieng Viet server tra ve.
  *
+ * CODE LIEN QUAN: moi ham o day goi 1 ham cung ten (hoac gan cung ten) trong
+ *   server/src/main/java/com/swp391/kpi/article/controller/ArticleController.java
+ *   (vd withdrawArticle -> ArticleController.withdrawArticle, createArticle -> createDraft, checkDuplication -> previewDuplicationCheck).
+ *   getGenres, getOpenEvents, getMediaFactors goi API cua luong khac (admin, royalty).
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   39  getMyArticles()                 UC-01: bai cua toi, sua gan nhat len dau [GET /api/articles?{params}]
- *   48  getArticleDetail()              UC-02: chi tiet 1 bai (noi dung, tac gia, lich su trang thai) [GET /api/articles/{articleId}]
- *   53  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{articleId}/withdraw]
- *   62  getMyStatusCounts()             3 ham cho trang chu Phong vien (gop y nhom truong muc C4), dang du li… [GET /api/articles/status-counts]
- *   67  getMyRevisionRequests()         Trang chu PV: bai bi tra ve can sua, kem ghi chu lan tra gan nhat [GET /api/articles/revision-requests]
- *   72  getMyCoAuthorInvites()          Trang chu PV + trang UC-12: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
- *   79  getGenres()                     UC-03: danh sach the loai dang dung (API dung chung cua admin - GET /… [GET /api/genres]
- *   84  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia [GET /api/articles/co-author-candidates]
- *   92  createArticle()                 UC-03 + UC-04: tao ban nhap [POST /api/articles]
- *   97  updateArticle()                 UC-03 + UC-04: sua ban nhap (cung dang du lieu voi createArticle) [PUT /api/articles/{articleId}]
- *  102  submitArticle()                 UC-05: nop bai Nhap. duLieu = { explanation } khi noi dung trung can … [POST /api/articles/{articleId}/submit]
- *  107  resubmitArticle()               UC-10: nop lai bai bi tra ve (duLieu giong submitArticle) [POST /api/articles/{articleId}/resubmit]
- *  112  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{articleId}/co-author/accept]
- *  117  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{articleId}/co-author/reject]
- *  124  getOpenEvents()                 UC-03: su kien dang mo de chon (API cua BF-04 - GET /api/events/open) [GET /api/events/open]
- *  132  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet o 3 muc diem, khong luu gi [POST /api/articles/royalty-estimate]
- *  137  getMediaFactors()               UC-03: loai anh/video va he so (API dung chung cua admin - GET /api/m… [GET /api/media-factors]
- *  142  getAttachments()                UC-03 / UC-07: anh/video cua bai kem ket qua kiem trung [GET /api/articles/{articleId}/attachments]
- *  150  addAttachment()                 UC-03 / UC-04 buoc 4: them 1 anh hoac 1 video [POST /api/articles/{articleId}/attachments]
- *  155  deleteAttachment()              Xoa 1 anh/video khi bai con sua duoc [DELETE /api/articles/{articleId}/attachments/{attachmentId}]
- *  160  getAttachmentFile()             Q7: file anh dang Blob (kem token) de hien bang URL.createObjectURL [GET /api/articles/{articleId}/attachments/{attachmentId}/file]
- *  165  checkDuplication()              UC-05 buoc 2 (B5): kiem trung noi dung truoc khi xac nhan nop, server… [POST /api/articles/{articleId}/duplication-check]
- *  170  getDuplicationCheck()           UC-06 / UC-08: ket qua kiem trung luc nop gan nhat (kem giai trinh); … [GET /api/articles/{articleId}/duplication-check]
+ *   44  getMyArticles()                 UC-01: bai cua toi, sua gan nhat len dau [GET /api/articles?{params}]
+ *   53  getArticleDetail()              UC-02: chi tiet 1 bai (noi dung, tac gia, lich su trang thai) [GET /api/articles/{articleId}]
+ *   58  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{articleId}/withdraw]
+ *   67  getMyStatusCounts()             3 ham cho trang chu Phong vien (gop y nhom truong muc C4), dang du li… [GET /api/articles/status-counts]
+ *   72  getMyRevisionRequests()         Trang chu PV: bai bi tra ve can sua, kem ghi chu lan tra gan nhat [GET /api/articles/revision-requests]
+ *   77  getMyCoAuthorInvites()          Trang chu PV + trang UC-12: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
+ *   84  getGenres()                     UC-03: danh sach the loai dang dung (API dung chung cua admin - GET /… [GET /api/genres]
+ *   89  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia [GET /api/articles/co-author-candidates]
+ *   97  createArticle()                 UC-03 + UC-04: tao ban nhap [POST /api/articles]
+ *  102  updateArticle()                 UC-03 + UC-04: sua ban nhap (cung dang du lieu voi createArticle) [PUT /api/articles/{articleId}]
+ *  107  submitArticle()                 UC-05: nop bai Nhap. duLieu = { explanation } khi noi dung trung can … [POST /api/articles/{articleId}/submit]
+ *  112  resubmitArticle()               UC-10: nop lai bai bi tra ve (duLieu giong submitArticle) [POST /api/articles/{articleId}/resubmit]
+ *  117  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{articleId}/co-author/accept]
+ *  122  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{articleId}/co-author/reject]
+ *  129  getOpenEvents()                 UC-03: su kien dang mo de chon (API cua BF-04 - GET /api/events/open) [GET /api/events/open]
+ *  137  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet o 3 muc diem, khong luu gi [POST /api/articles/royalty-estimate]
+ *  142  getMediaFactors()               UC-03: loai anh/video va he so (API dung chung cua admin - GET /api/m… [GET /api/media-factors]
+ *  147  getAttachments()                UC-03 / UC-07: anh/video cua bai kem ket qua kiem trung [GET /api/articles/{articleId}/attachments]
+ *  155  addAttachment()                 UC-03 / UC-04 buoc 4: them 1 anh hoac 1 video [POST /api/articles/{articleId}/attachments]
+ *  160  deleteAttachment()              Xoa 1 anh/video khi bai con sua duoc [DELETE /api/articles/{articleId}/attachments/{attachmentId}]
+ *  165  getAttachmentFile()             Q7: file anh dang Blob (kem token) de hien bang URL.createObjectURL [GET /api/articles/{articleId}/attachments/{attachmentId}/file]
+ *  170  checkDuplication()              UC-05 buoc 2 (B5): kiem trung noi dung truoc khi xac nhan nop, server… [POST /api/articles/{articleId}/duplication-check]
+ *  175  getDuplicationCheck()           UC-06 / UC-08: ket qua kiem trung luc nop gan nhat (kem giai trinh); … [GET /api/articles/{articleId}/duplication-check]
  */
 
 /**

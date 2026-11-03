@@ -11,7 +11,7 @@ import java.util.List;
  * DTO phan hoi sau khi chot ky KPI thang thanh cong (UC-66).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  field       thong tin ky, nguoi chot, thoi gian chot va thong ke ket qua
+ *   20  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

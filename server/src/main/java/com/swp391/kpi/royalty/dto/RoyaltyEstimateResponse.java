@@ -13,7 +13,7 @@ import java.util.List;
  * chua tinh anh/video.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   22  field                          cac truong tra ve cho giao dien
+ *   22  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

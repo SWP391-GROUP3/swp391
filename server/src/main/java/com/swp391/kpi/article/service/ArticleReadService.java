@@ -11,12 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
  * Ham doc bai cho luong khac (BF-03): kiem tra 1 nguoi co phai tac gia cua bai khong, lay thong tin
  * bai.
  *
+ * CODE LIEN QUAN: duoc goi tu luong BF-03 (server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java, AppealReviewService.java,
+ *   CrossReviewService.java, ...) de doc bai va phien ban bai
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   24  field                           repository / service duoc inject
- *   27  isAuthor()                      kiem tra author
- *   30  getVersion()                    lay version
- *   37  getPublishedByAuthor()          lay published theo author
- *   42  getArticle()                    lay article
+ *   27  field                           repository / service duoc inject
+ *   30  isAuthor()                      kiem tra author
+ *   33  getVersion()                    lay version
+ *   40  getPublishedByAuthor()          lay published theo author
+ *   45  getArticle()                    lay article
  */
 @Service
 @RequiredArgsConstructor

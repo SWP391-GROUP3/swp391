@@ -17,14 +17,15 @@ import java.util.Map;
  * Loi khac (sai URL, sai method...) de Spring tu xu ly de giu dung status.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   34  handleDataConflict()            xu ly data conflict
- *   40  handleStatus()                  xu ly status
- *   47  handleValidation()              @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
- *   58  handleNotFound()                Khong tim thay du lieu -> 404
- *   65  handleUnauthorized()            Dang nhap that bai (sai tai khoan/mat khau, tai khoan bi khoa) -> 401
- *   72  handleBusiness()                Vi pham quy tac nghiep vu -> 409
- *   81  handleIllegalArgument()         Lop tinh toan bao du lieu sai -> 400
- *   88  handleIllegalState()            Loi cau hinh he thong (thieu tham so...) -> 500 kem cau tieng Viet
+ *   34  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   37  handleDataConflict()            xu ly data conflict
+ *   43  handleStatus()                  xu ly status
+ *   50  handleValidation()              @Valid tren Request DTO khong qua -> 400, kem loi cua tung field
+ *   61  handleNotFound()                Khong tim thay du lieu -> 404
+ *   68  handleUnauthorized()            Dang nhap that bai (sai tai khoan/mat khau, tai khoan bi khoa) -> 401
+ *   75  handleBusiness()                Vi pham quy tac nghiep vu -> 409
+ *   83  handleIllegalArgument()         Lop tinh toan thuan (ScoreCalculator, RoyaltyCalculator...) bao du lieu sai, vd diem < 50 thieu nhan xet -> 4…
+ *   90  handleIllegalState()            Loi cau hinh he thong (vd thieu tham so trong system_parameters) -> 500, kem cau tieng Viet de bao Admin
  */
 @RestControllerAdvice
 @SuppressWarnings("unused") // Cac handler duoc Spring goi qua @ExceptionHandler.

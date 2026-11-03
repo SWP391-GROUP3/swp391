@@ -39,8 +39,8 @@ import java.nio.charset.StandardCharsets;
  *  ---- Ham public (controller / luong khac goi) ----
  *   55  securityFilterChain()           security filter chain
  *  ---- Ham phu (private, chi dung trong file) ----
- *  103  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
- *  114  writeError()                    Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
+ *  116  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
+ *  127  writeError()                    Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
  */
 @Configuration
 @RequiredArgsConstructor

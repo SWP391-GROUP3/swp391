@@ -47,28 +47,37 @@ import java.util.List;
  * API bai viet BF-01. Nguoi thao tac lay tu token dang nhap (AGENTS.md muc 3.8):
  * subject cua JWT la id nguoi dung.
  *
+ * CODE LIEN QUAN (moi API goi 1 service, duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   article/service/ArticleService.java              bai cua toi, dem trang thai, viec cho xu ly, loi moi, rut bai
+ *   article/service/ArticleViewService.java          chi tiet bai (kiem quyen xem)
+ *   article/service/ArticleEditorService.java        tao / sua nhap, nop, nop lai, uoc tinh, danh sach phong vien
+ *   article/service/ArticleConfirmationService.java  dong y / tu choi dong tac gia
+ *   article/service/ArticleAttachmentService.java    anh / video
+ *   article/service/DuplicationCheckService.java     kiem trung noi dung
+ *   Phia web: client/src/api/articleApi.js (ham cung ten)
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   78  field                           service duoc inject
- *   90  getMyArticles()                 UC-01: bai cua toi. Loc nhieu trang thai ngan bang dau phay, khong truyen = tat ca. [GET /api/articles]
- *  105  getMyStatusCounts()             Trang chu Phong vien: so bai theo tung trang thai [GET /api/articles/status-counts]
- *  117  getMyRevisionRequests()         Trang chu Phong vien: bai bi tra ve can sua kem ghi chu moi nhat [GET /api/articles/revision-requests]
- *  129  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
- *  141  getArticleDetail()              UC-02: chi tiet 1 bai [GET /api/articles/{id}]
- *  154  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{id}/withdraw]
- *  167  getCoAuthorCandidates()         UC-04: danh sach phong vien chon lam dong tac gia [GET /api/articles/co-author-candidates]
- *  179  createDraft()                   UC-03 + UC-04: tao ban nhap [POST /api/articles]
- *  192  updateDraft()                   UC-03 + UC-04: sua ban nhap (DRAFT hoac REVISION_REQUESTED) [PUT /api/articles/{id}]
- *  206  submitArticle()                 UC-05: nop bai. Body khong bat buoc: { "explanation" } khi noi dung trung ca… [POST /api/articles/{id}/submit]
- *  221  resubmitArticle()               UC-10: nop lai bai bi tra ve [POST /api/articles/{id}/resubmit]
- *  236  previewDuplicationCheck()       UC-05 buoc 2 (B5): kiem trung noi dung truoc khi xac nhan nop, ch… [POST /api/articles/{id}/duplication-check]
- *  249  getDuplicationCheck()           UC-06 / UC-08: ket qua kiem trung luc nop gan nhat (kem giai trinh) [GET /api/articles/{id}/duplication-check]
- *  262  estimateRoyalty()               UC-09: uoc tinh nhuan but cua bai theo the loai, tinh chat va su kien d… [POST /api/articles/royalty-estimate]
- *  275  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{id}/co-author/accept]
- *  288  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{id}/co-author/reject]
- *  302  getAttachments()                UC-03 / UC-07: anh/video cua bai kem ket qua kiem trung (nguoi xem nhu c… [GET /api/articles/{id}/attachments]
- *  315  addAttachment()                 UC-03 / UC-04 buoc 4: them 1 anh (file) hoac 1 video (link) [POST /api/articles/{id}/attachments]
- *  329  deleteAttachment()              Xoa 1 anh/video khi bai con sua duoc (chi tac gia chin… [DELETE /api/articles/{id}/attachments/{attachmentId}]
- *  343  getImageFile()                  Q7: file anh de trinh duyet hien (tra thang byte anh… [GET /api/articles/{id}/attachments/{attachmentId}/file]
+ *   87  field                           service duoc inject
+ *   99  getMyArticles()                 UC-01: bai cua toi. Loc nhieu trang thai ngan bang dau phay, khong truyen = tat ca. [GET /api/articles]
+ *  114  getMyStatusCounts()             Trang chu Phong vien: so bai theo tung trang thai [GET /api/articles/status-counts]
+ *  126  getMyRevisionRequests()         Trang chu Phong vien: bai bi tra ve can sua kem ghi chu moi nhat [GET /api/articles/revision-requests]
+ *  138  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
+ *  150  getArticleDetail()              UC-02: chi tiet 1 bai [GET /api/articles/{id}]
+ *  163  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{id}/withdraw]
+ *  176  getCoAuthorCandidates()         UC-04: danh sach phong vien chon lam dong tac gia [GET /api/articles/co-author-candidates]
+ *  188  createDraft()                   UC-03 + UC-04: tao ban nhap [POST /api/articles]
+ *  201  updateDraft()                   UC-03 + UC-04: sua ban nhap (DRAFT hoac REVISION_REQUESTED) [PUT /api/articles/{id}]
+ *  215  submitArticle()                 UC-05: nop bai. Body khong bat buoc: { "explanation" } khi noi dung trung ca… [POST /api/articles/{id}/submit]
+ *  230  resubmitArticle()               UC-10: nop lai bai bi tra ve [POST /api/articles/{id}/resubmit]
+ *  245  previewDuplicationCheck()       UC-05 buoc 2 (B5): kiem trung noi dung truoc khi xac nhan nop, ch… [POST /api/articles/{id}/duplication-check]
+ *  258  getDuplicationCheck()           UC-06 / UC-08: ket qua kiem trung luc nop gan nhat (kem giai trinh) [GET /api/articles/{id}/duplication-check]
+ *  271  estimateRoyalty()               UC-09: uoc tinh nhuan but cua bai theo the loai, tinh chat va su kien d… [POST /api/articles/royalty-estimate]
+ *  284  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{id}/co-author/accept]
+ *  297  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{id}/co-author/reject]
+ *  311  getAttachments()                UC-03 / UC-07: anh/video cua bai kem ket qua kiem trung (nguoi xem nhu c… [GET /api/articles/{id}/attachments]
+ *  324  addAttachment()                 UC-03 / UC-04 buoc 4: them 1 anh (file) hoac 1 video (link) [POST /api/articles/{id}/attachments]
+ *  338  deleteAttachment()              Xoa 1 anh/video khi bai con sua duoc (chi tac gia chin… [DELETE /api/articles/{id}/attachments/{attachmentId}]
+ *  352  getImageFile()                  Q7: file anh de trinh duyet hien (tra thang byte anh… [GET /api/articles/{id}/attachments/{attachmentId}/file]
  */
 @RestController
 @RequestMapping("/api/articles")

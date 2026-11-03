@@ -11,9 +11,9 @@ import AppLayout from './AppLayout.jsx'
  *   64  AdminLayout()                   Khung trang cua Admin
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   29  menu [Tai khoan]                mo trang /users (ComingSoon - chua lam "Tai khoan")
- *   31  menu [The loai]                 mo trang /genres (ComingSoon - chua lam "The loai")
- *   33  menu [Tham so he thong]         mo trang /system-parameters (ComingSoon - chua lam "Tham so he thong")
+ *   29  menu [Tai khoan]                mo trang /users (UserList)
+ *   31  menu [The loai]                 mo trang /genres (GenreList)
+ *   33  menu [Tham so he thong]         mo trang /system-parameters (SystemParameters)
  *   40  menu [Bo tieu chi]              mo trang /criteria-sets (CriteriaManagement)
  *   42  menu [Cau hinh khieu nai]       mo trang /appeal-rules (AppealRuleConfigPage)
  *   44  menu [Ho so bien tap vien]      mo trang /reviewers (ReviewerDeviationPage)

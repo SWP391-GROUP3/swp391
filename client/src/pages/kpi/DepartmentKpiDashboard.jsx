@@ -11,14 +11,15 @@ import '../../styles/DepartmentKpiDashboard.css'
  * MO TRANG NAY TAI: /kpi-board
  *
  * MUC LUC (so dong - ten - tac dung)
- *   22  DepartmentKpiDashboard()        xem tom tat dau file
- *   31    useEffect                     tai du lieu khi mo trang
- *   35    taiDuLieuDashboard()          tai du lieu dashboard
- *   49    xuLyChayTongHop()             xu ly chay tong hop
+ *   24  DepartmentKpiDashboard()        xem tom tat dau file
+ *   33    useEffect                     tai du lieu khi mo trang
+ *   37    taiDuLieuDashboard()          tai du lieu dashboard
+ *   51    xuLyChayTongHop()             xu ly chay tong hop
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  107  [Dang tong hop... / ⚡ Chay tong hop tu d…]  xuLyChayTongHop() -> hoi xac nhan; goi POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
- *  218  link [Chi tiet →]               mo trang /kpi-board/{item.reporterId}?year={nam}&month={thang} (ReporterKpiDetails)
+ *  108  [Dang tong hop... / ⚡ Chay tong hop tu d…]  xuLyChayTongHop() -> hoi xac nhan; goi POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
+ *  115  link [🔒 Chot KPI thang →]      mo trang /kpi-finalization (MonthlyKpiFinalization)
+ *  227  link [Chi tiet →]               mo trang /kpi-board/{item.reporterId}?year={nam}&month={thang} (ReporterKpiDetails)
  */
 export default function DepartmentKpiDashboard({ nguoiDung }) {
   const [nam, setNam] = useState(namHienTai())

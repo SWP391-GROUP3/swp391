@@ -11,11 +11,14 @@ import java.util.List;
  * Repository truy van bang cua entity ? (Spring Data JPA). Chi service cung luong goi.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   23  field                           cac truong du lieu
- *   32  findSubmitted()                 tim submitted
- *   37  findSubmittedByArticleId()      cac lan cham da nop cua 1 bai (khong tai het bang)
- *   41  toResponse()                    doi 1 dong ket qua sang DTO
- *   48  findCriteria()                  tim criteria
+ *   26  field                           cac truong du lieu
+ *   28  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   35  findSubmitted()                 tim submitted
+ *   39  findSubmittedByArticleId()      tim submitted theo article id
+ *   51  findCriteria()                  tim criteria
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *   43  toResponse()                    doi sang response
  */
 @Repository
 @RequiredArgsConstructor

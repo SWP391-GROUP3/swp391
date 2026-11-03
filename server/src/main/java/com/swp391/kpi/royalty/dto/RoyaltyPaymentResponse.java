@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  * Phieu chi cua 1 nguoi trong 1 ky (UC-53 tao, UC-54 Ke toan ghi nhan chi, UC-57 PV xem).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   23  field                           cac truong tra ve cho giao dien
- *   37  from()                          doi entity sang DTO, kem ho ten nguoi nhan
+ *   21  field                           cac truong tra ve cho giao dien
+ *   34  from()                          Lay periodId qua getPeriod().getId(): Hibernate da biet san id, khong can query them
  */
 @Getter
 @Setter

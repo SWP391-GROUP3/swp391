@@ -7,10 +7,10 @@
  * Ten field tra ve giu nhu ban du lieu gia truoc day, nen AccountantHome.jsx dung tiep duoc.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   23  layTrangChuKeToan()             So lieu trang chu Ke toan: so ky theo trang thai, ky cho duyet, ky cho chi
- *   46  demKyTheoTrangThai()            So ky NAM NAY theo royalty_periods.status
- *   60  layKyChoDuyet()                 Ky CLOSED (Thu ky da gui) kem so nguoi nhan - UC-51
- *   76  layKyChoChi()                   Ky LOCKED kem so nguoi da chi / chua chi - UC-54
+ *   23  layTrangChuKeToan()             So lieu trang chu Ke toan: - periodStatusCounts: so ky nhuan but NAM NAY theo royalty_periods.status - period…
+ *   46  demKyTheoTrangThai()            So ky NAM NAY theo royalty_periods.status, dang [{ status, count }]
+ *   61  layKyChoDuyet()                 Ky CLOSED (Thu ky da gui) kem so nguoi nhan tien - UC-51
+ *   73  layKyChoChi()                   Ky LOCKED kem so nguoi da chi / chua chi va tien con phai chi - UC-54
  */
 import { getRoyaltyPayments, getRoyaltyPeriodDetail, getRoyaltyPeriods } from './royaltyApi.js'
 

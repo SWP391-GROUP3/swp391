@@ -15,11 +15,12 @@ import '../../styles/Royalty.css'
  * MO TRANG NAY TAI: /royalty-periods
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  RoyaltyPeriods()                xem tom tat dau file
- *   28    useEffect                     tai du lieu khi mo trang
+ *   25  RoyaltyPeriods()                xem tom tat dau file
+ *   35    useEffect                     tai du lieu khi mo trang
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   81  link [Xem bang ke]              mo trang /royalty-periods/{period.id} (RoyaltyPeriodDetail)
+ *   55  link [Xem tat ca ky]            mo trang /royalty-periods (RoyaltyPeriods)
+ *   93  link [Xem bang ke]              mo trang /royalty-periods/{period.id} (RoyaltyPeriodDetail)
  */
 export default function RoyaltyPeriods() {
   const [periods, setPeriods] = useState(null)   // null = dang tai

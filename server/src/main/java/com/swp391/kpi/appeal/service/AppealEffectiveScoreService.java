@@ -20,14 +20,14 @@ import java.math.BigDecimal;
  * (BF-04) va KPI (BF-05) deu goi class nay, khong tu doc bang scoring_attempts.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   32  field                           repository / service duoc inject
+ *   35  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   38  getEffectiveScore(id, diem)     Ben goi cung cap diem cua phieu goc da cong bo; appeal dang xu ly khong doi diem nay
- *   46  getEffectiveScore(id)           Diem hieu luc cua bai, tu lay diem S0; bai chua cong bo diem -> null
- *   54  getEffectiveAttempt()           Diem hieu luc kem lan cham dang dung (phieu nhuan but can ca 2); chua cong bo -> null
+ *   40  getEffectiveScore()             Ben goi cung cap diem cua phieu goc da cong bo; appeal dang xu ly khong doi diem nay
+ *   47  getEffectiveScore()             Diem hieu luc cua bai, tu lay diem S0 da duyet
+ *   55  getEffectiveAttempt()           Diem hieu luc kem lan cham dang dung: chua co khieu nai RESOLVED -> lan cham S0 da duyet, co -> lan cham S1/S…
  *  ---- Ham phu (private, chi dung trong file) ----
- *   68  findResolution()                Ket qua khieu nai da RESOLVED cua bai; chua co khieu nai / chua xong -> null
- *   78  resolvedScore()                 Diem chot trong ket qua khieu nai (du lieu cu khong co effective_score thi lay diem lan cham)
+ *   67  findResolution()                Khieu nai SUBMITTED / IN_REVIEW chua doi diem (SRS BF-03: diem cu tam thoi van co hieu luc)
+ *   75  resolvedScore()                 Du lieu cu (truoc Iter3) khong ghi effective_score, khi do lay tong diem cua lan cham duoc chon
  */
 @Service @RequiredArgsConstructor
 @Transactional(readOnly = true)

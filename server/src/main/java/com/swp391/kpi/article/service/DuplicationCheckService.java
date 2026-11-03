@@ -38,17 +38,23 @@ import java.util.Set;
  * Thu tu khi nop: checkBeforeSubmit() (tinh + chan) -> ArticleEditorService chup ban SUBMISSION
  * -> saveResult() (luu ket qua gan voi ban do).
  *
+ * CODE LIEN QUAN (duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   Duoc goi tu: article/controller/ArticleController.java (previewDuplicationCheck, getDuplicationCheck);
+ *     article/service/ArticleEditorService.java (checkBeforeSubmit, saveResult luc nop)
+ *   Goi sang: article/service/DuplicationShingleCalculator.java (tinh %), article/service/ArticleViewService.java (checkCanView),
+ *     admin/service/SystemParameterService.java (nguong 20 / 50, so am tiet moi cum)
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   57  field                           repository / service duoc inject
+ *   63  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   71  previewCheck()                  UC-05 buoc 2 / B5: "Kiem tra" truoc khi bam xac nhan nop
- *   87  checkBeforeSubmit()             Luc nop / nop lai: tinh lai roi chan neu can (B6)
- *  104  saveResult()                    Luu ket qua kiem trung gan voi ban SUBMISSION vua tao
- *  133  getLatestCheck()                Ket qua kiem trung luc nop gan nhat de hien o chi tiet bai
+ *   77  previewCheck()                  UC-05 buoc 2 / B5: "Kiem tra" truoc khi bam xac nhan nop
+ *   93  checkBeforeSubmit()             Luc nop / nop lai: tinh lai roi chan neu can (B6)
+ *  110  saveResult()                    Luu ket qua kiem trung gan voi ban SUBMISSION vua tao
+ *  139  getLatestCheck()                Ket qua kiem trung luc nop gan nhat de hien o chi tiet bai
  *  ---- Ham phu (private, chi dung trong file) ----
- *  168  calculate()                     Tinh trung noi dung cua bai voi ban nop moi nhat cua moi bai khac da nop (B1-B3)
- *  208  toJson()                        B4: danh sach doan trung -> chuoi JSON de luu cot passages
- *  218  fromJson()                      Cot passages (JSON mang chuoi) -> danh sach doan trung
+ *  174  calculate()                     Tinh trung noi dung cua bai voi ban nop moi nhat cua moi bai khac da nop (B1-B3)
+ *  214  toJson()                        B4: danh sach doan trung -> chuoi JSON de luu cot passages
+ *  224  fromJson()                      Cot passages (JSON mang chuoi) -> danh sach doan trung
  */
 @Service
 @RequiredArgsConstructor

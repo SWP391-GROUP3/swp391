@@ -17,8 +17,9 @@ import java.util.Optional;
  * Doc bao cao do lech nguoi cham (UC-41) cho man Truong ban.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   27  field                           repository / service duoc inject
- *   33  getReport()                     lay report (chi doc)
+ *   29  field                           repository / service duoc inject
+ *   36  getReport()                     Chi doc bang chi so da luu: khong tinh lai, khong khoa he thong
+ *   84  recalculate()                   Tinh lai chi so 1 ky (hoac moi ky neu period null) roi luu; chi Admin / Truong ban
  *      recalculate()                   tinh lai va luu chi so
  */
 @Service

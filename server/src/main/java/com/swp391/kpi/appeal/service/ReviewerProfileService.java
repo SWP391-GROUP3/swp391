@@ -33,17 +33,17 @@ import java.util.*;
  * lich su cham.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   56  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   57  field                           repository / service duoc inject
+ *   52  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   53  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   66  getEditors()                    lay editors
- *   80  getProfile()                    lay profile
- *  107  getHistory()                    lay history
+ *   61  getEditors()                    lay editors
+ *   75  getProfile()                    lay profile
+ *  102  getHistory()                    lay history
  *  ---- Ham phu (private, chi dung trong file) ----
- *  132  requireEditor()                 bat buoc editor
- *  145  normalizePeriod()               normalize period
- *  153  inPeriod()                      in period
- *  157  calculateDeviation()            tinh deviation
+ *  127  requireEditor()                 bat buoc editor
+ *  140  normalizePeriod()               normalize period
+ *  148  inPeriod()                      in period
+ *  152  calculateDeviation()            tinh deviation
  */
 @Service
 @RequiredArgsConstructor

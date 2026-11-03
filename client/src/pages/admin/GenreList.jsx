@@ -7,13 +7,11 @@ import './AdminPages.css'
  * Danh sach the loai dang dung (Admin, M-A7): ma, ten, he so chuan (BR-RY-01).
  * Chi xem; them / sua / tat the loai lam sau.
  *
- * MO TRANG NAY TAI: /genres (Admin)
- *
  * MO TRANG NAY TAI: /genres
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  GenreList()                     Danh sach the loai dang dung (Admin, M-A7): ma, ten, he so chuan (BR-RY-01)
- *   22    useEffect                     tai du lieu khi mo trang
+ *   16  GenreList()                     xem tom tat dau file
+ *   20    useEffect                     tai du lieu khi mo trang
  */
 export default function GenreList() {
   const [genres, setGenres] = useState(null)   // null = dang tai

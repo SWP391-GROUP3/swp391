@@ -10,11 +10,15 @@ import './GenrePopularityReport.css'
  * Danh cho Truong ban bien tap (Head of Editorial Department) theo doi cac chi so:
  * Mean/Median views, Bayesian rating, Royalty cost / 1.000 views, diem chat luong trung binh.
  *
+ * MO TRANG NAY TAI: /kpi-reports
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   20  GenrePopularityReport        - Component chinh cua man hinh bao cao the loai
- *   28    useEffect                  - Tai du lieu khi thay doi nam hoac thang
- *   32    taiDuLieuBaoCao()          - Goi API lay du lieu phan tich the loai
- *   64    locDanhSachTheLoai         - Loc the loai theo tu khoa tim kiem
+ *   23  GenrePopularityReport()         xem tom tat dau file
+ *   31    useEffect                     tai du lieu khi mo trang
+ *   35    taiDuLieuBaoCao()             tai du lieu bao cao
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *   96  [Dang tai... / Lam moi]         taiDuLieuBaoCao() -> goi GET url
  */
 export default function GenrePopularityReport({ nguoiDung }) {
   const [nam, setNam] = useState(namHienTai())

@@ -17,8 +17,8 @@ import java.time.LocalDate;
  * Controller cung cap API bao cao su kien xu huong va phat hien dot bien (UC-65).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  field                           service xu ly
- *   28  getTrendingEventsReport()       GET /api/kpi-reports/trending-events
+ *   28  field                           service duoc inject
+ *   35  getTrendingEventsReport()       Lay bao cao phan tich su kien xu huong theo ngay moc (UC-65) [GET /api/kpi-reports/trending-events]
  */
 @RestController
 @RequestMapping("/api/kpi-reports")

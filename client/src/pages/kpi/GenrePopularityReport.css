@@ -1,6 +1,17 @@
 /* ===========================================================================
    SWP391 - BF-05: Báo cáo mức độ quan tâm thể loại & chi phí nhuận bút (UC-64)
    Tuân thủ biến màu Figma (--fm-*). Tiền tố class: .bc-the-loai__
+
+   MUC LUC (so dong - khoi CSS)
+     17  tieu de, bo cuc dau trang
+     23  Header & Controls
+     94  Cards tong quan
+    133  Thanh tim kiem & Bo loc nhanh
+    166  Bang du lieu
+    206  Thong tin the loai
+    218  Huy hieu & Canh bao
+    253  Gia tri so
+    269  Thong bao loi & dang tai
    =========================================================================== */
 
 .bc-the-loai {

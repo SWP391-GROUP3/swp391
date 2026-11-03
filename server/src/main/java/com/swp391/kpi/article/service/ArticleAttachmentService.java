@@ -45,28 +45,35 @@ import java.util.UUID;
  * Quyet dinh 03/11 "chuyen dong cu": moi dong article_attachments cua bai la anh hien tai; moi lan nop / nop lai
  * doi version_id cua tat ca sang ban SUBMISSION moi (BF-04 doc anh theo ban SUBMISSION moi nhat).
  *
+ * CODE LIEN QUAN (duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   Duoc goi tu: article/controller/ArticleController.java (getAttachments, addAttachment, deleteAttachment, getImageFile);
+ *     article/service/ArticleEditorService.java (findAuthorError, checkAndAttachToSubmission luc nop)
+ *   Goi sang: article/service/ArticleViewService.java (checkCanView), article/service/ArticleMediaHasher.java (SHA-256, dHash),
+ *     royalty/service/RoyaltyGradingService.java (hasMediaBeenPaid), admin/service/MediaFactorService.java,
+ *     admin/service/SystemParameterService.java (dhashMaxBits), admin/service/UserReadService.java
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   76  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   82  field                           repository / service duoc inject
+ *   83  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   89  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   98  getAttachments()                Anh/video cua bai kem ket qua kiem trung; nguoi xem nhu chi tiet bai (B8)
- *  113  addAttachment()                 UC-03 / UC-04 buoc 4: tac gia chinh them 1 anh (file JPG/PNG) hoac 1 video (link)
- *  162  deleteAttachment()              Tac gia chinh xoa 1 anh/video khi bai con sua duoc
- *  184  getImageFile()                  Q7: noi dung file anh de trinh duyet hien (nguoi xem nhu B8)
- *  210  findAuthorError()               BR-IN-05 / B23: tac gia moi anh/video phai la 1 trong cac tac gia cua bai
- *  230  checkAndAttachToSubmission()    UC-07 luc nop / nop lai (UC-05 buoc 2, UC-10 buoc 3): kiem trung tung anh/video, roi gan tat ca anh/video cua…
+ *  105  getAttachments()                Anh/video cua bai kem ket qua kiem trung; nguoi xem nhu chi tiet bai (B8)
+ *  120  addAttachment()                 UC-03 / UC-04 buoc 4: tac gia chinh them 1 anh (file JPG/PNG) hoac 1 video (link)
+ *  169  deleteAttachment()              Tac gia chinh xoa 1 anh/video khi bai con sua duoc
+ *  191  getImageFile()                  Q7: noi dung file anh de trinh duyet hien (nguoi xem nhu B8)
+ *  217  findAuthorError()               BR-IN-05 / B23: tac gia moi anh/video phai la 1 trong cac tac gia cua bai
+ *  237  checkAndAttachToSubmission()    UC-07 luc nop / nop lai (UC-05 buoc 2, UC-10 buoc 3): kiem trung tung anh/video, roi gan tat ca anh/video cua…
  *  ---- Ham phu (private, chi dung trong file) ----
- *  241  checkDuplicate()                B21: so voi anh/video cung dinh dang cua cac bai KHAC da nop (khac DRAFT)
- *  296  saveImage()                     Kiem file anh (A1: JPG/PNG, toi da 10 MB), luu vao server/uploads/nam/thang/, tinh SHA-256 + dHash
- *  336  toResponse()                    Doi entity sang DTO kem ho ten tac gia, bai chua anh bi trung va ly do khong tinh tien (B22)
- *  354  checkCanEditMedia()             BR-IN-01: chi tac gia chinh them / xoa anh, khi bai Nhap hoac bi tra ve sua
- *  364  checkMediaKind()                Loai anh/video phai co trong bang media_factors (luong admin, doc qua MediaFactorService)
- *  374  authorIdsOf()                   Tac gia chinh + cac dong article_authors cua bai
- *  384  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  390  findAttachment()                Tim anh/video thuoc dung bai, khong co thi bao 404
- *  399  filePathOf()                    url luu dang "/uploads/2026/11/abc.jpg" -> file uploads/2026/11/abc.jpg (tinh tu thu muc chay server)
- *  404  extensionOf()                   "Anh Bia.JPG" -> "jpg"; khong co dau cham -> chuoi rong
- *  412  blankToNull()                   Chuoi rong / toan khoang trang -> null (cot NULL trong DB)
+ *  248  checkDuplicate()                B21: so voi anh/video cung dinh dang cua cac bai KHAC da nop (khac DRAFT)
+ *  303  saveImage()                     Kiem file anh (A1: JPG/PNG, toi da 10 MB), luu vao server/uploads/nam/thang/, tinh SHA-256 + dHash
+ *  343  toResponse()                    Doi entity sang DTO kem ho ten tac gia, bai chua anh bi trung va ly do khong tinh tien (B22)
+ *  361  checkCanEditMedia()             BR-IN-01: chi tac gia chinh them / xoa anh, khi bai Nhap hoac bi tra ve sua
+ *  371  checkMediaKind()                Loai anh/video phai co trong bang media_factors (luong admin, doc qua MediaFactorService)
+ *  381  authorIdsOf()                   Tac gia chinh + cac dong article_authors cua bai
+ *  391  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  397  findAttachment()                Tim anh/video thuoc dung bai, khong co thi bao 404
+ *  406  filePathOf()                    url luu dang "/uploads/2026/11/abc.jpg" -> file uploads/2026/11/abc.jpg (tinh tu thu muc chay server)
+ *  411  extensionOf()                   "Anh Bia.JPG" -> "jpg"; khong co dau cham -> chuoi rong
+ *  419  blankToNull()                   Chuoi rong / toan khoang trang -> null (cot NULL trong DB)
  */
 @Service
 @RequiredArgsConstructor

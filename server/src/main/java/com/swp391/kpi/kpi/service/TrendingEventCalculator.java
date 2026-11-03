@@ -12,10 +12,11 @@ import java.util.Map;
  * Khong doc DB, khong co @Service (AGENTS.md muc 1, 3.1, 3.9).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   25  calculateRecent7DaysViews()       Tong luot xem trong 7 ngay gan nhat [T-6, T]
- *   42  calculateBaseline4WeeksAverage()   Luot xem trung binh 7 ngay cua 4 tuan truoc [T-34, T-7] chia 4
- *   64  isSurgeDetected()                 Kiem tra dieu kien tang dot bien (views 7 ngay > 2x baseline)
- *   79  calculateSurgeRatio()             Tinh ty le tang truong (so lan gap baseline)
+ *   23  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   33  calculateRecent7DaysViews()     Tinh tong luot xem trong 7 ngay gan nhat [anchorDate - 6 ngay, anchorDate]
+ *   60  calculateBaseline4WeeksAverage()  Tinh luot xem trung binh 7 ngay cua 4 tuan co so truoc do
+ *   89  isSurgeDetected()               Kiem tra su kien co dang tang dot bien khong: Luot xem trong 7 ngay gan nhat vuot qua 2x luot xem trung binh …
+ *  110  calculateSurgeRatio()           Tinh he so tang truong so voi muc co so (so lan)
  */
 public class TrendingEventCalculator {
 

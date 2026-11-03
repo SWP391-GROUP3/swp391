@@ -40,15 +40,15 @@ import java.util.Set;
  *  ---- Ham public (controller / luong khac goi) ----
  *   71  AppealService()                 ham khoi tao
  *  110  submitAppeal()                  nop appeal
- *  142  getEligibility()                lay eligibility
- *  172  getEligibleArticles()           lay eligible articles
- *  186  getMyAppeals()                  lay my appeals
+ *  148  getEligibility()                lay eligibility
+ *  178  getEligibleArticles()           lay eligible articles
+ *  192  getMyAppeals()                  lay my appeals
  *  ---- Ham phu (private, chi dung trong file) ----
- *  200  validateSubmission()            kiem tra submission
- *  212  validateArticleAndWindow()      kiem tra article va window
- *  235  validateCriteria()              kiem tra criteria
- *  263  saveCriteria()                  luu criteria
- *  277  toResponse()                    doi sang response
+ *  206  validateSubmission()            kiem tra submission
+ *  218  validateArticleAndWindow()      kiem tra article va window
+ *  241  validateCriteria()              kiem tra criteria
+ *  269  saveCriteria()                  luu criteria
+ *  283  toResponse()                    doi sang response
  */
 @Service
 public class AppealService {

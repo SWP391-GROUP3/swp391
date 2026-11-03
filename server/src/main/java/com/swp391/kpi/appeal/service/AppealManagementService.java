@@ -34,25 +34,26 @@ import java.util.*;
  * nguoi cham goc), phan cong, giao lai, giao cham lan 2.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   61  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   62  field                           repository / service duoc inject
+ *   62  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   63  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   75  getQueue()                      lay queue
- *  105  getDetail()                     lay detail
- *  110  getCandidates()                 lay candidates
- *  116  assign()                        phan cong
- *  132  assignSecond()                  phan cong second
- *  157  reassign()                      phan cong lai
+ *   76  getQueue()                      lay queue
+ *  108  getDetail()                     lay detail
+ *  113  getCandidates()                 lay candidates
+ *  119  assign()                        phan cong
+ *  135  assignSecond()                  phan cong second
+ *  160  reassign()                      phan cong lai
  *  ---- Ham phu (private, chi dung trong file) ----
- *  143  requiresSecond()                requires second
- *  178  scopedAppeal()                  scoped appeal
- *  193  currentAttempt()                current attempt
- *  201  candidates()                    candidates
- *  228  requireCandidate()              bat buoc candidate
- *  238  addHistoricalReviewer()         them historical reviewer
- *  248  assignmentJson()                assignment json
- *  257  response()                      response
- *  281  badRequest()                    bad request
+ *  146  requiresSecond()                requires second
+ *  181  scopedAppeal()                  scoped appeal
+ *  196  currentAttempt()                current attempt
+ *  204  candidates()                    candidates
+ *  231  requireCandidate()              bat buoc candidate
+ *  241  addHistoricalReviewer()         them historical reviewer
+ *  251  assignmentJson()                assignment json
+ *  260  response()                      response
+ *  284  userNames()                     Doc bang users 1 lan cho ca danh sach thay vi 1 lan moi dong
+ *  290  badRequest()                    bad request
  */
 @Service
 @RequiredArgsConstructor

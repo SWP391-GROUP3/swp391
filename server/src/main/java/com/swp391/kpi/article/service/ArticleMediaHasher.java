@@ -11,16 +11,19 @@ import java.util.HexFormat;
  * khoang cach Hamming giua 2 dHash, chuan hoa link video (nhom chot 01/11, A3).
  * Logic tinh thuan, khong dung Spring/DB (AGENTS.md muc 3.9) -> co unit test rieng.
  *
+ * CODE LIEN QUAN: duoc goi tu server/src/main/java/com/swp391/kpi/article/service/ArticleAttachmentService.java;
+ *   test: server/src/test/java/com/swp391/kpi/article/service/ArticleMediaHasherTest.java
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   28  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   31  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *  ---- Ham public (controller / luong khac goi) ----
- *   32  sha256Hex()                     SHA-256 cua mot day byte, dang 64 ky tu hex (cot file_hash)
- *   43  normalizeVideoLink()            Chuan hoa link video truoc khi bam (A3): bo khoang trang, chu thuong, bo dau "/" cuoi
- *   52  videoLinkHash()                 SHA-256 cua link video da chuan hoa (A3)
- *   57  dHash()                         dHash 64 bit cua anh, dang 16 ky tu hex (cot dhash)
- *  104  hammingDistance()               So bit khac nhau giua 2 dHash (0-64); cang nho cang giong
+ *   35  sha256Hex()                     SHA-256 cua mot day byte, dang 64 ky tu hex (cot file_hash)
+ *   46  normalizeVideoLink()            Chuan hoa link video truoc khi bam (A3): bo khoang trang, chu thuong, bo dau "/" cuoi
+ *   55  videoLinkHash()                 SHA-256 cua link video da chuan hoa (A3)
+ *   60  dHash()                         dHash 64 bit cua anh, dang 16 ky tu hex (cot dhash)
+ *  107  hammingDistance()               So bit khac nhau giua 2 dHash (0-64); cang nho cang giong
  *  ---- Ham phu (private, chi dung trong file) ----
- *   83  averageBrightness()             Do sang trung binh (0-255) cua o thu (cx, cy) khi chia anh thanh 9 x 8 o
+ *   86  averageBrightness()             Do sang trung binh (0-255) cua o thu (cx, cy) khi chia anh thanh 9 x 8 o
  */
 public class ArticleMediaHasher {
 

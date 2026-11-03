@@ -8,15 +8,23 @@ import '../../styles/CoAuthorInvites.css'
  * UC-12 - "Xac nhan dong tac gia": bai dang cho nguoi dung xac nhan ty le dong tac gia,
  * sap het han xep truoc. Bam tieu de de mo chi tiet bai (UC-02), nut Dong y / Tu choi nam o do.
  *
+ * CODE LIEN QUAN (Ctrl+P trong VS Code, dan duong dan de mo file):
+ *   client/src/api/articleApi.js
+ *   server/src/main/java/com/swp391/kpi/article/controller/ArticleController.java
+ *   server/src/main/java/com/swp391/kpi/article/service/ArticleService.java   getMyCoAuthorInvites()
+ * DUONG DI KHI MO TRANG / BAM NUT (ham api -> URL -> Controller -> Service):
+ *   Mo trang: getMyCoAuthorInvites() -> GET /api/articles/co-author-invites -> ArticleService.getMyCoAuthorInvites()
+ *   Bam ten bai: mo ArticleDetail.jsx, nut Dong y / Tu choi nam o do
+ *
  * MO TRANG NAY TAI: /co-author-invites
  *
  * MUC LUC (so dong - ten - tac dung)
- *   21  CoAuthorInvites()               xem tom tat dau file
- *   25    useEffect                     tai du lieu khi mo trang
- *   41    deadlineText()                Han xac nhan 3 ngay (BR-IN-06): hien so ngay con lai cho de thay
+ *   29  CoAuthorInvites()               xem tom tat dau file
+ *   33    useEffect                     tai du lieu khi mo trang
+ *   49    deadlineText()                Han xac nhan 3 ngay (BR-IN-06): hien so ngay con lai cho de thay
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   84  [ten bai] trong bang            mo /my-articles/:id (ArticleDetail): xem bai va bam Dong y / Tu choi o do (UC-12)
+ *   92  [ten bai] trong bang            mo /my-articles/:id (ArticleDetail): xem bai va bam Dong y / Tu choi o do (UC-12)
  */
 export default function CoAuthorInvites() {
   const [invites, setInvites] = useState(null)   // null = dang tai

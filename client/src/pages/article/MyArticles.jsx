@@ -14,21 +14,30 @@ const PAGE_SIZE = 10
  * Loc theo nhom trang thai bang URL (?status=A,B), nen trang chu link thang toi
  * dung nhom duoc. Bam tieu de de mo chi tiet bai (UC-02).
  *
+ * CODE LIEN QUAN (Ctrl+P trong VS Code, dan duong dan de mo file):
+ *   client/src/api/articleApi.js
+ *   server/src/main/java/com/swp391/kpi/article/controller/ArticleController.java
+ *   server/src/main/java/com/swp391/kpi/article/service/ArticleService.java          getMyArticles(): loc, phan trang
+ *   server/src/main/java/com/swp391/kpi/article/repository/ArticleRepository.java    findMyArticles(), findMyArticlesByStatuses()
+ * DUONG DI KHI MO TRANG / BAM NUT (ham api -> URL -> Controller -> Service):
+ *   Mo trang / doi chip / doi trang: getMyArticles() -> GET /api/articles?status=&page=&size=
+ *       -> ArticleController.getMyArticles() -> ArticleService.getMyArticles()
+ *
  * MO TRANG NAY TAI: /my-articles
  *
  * MUC LUC (so dong - ten - tac dung)
  *   10  PAGE_SIZE                       So bai moi trang (AGENTS.md 3.7: ?page=0&size=10)
- *   33  MyArticles()                    xem tom tat dau file
- *   43    useEffect                     Tai lai danh sach moi khi doi bo loc hoac doi trang
- *   60    selectGroup()                 Bam 1 nhom loc: ghi vao URL va quay ve trang dau
- *   69    goToPage()                    Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc
+ *   42  MyArticles()                    xem tom tat dau file
+ *   52    useEffect                     Tai lai danh sach moi khi doi bo loc hoac doi trang
+ *   69    selectGroup()                 Bam 1 nhom loc: ghi vao URL va quay ve trang dau
+ *   78    goToPage()                    Bam Trang truoc / Trang sau: doi so trang tren URL, giu bo loc
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   83  [Soan bai moi]                  mo trang /my-articles/new (ArticleEditor) de soan bai moi (UC-03)
- *   94  chip [Tat ca]                   bo loc, ghi ?status= tren URL -> goi lai GET /api/articles
- *  105  chip nhom trang thai            loc theo nhom (Nhap, Cho xac nhan...) -> ?status=A,B -> GET /api/articles
- *  140  [ten bai] trong bang            mo trang /my-articles/:id (ArticleDetail) xem chi tiet bai (UC-02)
- *  174  [Trang truoc] / [Trang sau]     doi ?page= tren URL -> tai trang khac cua danh sach
+ *   92  [Soan bai moi]                  mo trang /my-articles/new (ArticleEditor) de soan bai moi (UC-03)
+ *  103  chip [Tat ca]                   bo loc, ghi ?status= tren URL -> goi lai GET /api/articles
+ *  114  chip nhom trang thai            loc theo nhom (Nhap, Cho xac nhan...) -> ?status=A,B -> GET /api/articles
+ *  149  [ten bai] trong bang            mo trang /my-articles/:id (ArticleDetail) xem chi tiet bai (UC-02)
+ *  183  [Trang truoc] / [Trang sau]     doi ?page= tren URL -> tai trang khac cua danh sach
  */
 export default function MyArticles() {
   const [searchParams, setSearchParams] = useSearchParams()

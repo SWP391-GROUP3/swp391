@@ -65,8 +65,8 @@ import java.util.Set;
  *  122  getPendingArticles()            UC-46: bai da dang ma chua co phieu cham, kem han chi va canh bao sap toi han
  *  148  previewGrading()                UC-47 buoc 1-3: tinh truoc he so va tien de Thu ky xem, CHUA luu gi
  *  171  completeGrading()               UC-47 buoc 4 + UC-48: Thu ky bam Hoan tat -> luu phieu, anh/video va cac dong tien cua tung nguoi vao ky dang…
- *  211  hasMediaBeenPaid()              BF-01 goi (BR-IN-05): anh da tung duoc tra nhuan but chua (co dong royalty_media_items)
- *  220  estimateRoyalty()               BF-01 goi (UC-09): uoc tinh tien phan bai viet truoc khi nop o 3 muc diem 100 / 80 / 50, khong luu gi
+ *  211  hasMediaBeenPaid()              BR-IN-05, UC-05 A3: anh nay DA TUNG duoc tra nhuan but chua (co dong trong royalty_media_items)
+ *  220  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet TRUOC khi nop, khong luu gi
  *  ---- Ham phu (private, chi dung trong file) ----
  *  250  checkCanRegrade()               Nhom chot 27/10/2026: chi cham lai khi ky cua phien ban cu con OPEN (vd Ke toan vua tra ky, UC-52); phien ban…
  *  265  calculate()                     Tinh du cac buoc cong thuc cho 1 bai (dung chung cho xem truoc va hoan tat)
@@ -77,9 +77,9 @@ import java.util.Set;
  *  371  findMediaFactor()               He so co dinh cua loai anh/video (bang media_factors, UC-56)
  *  377  sumMediaAmount()                sum media amount
  *  386  findRateOnPublishDate()         UC-47 E1: don gia hieu luc tai ngay dang bai (GBR-08); khong co thi khong cham duoc
- *  394  findRateOnDate()                UC-09: don gia hieu luc tai 1 ngay (uoc tinh dung hom nay)
- *  401  findExemptScore()               UC-09: muc diem duoc mien giam bao hoa cua su kien; bai khong thuoc su kien -> null
- *  414  parseNature()                   UC-09: doi tinh chat bai (chuoi BF-01 truyen vao) sang enum, sai thi bao loi
+ *  394  findRateOnDate()                UC-09: don gia hieu luc tai 1 ngay (uoc tinh dung hom nay); chua co thi khong uoc tinh duoc
+ *  401  findExemptScore()               UC-09: muc diem duoc mien giam bao hoa cua su kien (GBR-09); bai khong thuoc su kien -> null
+ *  414  parseNature()                   UC-09: doi tinh chat bai (chuoi BF-01 truyen vao) sang enum; sai thi bao loi tieng Viet
  *  425  findOpenPeriod()                tim open period
  *  429  fillPeriod()                    fill period
  *  439  saveGrading()                   Phieu cham 1 phien ban (khong sua phien ban cu)

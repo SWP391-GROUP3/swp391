@@ -22,7 +22,7 @@ import java.util.Map;
  *   62  unitPrice()                     Don gia 1 he so = luong co so x UNIT_PRICE_PERCENT / 100, bo phan le duoi 1 dong (UC-55)
  *   68  suggestedFactor()               He so goi y = he so chuan cua the loai x diem / 100 (BR-RY-01, nhom da doi: nhan thang diem thay cho chia bac…
  *   77  effectiveSaturationRate()       Ty le bao hoa (%) dung de tinh tien (GBR-09): - bai khong thuoc su kien (articleSaturationRate = null) -> 100…
- *   92  saturationRateByRank()          Doi hang cua bai trong su kien ra ty le bao hoa (GBR-09): moi bac k_limit bai, 100 -> 80 -> 60
+ *   92  saturationRateByRank()          Doi hang cua bai trong su kien ra ty le bao hoa (%) de BF-01 khoa luc nop bai (GBR-09, BR-IN-03)
  *  108  natureRate()                    Ty le % theo tinh chat bai (BR-RY-02), lay tu system_parameters NATURE_RATE_..
  *  119  finalFactor()                   He so cuoi = he so x ty le bao hoa / 100 x ty le tinh chat / 100, toi thieu MIN_FINAL_FACTOR (BR-RY-02)
  *  128  calculateAmount()               Tien = he so x don gia, lam tron XUONG ve boi so ROUNDING_UNIT (1.000d)

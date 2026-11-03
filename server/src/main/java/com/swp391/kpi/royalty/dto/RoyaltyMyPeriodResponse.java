@@ -12,7 +12,7 @@ import java.util.List;
  * Nhuan but cua phong vien trong 1 ky (UC-57): cac dong tien, tong tien va phieu chi (khi ky da khoa).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   21  field                           cac truong tra ve cho giao dien
+ *   20  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

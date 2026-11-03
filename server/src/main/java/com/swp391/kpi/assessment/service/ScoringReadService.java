@@ -14,11 +14,11 @@ import java.util.List;
  * cua phieu.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   27  field                           repository / service duoc inject
- *   29  getSubmittedAttempts()          lay submitted attempts
- *   31  getAttempt()                    lay attempt
- *   38  getPublishedAttempt()           lay published attempt (khong co thi bao loi)
- *   46  findPublishedAttempt()          lan cham da duyet + cong bo moi nhat cua bai; chua co thi tra null
+ *   28  field                           repository / service duoc inject
+ *   30  getSubmittedAttempts()          lay submitted attempts
+ *   32  getAttempt()                    lay attempt
+ *   39  getPublishedAttempt()           lay published attempt
+ *   47  findPublishedAttempt()          Lan cham co score_approvals APPROVED va da cong bo (announced_at) moi nhat cua bai
  *   56  getCriteria()                   lay criteria
  */
 @Service

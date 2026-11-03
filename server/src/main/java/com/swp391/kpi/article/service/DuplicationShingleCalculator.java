@@ -17,14 +17,17 @@ import java.util.Set;
  *  - B2: % = so cum cua bai dang nop co trong bai kia / tong so cum cua bai dang nop x 100.
  *  - B4: doan trung = gop cac cum trung lien nhau thanh 1 doan.
  *
+ * CODE LIEN QUAN: duoc goi tu server/src/main/java/com/swp391/kpi/article/service/DuplicationCheckService.java;
+ *   test: server/src/test/java/com/swp391/kpi/article/service/DuplicationShingleCalculatorTest.java
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   31  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   36  splitWords()                    Tach noi dung thanh cac am tiet, giu nguyen chu goc (de hien doan trung)
- *   50  normalize()                     B1: 1 am tiet -> chu thuong, bo dau cau, giu dau tieng Viet (\p{M} la dau thanh neu go kieu to hop)
- *   56  shingles()                      Cac cum size am tiet lien nhau (cum thu i bat dau o am tiet thu i)
- *   72  overlapPercent()                B2: % cum cua bai dang nop co trong bai kia, lam tron 2 chu so
- *   87  passages()                      B4: cac doan trung (chu goc cua bai dang nop), gop cac cum trung lien nhau / chong nhau thanh 1 doan
- *  119  classify()                      BR-IN-04 (comment bang duplication_checks): duoi warn% NORMAL; tren block% va bai Sang tac BLOCKED; con lai (…
+ *   34  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   39  splitWords()                    Tach noi dung thanh cac am tiet, giu nguyen chu goc (de hien doan trung)
+ *   53  normalize()                     B1: 1 am tiet -> chu thuong, bo dau cau, giu dau tieng Viet (\p{M} la dau thanh neu go kieu to hop)
+ *   59  shingles()                      Cac cum size am tiet lien nhau (cum thu i bat dau o am tiet thu i)
+ *   75  overlapPercent()                B2: % cum cua bai dang nop co trong bai kia, lam tron 2 chu so
+ *   90  passages()                      B4: cac doan trung (chu goc cua bai dang nop), gop cac cum trung lien nhau / chong nhau thanh 1 doan
+ *  122  classify()                      BR-IN-04 (comment bang duplication_checks): duoi warn% NORMAL; tren block% va bai Sang tac BLOCKED; con lai (…
  */
 public class DuplicationShingleCalculator {
 

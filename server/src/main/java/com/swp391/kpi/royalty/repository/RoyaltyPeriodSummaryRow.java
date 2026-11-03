@@ -9,9 +9,9 @@ import java.math.BigDecimal;
  * giong ten getter. Khong phai entity, khong co bang.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  getPeriodId()                   cot periodId: id ky
- *   19  getTotalAmount()                cot totalAmount: tong moi dong tien cua ky (0 neu chua co dong nao)
- *   20  getGradedArticleCount()         cot gradedArticleCount: so bai da cham (cham lai van tinh 1 bai)
+ *   17  getPeriodId()                   cot periodId cua cau query
+ *   18  getTotalAmount()                cot totalAmount cua cau query
+ *   19  getGradedArticleCount()         cot gradedArticleCount cua cau query
  */
 public interface RoyaltyPeriodSummaryRow {
     Integer getPeriodId();

@@ -26,8 +26,8 @@ import java.util.Map;
  * trung binh 7 ngay cua 4 tuan truoc do [T-34, T-7].
  *
  * MUC LUC (so dong - ten - tac dung)
- *   33  field                           cac repository va bo tinh toan
- *   42  getTrendingEventsReport()       Lay danh sach su kien va phat hien dot bien
+ *   36  field                           repository / service duoc inject
+ *   48  getTrendingEventsReport()       Lay bao cao phan tich su kien xu huong theo ngay moc (UC-65)
  */
 @Service
 @RequiredArgsConstructor

@@ -2,22 +2,22 @@
  * API cua luong royalty (BF-04). Goi qua goiApi(): tu gan token, tu bao loi tieng Viet.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   25  getRoyaltyRates()               UC-55: tat ca phien ban don gia nhuan but (royalty_rates), moi nhat t… [GET /api/royalty-rates]
- *   33  createRoyaltyRate()             UC-55: them don gia moi [POST /api/royalty-rates]
- *   38  getMediaFactors()               UC-56: he so cua tung loai anh/video [GET /api/media-factors]
- *   43  updateMediaFactor()             UC-56: Admin sua he so 1 loai anh/video [PUT /api/media-factors/{id}]
- *   52  getRoyaltyPeriods()             UC-49: cac ky nhuan but, ky moi nhat truoc [GET /api/royalty-periods]
- *   62  getPendingGradings()            UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han ch… [GET /api/royalty-gradings/pending]
- *   71  previewRoyaltyGrading()         UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu [GET /api/royalty-gradings/preview?articleId={encodeURIComponentarticleId}]
- *   81  completeRoyaltyGrading()        UC-47 buoc 5: Thu ky bam Hoan tat -> luu phieu, anh/video, dong tien … [POST /api/royalty-gradings]
- *   91  getRoyaltyPeriodDetail()        UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNot… [GET /api/royalty-periods/{periodId}]
- *   96  closeRoyaltyPeriod()            UC-50: Thu ky chot ky OPEN -> CLOSED [POST /api/royalty-periods/{periodId}/close]
- *  101  returnRoyaltyPeriod()           UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do (… [POST /api/royalty-periods/{periodId}/return]
- *  106  lockRoyaltyPeriod()             UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho m… [POST /api/royalty-periods/{periodId}/lock]
- *  115  getRoyaltyPayments()            UC-54: phieu chi cua tung nguoi trong 1 ky [GET /api/royalty-payments?periodId=]
- *  120  recordRoyaltyPayment()          UC-54: Ke toan ghi nhan da chi 1 phieu [POST /api/royalty-payments/{paymentId}/pay]
- *  131  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap theo ky [GET /api/royalty-payments/me]
- *  140  getUnpaidRoyaltyTotal()         Chip vi Phong vien: tong nhuan but chua nhan (tinh tu getMyRoyalties)
+ *   29  getRoyaltyRates()               UC-55: tat ca phien ban don gia nhuan but (royalty_rates), moi nhat t… [GET /api/royalty-rates]
+ *   37  createRoyaltyRate()             UC-55: them don gia moi [POST /api/royalty-rates]
+ *   42  getMediaFactors()               UC-56: he so cua tung loai anh/video [GET /api/media-factors]
+ *   47  updateMediaFactor()             UC-56: Admin sua he so 1 loai anh/video [PUT /api/media-factors/{id}]
+ *   56  getRoyaltyPeriods()             UC-49: cac ky nhuan but, ky moi nhat truoc [GET /api/royalty-periods]
+ *   66  getPendingGradings()            UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han ch… [GET /api/royalty-gradings/pending]
+ *   75  previewRoyaltyGrading()         UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu [GET /api/royalty-gradings/preview?articleId={encodeURIComponentarticleId}]
+ *   85  completeRoyaltyGrading()        UC-47 buoc 5: Thu ky bam Hoan tat -> luu phieu, anh/video, dong tien … [POST /api/royalty-gradings]
+ *   95  getRoyaltyPeriodDetail()        UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNot… [GET /api/royalty-periods/{periodId}]
+ *  100  closeRoyaltyPeriod()            UC-50: Thu ky chot ky OPEN -> CLOSED [POST /api/royalty-periods/{periodId}/close]
+ *  105  returnRoyaltyPeriod()           UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do (… [POST /api/royalty-periods/{periodId}/return]
+ *  110  lockRoyaltyPeriod()             UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho m… [POST /api/royalty-periods/{periodId}/lock]
+ *  119  getRoyaltyPayments()            UC-54: phieu chi cua tung nguoi trong 1 ky (ky da khoa moi co phieu) [GET /api/royalty-payments?periodId={encodeURIComponentperiodId}]
+ *  124  recordRoyaltyPayment()          UC-54: Ke toan ghi nhan da chi 1 phieu [POST /api/royalty-payments/{paymentId}/pay]
+ *  135  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap, moi ky 1 dong, ky moi nhat… [GET /api/royalty-payments/me]
+ *  144  getUnpaidRoyaltyTotal()         Chip vi o khung Phong vien: tong nhuan but CHUA NHAN
  */
 import { goiApi } from './goiApi.js'
 

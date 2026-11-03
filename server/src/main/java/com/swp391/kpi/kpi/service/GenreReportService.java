@@ -31,8 +31,8 @@ import java.util.Optional;
  * Cung cap cac chi so: mean/median views, Bayesian rating, cost per 1,000 views, avg quality score.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   43  field                           repository va bo tinh toan
- *   53  getGenrePopularityReport()      Lay bao cao tong hop the loai theo nam va thang (UC-64)
+ *   41  field                           repository / service duoc inject
+ *   54  getGenrePopularityReport()      Lay bao cao phan tich the loai theo nam va thang (UC-64: View Genre Popularity Report)
  */
 @Service
 @RequiredArgsConstructor

@@ -21,8 +21,9 @@ import java.util.List;
  * API bao cao do lech nguoi cham (UC-41).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   31  field                           service duoc inject
- *   34  getReport()                     lay report [GET /api/reports/reviewer-deviations]
+ *   34  field                           service duoc inject
+ *   37  getReport()                     lay report [GET /api/reports/reviewer-deviations]
+ *   54  recalculate()                   recalculate [POST /api/reports/reviewer-deviations/refresh]
  *      recalculate()                   tinh lai chi so [POST /api/reports/reviewer-deviations/refresh]
  */
 @RestController

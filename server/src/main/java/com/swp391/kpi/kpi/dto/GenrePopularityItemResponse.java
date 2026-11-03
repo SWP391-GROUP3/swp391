@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * DTO chi tiet cho tung the loai trong bao cao muc do quan tam the loai (UC-64).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   16  field                           cac truong du lieu cua the loai
+ *   18  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

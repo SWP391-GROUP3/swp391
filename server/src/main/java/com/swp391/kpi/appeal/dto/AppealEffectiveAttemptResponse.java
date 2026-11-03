@@ -9,6 +9,6 @@ import java.math.BigDecimal;
  * fromAppeal = true khi diem lay tu ket qua khieu nai.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   15  record                          cac truong khai bao trong ngoac cua record
+ *   14  record                          cac truong khai bao trong ngoac cua record
  */
 public record AppealEffectiveAttemptResponse(Integer attemptId, BigDecimal score, boolean fromAppeal) {}

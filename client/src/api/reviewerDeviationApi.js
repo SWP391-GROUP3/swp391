@@ -4,7 +4,8 @@ import { goiApi } from './goiApi.js'
  * API bao cao do lech nguoi cham (UC-41). Goi qua goiApi().
  *
  * MUC LUC (so dong - ten - tac dung)
- *   10  layBaoCaoDoLech()               lay bao cao do lech [GET duongDan]
+ *   12  layBaoCaoDoLech()               lay bao cao do lech [GET duongDan]
+ *   25  tinhLaiBaoCaoDoLech()           Tinh lai va luu chi so (thang trong bo loc, de trong = moi thang) [POST /api/reports/reviewer-deviations/refresh{query}]
  *      tinhLaiBaoCaoDoLech()           tinh lai chi so [POST /api/reports/reviewer-deviations/refresh]
  */
 

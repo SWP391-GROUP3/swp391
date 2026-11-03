@@ -21,11 +21,11 @@ const LINE_TYPE_LABELS = {
  * MO TRANG NAY TAI: /my-royalties
  *
  * MUC LUC (so dong - ten - tac dung)
- *   10  LINE_TYPE_LABELS                hang so
+ *   10  LINE_TYPE_LABELS                royalty_lines.line_type -> chu hien thi (xem comment bang royalty_lines trong schema.sql)
  *   30  MyRoyalties()                   xem tom tat dau file
  *   34    useEffect                     tai du lieu khi mo trang
- *   67  PeriodCard()                    1 ky: phieu chi (neu co) + bang dong tien
- *  102  PaymentSummary()                Tom tat phieu chi cua ky da khoa
+ *   62  PeriodCard()                    1 ky: phieu chi (neu co) + bang dong tien
+ *  104  PaymentSummary()                Tom tat phieu chi cua ky da khoa: no ky truoc tru vao, thuc nhan, da chi chua (GBR-12)
  */
 export default function MyRoyalties() {
   const [periods, setPeriods] = useState(null)   // null = dang tai

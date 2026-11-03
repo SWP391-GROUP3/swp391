@@ -24,13 +24,19 @@ import java.util.Optional;
  * Tach rieng khoi ArticleService vi can AssignmentService (BTV duoc giao), ma AssignmentService
  * da goi ArticleService -> dat trong ArticleService se thanh vong phu thuoc (quyet dinh 03/11).
  *
+ * CODE LIEN QUAN (duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   Duoc goi tu: article/controller/ArticleController.java (getArticleDetail);
+ *     ArticleAttachmentService, DuplicationCheckService (checkCanView truoc khi tra anh / ket qua kiem trung)
+ *   Goi sang: article/service/ArticleService.java (buildArticleDetail, isAuthorOrCoAuthor),
+ *     assessment/service/AssignmentService.java (BTV duoc giao), admin/service/UserReadService.java (vai tro, ban)
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   39  field                           repository / service duoc inject
+ *   45  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   50  getArticleDetail()              UC-02: chi tiet 1 bai cho tac gia, BTV duoc giao, Truong ban cung ban; nguoi khac 403
- *   60  checkCanView()                  Bai khong ton tai -> 404, nguoi dung khong duoc xem -> 403; duoc xem thi tra ve bai
+ *   56  getArticleDetail()              UC-02: chi tiet 1 bai cho tac gia, BTV duoc giao, Truong ban cung ban; nguoi khac 403
+ *   66  checkCanView()                  Bai khong ton tai -> 404, nguoi dung khong duoc xem -> 403; duoc xem thi tra ve bai
  *  ---- Ham phu (private, chi dung trong file) ----
- *   70  canView()                       Nguoi dung co duoc xem bai khong (BR-IN-01, B18, B19)
+ *   76  canView()                       Nguoi dung co duoc xem bai khong (BR-IN-01, B18, B19)
  */
 @Service
 @RequiredArgsConstructor

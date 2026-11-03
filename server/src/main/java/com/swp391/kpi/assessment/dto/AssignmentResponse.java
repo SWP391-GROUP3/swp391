@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  * DTO tra ve cho giao dien. Dung o: AssignmentController.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   22  field                           cac truong tra ve cho giao dien
- *   29  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
+ *   23  field                           cac truong tra ve cho giao dien
+ *   36  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

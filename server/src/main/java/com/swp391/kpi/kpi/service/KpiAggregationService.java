@@ -48,12 +48,12 @@ import java.util.Optional;
  *   64  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
  *   83  aggregateMonthlyKpi()           Tong hop KPI thang cho tat ca phong vien trong mot ky (Automated Aggregation Job)
- *  180  finalizeMonthlyKpi()            UC-66: chot ky KPI, xet PASS / NOT_PASS, snapshot bat bien (BR-KPI-06)
+ *  180  finalizeMonthlyKpi()            Chot ky KPI thang va luu snapshot bat bien (UC-66, BR-KPI-06)
  *  279  getDepartmentDashboard()        Lay du lieu tong the cho bang theo doi KPI toan ban (UC-61: Department KPI Board)
  *  384  getReporterKpiDetail()          Lay chi tiet KPI cua mot phong vien trong ky (UC-62, UC-60)
  *  ---- Ham phu (private, chi dung trong file) ----
- *   93  aggregateSnapshots()            tinh va luu snapshot DRAFT, tra entity (aggregate + finalize dung chung)
- *  530  isReporter()                    user co role REPORTER khong
+ *   93  aggregateSnapshots()            Phan tinh va luu snapshot DRAFT, tra entity de finalizeMonthlyKpi chot tiep (UC-66)
+ *  530  isReporter()                    Nguoi dung co vai tro Phong vien khong (roles.code = REPORTER)
  *  534  validatePeriod()                kiem tra period
  */
 @Service

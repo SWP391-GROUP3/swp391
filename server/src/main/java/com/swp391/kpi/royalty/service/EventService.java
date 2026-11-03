@@ -24,7 +24,7 @@ import java.util.Map;
  *   38  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *   40  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   45  getOpenEvents()                 Su kien dang mo hom nay, cho o chon su kien cua BF-01
+ *   45  getOpenEvents()                 Su kien dang mo hom nay, cho o chon su kien cua BF-01 (BR-IN-03)
  *   55  getEvent()                      1 su kien theo id (BF-01 can windowDays, kLimit de dem hang cua bai)
  *   63  getSaturationRate()             Ty le bao hoa (%) cua bai xep hang rank trong su kien eventId (GBR-09)
  *  ---- Ham phu (private, chi dung trong file) ----

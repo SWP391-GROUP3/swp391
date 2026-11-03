@@ -22,15 +22,15 @@ import java.util.List;
  * ghi nhat ky.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   37  field                           repository / service duoc inject
+ *   39  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   45  getActiveConfig()               Lay cau hinh khiieu nai dang co hieu luc tinh den ngay hom nay
- *   56  getActiveConfigEntity()         Ham noi bo de cac service khac trong luong appeal lay entity cau hinh dang ap dung
- *   68  getAppealDeadline()             Han khieu nai = luc cong bo diem + so ngay cua cau hinh dang ap dung (BR-QC-01); BF-02 goi
- *   77  getAllConfigs()                 Lay danh sach tat ca cac phien ban cau hinh de Admin theo doi lich su (UC-44 Normal Flow 1)
- *   92  createConfig()                  Tao phien ban cau hinh moi theo ngay hieu luc (UC-44)
+ *   47  getActiveConfig()               Lay cau hinh khiieu nai dang co hieu luc tinh den ngay hom nay
+ *   57  getActiveConfigEntity()         Ham noi bo de cac service khac trong luong appeal lay entity cau hinh dang ap dung
+ *   69  getAppealDeadline()             Han khieu nai = thoi diem cong bo diem + appeal_window_days cua cau hinh dang ap dung (BR-QC-01)
+ *   78  getAllConfigs()                 Lay danh sach tat ca cac phien ban cau hinh de Admin theo doi lich su (UC-44 Normal Flow 1)
+ *   93  createConfig()                  Tao phien ban cau hinh moi theo ngay hieu luc (UC-44)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  124  toAuditValue()                  doi sang audit value
+ *  125  toAuditValue()                  doi sang audit value
  */
 @Service
 @RequiredArgsConstructor

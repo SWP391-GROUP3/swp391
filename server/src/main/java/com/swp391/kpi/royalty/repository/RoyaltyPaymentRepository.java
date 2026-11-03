@@ -12,10 +12,10 @@ import java.util.List;
  * Doc/ghi bang royalty_payments (phieu chi tung nguoi trong ky, UC-53, UC-54).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   22  findByPeriodId()                Cac phieu chi cua 1 ky: khoa ky sau lay no chuyen tiep (debt_out)
- *   25  findByPeriodIdOrderByUserIdAsc() UC-54: danh sach phieu chi cua 1 ky cho Ke toan, xep theo nguoi nhan
- *   28  countByPeriodIdAndStatus()      UC-54: con bao nhieu phieu UNPAID -> het thi ky sang PAID
- *   32  findMyPayments()                UC-57: cac phieu chi cua 1 nguoi qua moi ky, nap san ky (JOIN FETCH)
+ *   23  findByPeriodId()                Cac phieu chi cua 1 ky: khoa ky sau lay no chuyen tiep (debt_out)
+ *   26  findByPeriodIdOrderByUserIdAsc()  UC-54: danh sach phieu chi cua 1 ky cho Ke toan, xep theo nguoi nhan
+ *   29  countByPeriodIdAndStatus()      UC-54: con bao nhieu phieu UNPAID -> het thi ky sang PAID
+ *   33  findMyPayments()                UC-57: cac phieu chi cua 1 nguoi qua moi ky
  */
 public interface RoyaltyPaymentRepository extends JpaRepository<RoyaltyPayment, Integer> {
 
