@@ -64,7 +64,7 @@ Sau đó tạo `appeals` trạng thái **SUBMITTED**, gắn `rule_config_id`, l�
 
 Thành công quay về `/my-appeals`. Khi đã RESOLVED, danh sách hiển thị điểm hiệu lực và thời điểm chốt. Mở mục tiêu chí đã khiếu nại bằng thẻ `details` không gọi API mới.
 
-Source: [MyAppealsPage.jsx](../client/src/pages/appeal/MyAppealsPage.jsx), [AppealCreatePage.jsx](../client/src/pages/appeal/AppealCreatePage.jsx), [appealApi.js](../client/src/api/appealApi.js), [AppealController.java](../server/src/main/java/com/swp391/kpi/controller/AppealController.java), [AppealService.java](../server/src/main/java/com/swp391/kpi/service/AppealService.java).
+Source: [MyAppealsPage.jsx](../client/src/pages/appeal/MyAppealsPage.jsx), [AppealCreatePage.jsx](../client/src/pages/appeal/AppealCreatePage.jsx), [appealApi.js](../client/src/api/appealApi.js), [AppealController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java), [AppealService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java).
 
 ## 4. Trưởng ban — nhận, phân công và giao lại (UC-38/43)
 
@@ -90,7 +90,7 @@ Source: [MyAppealsPage.jsx](../client/src/pages/appeal/MyAppealsPage.jsx), [Appe
 - Nháp cũ được giữ trong audit; điểm/nhận xét nháp được xóa khỏi phiếu trước khi đổi người. Người cũ mất quyền truy cập.
 - Giao lại giữ cùng phiếu, không tăng vòng S1/S2 và không đổi BTV của `assignments` gốc.
 
-Source: [AppealManagementPage.jsx](../client/src/pages/appeal/AppealManagementPage.jsx), [AppealDetailPage.jsx](../client/src/pages/appeal/AppealDetailPage.jsx), [AppealManagementController.java](../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java), [AppealManagementService.java](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java), [ScoringAppealService.java](../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java).
+Source: [AppealManagementPage.jsx](../client/src/pages/appeal/AppealManagementPage.jsx), [AppealDetailPage.jsx](../client/src/pages/appeal/AppealDetailPage.jsx), [AppealManagementController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealManagementController.java), [AppealManagementService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java), [ScoringAppealService.java](../server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java).
 
 ## 5. BTV — chấm mù S1 hoặc S2 (UC-36/37)
 
@@ -126,7 +126,7 @@ ScoringAppealService.saveScorecard()
 - Response backend không trả điểm/nhận xét cũ, người chấm cũ, tiêu chí/lý do khiếu nại hoặc kết quả so sánh.
 - S1 và S2 dùng cùng màn hình và endpoint. Phiếu APPEAL không tự tạo quyết định xuất bản ACCEPT/REVISION/REJECT.
 
-Source: [BlindReviewQueuePage.jsx](../client/src/pages/appeal/BlindReviewQueuePage.jsx), [BlindReviewPage.jsx](../client/src/pages/appeal/BlindReviewPage.jsx), [blindScorecard.js](../client/src/pages/appeal/blindScorecard.js), [AppealReviewController.java](../server/src/main/java/com/swp391/kpi/controller/AppealReviewController.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/service/AppealReviewService.java), [ScoringAppealService.java](../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java).
+Source: [BlindReviewQueuePage.jsx](../client/src/pages/appeal/BlindReviewQueuePage.jsx), [BlindReviewPage.jsx](../client/src/pages/appeal/BlindReviewPage.jsx), [blindScorecard.js](../client/src/pages/appeal/blindScorecard.js), [AppealReviewController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealReviewController.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealReviewService.java), [ScoringAppealService.java](../server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java).
 
 ## 6. Trưởng ban — so sánh, giao S2 và chốt điểm (UC-37/39)
 
@@ -163,7 +163,7 @@ Ghi `appeal_resolutions` gồm `effective_score`, `effective_attempt_id`, `rule_
 
 `effective_attempt_id` chỉ là tham chiếu một phiếu. Khi kết quả là trung bình, phải dùng **effective_score**, không lấy tổng của phiếu được tham chiếu thay thế. `AppealEffectiveScoreService` cung cấp điểm hiệu lực; khi chưa RESOLVED thì vẫn dùng điểm công bố.
 
-Source: [AppealComparisonPage.jsx](../client/src/pages/appeal/AppealComparisonPage.jsx), [AppealScoreCalculator.java](../server/src/main/java/com/swp391/kpi/service/AppealScoreCalculator.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/service/AppealReviewService.java), [AppealEffectiveScoreService.java](../server/src/main/java/com/swp391/kpi/service/AppealEffectiveScoreService.java).
+Source: [AppealComparisonPage.jsx](../client/src/pages/appeal/AppealComparisonPage.jsx), [AppealScoreCalculator.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealScoreCalculator.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealReviewService.java), [AppealEffectiveScoreService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealEffectiveScoreService.java).
 
 ## 7. Trưởng ban và BTV — chấm chéo (UC-40)
 
@@ -198,7 +198,7 @@ Các endpoint trên thuộc `CrossReviewController` và `CrossReviewService`.
 
 Chấm chéo không có lưu nháp. Khi nộp, lưu `score`, `deviation = score - originalScore`, trạng thái DONE vào `cross_review_tasks`; chi tiết chấm được giữ trong audit. Không ghi điểm này thành điểm chính thức trong `scoring_attempts` hoặc kết quả khiếu nại. Chỉ gỡ task PENDING của đợt OPEN; chỉ đóng đợt khi hết PENDING.
 
-Source: [CrossReviewBatchPage.jsx](../client/src/pages/appeal/CrossReviewBatchPage.jsx), [CrossReviewBatchDetailPage.jsx](../client/src/pages/appeal/CrossReviewBatchDetailPage.jsx), [crossReviewApi.js](../client/src/api/crossReviewApi.js), [CrossReviewController.java](../server/src/main/java/com/swp391/kpi/controller/CrossReviewController.java), [CrossReviewService.java](../server/src/main/java/com/swp391/kpi/service/CrossReviewService.java). BTV dùng lại `BlindReviewPage` với `cheo=true`.
+Source: [CrossReviewBatchPage.jsx](../client/src/pages/appeal/CrossReviewBatchPage.jsx), [CrossReviewBatchDetailPage.jsx](../client/src/pages/appeal/CrossReviewBatchDetailPage.jsx), [crossReviewApi.js](../client/src/api/crossReviewApi.js), [CrossReviewController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/CrossReviewController.java), [CrossReviewService.java](../server/src/main/java/com/swp391/kpi/appeal/service/CrossReviewService.java). BTV dùng lại `BlindReviewPage` với `cheo=true`.
 
 ## 8. Báo cáo, hồ sơ, cấu hình và nhật ký (UC-41–45)
 

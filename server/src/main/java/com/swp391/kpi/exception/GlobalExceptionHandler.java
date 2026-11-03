@@ -1,6 +1,6 @@
 package com.swp391.kpi.exception;
 
-import com.swp391.kpi.dto.ApiResponse;
+import com.swp391.kpi.common.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

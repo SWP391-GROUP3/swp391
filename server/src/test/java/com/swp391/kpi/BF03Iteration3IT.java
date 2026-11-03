@@ -24,12 +24,12 @@ class BF03Iteration3IT {
     @Autowired JdbcTemplate jdbc;
     @Autowired JwtEncoder encoder;
     @Autowired ObjectMapper json;
-    @Autowired com.swp391.kpi.service.AppealEffectiveScoreService effectiveScores;
+    @Autowired com.swp391.kpi.appeal.service.AppealEffectiveScoreService effectiveScores;
     @Autowired jakarta.persistence.EntityManager em;
-    @Autowired com.swp391.kpi.service.AppealReviewService reviewService;
+    @Autowired com.swp391.kpi.appeal.service.AppealReviewService reviewService;
     @Autowired org.springframework.transaction.PlatformTransactionManager txManager;
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
-    com.swp391.kpi.service.NotificationService notifications;
+    com.swp391.kpi.common.service.NotificationService notifications;
 
     @Test void blindCardUsesOriginalVersionAndNeverReturnsOldScoringOrAppealInformation() throws Exception {
         var f=fixture(); int reviewer=editor(); int draft=assign(f,reviewer);
@@ -242,7 +242,7 @@ class BF03Iteration3IT {
                 int draft=assign(f,reviewer);submit(draft,reviewer,body(f,75));
                 org.mockito.Mockito.doThrow(new IllegalStateException("test notification failure"))
                         .when(notifications).notifyUser(org.mockito.ArgumentMatchers.eq(1),org.mockito.ArgumentMatchers.eq(f.article),org.mockito.ArgumentMatchers.anyString());
-                var request=new com.swp391.kpi.dto.AppealFinalizeRequest();request.setExpectedAttemptId(draft);
+                var request=new com.swp391.kpi.appeal.dto.AppealFinalizeRequest();request.setExpectedAttemptId(draft);
                 reviewService.finalizeAppeal(f.appeal,5,request);
             } catch(RuntimeException ex) {throw ex;} catch(Exception ex) {throw new IllegalStateException(ex);}
         }));

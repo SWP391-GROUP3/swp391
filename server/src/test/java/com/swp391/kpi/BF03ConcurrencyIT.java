@@ -1,7 +1,13 @@
 package com.swp391.kpi;
 
-import com.swp391.kpi.dto.*;
-import com.swp391.kpi.service.*;
+import com.swp391.kpi.appeal.dto.AppealBlindScorecardResponse;
+import com.swp391.kpi.appeal.dto.AppealReassignRequest;
+import com.swp391.kpi.appeal.dto.AppealScorecardRequest;
+import com.swp391.kpi.appeal.service.AppealManagementService;
+import com.swp391.kpi.appeal.service.AppealReviewService;
+import com.swp391.kpi.appeal.service.CrossReviewService;
+import com.swp391.kpi.appeal.service.ReviewerDeviationRefreshService;
+import com.swp391.kpi.appeal.service.ScoringAppealService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

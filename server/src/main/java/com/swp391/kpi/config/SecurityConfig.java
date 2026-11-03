@@ -1,8 +1,8 @@
 package com.swp391.kpi.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.swp391.kpi.dto.ApiResponse;
-import com.swp391.kpi.service.TokenService;
+import com.swp391.kpi.common.dto.ApiResponse;
+import com.swp391.kpi.common.service.TokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

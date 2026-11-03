@@ -440,11 +440,11 @@ Toàn bộ các logic nghiệp vụ quan trọng và tính toán số học củ
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
-[INFO] Running com.swp391.kpi.service.ScoreApprovalServiceTest
+[INFO] Running com.swp391.kpi.assessment.service.ScoreApprovalServiceTest
 [INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0 - PASSED
-[INFO] Running com.swp391.kpi.service.ScoringAttemptServiceTest
+[INFO] Running com.swp391.kpi.assessment.service.ScoringAttemptServiceTest
 [INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0 - PASSED
-[INFO] Running com.swp391.kpi.service.ScoreCalculatorTest
+[INFO] Running com.swp391.kpi.assessment.service.ScoreCalculatorTest
 [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0 - PASSED
 [INFO] -------------------------------------------------------
 [INFO] BUILD SUCCESS

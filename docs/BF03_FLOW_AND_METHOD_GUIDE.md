@@ -26,8 +26,8 @@ Các file chung cần mở trước:
 | [ReporterLayout.jsx](../client/src/layouts/ReporterLayout.jsx), [HeadLayout.jsx](../client/src/layouts/HeadLayout.jsx), [EditorLayout.jsx](../client/src/layouts/EditorLayout.jsx), [AdminLayout.jsx](../client/src/layouts/AdminLayout.jsx) | Nhãn menu và đường dẫn khi bấm |
 | [goiApi.js](../client/src/api/goiApi.js) | `goiApi()` gắn Bearer token, stringify body, bóc `data`, ném lỗi và xử lý401 |
 | [phienDangNhap.js](../client/src/auth/phienDangNhap.js) | Đọc/lưu/xóa phiên đăng nhập; component không tự giữ userId tin cậy để gửi lên backend |
-| [UserReadService.java](../server/src/main/java/com/swp391/kpi/service/UserReadService.java) | `requireActive()` kiểm tra tài khoản và role thực tế trong DB |
-| [ApiResponse.java](../server/src/main/java/com/swp391/kpi/dto/ApiResponse.java) | Vỏ JSON thống nhất gồm success/message/data/errors |
+| [UserReadService.java](../server/src/main/java/com/swp391/kpi/admin/service/UserReadService.java) | `requireActive()` kiểm tra tài khoản và role thực tế trong DB |
+| [ApiResponse.java](../server/src/main/java/com/swp391/kpi/common/dto/ApiResponse.java) | Vỏ JSON thống nhất gồm success/message/data/errors |
 | [GlobalExceptionHandler.java](../server/src/main/java/com/swp391/kpi/exception/GlobalExceptionHandler.java) | Chuyển exception thành status và thông báo cho frontend |
 
 Controller lấy `currentUserId` từ `jwt.getSubject()`. Không lấy người thao tác từ `reviewerId` trong form và không dùng `X-User-Id`.
@@ -56,7 +56,7 @@ Controller lấy `currentUserId` từ `jwt.getSubject()`. Không lấy người 
 
 ## 3. Reporter gửi khiếu nại — UC35
 
-Mở [AppealCreatePage.jsx](../client/src/pages/appeal/AppealCreatePage.jsx), [appealApi.js](../client/src/api/appealApi.js), [AppealController.java](../server/src/main/java/com/swp391/kpi/controller/AppealController.java), [AppealService.java](../server/src/main/java/com/swp391/kpi/service/AppealService.java).
+Mở [AppealCreatePage.jsx](../client/src/pages/appeal/AppealCreatePage.jsx), [appealApi.js](../client/src/api/appealApi.js), [AppealController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java), [AppealService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java).
 
 ### 3.1 Bấm Gửi khiếu nại để mở màn chọn bài
 
@@ -86,7 +86,7 @@ layDieuKienKhieuNai(articleId)
   → ArticleReadService + ScoringReadService
 ```
 
-[AppealDatabaseSubmissionDataProvider.java](../server/src/main/java/com/swp391/kpi/service/AppealDatabaseSubmissionDataProvider.java) ghép thông tin bài, lần chấm công bố, thời điểm công bố và từng tiêu chí. `ScoringReadService.getPublishedAttempt()` tìm lần đã công bố; `getCriteria()` lấy điểm/nhận xét của lần đó.
+[AppealDatabaseSubmissionDataProvider.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealDatabaseSubmissionDataProvider.java) ghép thông tin bài, lần chấm công bố, thời điểm công bố và từng tiêu chí. `ScoringReadService.getPublishedAttempt()` tìm lần đã công bố; `getCriteria()` lấy điểm/nhận xét của lần đó.
 
 Repository phía sau: `ArticleReadRepository` đọc `articles`; `ScoringReadRepository.findSubmitted()` đọc `scoring_attempts`/`score_approvals`; `findCriteria()` đọc `scoring_attempt_details`/`criteria`. Cấu hình đọc qua `AppealRuleConfigService.getActiveConfigEntity()`.
 
@@ -131,7 +131,7 @@ Khi RESOLVED, `toResponse()` gọi `AppealEffectiveScoreService.getEffectiveScor
 
 ## 4. Head nhận và phân công khiếu nại — UC38
 
-Mở [AppealManagementPage.jsx](../client/src/pages/appeal/AppealManagementPage.jsx), [AppealDetailPage.jsx](../client/src/pages/appeal/AppealDetailPage.jsx), [AppealManagementController.java](../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java), [AppealManagementService.java](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java).
+Mở [AppealManagementPage.jsx](../client/src/pages/appeal/AppealManagementPage.jsx), [AppealDetailPage.jsx](../client/src/pages/appeal/AppealDetailPage.jsx), [AppealManagementController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealManagementController.java), [AppealManagementService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java).
 
 ### 4.1 Bấm menu Khiếu nại, lọc hoặc đổi trang
 
@@ -187,7 +187,7 @@ Nếu đã nộp thì409. Nếu request frontend nhận409, màn tải lại d�
 
 ## 6. Editor mở, lưu nháp và nộp chấm mù — UC36
 
-Mở [BlindReviewQueuePage.jsx](../client/src/pages/appeal/BlindReviewQueuePage.jsx), [BlindReviewPage.jsx](../client/src/pages/appeal/BlindReviewPage.jsx), [AppealReviewController.java](../server/src/main/java/com/swp391/kpi/controller/AppealReviewController.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/service/AppealReviewService.java), [ScoringAppealService.java](../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java).
+Mở [BlindReviewQueuePage.jsx](../client/src/pages/appeal/BlindReviewQueuePage.jsx), [BlindReviewPage.jsx](../client/src/pages/appeal/BlindReviewPage.jsx), [AppealReviewController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealReviewController.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealReviewService.java), [ScoringAppealService.java](../server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java).
 
 ### 6.1 Bấm Chấm lại & chấm chéo
 
@@ -242,7 +242,7 @@ Draft có thể thiếu tiêu chí. Khi nộp phải đủ, điểm0–100, nh�
 
 ## 7. Head so sánh, giao S2 và xác nhận — UC37/39
 
-Mở [AppealComparisonPage.jsx](../client/src/pages/appeal/AppealComparisonPage.jsx), [AppealScoreCalculator.java](../server/src/main/java/com/swp391/kpi/service/AppealScoreCalculator.java), cùng các service/controller ở mục4 và6.
+Mở [AppealComparisonPage.jsx](../client/src/pages/appeal/AppealComparisonPage.jsx), [AppealScoreCalculator.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealScoreCalculator.java), cùng các service/controller ở mục4 và6.
 
 ### 7.1 Bấm So sánh & chốt điểm
 
@@ -301,7 +301,7 @@ Ghi `AppealResolutionRepository.save()` vào `appeal_resolutions` với `effecti
 
 ## 8. Tạo và thực hiện chấm chéo — UC40
 
-Mở [CrossReviewBatchPage.jsx](../client/src/pages/appeal/CrossReviewBatchPage.jsx), [CrossReviewBatchDetailPage.jsx](../client/src/pages/appeal/CrossReviewBatchDetailPage.jsx), [crossReviewApi.js](../client/src/api/crossReviewApi.js), [CrossReviewController.java](../server/src/main/java/com/swp391/kpi/controller/CrossReviewController.java), [CrossReviewService.java](../server/src/main/java/com/swp391/kpi/service/CrossReviewService.java).
+Mở [CrossReviewBatchPage.jsx](../client/src/pages/appeal/CrossReviewBatchPage.jsx), [CrossReviewBatchDetailPage.jsx](../client/src/pages/appeal/CrossReviewBatchDetailPage.jsx), [crossReviewApi.js](../client/src/api/crossReviewApi.js), [CrossReviewController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/CrossReviewController.java), [CrossReviewService.java](../server/src/main/java/com/swp391/kpi/appeal/service/CrossReviewService.java).
 
 | Bấm/thao tác | Frontend chạy | HTTP | Controller → service |
 |---|---|---|---|
@@ -328,7 +328,7 @@ Task chấm chéo không có draft. Sau nộp, màn chỉ hiện tổng của m�
 
 ## 9. Xem độ lệch và hồ sơ — UC41/42
 
-Mở [ReviewerDeviationPage.jsx](../client/src/pages/appeal/ReviewerDeviationPage.jsx), [ReviewerProfilePage.jsx](../client/src/pages/appeal/ReviewerProfilePage.jsx), [ReviewerDeviationService.java](../server/src/main/java/com/swp391/kpi/service/ReviewerDeviationService.java), [ReviewerProfileService.java](../server/src/main/java/com/swp391/kpi/service/ReviewerProfileService.java).
+Mở [ReviewerDeviationPage.jsx](../client/src/pages/appeal/ReviewerDeviationPage.jsx), [ReviewerProfilePage.jsx](../client/src/pages/appeal/ReviewerProfilePage.jsx), [ReviewerDeviationService.java](../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerDeviationService.java), [ReviewerProfileService.java](../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerProfileService.java).
 
 ### 9.1 Mở báo cáo hoặc bấm Lọc báo cáo
 
@@ -368,7 +368,7 @@ Hồ sơ tính để trả DTO, không ghi bảng chỉ số như màn báo cáo
 
 ## 10. Admin cấu hình luật — UC44
 
-Mở [AppealRuleConfigPage.jsx](../client/src/pages/admin/AppealRuleConfigPage.jsx), [appealRuleConfigApi.js](../client/src/api/appealRuleConfigApi.js), [AppealRuleConfigController.java](../server/src/main/java/com/swp391/kpi/controller/AppealRuleConfigController.java), [AppealRuleConfigService.java](../server/src/main/java/com/swp391/kpi/service/AppealRuleConfigService.java).
+Mở [AppealRuleConfigPage.jsx](../client/src/pages/admin/AppealRuleConfigPage.jsx), [appealRuleConfigApi.js](../client/src/api/appealRuleConfigApi.js), [AppealRuleConfigController.java](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealRuleConfigController.java), [AppealRuleConfigService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealRuleConfigService.java).
 
 | Bấm/thao tác | Chuỗi chạy |
 |---|---|
@@ -382,7 +382,7 @@ Chưa có active config trả404; frontend xử lý trạng thái trống và v�
 
 ## 11. Xem nhật ký — UC45
 
-Mở [AuditLogPage.jsx](../client/src/pages/appeal/AuditLogPage.jsx), [auditLogApi.js](../client/src/api/auditLogApi.js), [AuditLogController.java](../server/src/main/java/com/swp391/kpi/controller/AuditLogController.java), [AppealAuditQueryService.java](../server/src/main/java/com/swp391/kpi/service/AppealAuditQueryService.java).
+Mở [AuditLogPage.jsx](../client/src/pages/appeal/AuditLogPage.jsx), [auditLogApi.js](../client/src/api/auditLogApi.js), [AuditLogController.java](../server/src/main/java/com/swp391/kpi/common/controller/AuditLogController.java), [AppealAuditQueryService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealAuditQueryService.java).
 
 ```text
 Menu nhật ký / Link từ appeal / Link nhật ký đợt

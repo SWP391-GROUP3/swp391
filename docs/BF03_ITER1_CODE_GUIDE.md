@@ -60,7 +60,7 @@ Các `UserReadRepository`, `ArticleReadRepository`, `ScoringReadRepository` hi�
 
 ### 3.1. Backend: UserReadService
 
-[UserReadService.java](../server/src/main/java/com/swp391/kpi/service/UserReadService.java)
+[UserReadService.java](../server/src/main/java/com/swp391/kpi/admin/service/UserReadService.java)
 
 Controller nhận `X-User-Id`, rồi service gọi:
 
@@ -129,7 +129,7 @@ Cho phép gửi khi currentTime <= deadline
 | `AppealResponse.java` | Khiếu nại, trạng thái và các tiêu chí/lý do đã gửi |
 | `NotificationService.java` | Ghi thông báo cho Trưởng ban phù hợp |
 
-[AppealService.java](../server/src/main/java/com/swp391/kpi/service/AppealService.java)
+[AppealService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java)
 
 ### 4.3. Luồng submitAppeal()
 
@@ -193,7 +193,7 @@ Admin ACTIVE tạo phiên bản cấu hình gồm thời hạn khiếu nại, s�
 
 Mặc định nghiệp vụ: 7 ngày, 1 lần/bài, ngưỡng 5 điểm. Có thể tạo cấu hình có ngày hiệu lực trong tương lai.
 
-[AppealRuleConfigService.java](../server/src/main/java/com/swp391/kpi/service/AppealRuleConfigService.java)
+[AppealRuleConfigService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealRuleConfigService.java)
 
 | Hàm | Nhiệm vụ |
 |---|---|
@@ -248,7 +248,7 @@ Báo cáo giúp theo dõi mức chênh lệch của kết quả chấm, số khi
 | `ReviewerDeviationRefreshService` | Gom dữ liệu nguồn, tính theo reviewer/tháng và lưu chỉ số |
 | `ReviewerDeviationCalculator` | Tính toán thuần bằng BigDecimal, không cần Spring/DB |
 
-[ReviewerDeviationRefreshService.java](../server/src/main/java/com/swp391/kpi/service/ReviewerDeviationRefreshService.java)
+[ReviewerDeviationRefreshService.java](../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerDeviationRefreshService.java)
 
 ### 6.3. Nguồn so sánh hợp lệ
 
@@ -327,7 +327,7 @@ Frontend: `ReviewerDeviationPage.jsx`, `QualityReportPage.css`, `reviewerDeviati
 | `AuditLogController` | API gọi service truy vấn có quyền |
 | `AuditLogResponse` | DTO chứa actor, hành động, entity, thời gian, old/new value |
 
-[AppealAuditQueryService.java](../server/src/main/java/com/swp391/kpi/service/AppealAuditQueryService.java)
+[AppealAuditQueryService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealAuditQueryService.java)
 
 `AuditService` còn có hàm đọc tổng quát `getLogs()`, nhưng controller hiện dùng **AppealAuditQueryService** để áp dụng quyền; không gọi trực tiếp hàm đọc tổng quát.
 

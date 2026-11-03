@@ -1,0 +1,48 @@
+package com.swp391.kpi.appeal.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ * Entity anh xa bang reviewer_deviation_indices trong schema.sql. Chi dung trong service, khong tra
+ * thang ra API.
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   32  field                           cac cot cua bang (khop schema.sql)
+ */
+@Entity
+@Table(name = "reviewer_deviation_indices")
+@Getter
+@Setter
+@NoArgsConstructor
+public class ReviewerDeviationIndex {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    // FK toi users(id). Tam de Integer vi User entity thuoc luong admin.
+    private Integer editorId;
+
+    private LocalDate period;
+
+    private BigDecimal avgDeviation;
+
+    private Integer appealCount;
+
+    private BigDecimal overturnRate;
+
+    private Integer workloadCount;
+
+    private LocalDateTime lastUpdated;
+}
