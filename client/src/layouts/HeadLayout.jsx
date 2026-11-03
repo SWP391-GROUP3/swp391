@@ -5,21 +5,23 @@ import AppLayout from './AppLayout.jsx'
  * Duong dan (path) khai bao o routes/AppRoutes.jsx.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  MENU_TRUONG_BAN                 xem tom tat dau file
- *   65  HeadLayout()                    Khung trang cua Truong ban bien tap
+ *   26  MENU_TRUONG_BAN                 xem tom tat dau file
+ *   71  HeadLayout()                    Khung trang cua Truong ban bien tap
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   28  menu [Phan cong cham]           mo trang /assignments (AssignmentQueue)
- *   30  menu [Duyet diem]               mo trang /score-approvals (ScoreApprovalQueue)
- *   32  menu [Duyet dang]               mo trang /publishing (PublishingQueue)
- *   39  menu [Khieu nai]                mo trang /appeals (AppealManagementPage)
- *   41  menu [Dot cham cheo]            mo trang /cross-reviews (CrossReviewBatchPage)
- *   43  menu [Do lech & ho so BTV]      mo trang /reviewers (ReviewerDeviationPage)
- *   45  menu [Nhat ky cham]             mo trang /audit-logs (AuditLogPage)
- *   52  menu [Bang KPI cua ban]         mo trang /kpi-board (DepartmentKpiDashboard)
- *   54  menu [Giao chi tieu thang]      mo trang /kpi-targets (MonthlyTargetSetting)
- *   56  menu [Dinh muc chuan]           mo trang /kpi-benchmarks (KpiBenchmarksConfig)
- *   58  menu [Bao cao]                  mo trang /kpi-reports (ComingSoon - chua lam "Bao cao")
+ *   30  menu [Phan cong cham]           mo trang /assignments (AssignmentQueue)
+ *   32  menu [Duyet diem]               mo trang /score-approvals (ScoreApprovalQueue)
+ *   34  menu [Duyet dang]               mo trang /publishing (PublishingQueue)
+ *   41  menu [Khieu nai]                mo trang /appeals (AppealManagementPage)
+ *   43  menu [Dot cham cheo]            mo trang /cross-reviews (CrossReviewBatchPage)
+ *   45  menu [Do lech & ho so BTV]      mo trang /reviewers (ReviewerDeviationPage)
+ *   47  menu [Nhat ky cham]             mo trang /audit-logs (AuditLogPage)
+ *   54  menu [Bang KPI cua ban]         mo trang /kpi-board (DepartmentKpiDashboard)
+ *   56  menu [Giao chi tieu thang]      mo trang /kpi-targets (MonthlyTargetSetting)
+ *   58  menu [Dinh muc chuan]           mo trang /kpi-benchmarks (KpiBenchmarksConfig)
+ *   60  menu [Bao cao]                  mo trang /kpi-reports (GenrePopularityReport)
+ *   62  menu [Su kien xu huong]         mo trang /kpi-trending (TrendingEventsReport)
+ *   64  menu [Chot KPI thang]           mo trang /kpi-finalization (MonthlyKpiFinalization)
  */
 const MENU_TRUONG_BAN = [
   {

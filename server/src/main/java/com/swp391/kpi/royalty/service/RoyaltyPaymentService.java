@@ -35,17 +35,17 @@ import java.util.Map;
  * Phieu chi duoc tao luc Ke toan khoa ky (RoyaltyPeriodService.lockPeriod, UC-53).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   56  field                           repository / service duoc inject
+ *   54  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   68  getPaymentsOfPeriod()           UC-54 buoc 1: cac phieu chi cua 1 ky cho Ke toan chon
- *   82  recordPayment()                 UC-54 buoc 2-3: ghi nhan da chi 1 phieu; het phieu UNPAID thi ky sang PAID
- *  111  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap, gom theo ky, ky moi nhat len dau
+ *   66  getPaymentsOfPeriod()           UC-54 buoc 1: Ke toan mo ky da khoa, thay phieu chi cua tung nguoi (so tien, no, trang thai)
+ *   79  recordPayment()                 UC-54 buoc 2-3: Ke toan xac nhan da chi 1 phieu
+ *  109  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap, gom theo ky: cac dong tien (bai theo ty le dong tac gia, anh/video…
  *  ---- Ham phu (private, chi dung trong file) ----
- *  148  markPeriodPaidIfAllPaid()       BR-RY-07: moi phieu cua ky da PAID -> ky PAID, bao nhung nguoi nhan tien
- *  166  newPeriodRow()                  1 dong ky rong cho man UC-57
- *  175  loadArticleTitles()             Tieu de bai, lay qua service BF-01 (khong query bang articles)
- *  184  findPeriod()                    tim period
- *  190  label()                         Vd "9/2026"
+ *  146  markPeriodPaidIfAllPaid()       BR-RY-07: moi phieu cua ky da PAID -> ky PAID (ghi paid_at), bao nhung nguoi nhan tien (UC-54 buoc 3)
+ *  161  newPeriodRow()                  new period row
+ *  170  loadArticleTitles()             tai article titles
+ *  178  findPeriod()                    tim period
+ *  183  label()                         label
  */
 @Service
 @RequiredArgsConstructor

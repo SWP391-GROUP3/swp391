@@ -10,14 +10,21 @@ import '../../styles/QualityReportPage.css'
  * Man Truong ban xem bao cao do lech nguoi cham (UC-41): moi BTV mot dong, chi so nghiem / de dai, loc
  * theo ky; bam ten de mo ho so BTV.
  *
- * MO TRANG NAY TAI: /reviewers, /reviewer-deviations
+ * MO TRANG NAY TAI: /reviewers
  *
  * MUC LUC (so dong - ten - tac dung)
- *   28  ReviewerDeviationPage()         reviewer deviation page
- *   36    useEffect                     tai du lieu khi mo trang
- *   44    useEffect                     tai du lieu khi mo trang
- *   52    locBaoCao()                   loc bao cao
- *   62    doiBoLoc()                    doi bo loc
+ *   37  ReviewerDeviationPage()         reviewer deviation page
+ *   46    useEffect                     tai du lieu khi mo trang
+ *   54    useEffect                     tai du lieu khi mo trang
+ *   62    locBaoCao()                   loc bao cao
+ *   72    tinhLai()                     tinh lai
+ *   86    doiBoLoc()                    doi bo loc
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  100  form, nut [Loc bao cao]         locBaoCao() -> goi GET duongDan
+ *  118  [Dang tinh… / Tinh lai chi so]  tinhLai() -> hoi xac nhan; goi POST /api/reports/reviewer-deviations/refresh{query}, GET duongDan
+ *  146  link [{item.editorName}]        mo trang /reviewers/{item.editorId}?period={item.period.slice(0, 7)} (ReviewerProfilePage)
+ *  167  link [{btv.editorName}]         mo trang /reviewers/{btv.editorId}{boLoc.period ? `?period=${boLoc.p… (ReviewerProfilePage)
  *      tinhLai()                     tinh lai chi so roi tai lai bao cao
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)

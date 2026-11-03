@@ -10,7 +10,7 @@ import java.util.List;
  * DTO tong the tra ve cho bao cao muc do quan tam the loai & chi phi nhuan but (UC-64).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  field                           cac truong tong hop toan bo the loai
+ *   19  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

@@ -22,10 +22,10 @@ import java.util.List;
  * nguoi dang nhap xem nhuan but cua chinh minh (UC-57). Quyen nam trong SecurityConfig.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   36  field                           service duoc inject
- *   40  getPaymentsOfPeriod()           phieu chi cua 1 ky [GET /api/royalty-payments?periodId=]
- *   48  recordPayment()                 ghi nhan da chi 1 phieu [POST /api/royalty-payments/{id}/pay]
- *   58  getMyRoyalties()                nhuan but cua toi [GET /api/royalty-payments/me]
+ *   35  field                           service duoc inject
+ *   39  getPaymentsOfPeriod()           lay payments cua period [GET /api/royalty-payments]
+ *   47  recordPayment()                 ghi payment [POST /api/royalty-payments/{id}/pay]
+ *   57  getMyRoyalties()                lay my royalties [GET /api/royalty-payments/me]
  */
 @RestController
 @RequestMapping("/api/royalty-payments")

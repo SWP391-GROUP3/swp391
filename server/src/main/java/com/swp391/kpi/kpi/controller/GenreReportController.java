@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller cung cap API bao cao muc do quan tam the loai & chi phi nhuan but (UC-64).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  field                           service xu ly
- *   28  getGenrePopularityReport()      GET /api/kpi-reports/genres
+ *   25  field                           service duoc inject
+ *   32  getGenrePopularityReport()      Lay bao cao phan tich the loai theo nam va thang (UC-64) [GET /api/kpi-reports/genres]
  */
 @RestController
 @RequestMapping("/api/kpi-reports")

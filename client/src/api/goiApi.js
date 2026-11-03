@@ -14,9 +14,9 @@ import { layToken, xoaPhien } from '../auth/phienDangNhap.js'
  * @returns phan "data" cua ApiResponse (hoac Blob khi taiFile)
  *
  * MUC LUC (so dong - ten - tac dung)
- *   20  goiApi()                        xem tom tat dau file [GET duongDan]
- *   57  docJson()                       Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} de khong vo
- *   66  chuLoi()                        Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh
+ *   21  goiApi()                        xem tom tat dau file [GET duongDan]
+ *   63  docJson()                       Doc body JSON; body rong / khong phai JSON (vd server tat) thi tra {} de khong vo
+ *   72  chuLoi()                        Uu tien loi tung truong (@Valid) -> message chung -> cau mac dinh
  */
 export async function goiApi(duongDan, tuyChon = {}) { // [CHUNG 4 LUONG] buoc 4: gan token Bearer, doi loi server thanh Error tieng Viet
   const headers = {}

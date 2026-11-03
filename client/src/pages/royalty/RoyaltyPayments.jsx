@@ -14,19 +14,18 @@ const PAYABLE_STATUSES = ['LOCKED', 'PAID']
  * Chon 1 ky da khoa -> thay phieu chi cua tung nguoi (tong tien, no ky truoc, tien thuc chi, no chuyen ky sau).
  * Bam "Ghi nhan da chi" tung phieu; phieu cuoi cung chi xong thi ky tu sang PAID (BR-RY-07).
  *
- * MO TRANG NAY TAI: /royalty-payments (co the kem ?periodId=)
+ * MO TRANG NAY TAI: /royalty-payments
  *
  * MUC LUC (so dong - ten - tac dung)
- *   10  PAYABLE_STATUSES                hang so
- *   31  RoyaltyPayments()               xem tom tat dau file
- *   40    useEffect                     tai danh sach ky da khoa khi mo trang, chon san ky trong ?periodId
- *   58    useEffect                     doi ky -> tai phieu chi cua ky do
- *   70    handlePay()                   ghi nhan da chi 1 phieu, chi thay dong do; phieu cuoi moi tai lai ky
+ *   10  PAYABLE_STATUSES                Chi ky da khoa (LOCKED) hoac da chi xong (PAID) moi co phieu chi (UC-53, UC-54)
+ *   30  RoyaltyPayments()               xem tom tat dau file
+ *   39    useEffect                     tai du lieu khi mo trang
+ *   57    useEffect                     tai du lieu khi mo trang
+ *   69    handlePay()                   xu ly pay
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  124  o chon [Ky]                     doi ?periodId -> tai phieu chi cua ky moi
- *  141  link [Xem bang ke]              mo trang /royalty-periods/{periodId} (RoyaltyPeriodDetail)
- *  183  [Ghi nhan da chi]              handlePay() -> hoi xac nhan; goi POST /api/royalty-payments/{id}/pay
+ *  140  link [Xem bang ke]              mo trang /royalty-periods/{selectedPeriod.id} (RoyaltyPeriodDetail)
+ *  182  [Dang ghi nhan… / Ghi nhan da chi]  handlePay() -> hoi xac nhan; goi POST /api/royalty-payments/{paymentId}/pay, GET /api/royalty-periods
  */
 export default function RoyaltyPayments() {
   const [searchParams, setSearchParams] = useSearchParams()

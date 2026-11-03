@@ -11,13 +11,13 @@ import java.util.List;
  * Khong doc DB, khong co @Service (AGENTS.md muc 1, 3.1, 3.9).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  hang so                         cac tham so mac dinh
- *   32  calculateMeanViews()            Tinh luot xem trung binh (mean views)
- *   52  calculateMedianViews()          Tinh luot xem trung vi (median views)
- *   82  calculateBayesianRating()       Tinh diem danh gia Bayesian weighted rating
- *  121  calculateAverageQualityScore()  Tinh diem chat luong trung binh cua the loai
- *  147  calculateCostPer1000Views()     Tinh chi phi nhuan but / 1.000 luot xem (BR-KPI-04)
- *  171  isNeglectedOrInsufficient()     Kiem tra the loai co bi it bai / thieu du lieu khong (< k bai)
+ *   24  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   33  calculateMeanViews()            Tinh luot xem trung binh (mean views) tren danh sach luot xem cua cac bai viet
+ *   53  calculateMedianViews()          Tinh luot xem trung vi (median views) tren danh sach luot xem cua cac bai viet
+ *   84  calculateBayesianRating()       Tinh diem danh gia Bayesian Rating (WR - Weighted Rating): WR = (v / (v + m)) * R + (m / (v + m)) * C Trong d…
+ *  109  calculateAverageQualityScore()  Tinh diem chat luong trung binh cua cac bai viet trong the loai (Average Quality Score)
+ *  136  calculateCostPer1000Views()     Tinh chi phi nhuan but tren 1.000 luot xem (BR-KPI-04): Royalty Cost per 1,000 Views = (Total Royalty Paid / …
+ *  151  isNeglectedOrInsufficient()     Kiem tra xem the loai co it bai viet hoac co nguy co bi lang quen khong (neglected genre / insufficient data)
  */
 public class GenreReportCalculator {
 

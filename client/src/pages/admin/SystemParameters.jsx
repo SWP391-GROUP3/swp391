@@ -7,18 +7,26 @@ import './AdminPages.css'
  * Gioi han tung o va luat "nguong canh bao < nguong chan" kiem o server; man nay chi hien loi server tra ve.
  * Sua chi ap dung cho bai nop SAU khi luu (ket qua da luu cua bai cu khong tinh lai).
  *
+ * CODE LIEN QUAN (Ctrl+P trong VS Code, dan duong dan de mo file):
+ *   client/src/api/adminApi.js
+ *   server/src/main/java/com/swp391/kpi/admin/controller/SystemParameterController.java  (Quang)
+ *   server/src/main/java/com/swp391/kpi/admin/service/SystemParameterService.java        updateIntakeParameters(): kiem gioi han, ghi audit_logs (Quang)
+ * DUONG DI KHI MO TRANG / BAM NUT (ham api -> URL -> Controller -> Service):
+ *   Mo trang: getIntakeParameters() -> GET /api/system-parameters/intake
+ *   [Luu]: updateIntakeParameters() -> PUT /api/system-parameters/intake -> SystemParameterService.updateIntakeParameters()
+ *
  * MO TRANG NAY TAI: /system-parameters
  *
  * MUC LUC (so dong - ten - tac dung)
- *   25  NHOM_THAM_SO                    Moi o: ten field cua API, nhan, goi y gioi han (khop @Min/@Max cua SystemParameterIntakeUpdateRequest)
- *   49  SystemParameters()              system parameters
- *   57    useEffect                     Tai 6 tham so khi mo trang
- *   70    toForm()                      Doi ket qua API sang gia tri chuoi cho o nhap
- *   81    save()                        Bam "Luu": gui du 6 truong, server kiem gioi han va ghi audit_logs cho o nao doi
+ *   33  NHOM_THAM_SO                    Moi o: ten field cua API, nhan, goi y gioi han (khop @Min/@Max cua SystemParameterIntakeUpdateRequest)
+ *   57  SystemParameters()              system parameters
+ *   65    useEffect                     Tai 6 tham so khi mo trang
+ *   78    toForm()                      Doi ket qua API sang gia tri chuoi cho o nhap
+ *   89    save()                        Bam "Luu": gui du 6 truong, server kiem gioi han va ghi audit_logs cho o nao doi
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  132  [Dang luu… / Luu]               save() Bam "Luu": gui du 6 truong, server kiem gioi han va ghi audit_logs cho o nao doi -> goi PUT /api/system-parameters/intake
- *  135  [Hoan tac]                      tren trang: form
+ *  140  [Dang luu… / Luu]               save() Bam "Luu": gui du 6 truong, server kiem gioi han va ghi audit_logs cho o nao doi -> goi PUT /api/system-parameters/intake
+ *  143  [Hoan tac]                      tren trang: form
  */
 
 // Moi o: ten field cua API, nhan, goi y gioi han (khop @Min/@Max cua SystemParameterIntakeUpdateRequest)

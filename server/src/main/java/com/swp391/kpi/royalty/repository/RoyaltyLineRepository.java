@@ -14,7 +14,7 @@ import java.util.List;
  * MUC LUC (so dong - ten - tac dung)
  *   22  findByPeriodId()                Moi dong tien cua 1 ky (bai, anh, dieu chinh), de cong theo tung nguoi (UC-50)
  *   27  deleteByGradingId()             Cham lai trong ky OPEN (nhom chot 27/10/2026): xoa dong tien cua phien ban cu
- *   34  findMyLines()                  UC-57: moi dong tien cua 1 nguoi qua moi ky, nap san ky + phieu cham (JOIN FETCH)
+ *   34  findMyLines()                   UC-57: moi dong tien cua 1 nguoi (bai, anh, dieu chinh) qua moi ky, moi nhat len dau
  */
 public interface RoyaltyLineRepository extends JpaRepository<RoyaltyLine, Integer> {
 

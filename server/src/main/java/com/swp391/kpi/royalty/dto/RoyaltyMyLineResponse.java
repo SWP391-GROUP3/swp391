@@ -12,8 +12,8 @@ import java.math.BigDecimal;
  * tien anh/video hoac dong dieu chinh.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   22  field                           cac truong tra ve cho giao dien
- *   30  from()                          doi entity sang DTO, kem tieu de bai
+ *   21  field                           cac truong tra ve cho giao dien
+ *   28  from()                          doi entity sang DTO (map tay, AGENTS 3.4)
  */
 @Getter
 @Setter

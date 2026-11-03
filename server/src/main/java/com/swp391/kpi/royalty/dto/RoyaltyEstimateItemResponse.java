@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  *
  * MUC LUC (so dong - ten - tac dung)
  *   20  field                           cac truong tra ve cho giao dien
- *   27  of()                           Gom ket qua tinh o 1 muc diem thanh 1 dong
+ *   27  of()                            Gom ket qua tinh o 1 muc diem thanh 1 dong
  */
 @Getter
 @Setter

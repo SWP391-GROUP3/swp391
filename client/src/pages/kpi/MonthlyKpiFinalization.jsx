@@ -12,11 +12,16 @@ import './MonthlyKpiFinalization.css'
  * MO TRANG NAY TAI: /kpi-finalization
  *
  * MUC LUC (so dong - ten - tac dung)
- *   25  MonthlyKpiFinalization       - Component chinh man hinh chot KPI thang
- *   35    useEffect                  - Tai du lieu khi doi nam/thang
- *   39    taiDuLieuKy()              - Tai du lieu KPI thang va trang thai chot
- *   54    xuLyChayTongHop()          - Kich hoat job tong hop tu dong truoc khi chot
- *   70    xuLyChotKyKpi()            - Khoa ky, chot snapshot bat bien va gui thong bao
+ *   26  MonthlyKpiFinalization()        xem tom tat dau file
+ *   36    useEffect                     tai du lieu khi mo trang
+ *   40    taiDuLieuKy()                 tai du lieu ky
+ *   63    xuLyChayTongHop()             xu ly chay tong hop
+ *   82    xuLyChotKyKpi()               xu ly chot ky kpi
+ *  114    capNhatGhiChu()               cap nhat ghi chu
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  167  [Dang xu ly... / ⚡ Cap nhat so lieu]  xuLyChayTongHop() -> hoi xac nhan; goi POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
+ *  176  [🔒 Da chot ky (FINALIZED) / 🔒 Chot ky …]  xuLyChotKyKpi() -> hoi xac nhan; goi POST /api/kpi-snapshots/finalize, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
  */
 export default function MonthlyKpiFinalization({ nguoiDung }) {
   const [nam, setNam] = useState(2026)

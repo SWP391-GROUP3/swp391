@@ -14,13 +14,14 @@ import java.util.Optional;
  * Doc bang royalty_periods (ky nhuan but, UC-49).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   28  findAllByOrderByPeriodYearDescPeriodMonthDesc()  Cac ky, thang moi nhat len dau
- *   32  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc()  Ky dang o 1 trang thai, ky cu nhat len dau
- *   35  existsByPeriodYearAndPeriodMonth()  Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi tu tao ky thang sau
- *   38  findByPeriodYearAndPeriodMonth()  Ky cua 1 thang: khoa ky can tim ky thang truoc de lay no chuyen tiep (UC-53 A2)
- *   44  sumLineAmountByPeriodId()      Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines
- *   49  countGradedArticlesByPeriodId()  So bai da cham trong ky (1 bai cham lai nhieu phien ban van tinh 1 bai)
- *   59  findPeriodSummaries()           UC-49: tong tien + so bai da cham cua moi ky trong 1 cau SQL
+ *   29  findAllByOrderByPeriodYearDescPeriodMonthDesc()  Cac ky, thang moi nhat len dau
+ *   33  findFirstByStatusOrderByPeriodYearAscPeriodMonthAsc()  Ky dang o 1 trang thai, ky cu nhat len dau
+ *   36  existsByPeriodYearAndPeriodMonth()  Thang nay da co ky chua (UNIQUE period_year + period_month): dung khi tu tao ky thang sau
+ *   39  findByPeriodYearAndPeriodMonth()  Ky cua 1 thang: khoa ky can tim ky thang truoc de lay no chuyen tiep (UC-53 A2)
+ *   45  sumLineAmountByPeriodId()       Tong tien 1 ky = tong moi dong tien (bai, anh, dieu chinh) cua ky trong royalty_lines
+ *   50  countGradedArticlesByPeriodId()  So bai da cham trong ky (1 bai cham lai nhieu phien ban van tinh 1 bai)
+ *   56  COALESCE()                      UC-49: tong tien + so bai da cham cua MOI ky trong 1 cau SQL, thay vi moi ky goi 2 ham o tren (N ky -> 2N cau)
+ *   60  findPeriodSummaries()           UC-49: tong tien + so bai da cham cua MOI ky trong 1 cau SQL, thay vi moi ky goi 2 ham o tren (N ky -> 2N cau)
  */
 public interface RoyaltyPeriodRepository extends JpaRepository<RoyaltyPeriod, Integer> {
 

@@ -1,4 +1,13 @@
-/* Style cho man hinh Bao cao su kien xu huong (UC-65) */
+/* ===========================================================================
+   Style cho man hinh Bao cao su kien xu huong (UC-65)
+
+   MUC LUC (so dong - khoi CSS)
+     11  tieu de, bo cuc dau trang
+     89  The thong ke
+    128  Banner canh bao
+    152  Khung bang du lieu
+    200  Badges
+   =========================================================================== */
 .bc-xu-huong {
   padding: 24px 32px;
   background-color: var(--fm-nen, #eef2f5);

@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
  * Chay dau moi gio (cron, khong dung fixedRate - nhom truong 24/10, A1; xem config/SchedulingConfig).
  * Tach class rieng de loi goi di qua proxy cua Spring -> @Transactional cua service co tac dung.
  *
+ * CODE LIEN QUAN: goi server/src/main/java/com/swp391/kpi/article/service/ArticleConfirmationService.java expireOverdueConfirmations()
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   24  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   26  field                           repository / service duoc inject
- *   30  expireOverdueConfirmations()    Dau moi gio: goi service dua bai qua han xac nhan ve Nhap, ghi log so bai da xu ly
+ *   26  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   28  field                           repository / service duoc inject
+ *   32  expireOverdueConfirmations()    Dau moi gio: goi service dua bai qua han xac nhan ve Nhap, ghi log so bai da xu ly
  */
 @Slf4j
 @Component

@@ -27,10 +27,11 @@ import java.util.List;
  * Quyen theo vai tro nam trong SecurityConfig; phong vien chi xem KPI cua minh (kiem trong service).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   36  field                           service duoc inject
- *   43  getDepartmentDashboard()        Lay du lieu bang theo doi KPI ban bien tap (UC-61: View Department KPI Boa… [GET /api/kpi-snapshots/dashboard]
- *   56  getReporterKpiDetail()          Lay chi tiet hieu suat KPI cua mot phong vien theo ch… [GET /api/kpi-snapshots/reporters/{reporterId}/details]
- *   72  triggerAggregation()            Kich hoat job tong hop KPI tu dong theo chu ky thang (Automated Aggregati… [POST /api/kpi-snapshots/aggregate]
+ *   41  field                           service duoc inject
+ *   48  getDepartmentDashboard()        Lay du lieu bang theo doi KPI ban bien tap (UC-61: View Department KPI Boa… [GET /api/kpi-snapshots/dashboard]
+ *   61  getReporterKpiDetail()          Lay chi tiet hieu suat KPI cua mot phong vien theo ch… [GET /api/kpi-snapshots/reporters/{reporterId}/details]
+ *   77  triggerAggregation()            Kich hoat job tong hop KPI tu dong theo chu ky thang (Automated Aggregati… [POST /api/kpi-snapshots/aggregate]
+ *   90  finalizeMonthlyKpi()            Chot ky KPI thang va luu snapshot bat bien (UC-66: Finalize Monthly KPI) [POST /api/kpi-snapshots/finalize]
  */
 @RestController
 @RequestMapping("/api/kpi-snapshots")

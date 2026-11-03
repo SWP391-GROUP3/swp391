@@ -11,23 +11,34 @@ import './ArticleAttachments.css'
  *  - ArticleDetail (canEdit = false): chi xem.
  * Ket qua kiem trung chi co sau khi nop bai (server kiem luc nop - UC-05 buoc 2).
  *
+ * CODE LIEN QUAN (Ctrl+P trong VS Code, dan duong dan de mo file):
+ *   client/src/api/articleApi.js
+ *   server/src/main/java/com/swp391/kpi/article/controller/ArticleController.java
+ *   server/src/main/java/com/swp391/kpi/article/service/ArticleAttachmentService.java  them / xoa anh-video, kiem trung anh (UC-07)
+ *   server/src/main/java/com/swp391/kpi/article/service/ArticleMediaHasher.java        tinh SHA-256, dHash cua anh
+ * DUONG DI KHI MO TRANG / BAM NUT (ham api -> URL -> Controller -> Service):
+ *   Mo khoi: getAttachments() -> GET /api/articles/{id}/attachments -> ArticleAttachmentService.getAttachments()
+ *            anh nho: getAttachmentFile() -> GET /api/articles/{id}/attachments/{attachmentId}/file -> getImageFile()
+ *   [Them]: addAttachment() -> POST /api/articles/{id}/attachments -> ArticleAttachmentService.addAttachment()
+ *   [Xoa]: deleteAttachment() -> DELETE /api/articles/{id}/attachments/{attachmentId} -> ArticleAttachmentService.deleteAttachment()
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   34  TEN_LOAI                        Ten loai anh/video (ma lay tu bang media_factors); ma moi chua co ten thi hien ma
- *   36  ANH_TOI_DA_MB                   A1 (nhom chot 01/11): anh toi da 10 MB - kiem truoc o day de bao loi tieng Viet ngay
- *   37  FORM_TRONG                      hang so
- *   40  ketQuaKiemTrung()               Chu + mau cua ket qua kiem trung 1 anh/video (UC-07)
- *   54  KHONG_TINH_TIEN                 Ly do khong tinh nhuan but (B22, UC-05 A3)
- *   60  AnhXemTruoc()                   Anh nho: tai file kem token (goiApi) roi hien bang URL tam (Q7, A2)
- *   64    useEffect                     tai du lieu khi mo trang
- *   85  ArticleAttachments()            article attachments
- *   95    useEffect                     Tai danh sach anh/video (va loai anh neu dang sua)
- *  109    changeField()                 Go vao 1 o cua form them anh/video
- *  114    themAnhVideo()                Bam "Them": gui file anh hoac link video len server
- *  144    xoaAnhVideo()                 Bam "Xoa" o 1 dong: hoi lai roi xoa
+ *   45  TEN_LOAI                        Ten loai anh/video (ma lay tu bang media_factors); ma moi chua co ten thi hien ma
+ *   47  ANH_TOI_DA_MB                   A1 (nhom chot 01/11): anh toi da 10 MB - kiem truoc o day de bao loi tieng Viet ngay
+ *   48  FORM_TRONG                      hang so
+ *   51  ketQuaKiemTrung()               Chu + mau cua ket qua kiem trung 1 anh/video (UC-07)
+ *   65  KHONG_TINH_TIEN                 Ly do khong tinh nhuan but (B22, UC-05 A3)
+ *   71  AnhXemTruoc()                   Anh nho: tai file kem token (goiApi) roi hien bang URL tam (Q7, A2)
+ *   75    useEffect                     tai du lieu khi mo trang
+ *   96  ArticleAttachments()            article attachments
+ *  106    useEffect                     Tai danh sach anh/video (va loai anh neu dang sua)
+ *  120    changeField()                 Go vao 1 o cua form them anh/video
+ *  125    themAnhVideo()                Bam "Them": gui file anh hoac link video len server
+ *  155    xoaAnhVideo()                 Bam "Xoa" o 1 dong: hoi lai roi xoa
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  190  [Xoa]                           xoaAnhVideo() Bam "Xoa" o 1 dong: hoi lai roi xoa -> hoi xac nhan; goi DELETE /api/articles/{articleId}/attachments/{attachmentId}
- *  238  [Dang them… / Them]             themAnhVideo() Bam "Them": gui file anh hoac link video len server -> goi POST /api/articles/{articleId}/attachments
+ *  201  [Xoa]                           xoaAnhVideo() Bam "Xoa" o 1 dong: hoi lai roi xoa -> hoi xac nhan; goi DELETE /api/articles/{articleId}/attachments/{attachmentId}
+ *  249  [Dang them… / Them]             themAnhVideo() Bam "Them": gui file anh hoac link video len server -> goi POST /api/articles/{articleId}/attachments
  */
 
 // Ten loai anh/video (ma lay tu bang media_factors); ma moi chua co ten thi hien ma

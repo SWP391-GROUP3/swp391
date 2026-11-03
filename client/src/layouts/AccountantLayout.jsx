@@ -12,7 +12,7 @@ import AppLayout from './AppLayout.jsx'
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
  *   22  menu [Ky nhuan but]             mo trang /royalty-periods (RoyaltyPeriods)
- *   24  menu [Chi tra]                  mo trang /royalty-payments (ComingSoon - chua lam "Chi tra nhuan but")
+ *   24  menu [Chi tra]                  mo trang /royalty-payments (RoyaltyPayments)
  *   26  menu [Don gia nhuan but]        mo trang /royalty-rates (RoyaltyRates)
  */
 const MENU_KE_TOAN = [

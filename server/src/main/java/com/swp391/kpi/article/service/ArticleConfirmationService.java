@@ -29,19 +29,26 @@ import java.util.Optional;
  * Xac nhan dong tac gia BF-01 (UC-12, BR-IN-06): dong y, tu choi co ly do,
  * va job het han 3 ngay (UC-12 A2). Doi trang thai bai qua ArticleService.updateArticleStatus().
  *
+ * CODE LIEN QUAN (duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   Duoc goi tu: article/controller/ArticleController.java (acceptCoAuthorship, rejectCoAuthorship);
+ *     article/service/ArticleCoAuthorExpiryJob.java (expireOverdueConfirmations, moi gio)
+ *   Goi sang: article/service/ArticleService.java (updateArticleStatus, getArticleDetail),
+ *     assessment/service/AssignmentService.java (bai da phan cong chua), common/service/NotificationService.java,
+ *     admin/service/UserReadService.java
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   51  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   57  field                           repository / service duoc inject
+ *   58  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   64  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   70  acceptCoAuthorship()            UC-12 buoc 2-4: dong tac gia dong y
- *  107  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi kem ly do
- *  146  expireOverdueConfirmations()    UC-12 A2 (job chay moi gio): dong tac gia khong tra loi qua han -> EXPIRED, bai ve DRAFT, bao moi tac gia
+ *   77  acceptCoAuthorship()            UC-12 buoc 2-4: dong tac gia dong y
+ *  114  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi kem ly do
+ *  153  expireOverdueConfirmations()    UC-12 A2 (job chay moi gio): dong tac gia khong tra loi qua han -> EXPIRED, bai ve DRAFT, bao moi tac gia
  *  ---- Ham phu (private, chi dung trong file) ----
- *  191  findMyPendingRow()              UC-12 Preconditions: bai PENDING_CONFIRMATION, nguoi dung la dong tac gia dang PENDING, chua qua han
- *  218  clearSaturationIfNeverAssigned()  B11 (Quang 01/11): bai ve DRAFT ma chua tung phan cong BTV -> bo su kien + hang + ty le da khoa
- *  228  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  234  userName()                      Ho ten nguoi dung de ghi vao thong bao (qua UserReadService)
- *  244  shorten()                       notifications.message toi da 500 ky tu
+ *  198  findMyPendingRow()              UC-12 Preconditions: bai PENDING_CONFIRMATION, nguoi dung la dong tac gia dang PENDING, chua qua han
+ *  225  clearSaturationIfNeverAssigned()  B11 (Quang 01/11): bai ve DRAFT ma chua tung phan cong BTV -> bo su kien + hang + ty le da khoa
+ *  235  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  241  userName()                      Ho ten nguoi dung de ghi vao thong bao (qua UserReadService)
+ *  251  shorten()                       notifications.message toi da 500 ky tu
  */
 @Service
 @RequiredArgsConstructor

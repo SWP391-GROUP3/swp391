@@ -49,15 +49,15 @@ import java.util.TreeMap;
  *   79  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
  *   82  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   97  getAllPeriods()                 Cac ky moi nhat len dau, kem tong tien va so bai da cham (chi 2 cau SQL)
- *  116  getPeriodDetail()              UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung nguoi
- *  133  closePeriod()                  UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan, roi tu tao ky thang sau de cham tiep (…
- *  155  returnPeriod()                 UC-52 / UC-53 A1: Ke toan tra ky CLOSED ve OPEN kem ghi chu bat buoc (BR-RY-07), bao Thu ky sua roi chot lai …
+ *   97  getAllPeriods()                 Cac ky moi nhat len dau, kem tong tien va so bai da cham
+ *  116  getPeriodDetail()               UC-50 buoc 1: bang ke ky = cac bai da cham trong ky + tong tien tung nguoi
+ *  133  closePeriod()                   UC-50 buoc 2-3: Thu ky chot ky OPEN -> CLOSED (BR-RY-07), bao Ke toan, roi tu tao ky thang sau de cham tiep (…
+ *  155  returnPeriod()                  UC-52 / UC-53 A1: Ke toan tra ky CLOSED ve OPEN kem ghi chu bat buoc (BR-RY-07), bao Thu ky sua roi chot lai …
  *  177  lockPeriod()                    UC-53: Ke toan khoa ky CLOSED -> LOCKED (BR-RY-07)
  *  ---- Ham phu (private, chi dung trong file) ----
  *  207  loadDebtFromPreviousPeriod()    No chuyen tiep = debt_out tren phieu chi cua ky thang truoc (GBR-12, UC-53 A2)
  *  230  groupLinesByUser()              Gom dong tien theo nguoi nhan
- *  243  createPayment()                1 phieu chi UNPAID cho 1 nguoi; gross = tong dong tien, tien chi va no tinh bang RoyaltyPaymentCalculator (ph…
+ *  243  createPayment()                 1 phieu chi UNPAID cho 1 nguoi; gross = tong dong tien, tien chi va no tinh bang RoyaltyPaymentCalculator (ph…
  *  267  checkAllArticlesOfMonthGraded()  UC-50 E1 (nhom chot 18/10/2026): con bai da dang tu truoc toi het thang cua ky ma chua cham thi chua cho chot
  *  283  createNextPeriodIfMissing()     Chot ky thang N thi tu tao ky thang N+1 (OPEN) neu chua co, de Thu ky cham tiep duoc (UC-47 E1 can ky OPEN)
  *  301  keepLatestVersions()            Cham lai trong ky OPEN tao phien ban moi cung ky (dong tien ban cu da xoa), nen bang ke chi giu phien ban moi…
@@ -68,8 +68,8 @@ import java.util.TreeMap;
  *  369  sumAmount()                     sum amount
  *  378  countArticles()                 1 bai cham lai nhieu phien ban van tinh 1 bai
  *  386  findPeriod()                    tim period
- *  392  requireStatus()                 BR-RY-07: thao tac chi lam duoc o 1 trang thai, sai thi bao loi kem trang thai hien tai
- *  400  toResponse()                    ky vua doi trang thai -> response kem tong tien va so bai (chot / tra / khoa ky dung chung)
+ *  392  requireStatus()                 BR-RY-07: moi thao tac chi lam duoc o 1 trang thai; sai thi bao kem trang thai hien tai
+ *  400  toResponse()                    Ky vua doi trang thai -> response kem tong tien va so bai (dung chung cho chot / tra / khoa ky)
  *  407  label()                         Vd "9/2026"
  */
 @Service

@@ -35,15 +35,18 @@ import java.util.Optional;
  * Tach rieng khoi ArticleService (nghiep vu cua Phong vien) cho de tim va de doc.
  * Luong khac goi cac ham public o day, KHONG goi repository cua BF-01 (AGENTS.md muc 2).
  *
+ * CODE LIEN QUAN: duoc goi tu luong BF-04 (server/src/main/java/com/swp391/kpi/royalty/service/RoyaltyGradingService.java,
+ *   RoyaltyPaymentService.java, RoyaltyPeriodService.java) de doc bai da dang
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   52  field                           repository / service duoc inject
+ *   55  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   63  getPublishedArticles()          UC-46 (BF-04): moi bai PUBLISHED, bai dang som nhat len dau (gan han chi nhat)
- *   78  getArticleForRoyalty()          UC-47, UC-48 (BF-04): thong tin 1 bai de cham nhuan but
+ *   66  getPublishedArticles()          UC-46 (BF-04): moi bai PUBLISHED, bai dang som nhat len dau (gan han chi nhat)
+ *   81  getArticleForRoyalty()          UC-47, UC-48 (BF-04): thong tin 1 bai de cham nhuan but
  *  ---- Ham phu (private, chi dung trong file) ----
- *   95  loadUserNames()                 Ho ten moi nguoi dung, lay qua service cua luong admin (khong tu query bang users)
- *  106  buildAuthorList()               Tac gia da dong y (ACCEPTED)
- *  129  buildAttachmentList()           Anh/video cua ban nop (SUBMISSION) moi nhat - Minh chot 17/10
+ *   98  loadUserNames()                 Ho ten moi nguoi dung, lay qua service cua luong admin (khong tu query bang users)
+ *  109  buildAuthorList()               Tac gia da dong y (ACCEPTED)
+ *  132  buildAttachmentList()           Anh/video cua ban nop (SUBMISSION) moi nhat - Minh chot 17/10
  */
 @Service
 @RequiredArgsConstructor

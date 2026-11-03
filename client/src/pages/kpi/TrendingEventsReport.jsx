@@ -13,10 +13,12 @@ import './TrendingEventsReport.css'
  * MO TRANG NAY TAI: /kpi-trending
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  TrendingEventsReport         - Component chinh man hinh bao cao su kien xu huong
- *   32    useEffect                  - Tai du lieu khi doi ngay moc
- *   36    taiDuLieuBaoCao()          - Goi API lay phan tich su kien xu huong
- *   58    locDanhSachSuKien          - Loc danh sach theo tu khoa va bo loc
+ *   23  TrendingEventsReport()          xem tom tat dau file
+ *   31    useEffect                     tai du lieu khi mo trang
+ *   35    taiDuLieuBaoCao()             tai du lieu bao cao
+ *
+ * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
+ *  114  [Dang tai... / Lam moi]         taiDuLieuBaoCao() -> goi GET url
  */
 export default function TrendingEventsReport({ nguoiDung }) {
   const [ngayMoc, setNgayMoc] = useState('')

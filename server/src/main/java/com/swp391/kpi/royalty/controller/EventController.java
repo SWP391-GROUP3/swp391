@@ -17,7 +17,7 @@ import java.util.List;
  *
  * MUC LUC (so dong - ten - tac dung)
  *   27  field                           service duoc inject
- *   31  getOpenEvents()                 su kien dang mo hom nay [GET /api/events/open]
+ *   31  getOpenEvents()                 lay open events [GET /api/events/open]
  */
 @RestController
 @RequestMapping("/api/events")

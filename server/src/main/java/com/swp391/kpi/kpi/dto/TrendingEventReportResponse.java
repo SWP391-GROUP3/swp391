@@ -11,7 +11,7 @@ import java.util.List;
  * DTO phan hoi bao cao tong hop su kien xu huong va tang dot bien (UC-65).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  field       ngay moc, cua so thoi gian, so su kien dot bien va danh sach su kien
+ *   20  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

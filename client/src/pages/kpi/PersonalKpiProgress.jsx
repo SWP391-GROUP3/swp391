@@ -13,9 +13,9 @@ import '../../styles/PersonalKpiProgress.css'
  * MO TRANG NAY TAI: /my-kpi
  *
  * MUC LUC (so dong - ten - tac dung)
- *   19  PersonalKpiProgress()           xem tom tat dau file
- *   26    useEffect                     tai du lieu khi mo trang
- *   32    taiKpiCaNhan()                tai kpi ca nhan
+ *   20  PersonalKpiProgress()           xem tom tat dau file
+ *   27    useEffect                     tai du lieu khi mo trang
+ *   33    taiKpiCaNhan()                tai kpi ca nhan
  */
 export default function PersonalKpiProgress({ nguoiDung }) {
   const [nam, setNam] = useState(namHienTai())

@@ -51,32 +51,42 @@ import java.util.Optional;
  * nop bai (UC-05), sua va nop lai (UC-10).
  * Doi articles.status luon goi ArticleService.updateArticleStatus() de ghi kem article_status_logs.
  *
+ * CODE LIEN QUAN (duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   Duoc goi tu: article/controller/ArticleController.java (createDraft, updateDraft, submitArticle, resubmitArticle,
+ *     estimateRoyalty, getCoAuthorCandidates)
+ *   Goi sang trong BF-01: ArticleService (updateArticleStatus, getArticleDetail), ArticleShareValidator (BR-IN-02),
+ *     DuplicationCheckService (checkBeforeSubmit, saveResult), ArticleAttachmentService (checkAndAttachToSubmission)
+ *   Goi sang luong khac: admin/service/SystemParameterService.java (tham so), admin/service/UserReadService.java,
+ *     admin/service/GenreService.java, assessment/service/AssignmentService.java (BTV cu khi nop lai),
+ *     common/service/NotificationService.java, royalty/service/EventService.java (su kien, ty le bao hoa),
+ *     royalty/service/RoyaltyGradingService.java (uoc tinh nhuan but)
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   86  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   99  field                           repository / service duoc inject
+ *   96  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *  109  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *  121  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia (Phong vien dang ACTIVE, tru chinh minh)
- *  136  createDraft()                   UC-03 + UC-04: tao ban nhap moi, nguoi tao la tac gia chinh
- *  188  updateDraft()                   UC-03 + UC-04: sua ban nhap
- *  216  submitArticle()                 UC-05: nop bai DRAFT. Bai da tung phan cong BTV (vd dot xac nhan khi nop lai bi tu choi, bai ve DRAFT) van ti…
- *  231  resubmitArticle()               UC-10: nop lai bai bi tra ve
- *  247  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet truoc khi nop, khong luu gi
+ *  131  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia (Phong vien dang ACTIVE, tru chinh minh)
+ *  146  createDraft()                   UC-03 + UC-04: tao ban nhap moi, nguoi tao la tac gia chinh
+ *  198  updateDraft()                   UC-03 + UC-04: sua ban nhap
+ *  226  submitArticle()                 UC-05: nop bai DRAFT. Bai da tung phan cong BTV (vd dot xac nhan khi nop lai bi tu choi, bai ve DRAFT) van ti…
+ *  241  resubmitArticle()               UC-10: nop lai bai bi tra ve
+ *  257  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet truoc khi nop, khong luu gi
  *  ---- Ham phu (private, chi dung trong file) ----
- *  277  doSubmit()                      Phan chung cua nop / nop lai: kiem du lieu -> kiem trung noi dung (chan neu can) -> chup ban SUBMISSION -> lu…
- *  386  saveAuthors()                   Luu danh sach tac gia: sua tai cho (khong xoa roi them lai cung khoa chinh)
- *  429  copyDeclarations()              Chep khai bao tu request vao bai
- *  443  authorsOrMainOnly()             Khong gui danh sach tac gia -> chi tac gia chinh 100%
- *  454  validateShares()                BR-IN-02 + dong tac gia phai la Phong vien dang ACTIVE (UC-04 buoc 2 "selects a reporter")
- *  479  shareErrorOfRows()              Kiem lai ty le tren cac dong da luu (luc nop)
- *  494  lockSaturation()                Khoa hang + ty le bao hoa luc nop lan dau (BR-IN-03)
- *  507  findOpenEvent()                 B14: su kien phai con mo luc nop (EventService.getOpenEvents: dang bat, hom nay trong khoang ngay)
- *  522  countSaturationRank()           B10 (Quang 01/11): hang bao hoa cua bai luc nop = so bai khac cung su kien da khoa hang, co lan nop (log SUBM…
- *  539  checkCategory()                 The loai phai la the loai dang dung (GenreService cua luong admin)
- *  549  checkMainAuthor()               BR-IN-01: chi tac gia chinh (articles.author_id) duoc sua / nop / nop lai
- *  556  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  562  findUser()                      Tim tai khoan qua UserReadService (luong admin), khong co thi 404
- *  572  readIntParam()                  Tham so so nguyen cua BF-01 trong system_parameters, khong viet cung so trong code
- *  581  shorten()                       notifications.message toi da 500 ky tu (tieu de bai co the dai toi 300)
+ *  287  doSubmit()                      Phan chung cua nop / nop lai: kiem du lieu -> kiem trung noi dung (chan neu can) -> chup ban SUBMISSION -> lu…
+ *  396  saveAuthors()                   Luu danh sach tac gia: sua tai cho (khong xoa roi them lai cung khoa chinh)
+ *  439  copyDeclarations()              Chep khai bao tu request vao bai
+ *  453  authorsOrMainOnly()             Khong gui danh sach tac gia -> chi tac gia chinh 100%
+ *  464  validateShares()                BR-IN-02 + dong tac gia phai la Phong vien dang ACTIVE (UC-04 buoc 2 "selects a reporter")
+ *  489  shareErrorOfRows()              Kiem lai ty le tren cac dong da luu (luc nop)
+ *  504  lockSaturation()                Khoa hang + ty le bao hoa luc nop lan dau (BR-IN-03)
+ *  517  findOpenEvent()                 B14: su kien phai con mo luc nop (EventService.getOpenEvents: dang bat, hom nay trong khoang ngay)
+ *  532  countSaturationRank()           B10 (Quang 01/11): hang bao hoa cua bai luc nop = so bai khac cung su kien da khoa hang, co lan nop (log SUBM…
+ *  549  checkCategory()                 The loai phai la the loai dang dung (GenreService cua luong admin)
+ *  559  checkMainAuthor()               BR-IN-01: chi tac gia chinh (articles.author_id) duoc sua / nop / nop lai
+ *  566  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  572  findUser()                      Tim tai khoan qua UserReadService (luong admin), khong co thi 404
+ *  582  readIntParam()                  Tham so so nguyen cua BF-01 trong system_parameters, khong viet cung so trong code
+ *  591  shorten()                       notifications.message toi da 500 ky tu (tieu de bai co the dai toi 300)
  */
 @Service
 @RequiredArgsConstructor

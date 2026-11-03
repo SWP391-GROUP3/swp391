@@ -3,18 +3,18 @@
  * Gọi qua goiApi(): tự gắn token đăng nhập, tự báo lỗi tiếng Việt (AGENTS.md mục 4).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   21  layDinhMucChuan()               Lay danh sach dinh muc chuan theo ngach phong vien (UC-58) [GET /api/kpi-targets/benchmarks]
- *   28  capNhatDinhMucChuan()           Cap nhat danh sach dinh muc chuan theo ngach phong vien (UC-58) [PUT /api/kpi-targets/benchmarks]
- *   35  layChiTieuTheoThang()           Lay danh sach chi tieu theo nam va thang (UC-59) [GET /api/kpi-targets?year={nam}&month={thang}]
- *   43  taoChiTieu()                    Giao chi tieu thang moi cho phong vien (UC-59) [POST /api/kpi-targets]
- *   50  capNhatChiTieu()                Dieu chinh chi tieu da giao (UC-59 nhanh A2) [PUT /api/kpi-targets/{id}]
- *   57  xoaChiTieu()                    Xoa chi tieu KPI. [DELETE /api/kpi-targets/{id}]
- *   64  layBangKpiBan()                 Lay du lieu bang KPI toan ban theo nam va thang (UC-61) [GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}]
- *   71  tongHopKpiThang()               Kich hoat job tong hop so lieu KPI tu dong cho ky (Automated Aggregat… [POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}]
- *   78  layChiTietKpiPhongVien()        Lay chi tiet KPI cua mot phong vien theo chu ky thang (UC-62, UC-60) [GET /api/kpi-snapshots/reporters/{reporterId}/details?year={nam}&month={thang}]
- *   85  layBaoCaoTheLoai()              Lay bao cao muc do quan tam the loai & chi phi nhuan but (UC-64) [GET /api/kpi-reports/genres?year={nam}&month={thang}]
- *   97  layBaoCaoSuKienXuHuong()        Lay bao cao su kien xu huong va phat hien tang dot bien (UC-65) [GET /api/kpi-reports/trending-events?anchorDate={ngay}]
- *  108  chotKpiThang()                  Chot ky KPI thang va luu snapshot bat bien (UC-66) [POST /api/kpi-snapshots/finalize]
+ *   24  layDinhMucChuan()               Lay danh sach dinh muc chuan theo ngach phong vien (UC-58) [GET /api/kpi-targets/benchmarks]
+ *   31  capNhatDinhMucChuan()           Cap nhat danh sach dinh muc chuan theo ngach phong vien (UC-58) [PUT /api/kpi-targets/benchmarks]
+ *   38  layChiTieuTheoThang()           Lay danh sach chi tieu theo nam va thang (UC-59) [GET /api/kpi-targets?year={nam}&month={thang}]
+ *   46  taoChiTieu()                    Giao chi tieu thang moi cho phong vien (UC-59) [POST /api/kpi-targets]
+ *   53  capNhatChiTieu()                Dieu chinh chi tieu da giao (UC-59 nhanh A2) [PUT /api/kpi-targets/{id}]
+ *   60  xoaChiTieu()                    Xoa chi tieu KPI. [DELETE /api/kpi-targets/{id}]
+ *   67  layBangKpiBan()                 Lay du lieu bang KPI toan ban theo nam va thang (UC-61) [GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}]
+ *   74  tongHopKpiThang()               Kich hoat job tong hop so lieu KPI tu dong cho ky (Automated Aggregat… [POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}]
+ *   81  layChiTietKpiPhongVien()        Lay chi tiet KPI cua mot phong vien theo chu ky thang (UC-62, UC-60) [GET /api/kpi-snapshots/reporters/{reporterId}/details?year={nam}&month={thang}]
+ *   88  layBaoCaoTheLoai()              Lay bao cao muc do quan tam the loai & chi phi nhuan but (UC-64) [GET url]
+ *  102  layBaoCaoSuKienXuHuong()        Lay bao cao su kien xu huong va phat hien tang dot bien (UC-65) [GET url]
+ *  114  chotKpiThang()                  Chot ky KPI thang va luu snapshot bat bien (UC-66) [POST /api/kpi-snapshots/finalize]
  */
 import { goiApi } from './goiApi.js'
 

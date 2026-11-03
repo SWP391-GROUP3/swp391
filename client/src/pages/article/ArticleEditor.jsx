@@ -17,29 +17,44 @@ import '../../styles/ArticleEditor.css'
  * /my-articles/new = bai moi, /my-articles/:id/edit = sua bai DRAFT / REVISION_REQUESTED.
  * Moi luat (5 tac gia, tong 100%, ai duoc sua) kiem o server; man nay chi hien loi server tra ve.
  *
+ * CODE LIEN QUAN (Ctrl+P trong VS Code, dan duong dan de mo file):
+ *   client/src/api/articleApi.js
+ *   server/src/main/java/com/swp391/kpi/article/controller/ArticleController.java
+ *   server/src/main/java/com/swp391/kpi/article/service/ArticleEditorService.java     tao / sua nhap, nop, nop lai (doSubmit), uoc tinh
+ *   server/src/main/java/com/swp391/kpi/article/service/ArticleShareValidator.java    luat tac gia + ty le (BR-IN-02)
+ *   server/src/main/java/com/swp391/kpi/article/service/DuplicationCheckService.java  kiem trung noi dung (UC-06)
+ * DUONG DI KHI MO TRANG / BAM NUT (ham api -> URL -> Controller -> Service):
+ *   Mo trang: getGenres(), getCoAuthorCandidates(), getOpenEvents(), getArticleDetail() (neu dang sua)
+ *   [Luu nhap]: createArticle() / updateArticle() -> POST / PUT /api/articles -> ArticleEditorService.createDraft() / updateDraft()
+ *   [Luu va kiem tra de nop]: luu nhu tren roi checkDuplication() -> POST /api/articles/{id}/duplication-check
+ *       -> DuplicationCheckService.previewCheck() (chi tinh, khong luu)
+ *   [Xac nhan nop]: submitArticle() / resubmitArticle() -> POST /api/articles/{id}/submit | /resubmit
+ *       -> ArticleEditorService.submitArticle() / resubmitArticle() -> doSubmit()
+ *   [Uoc tinh nhuan but]: estimateRoyalty() -> POST /api/articles/royalty-estimate -> ArticleEditorService.estimateRoyalty()
+ *
  * MO TRANG NAY TAI: /my-articles/new, /my-articles/:id/edit
  *
  * MUC LUC (so dong - ten - tac dung)
- *   44  ArticleEditor()                 xem tom tat dau file
- *   72    useEffect                     Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
- *  118    changeField()                 Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat)
- *  125    changeShare()                 Doi ty le cua 1 tac gia
- *  131    addCoAuthor()                 Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap
- *  139    removeCoAuthor()              Bo 1 dong tac gia (UC-04 A1: phai chia lai ty le truoc khi luu)
- *  144    buildPayload()                Du lieu gui server: dung ten field cua ArticleSaveRequest
- *  160    save()                        Luu nhap; alsoCheck = true thi luu xong kiem trung noi dung (UC-05 buoc 2) va hien ket qua, nguoi dung bam "X…
- *  184    confirmSubmit()               UC-05 buoc 3 / UC-10 buoc 3: xac nhan nop (kem giai trinh neu can), server kiem trung lai roi moi nop
- *  196    runEstimate()                 UC-09: uoc tinh nhuan but theo the loai, tinh chat, su kien dang chon (khong luu gi)
+ *   59  ArticleEditor()                 xem tom tat dau file
+ *   87    useEffect                     Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
+ *  133    changeField()                 Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat)
+ *  140    changeShare()                 Doi ty le cua 1 tac gia
+ *  146    addCoAuthor()                 Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap
+ *  154    removeCoAuthor()              Bo 1 dong tac gia (UC-04 A1: phai chia lai ty le truoc khi luu)
+ *  159    buildPayload()                Du lieu gui server: dung ten field cua ArticleSaveRequest
+ *  175    save()                        Luu nhap; alsoCheck = true thi luu xong kiem trung noi dung (UC-05 buoc 2) va hien ket qua, nguoi dung bam "X…
+ *  199    confirmSubmit()               UC-05 buoc 3 / UC-10 buoc 3: xac nhan nop (kem giai trinh neu can), server kiem trung lai roi moi nop
+ *  211    runEstimate()                 UC-09: uoc tinh nhuan but theo the loai, tinh chat, su kien dang chon (khong luu gi)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  221  [< Chi tiet bai / Bai cua toi]  quay ve /my-articles/:id (dang sua) hoac /my-articles (bai moi), khong luu
- *  296  [Uoc tinh nhuan but]            runEstimate() -> POST /api/articles/royalty-estimate (UC-09), chi hien bang uoc tinh, khong luu
- *  337  [Bo] o dong dong tac gia        bo nguoi do khoi danh sach (chua goi server, bam Luu moi luu)
- *  355  [Them]                          them nguoi chon o o 'Them dong tac gia' vao danh sach, ty le 0%
- *  361  [Luu nhap]                      bai moi: POST /api/articles roi chuyen sang /my-articles/:id/edit; bai cu: PUT /api/articles/{id}
- *  364  [Luu va kiem tra de nop] / [nop lai]  luu nhu tren roi POST /api/articles/{id}/duplication-check (UC-05 buoc 2): hien ket qua kiem trung, CHUA nop
- *  383  [De sau]                        dong khung ket qua kiem trung, bai van la Nhap
- *  385  [Xac nhan nop] / [Xac nhan nop lai]  an khi BLOCKED; POST /submit (UC-05) hoac /resubmit (UC-10) kem giai trinh, server kiem trung lai roi moi nop -> mo /my-articles/:id
+ *  236  [< Chi tiet bai / Bai cua toi]  quay ve /my-articles/:id (dang sua) hoac /my-articles (bai moi), khong luu
+ *  311  [Uoc tinh nhuan but]            runEstimate() -> POST /api/articles/royalty-estimate (UC-09), chi hien bang uoc tinh, khong luu
+ *  352  [Bo] o dong dong tac gia        bo nguoi do khoi danh sach (chua goi server, bam Luu moi luu)
+ *  370  [Them]                          them nguoi chon o o 'Them dong tac gia' vao danh sach, ty le 0%
+ *  376  [Luu nhap]                      bai moi: POST /api/articles roi chuyen sang /my-articles/:id/edit; bai cu: PUT /api/articles/{id}
+ *  379  [Luu va kiem tra de nop] / [nop lai]  luu nhu tren roi POST /api/articles/{id}/duplication-check (UC-05 buoc 2): hien ket qua kiem trung, CHUA nop
+ *  398  [De sau]                        dong khung ket qua kiem trung, bai van la Nhap
+ *  400  [Xac nhan nop] / [Xac nhan nop lai]  an khi BLOCKED; POST /submit (UC-05) hoac /resubmit (UC-10) kem giai trinh, server kiem trung lai roi moi nop -> mo /my-articles/:id
  */
 export default function ArticleEditor({ nguoiDung }) {
   const { id } = useParams()            // khong co id = bai moi

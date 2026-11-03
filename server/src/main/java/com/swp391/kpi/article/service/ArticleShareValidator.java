@@ -10,11 +10,14 @@ import java.util.Set;
  * Logic tinh thuan, khong dung Spring/DB (AGENTS.md muc 3.9) -> co unit test rieng.
  * So tac gia toi da truyen vao tu system_parameters (MAX_AUTHORS_PER_ARTICLE), khong viet cung.
  *
+ * CODE LIEN QUAN: duoc goi tu server/src/main/java/com/swp391/kpi/article/service/ArticleEditorService.java;
+ *   test: server/src/test/java/com/swp391/kpi/article/service/ArticleShareValidatorTest.java
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   21  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   23  field                           repository / service duoc inject
- *   26  ArticleShareValidator()         maxAuthors = MAX_AUTHORS_PER_ARTICLE doc tu system_parameters
- *   34  findError()                     userIds.get(i) co ty le shares.get(i), danh sach gom ca tac gia chinh
+ *   24  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   26  field                           repository / service duoc inject
+ *   29  ArticleShareValidator()         maxAuthors = MAX_AUTHORS_PER_ARTICLE doc tu system_parameters
+ *   37  findError()                     userIds.get(i) co ty le shares.get(i), danh sach gom ca tac gia chinh
  */
 public class ArticleShareValidator {
 

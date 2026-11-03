@@ -14,25 +14,25 @@ import {
  * MO TRANG NAY TAI: /kpi-targets
  *
  * MUC LUC (so dong - ten - tac dung)
- *   36  MonthlyTargetSetting()          xem tom tat dau file
- *   54    useEffect                     Tai dinh muc chuan khi mo trang
- *   61    useEffect                     Tai danh sach chi tieu theo thang
- *   65    taiDanhSachChiTieu()          tai danh sach chi tieu
- *   79    moModalThemMoi()              mo modal them moi
- *   89    moModalSua()                  mo modal sua
- *   99    apDungDinhMuc()               ap dung dinh muc
- *  104    xuLyLuuForm()                 xu ly luu form
- *  141    xuLyXoa()                     xu ly xoa
+ *   37  MonthlyTargetSetting()          xem tom tat dau file
+ *   55    useEffect                     Tai dinh muc chuan khi mo trang
+ *   62    useEffect                     Tai danh sach chi tieu theo thang
+ *   66    taiDanhSachChiTieu()          tai danh sach chi tieu
+ *   80    moModalThemMoi()              mo modal them moi
+ *   90    moModalSua()                  mo modal sua
+ *  100    apDungDinhMuc()               ap dung dinh muc
+ *  105    xuLyLuuForm()                 xu ly luu form
+ *  142    xuLyXoa()                     xu ly xoa
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  163  [+ Giao chi tieu moi]           moModalThemMoi() -> tren trang: dong/xoa dang sua id, dong/xoa form reporter id, form min published
- *  201  [Tai lai]                       taiDanhSachChiTieu() -> goi GET /api/kpi-targets?year={nam}&month={thang}
- *  247  [Sua]                           moModalSua() -> tren trang: dang sua id, form reporter id, form min published
- *  254  [Xoa]                           xuLyXoa() -> hoi xac nhan; goi DELETE /api/kpi-targets/{id}, GET /api/kpi-targets?year={nam}&month={thang}
- *  276  [✕]                             tren trang: dong/xoa hien modal
- *  282  form, nut [Dang luu... / Cap nhat / Giao chi t…]  xuLyLuuForm() -> goi PUT /api/kpi-targets/{id}, POST /api/kpi-targets, GET /api/kpi-targets?year={nam}&month={thang}
- *  292  [{dm.levelName} ( {dm.defaultMinPublishe…]  apDungDinhMuc() -> tren trang: form min published, form min avg score
- *  349  [Huy]                           tren trang: dong/xoa hien modal
+ *  164  [+ Giao chi tieu moi]           moModalThemMoi() -> tren trang: dong/xoa dang sua id, dong/xoa form reporter id, form min published
+ *  202  [Tai lai]                       taiDanhSachChiTieu() -> goi GET /api/kpi-targets?year={nam}&month={thang}
+ *  248  [Sua]                           moModalSua() -> tren trang: dang sua id, form reporter id, form min published
+ *  255  [Xoa]                           xuLyXoa() -> hoi xac nhan; goi DELETE /api/kpi-targets/{id}, GET /api/kpi-targets?year={nam}&month={thang}
+ *  277  [✕]                             tren trang: dong/xoa hien modal
+ *  283  form, nut [Dang luu... / Cap nhat / Giao chi t…]  xuLyLuuForm() -> goi PUT /api/kpi-targets/{id}, POST /api/kpi-targets, GET /api/kpi-targets?year={nam}&month={thang}
+ *  293  [{dm.levelName} ( {dm.defaultMinPublishe…]  apDungDinhMuc() -> tren trang: form min published, form min avg score
+ *  350  [Huy]                           tren trang: dong/xoa hien modal
  */
 export default function MonthlyTargetSetting({ nguoiDung }) {
   const [nam, setNam] = useState(namHienTai())

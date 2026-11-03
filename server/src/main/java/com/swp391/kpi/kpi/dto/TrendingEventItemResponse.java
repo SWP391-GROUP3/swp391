@@ -10,7 +10,7 @@ import java.time.LocalDate;
  * DTO bieu dien thong tin phan tich tang dot bien cua 1 su kien (UC-65).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  field       cac truong thong tin su kien, luot xem 7 ngay, baseline 4 tuan, he so dot bien
+ *   19  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 
 /**
  * DTO tra ve thong tin bai viet SUBMITTED cho Truong ban phan cong (UC-18).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   21  field                           cac truong tra ve cho giao dien
  */
 @Getter
 @Setter

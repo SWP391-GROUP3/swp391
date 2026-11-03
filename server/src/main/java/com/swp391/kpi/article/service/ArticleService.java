@@ -45,35 +45,42 @@ import java.util.Map;
  * Nghiep vu bai viet BF-01. Moi lan doi articles.status deu di qua changeStatus()
  * de ghi kem 1 dong article_status_logs (AGENTS.md muc 2).
  *
+ * CODE LIEN QUAN (duong dan tinh tu server/src/main/java/com/swp391/kpi/):
+ *   Duoc goi tu: article/controller/ArticleController.java; ArticleViewService, ArticleEditorService,
+ *     ArticleConfirmationService (cung thu muc);
+ *     luong khac doi trang thai bai qua updateArticleStatus(): assessment/service/AssignmentService.java,
+ *     assessment/service/ScoringAttemptService.java, assessment/service/ScoreApprovalService.java
+ *   Goi sang: admin/service/UserReadService.java (ten nguoi), admin/service/GenreService.java (ten the loai)
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   83  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   90  field                           repository / service duoc inject
+ *   90  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   97  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *  104  getMyArticles()                 UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau
- *  151  getArticleDetail()              UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai
- *  168  buildArticleDetail()            UC-02 cho nguoi xem khong phai tac gia (BTV duoc giao, Truong ban): dung chi tiet bai, KHONG kiem quyen
- *  177  withdrawArticle()               UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAFT (BR-IN-08)
- *  206  publishArticle()                Cho BF-02 (UC-33 duyet dang): bai SCORE_PUBLISHED -> PUBLISHED
- *  221  getMyStatusCounts()             Trang chu Phong vien: so bai cua nguoi dung o tung trang thai
- *  242  getMyRevisionRequests()         Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can sua, kem ghi chu cua lan tra ve gan nh…
- *  262  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi (UC-12), sap het han xep truoc
- *  286  isAuthorOrCoAuthor()            Cho BF-02 (Duong, 02/11): nguoi dung la tac gia chinh hoac dong tac gia cua bai thi tra true
- *  312  getVersionForRead()             1 ban luu cua bai (article_versions), dung de cham mu / cham lai dung ban da nop
- *  323  getPublishedByAuthor()          Bai da cong bo diem hoac da dang cua 1 tac gia chinh
- *  334  getArticleForRead()             Thong tin ngan cua 1 bai (tac gia, ban, tieu de, trang thai); khong co bai -> 404
- *  340  getAuthors()                    Moi tac gia cua bai kem ty le nhuan but, ty le cao truoc
- *  350  getAuthorShares()               Ty le nhuan but cua 1 nguoi trong nhieu bai (bai nguoi do khong co ten thi khong co dong)
- *  359  existsArticle()                 kiem tra ton tai article
- *  368  changeCategory()                M-A4: BF-02 doi the loai ap dung cua bai (UC-23)
- *  380  updateArticleStatus()           Ham dung chung cho cac luong khac (BF-02, BF-03, BF-04) doi trang thai bai viet va tu dong ghi 1 dong lich su…
+ *  111  getMyArticles()                 UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau
+ *  158  getArticleDetail()              UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai
+ *  175  buildArticleDetail()            UC-02 cho nguoi xem khong phai tac gia (BTV duoc giao, Truong ban): dung chi tiet bai, KHONG kiem quyen
+ *  184  withdrawArticle()               UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAFT (BR-IN-08)
+ *  213  publishArticle()                Cho BF-02 (UC-33 duyet dang): bai SCORE_PUBLISHED -> PUBLISHED
+ *  228  getMyStatusCounts()             Trang chu Phong vien: so bai cua nguoi dung o tung trang thai
+ *  249  getMyRevisionRequests()         Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can sua, kem ghi chu cua lan tra ve gan nh…
+ *  269  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi (UC-12), sap het han xep truoc
+ *  293  isAuthorOrCoAuthor()            Cho BF-02 (Duong, 02/11): nguoi dung la tac gia chinh hoac dong tac gia cua bai thi tra true
+ *  319  getVersionForRead()             1 ban luu cua bai (article_versions), dung de cham mu / cham lai dung ban da nop
+ *  330  getPublishedByAuthor()          Bai da cong bo diem hoac da dang cua 1 tac gia chinh
+ *  341  getArticleForRead()             Thong tin ngan cua 1 bai (tac gia, ban, tieu de, trang thai); khong co bai -> 404
+ *  347  getAuthors()                    Moi tac gia cua bai kem ty le nhuan but, ty le cao truoc
+ *  357  getAuthorShares()               Ty le nhuan but cua 1 nguoi trong nhieu bai (bai nguoi do khong co ten thi khong co dong)
+ *  366  existsArticle()                 kiem tra ton tai article
+ *  375  changeCategory()                M-A4: BF-02 doi the loai ap dung cua bai (UC-23)
+ *  387  updateArticleStatus()           Ham dung chung cho cac luong khac (BF-02, BF-03, BF-04) doi trang thai bai viet va tu dong ghi 1 dong lich su…
  *  ---- Ham phu (private, chi dung trong file) ----
- *  294  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  300  isAuthor()                      Tac gia chinh (articles.author_id) hoac co dong trong article_authors
- *  385  changeStatus()                  doi status
- *  404  toReadResponse()                Bai -> DTO doc ngan cho luong khac (M-D2)
- *  410  toDetailResponse()              Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
- *  455  loadGenreNames()                Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
- *  464  loadUserNames()                 Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien
+ *  301  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  307  isAuthor()                      Tac gia chinh (articles.author_id) hoac co dong trong article_authors
+ *  392  changeStatus()                  doi status
+ *  411  toReadResponse()                Bai -> DTO doc ngan cho luong khac (M-D2)
+ *  417  toDetailResponse()              Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
+ *  462  loadGenreNames()                Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
+ *  471  loadUserNames()                 Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien
  */
 @Service
 @RequiredArgsConstructor

@@ -13,10 +13,11 @@ import java.util.Optional;
  * Repository thao tac voi bang reader_interactions (BF-05).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   23  findByArticleId()               tim theo article id
- *   25  findByArticleIdIn()             tim theo article id trong
- *   27  findByArticleIdAndRecordDate()  tim theo article id va record date
- *   30  sumPageViewsByArticleIds()      sum page views theo article ids
+ *   24  findByArticleId()               tim theo article id
+ *   26  findByArticleIdIn()             tim theo article id trong
+ *   28  findByArticleIdAndRecordDate()  tim theo article id va record date
+ *   31  sumPageViewsByArticleIds()      sum page views theo article ids
+ *   34  findMaxRecordDate()             tim max record date
  */
 public interface ReaderInteractionRepository extends JpaRepository<ReaderInteraction, Integer> {
 

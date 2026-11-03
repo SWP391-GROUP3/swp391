@@ -6,9 +6,14 @@ import './ArticleDuplicationResult.css'
  *  - ArticleDetail: ket qua da luu luc nop gan nhat, kem giai trinh.
  * B7: chi hien tieu de bai bi trung, % va cac doan trung (chu cua bai nay), khong hien bai cua nguoi khac.
  *
+ * CODE LIEN QUAN (Ctrl+P trong VS Code, dan duong dan de mo file):
+ *   server/src/main/java/com/swp391/kpi/article/service/DuplicationCheckService.java       tinh / luu ket qua (previewCheck, saveResult, getLatestCheck)
+ *   server/src/main/java/com/swp391/kpi/article/service/DuplicationShingleCalculator.java  tach cum am tiet, tinh %, gom doan trung
+ *   Khong goi API: nhan ket qua qua prop tu ArticleEditor.jsx / ArticleDetail.jsx
+ *
  * MUC LUC (so dong - ten - tac dung)
- *   15  KET_QUA                         Chu + mau cua 3 ket qua (gia tri cot duplication_checks.result)
- *   21  ArticleDuplicationResult()      article duplication result
+ *   20  KET_QUA                         Chu + mau cua 3 ket qua (gia tri cot duplication_checks.result)
+ *   26  ArticleDuplicationResult()      article duplication result
  */
 
 // Chu + mau cua 3 ket qua (gia tri cot duplication_checks.result)

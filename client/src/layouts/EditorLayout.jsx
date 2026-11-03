@@ -12,7 +12,7 @@ import AppLayout from './AppLayout.jsx'
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
  *   21  menu [Bai duoc giao]            mo trang /assigned-articles (EditorTaskQueue)
  *   23  menu [Cham lai & cham cheo]     mo trang /re-reviews (BlindReviewQueuePage)
- *   25  menu [Lich su cham]             mo trang /my-scorings (ComingSoon - chua lam "Lich su cham")
+ *   25  menu [Lich su cham]             mo trang /my-scorings (MyScorings)
  */
 const MENU_BIEN_TAP_VIEN = [
   {

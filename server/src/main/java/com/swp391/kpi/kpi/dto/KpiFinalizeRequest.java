@@ -12,7 +12,7 @@ import java.util.Map;
  * DTO yeu cau chot ky KPI thang va luu snapshot bat bien (UC-66, BR-KPI-06).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   18  field       nam, thang va danh sach nhan xet danh gia cho tung phong vien
+ *   24  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

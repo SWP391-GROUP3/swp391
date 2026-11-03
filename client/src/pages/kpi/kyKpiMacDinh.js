@@ -3,10 +3,10 @@
  * thay cho so cung 9/2026 truoc day. Chi cac trang trong pages/kpi dung.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   12  NAM_BAT_DAU                     nam dau tien co du lieu KPI (o chon nam bat dau tu day)
- *   15  namHienTai()                    nam hien tai
- *   20  thangHienTai()                  thang hien tai (1-12)
- *   25  danhSachNam()                   cac nam cho o chon: tu NAM_BAT_DAU toi nam sau
+ *   11  NAM_BAT_DAU                     xem tom tat dau file
+ *   14  namHienTai()                    Nam hien tai theo gio may
+ *   19  thangHienTai()                  Thang hien tai (1-12): getMonth() dem tu 0 nen phai cong 1
+ *   24  danhSachNam()                   Cac nam cho o chon nam: tu NAM_BAT_DAU toi nam sau (de dat chi tieu truoc)
  */
 const NAM_BAT_DAU = 2025
 
