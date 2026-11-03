@@ -48,14 +48,16 @@ import MediaFactors from '../pages/royalty/MediaFactors.jsx'
 import RoyaltyPayments from '../pages/royalty/RoyaltyPayments.jsx'
 import MyRoyalties from '../pages/royalty/MyRoyalties.jsx'
 import ReaderDataImport from '../pages/admin/ReaderDataImport.jsx'
+import SystemParameters from '../pages/admin/SystemParameters.jsx'
+import GenreList from '../pages/admin/GenreList.jsx'
+import UserList from '../pages/admin/UserList.jsx'
 import CriteriaManagement from '../pages/flow2/CriteriaManagement.jsx'
 import AssignmentQueue from '../pages/flow2/AssignmentQueue.jsx'
 import EditorTaskQueue from '../pages/flow2/EditorTaskQueue.jsx'
+import MyScorings from '../pages/flow2/MyScorings.jsx'
 import ScoringSheet from '../pages/flow2/ScoringSheet.jsx'
 import ScoreApprovalQueue from '../pages/flow2/ScoreApprovalQueue.jsx'
 import PublishingQueue from '../pages/flow2/PublishingQueue.jsx'
-import Flow2Dashboard from '../pages/flow2/Flow2Dashboard.jsx'
-import ScoreCalculatorTester from '../pages/flow2/ScoreCalculatorTester.jsx'
 import UserProfile from '../pages/profile/UserProfile.jsx'
 
 /*
@@ -66,35 +68,20 @@ import UserProfile from '../pages/profile/UserProfile.jsx'
 // Phong vien: UC-57 Nhuan but da lam (Quang, 02/11/2026) -> mang rong
 const TRANG_PV_CHUA_LAM = []
 
-const TRANG_BTV_CHUA_LAM = [
-  { path: '/assigned-articles/:id', ten: 'Chấm bài' },               // UC-22…28
-  { path: '/my-scorings',           ten: 'Lịch sử chấm' },           // UC-21
-  { path: '/re-reviews', ten: 'Chấm lại & chấm chéo' },   // UC-36, UC-37
-  { path: '/re-reviews/:id', ten: 'Phiếu chấm lại' },         // UC-36, UC-37
-  { path: '/my-scorings', ten: 'Lịch sử chấm' },           // UC-21
-]
+// BTV: M-A7 da co trang Lich su cham -> mang rong
+const TRANG_BTV_CHUA_LAM = []
 
 // Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
 const TRANG_TK_CHUA_LAM = []
 
-const TRANG_TB_CHUA_LAM = [
-  { path: '/reviewers/:id',         ten: 'Hồ sơ biên tập viên' },     // UC-42
-  { path: '/audit-logs',            ten: 'Nhật ký chấm' },            // UC-45
-  { path: '/kpi-board',             ten: 'Bảng KPI của ban' },        // UC-61, 66
-  { path: '/cross-reviews',         ten: 'Đợt chấm chéo' },           // UC-40
-  { path: '/kpi-board/:reporterId', ten: 'KPI phóng viên' },          // UC-62
-]
+// Truong ban: moi trang trong menu da co trang that (M-D1, 03/11) -> mang rong
+const TRANG_TB_CHUA_LAM = []
 
 // Ke toan: UC-54 Chi tra nhuan but da lam (Quang, 02/11/2026) -> mang rong
 const TRANG_KT_CHUA_LAM = []
 
-const TRANG_ADMIN_CHUA_LAM = [
-  { path: '/users', ten: 'Tài khoản' },
-  { path: '/genres', ten: 'Thể loại' },
-  { path: '/system-parameters', ten: 'Tham số hệ thống' },        // UC-13
-  { path: '/criteria-sets', ten: 'Bộ tiêu chí' },             // UC-14, 15
-  { path: '/criteria-sets/:id', ten: 'Chi tiết bộ tiêu chí' },    // UC-16, 17
-]
+// Admin: tai khoan, the loai, tham so (UC-13) da lam (Minh, 03/11) -> mang rong
+const TRANG_ADMIN_CHUA_LAM = []
 
 /**
  * Moi vai tro co khung trang (menu) rieng, khai bao o day:
@@ -117,75 +104,79 @@ const KHUNG_THEO_VAI_TRO = {
  * cua minh. Bam vao duong dan cua vai tro khac -> khong co route -> ve trang chu.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   61  TRANG_PV_CHUA_LAM               Trang CHUA LAM cua tung vai tro: menu va nut tren trang chu tro toi day, tam hien ComingSoon
- *   66  TRANG_BTV_CHUA_LAM              hang so
+ *   69  TRANG_PV_CHUA_LAM               Phong vien: UC-57 Nhuan but da lam (Quang, 02/11/2026) -> mang rong
+ *   72  TRANG_BTV_CHUA_LAM              BTV: M-A7 da co trang Lich su cham -> mang rong
  *   75  TRANG_TK_CHUA_LAM               Thu ky: Iter 2 da lam het (UC-46, 47, 48, 50) -> mang rong
- *   77  TRANG_TB_CHUA_LAM               hang so
- *   86  TRANG_KT_CHUA_LAM               hang so
- *   90  TRANG_ADMIN_CHUA_LAM            hang so
- *  102  KHUNG_THEO_VAI_TRO              Moi vai tro co khung trang (menu) rieng, khai bao o day: Layout = khung + menu, TrangChu = trang hien o /main…
- *  189  AppRoutes()                     xem tom tat dau file
+ *   78  TRANG_TB_CHUA_LAM               Truong ban: moi trang trong menu da co trang that (M-D1, 03/11) -> mang rong
+ *   81  TRANG_KT_CHUA_LAM               Ke toan: UC-54 Chi tra nhuan but da lam (Quang, 02/11/2026) -> mang rong
+ *   84  TRANG_ADMIN_CHUA_LAM            Admin: tai khoan, the loai, tham so (UC-13) da lam (Minh, 03/11) -> mang rong
+ *   90  KHUNG_THEO_VAI_TRO              Moi vai tro co khung trang (menu) rieng, khai bao o day: Layout = khung + menu, TrangChu = trang hien o /main…
+ *  181  AppRoutes()                     xem tom tat dau file
  *
  * DUONG DAN -> TRANG (so dong - path - component)
- *  199  /                               chuyen tiep -> /main
- *  202  /login                          chuyen tiep -> /main hoac Login (tuy da dang nhap chua)
- *  225  /main                           TrangChu
- *  226  /calculator                     ScoreCalculatorTester
- *  227  /flow2                          Flow2Dashboard
- *  230  /profile                        UserProfile
- *  233  /my-appeals                     MyAppealsPage
- *  234  /my-appeals/new                 AppealCreatePage
- *  236  /my-articles                    MyArticles
- *  237  /my-articles/:id                ArticleDetail
- *  239  /my-articles/new                ArticleEditor
- *  240  /my-articles/:id/edit           ArticleEditor
- *  242  /co-author-invites              CoAuthorInvites
- *  244  /my-kpi                         PersonalKpiProgress
- *  250  /assigned-articles              EditorTaskQueue
- *  251  /re-reviews                     BlindReviewQueuePage
- *  252  /re-reviews/:id                 BlindReviewPage
- *  253  /cross-review-tasks/:id         BlindReviewPage
- *  254  /assigned-articles/:articleId   ScoringSheet
- *  255  /flow2-dashboard                Flow2Dashboard
- *  261  /assignments                    AssignmentQueue
- *  263  /score-approvals                ScoreApprovalQueue
- *  264  /score-approvals/:id            ScoreApprovalQueue
- *  265  /publishing                     PublishingQueue
- *  267  /appeals                        AppealManagementPage
- *  268  /appeals/:id                    AppealDetailPage
- *  269  /appeals/:id/comparison         AppealComparisonPage
- *  270  /cross-reviews                  CrossReviewBatchPage
- *  271  /cross-reviews/:id              CrossReviewBatchDetailPage
- *  273  /flow2-dashboard                Flow2Dashboard
- *  275  /kpi-board                      DepartmentKpiDashboard
- *  276  /kpi-board/:reporterId          ReporterKpiDetails
- *  277  /kpi-targets                    MonthlyTargetSetting
- *  278  /kpi-benchmarks                 KpiBenchmarksConfig
- *  284  /royalty-grading                RoyaltyPendingList
- *  285  /royalty-grading/:articleId     RoyaltyGrading
- *  286  /royalty-periods                RoyaltyPeriods
- *  287  /royalty-periods/:id            RoyaltyPeriodDetail
- *  294  /royalty-periods                RoyaltyPeriods
- *  295  /royalty-periods/:id            RoyaltyPeriodDetail
- *  296  /royalty-rates                  RoyaltyRates
+ *  191  /                               chuyen tiep -> /main
+ *  194  /login                          chuyen tiep -> /main hoac Login (tuy da dang nhap chua)
+ *  217  /main                           TrangChu
+ *  220  /profile                        UserProfile
+ *  223  /my-appeals                     MyAppealsPage
+ *  224  /my-appeals/new                 AppealCreatePage
+ *  226  /my-articles                    MyArticles
+ *  227  /my-articles/:id                ArticleDetail
+ *  229  /my-articles/new                ArticleEditor
+ *  230  /my-articles/:id/edit           ArticleEditor
+ *  232  /co-author-invites              CoAuthorInvites
+ *  234  /my-kpi                         PersonalKpiProgress
+ *  236  /my-royalties                   MyRoyalties
+ *  242  /assigned-articles              EditorTaskQueue
+ *  243  /my-scorings                    MyScorings
+ *  244  /re-reviews                     BlindReviewQueuePage
+ *  245  /re-reviews/:id                 BlindReviewPage
+ *  246  /cross-review-tasks/:id         BlindReviewPage
+ *  247  /assigned-articles/:articleId   ScoringSheet
+ *  249  /articles/:id                   ArticleDetail
+ *  255  /assignments                    AssignmentQueue
+ *  257  /score-approvals                ScoreApprovalQueue
+ *  258  /score-approvals/:id            ScoreApprovalQueue
+ *  259  /publishing                     PublishingQueue
+ *  261  /appeals                        AppealManagementPage
+ *  262  /appeals/:id                    AppealDetailPage
+ *  263  /appeals/:id/comparison         AppealComparisonPage
+ *  264  /cross-reviews                  CrossReviewBatchPage
+ *  265  /cross-reviews/:id              CrossReviewBatchDetailPage
+ *  268  /articles/:id                   ArticleDetail
+ *  270  /kpi-board                      DepartmentKpiDashboard
+ *  271  /kpi-board/:reporterId          ReporterKpiDetails
+ *  272  /kpi-targets                    MonthlyTargetSetting
+ *  273  /kpi-benchmarks                 KpiBenchmarksConfig
+ *  274  /kpi-reports                    GenrePopularityReport
+ *  275  /kpi-trending                   TrendingEventsReport
+ *  276  /kpi-finalization               MonthlyKpiFinalization
+ *  282  /royalty-grading                RoyaltyPendingList
+ *  283  /royalty-grading/:articleId     RoyaltyGrading
+ *  284  /royalty-periods                RoyaltyPeriods
+ *  285  /royalty-periods/:id            RoyaltyPeriodDetail
+ *  292  /royalty-periods                RoyaltyPeriods
+ *  293  /royalty-periods/:id            RoyaltyPeriodDetail
+ *  294  /royalty-rates                  RoyaltyRates
+ *  296  /royalty-payments               RoyaltyPayments
  *  302  /criteria-sets                  CriteriaManagement
- *  303  /criteria-sets/:id              CriteriaManagement
- *  304  /flow2-dashboard                Flow2Dashboard
- *  306  /appeal-rules                   AppealRuleConfigPage
- *  307  /kpi-benchmarks                 KpiBenchmarksConfig
- *  308  /media-factors                  MediaFactors
- *  309  /reader-imports                 ReaderDataImport
- *  315  /reviewers                      ReviewerDeviationPage
- *  316  /reviewers/:id                  ReviewerProfilePage
- *  317  /reviewer-deviations            ReviewerDeviationPage
- *  318  /audit-logs                     AuditLogPage
- *  336  /main                           RequireRole
- *  346  *                               chuyen tiep -> /
+ *  304  /appeal-rules                   AppealRuleConfigPage
+ *  305  /kpi-benchmarks                 KpiBenchmarksConfig
+ *  306  /media-factors                  MediaFactors
+ *  307  /reader-imports                 ReaderDataImport
+ *  309  /system-parameters              SystemParameters
+ *  310  /genres                         GenreList
+ *  311  /users                          UserList
+ *  317  /reviewers                      ReviewerDeviationPage
+ *  318  /reviewers/:id                  ReviewerProfilePage
+ *  319  /audit-logs                     AuditLogPage
+ *  337  /main                           RequireRole
+ *  347  *                               chuyen tiep -> /
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  199  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
- *  206  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
- *  346  tu chuyen trang (Navigate)      chuyen sang / (Navigate)
+ *  191  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
+ *  198  tu chuyen trang (Navigate)      chuyen sang /main (trang chu theo vai tro)
+ *  347  tu chuyen trang (Navigate)      chuyen sang / (Navigate)
  */
 export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhatNguoiDung }) {
   // Moi user chi co 1 vai tro (users.role_id)
@@ -224,8 +215,6 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
         >
           {/* ---- Trang da lam ---- */}
           <Route path="/main" element={<TrangChu nguoiDung={nguoiDung} />} />
-          <Route path="/calculator" element={<ScoreCalculatorTester />} />
-          <Route path="/flow2" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
 
           {/* Ho so ca nhan: moi vai tro deu co, mo tu menu avatar o thanh tren */}
           <Route path="/profile" element={<UserProfile onCapNhatNguoiDung={onCapNhatNguoiDung} />} />
@@ -251,11 +240,13 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
             <>
               {/* BF-02 (Duong): UC-21 Bài được giao & UC-22..28 Chấm điểm */}
               <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
+              <Route path="/my-scorings" element={<MyScorings />} />
               <Route path="/re-reviews" element={<BlindReviewQueuePage />} />
               <Route path="/re-reviews/:id" element={<BlindReviewPage />} /> {/* [LUONG 3 - CHAM MU] buoc 1/7 route: /re-reviews/:id -> BlindReviewPage */}
               <Route path="/cross-review-tasks/:id" element={<BlindReviewPage cheo />} />
               <Route path="/assigned-articles/:articleId" element={<ScoringSheet nguoiDung={nguoiDung} />} />
-              <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
+              {/* BF-01 (Minh) Iter 3: UC-02 BTV duoc giao xem chi tiet bai (chi xem) */}
+              <Route path="/articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
             </>
           )}
           {vaiTro === 'HEAD_OF_DEPARTMENT' && (
@@ -273,7 +264,8 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/cross-reviews" element={<CrossReviewBatchPage />} />
               <Route path="/cross-reviews/:id" element={<CrossReviewBatchDetailPage />} />
 
-              <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
+              {/* BF-01 (Minh) Iter 3: UC-02 Truong ban xem chi tiet bai cung ban (chi xem) */}
+              <Route path="/articles/:id" element={<ArticleDetail nguoiDung={nguoiDung} />} />
               {/* BF-05 (Khang) */}
               <Route path="/kpi-board" element={<DepartmentKpiDashboard nguoiDung={nguoiDung} />} />
               <Route path="/kpi-board/:reporterId" element={<ReporterKpiDetails nguoiDung={nguoiDung} />} />
@@ -308,13 +300,15 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
             <>
               {/* BF-02 (Duong): UC-14…17 Bộ tiêu chí chấm điểm */}
               <Route path="/criteria-sets" element={<CriteriaManagement nguoiDung={nguoiDung} />} />
-              <Route path="/criteria-sets/:id" element={<CriteriaManagement nguoiDung={nguoiDung} />} />
-              <Route path="/flow2-dashboard" element={<Flow2Dashboard nguoiDung={nguoiDung} />} />
               {/* BF-03 (Vu), BF-05 (Khang), BF-04 (Quang): UC-56 he so anh/video */}
               <Route path="/appeal-rules" element={<AppealRuleConfigPage />} />
               <Route path="/kpi-benchmarks" element={<KpiBenchmarksConfig />} />
               <Route path="/media-factors" element={<MediaFactors />} />
               <Route path="/reader-imports" element={<ReaderDataImport />} />
+              {/* admin (Minh): UC-13 tham so nhap bai, danh sach the loai, danh sach tai khoan (M-A7) */}
+              <Route path="/system-parameters" element={<SystemParameters />} />
+              <Route path="/genres" element={<GenreList />} />
+              <Route path="/users" element={<UserList />} />
             </>
           )}
 
@@ -322,7 +316,6 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
             <>
               <Route path="/reviewers" element={<ReviewerDeviationPage />} />
               <Route path="/reviewers/:id" element={<ReviewerProfilePage />} />
-              <Route path="/reviewer-deviations" element={<ReviewerDeviationPage />} />
               <Route path="/audit-logs" element={<AuditLogPage />} />
             </>
           )}

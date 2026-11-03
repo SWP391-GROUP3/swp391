@@ -7,20 +7,29 @@ import { goiApi } from './goiApi.js'
  * ApiResponse, loi thi nem Error kem message tieng Viet server tra ve.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   30  getMyArticles()                 UC-01: bai cua toi, sua gan nhat len dau [GET /api/articles?{params}]
- *   39  getArticleDetail()              UC-02: chi tiet 1 bai (noi dung, tac gia, lich su trang thai) [GET /api/articles/{articleId}]
- *   44  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{articleId}/withdraw]
- *   53  getMyStatusCounts()             3 ham cho trang chu Phong vien (gop y nhom truong muc C4), dang du li… [GET /api/articles/status-counts]
- *   58  getMyRevisionRequests()         Trang chu PV: bai bi tra ve can sua, kem ghi chu lan tra gan nhat [GET /api/articles/revision-requests]
- *   63  getMyCoAuthorInvites()          Trang chu PV + trang UC-12: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
- *   70  getGenres()                     UC-03: danh sach the loai dang dung (API dung chung cua admin - GET /… [GET /api/genres]
- *   75  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia [GET /api/articles/co-author-candidates]
- *   83  createArticle()                 UC-03 + UC-04: tao ban nhap [POST /api/articles]
- *   88  updateArticle()                 UC-03 + UC-04: sua ban nhap (cung dang du lieu voi createArticle) [PUT /api/articles/{articleId}]
- *   93  submitArticle()                 UC-05: nop bai Nhap [POST /api/articles/{articleId}/submit]
- *   98  resubmitArticle()               UC-10: nop lai bai bi tra ve [POST /api/articles/{articleId}/resubmit]
- *  103  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{articleId}/co-author/accept]
- *  108  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{articleId}/co-author/reject]
+ *   39  getMyArticles()                 UC-01: bai cua toi, sua gan nhat len dau [GET /api/articles?{params}]
+ *   48  getArticleDetail()              UC-02: chi tiet 1 bai (noi dung, tac gia, lich su trang thai) [GET /api/articles/{articleId}]
+ *   53  withdrawArticle()               UC-11: rut bai da nop ve Nhap [POST /api/articles/{articleId}/withdraw]
+ *   62  getMyStatusCounts()             3 ham cho trang chu Phong vien (gop y nhom truong muc C4), dang du li… [GET /api/articles/status-counts]
+ *   67  getMyRevisionRequests()         Trang chu PV: bai bi tra ve can sua, kem ghi chu lan tra gan nhat [GET /api/articles/revision-requests]
+ *   72  getMyCoAuthorInvites()          Trang chu PV + trang UC-12: loi moi dong tac gia dang cho minh tra loi [GET /api/articles/co-author-invites]
+ *   79  getGenres()                     UC-03: danh sach the loai dang dung (API dung chung cua admin - GET /… [GET /api/genres]
+ *   84  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia [GET /api/articles/co-author-candidates]
+ *   92  createArticle()                 UC-03 + UC-04: tao ban nhap [POST /api/articles]
+ *   97  updateArticle()                 UC-03 + UC-04: sua ban nhap (cung dang du lieu voi createArticle) [PUT /api/articles/{articleId}]
+ *  102  submitArticle()                 UC-05: nop bai Nhap. duLieu = { explanation } khi noi dung trung can … [POST /api/articles/{articleId}/submit]
+ *  107  resubmitArticle()               UC-10: nop lai bai bi tra ve (duLieu giong submitArticle) [POST /api/articles/{articleId}/resubmit]
+ *  112  acceptCoAuthorship()            UC-12: dong tac gia dong y [POST /api/articles/{articleId}/co-author/accept]
+ *  117  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi, bat buoc ly do [POST /api/articles/{articleId}/co-author/reject]
+ *  124  getOpenEvents()                 UC-03: su kien dang mo de chon (API cua BF-04 - GET /api/events/open) [GET /api/events/open]
+ *  132  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet o 3 muc diem, khong luu gi [POST /api/articles/royalty-estimate]
+ *  137  getMediaFactors()               UC-03: loai anh/video va he so (API dung chung cua admin - GET /api/m… [GET /api/media-factors]
+ *  142  getAttachments()                UC-03 / UC-07: anh/video cua bai kem ket qua kiem trung [GET /api/articles/{articleId}/attachments]
+ *  150  addAttachment()                 UC-03 / UC-04 buoc 4: them 1 anh hoac 1 video [POST /api/articles/{articleId}/attachments]
+ *  155  deleteAttachment()              Xoa 1 anh/video khi bai con sua duoc [DELETE /api/articles/{articleId}/attachments/{attachmentId}]
+ *  160  getAttachmentFile()             Q7: file anh dang Blob (kem token) de hien bang URL.createObjectURL [GET /api/articles/{articleId}/attachments/{attachmentId}/file]
+ *  165  checkDuplication()              UC-05 buoc 2 (B5): kiem trung noi dung truoc khi xac nhan nop, server… [POST /api/articles/{articleId}/duplication-check]
+ *  170  getDuplicationCheck()           UC-06 / UC-08: ket qua kiem trung luc nop gan nhat (kem giai trinh); … [GET /api/articles/{articleId}/duplication-check]
  */
 
 /**
@@ -89,14 +98,14 @@ export function updateArticle(articleId, duLieu) {
   return goiApi(`/api/articles/${articleId}`, { method: 'PUT', body: duLieu })
 }
 
-// UC-05: nop bai Nhap
-export function submitArticle(articleId) {
-  return goiApi(`/api/articles/${articleId}/submit`, { method: 'POST' })
+// UC-05: nop bai Nhap. duLieu = { explanation } khi noi dung trung can giai trinh (UC-08), co the bo trong
+export function submitArticle(articleId, duLieu = {}) {
+  return goiApi(`/api/articles/${articleId}/submit`, { method: 'POST', body: duLieu })
 }
 
-// UC-10: nop lai bai bi tra ve
-export function resubmitArticle(articleId) {
-  return goiApi(`/api/articles/${articleId}/resubmit`, { method: 'POST' })
+// UC-10: nop lai bai bi tra ve (duLieu giong submitArticle)
+export function resubmitArticle(articleId, duLieu = {}) {
+  return goiApi(`/api/articles/${articleId}/resubmit`, { method: 'POST', body: duLieu })
 }
 
 // UC-12: dong tac gia dong y
@@ -107,4 +116,57 @@ export function acceptCoAuthorship(articleId) {
 // UC-12 A1: dong tac gia tu choi, bat buoc ly do
 export function rejectCoAuthorship(articleId, reason) {
   return goiApi(`/api/articles/${articleId}/co-author/reject`, { method: 'POST', body: { reason } })
+}
+
+// ---------------------------------------------------------------- Iter 3
+
+// UC-03: su kien dang mo de chon (API cua BF-04 - GET /api/events/open)
+export function getOpenEvents() {
+  return goiApi('/api/events/open')
+}
+
+/**
+ * UC-09: uoc tinh nhuan but phan bai viet o 3 muc diem, khong luu gi.
+ * duLieu = { declaredCategoryId, declaredNature, eventId, articleId } (eventId, articleId co the null).
+ */
+export function estimateRoyalty(duLieu) {
+  return goiApi('/api/articles/royalty-estimate', { method: 'POST', body: duLieu })
+}
+
+// UC-03: loai anh/video va he so (API dung chung cua admin - GET /api/media-factors)
+export function getMediaFactors() {
+  return goiApi('/api/media-factors')
+}
+
+// UC-03 / UC-07: anh/video cua bai kem ket qua kiem trung
+export function getAttachments(articleId) {
+  return goiApi(`/api/articles/${articleId}/attachments`)
+}
+
+/**
+ * UC-03 / UC-04 buoc 4: them 1 anh hoac 1 video. formData gom: file (anh) hoac videoUrl (link),
+ * mediaKind, authorId, externalSource, caption. Gui FormData thi goiApi tu de trinh duyet dat Content-Type.
+ */
+export function addAttachment(articleId, formData) {
+  return goiApi(`/api/articles/${articleId}/attachments`, { method: 'POST', body: formData })
+}
+
+// Xoa 1 anh/video khi bai con sua duoc
+export function deleteAttachment(articleId, attachmentId) {
+  return goiApi(`/api/articles/${articleId}/attachments/${attachmentId}`, { method: 'DELETE' })
+}
+
+// Q7: file anh dang Blob (kem token) de hien bang URL.createObjectURL
+export function getAttachmentFile(articleId, attachmentId) {
+  return goiApi(`/api/articles/${articleId}/attachments/${attachmentId}/file`, { taiFile: true })
+}
+
+// UC-05 buoc 2 (B5): kiem trung noi dung truoc khi xac nhan nop, server chi tinh, khong luu
+export function checkDuplication(articleId) {
+  return goiApi(`/api/articles/${articleId}/duplication-check`, { method: 'POST' })
+}
+
+// UC-06 / UC-08: ket qua kiem trung luc nop gan nhat (kem giai trinh); chua nop lan nao -> null
+export function getDuplicationCheck(articleId) {
+  return goiApi(`/api/articles/${articleId}/duplication-check`)
 }

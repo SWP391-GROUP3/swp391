@@ -13,19 +13,19 @@ import '../../styles/Flow2.css'
  *
  * MUC LUC (so dong - ten - tac dung)
  *   31  PublishingQueue()               publishing queue
- *   44    useEffect                     tai du lieu khi mo trang
- *   48    taiDanhSach()                 tai danh sach
- *   61    moModalKiemDuyet()            mo modal kiem duyet
- *   75    dongModal()                   dong modal
- *   81    xuLyDuyetDang()               xu ly duyet dang
+ *   45    useEffect                     tai du lieu khi mo trang
+ *   50    taiDanhSach()                 Bai SCORE_PUBLISHED cua ban minh, kem diem hieu luc va han khieu nai
+ *   64    moModalKiemDuyet()            Mo hop kiem duyet: tai noi dung bai de doc truoc khi dang
+ *   81    dongModal()                   Dong hop kiem duyet
+ *   88    xuLyDuyetDang()               UC-33: duyet dang -> bai PUBLISHED, ghi ngay dang (BR-SC-11)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  130  [Dang tai... / Lam moi]         taiDanhSach() -> goi GET /api/score-approvals/publishing{query}
- *  240  [Kiem duyet & Dang]             moModalKiemDuyet() -> goi GET /api/articles/{articleId}
- *  259  [vung nen ngoai hop thoai]      dongModal() -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
- *  266  []                              dongModal() -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
- *  325  [Dong]                          dongModal() -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
- *  333  [Dang duyet xuat ban... / Duyet xuat ban]  xuLyDuyetDang() -> goi POST /api/score-approvals/article/{articleId}/publish, GET /api/score-approvals/publishing{query}
+ *  137  [Dang tai... / Lam moi]         taiDanhSach() Bai SCORE_PUBLISHED cua ban minh, kem diem hieu luc va han khieu nai -> goi GET /api/score-approvals/publishing
+ *  247  [Kiem duyet & Dang]             moModalKiemDuyet() Mo hop kiem duyet: tai noi dung bai de doc truoc khi dang -> goi GET /api/articles/{articleId}
+ *  266  [vung nen ngoai hop thoai]      dongModal() Dong hop kiem duyet -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
+ *  273  []                              dongModal() Dong hop kiem duyet -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
+ *  334  [Dong]                          dongModal() Dong hop kiem duyet -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
+ *  342  [Dang duyet xuat ban... / Duyet xuat ban]  xuLyDuyetDang() UC-33: duyet dang -> bai PUBLISHED, ghi ngay dang (BR-SC-11) -> goi POST /api/score-approvals/article/{articleId}/publish, GET /api/score-appro…
  */
 
 export default function PublishingQueue({ nguoiDung }) {
@@ -39,17 +39,19 @@ export default function PublishingQueue({ nguoiDung }) {
   const [baiKiemDuyet, setBaiKiemDuyet] = useState(null)
   const [chiTietBai, setChiTietBai] = useState(null)
   const [dangTaiChiTiet, setDangTaiChiTiet] = useState(false)
+  const [loiChiTiet, setLoiChiTiet] = useState('')
   const [dangXuLy, setDangXuLy] = useState(false)
 
   useEffect(() => {
     taiDanhSach()
   }, [])
 
+  // Bai SCORE_PUBLISHED cua ban minh, kem diem hieu luc va han khieu nai
   async function taiDanhSach() {
     setDangTai(true)
     setLoi('')
     try {
-      const data = await layDanhSachChoDuyetDang(nguoiDung?.sectionId)
+      const data = await layDanhSachChoDuyetDang()
       setDanhSach(data || [])
     } catch (err) {
       setLoi(err.message || 'Không thể tải danh sách chờ duyệt xuất bản')
@@ -58,26 +60,31 @@ export default function PublishingQueue({ nguoiDung }) {
     }
   }
 
+  // Mo hop kiem duyet: tai noi dung bai de doc truoc khi dang
   async function moModalKiemDuyet(item) {
     setBaiKiemDuyet(item)
     setDangTaiChiTiet(true)
     setChiTietBai(null)
+    setLoiChiTiet('')
     try {
       const chiTiet = await getArticleDetail(item.articleId)
       setChiTietBai(chiTiet)
-    } catch {
-      // Nếu không lấy được chi tiết mở rộng thì vẫn hiển thị thông tin tóm tắt
+    } catch (err) {
+      // M-A1: khong nuot loi - hien thong bao cua server (vd khong co quyen xem bai)
+      setLoiChiTiet(err.message)
     } finally {
       setDangTaiChiTiet(false)
     }
   }
 
+  // Dong hop kiem duyet
   function dongModal() {
     if (dangXuLy) return
     setBaiKiemDuyet(null)
     setChiTietBai(null)
   }
 
+  // UC-33: duyet dang -> bai PUBLISHED, ghi ngay dang (BR-SC-11)
   async function xuLyDuyetDang() {
     if (!baiKiemDuyet) return
     setDangXuLy(true)
@@ -296,6 +303,8 @@ export default function PublishingQueue({ nguoiDung }) {
               <div className="duyet-dang__bai-noi-dung">
                 {dangTaiChiTiet ? (
                   <p style={{ color: 'var(--fm-chu-nhat)' }}>Đang tải nội dung chi tiết bài viết...</p>
+                ) : loiChiTiet ? (
+                  <p className="thong-bao-loi" role="alert">Không tải được nội dung bài: {loiChiTiet}</p>
                 ) : chiTietBai?.content ? (
                   chiTietBai.content
                 ) : (

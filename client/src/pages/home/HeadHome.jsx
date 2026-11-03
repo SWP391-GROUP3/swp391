@@ -9,36 +9,36 @@ import SummaryCard from '../../components/common/SummaryCard.jsx'
 
 /**
  * Gop viec cua Truong ban thanh 1 danh sach "Chờ xử lý".
- * Thu tu: khieu nai cho xac nhan (dang treo diem cua PV), diem cho duyet,
+ * Thu tu: khieu nai moi cho giao nguoi cham, diem cho duyet,
  * cuoi cung la bai cho phan cong.
  */
 function gopDanhSachViec(duLieu) {
   const danhSach = []
 
-  // UC-37: lech diem vuot nguong -> BTV thu 3 cham (S2), Truong ban xac nhan
-  for (const kn of duLieu.appealsToConfirm) {
+  // UC-38: khieu nai moi gui, Truong ban giao BTV cham mu
+  for (const kn of duLieu.newAppeals) {
     danhSach.push({
       khoa: `khieu-nai-${kn.appealId}`,
-      loai: 'Khiếu nại chờ xác nhận',
+      loai: 'Khiếu nại mới',
       mau: 'hong',
       tieuDe: kn.title,
-      moTa: `Điểm gốc ${formatNumber(kn.s0)} · chấm lại ${formatNumber(kn.s1)} · trọng tài ${formatNumber(kn.s2)}`,
+      moTa: `${kn.appellantName} · gửi ${formatDate(kn.submittedAt)}`,
       hanChot: null,
       duongDan: `/appeals/${kn.appealId}`,
-      nut: 'Xác nhận',
+      nut: 'Giao chấm',
     })
   }
 
   // UC-29…31: BTV da cham, cho Truong ban duyet diem
   for (const lan of duLieu.pendingApprovals) {
     danhSach.push({
-      khoa: `duyet-${lan.scoringAttemptId}`,
+      khoa: `duyet-${lan.articleId}`,
       loai: 'Chờ duyệt điểm',
       mau: 'cam',
       tieuDe: lan.title,
       moTa: `BTV ${lan.editorName} · ${formatNumber(lan.totalScore)}/100 · gửi ${formatDate(lan.submittedAt)}`,
       hanChot: null,
-      duongDan: `/score-approvals/${lan.scoringAttemptId}`,
+      duongDan: `/score-approvals/${lan.articleId}`,
       nut: 'Duyệt',
     })
   }
@@ -64,7 +64,6 @@ function gopDanhSachViec(duLieu) {
 function taoCacNhom(dem) {
   return [
     { nhan: 'Chờ phân công',     mau: 'xanh-duong', so: dem.submitted,       duongDan: '/assignments' },
-    { nhan: 'Đang chấm',         mau: 'tim',        so: dem.assigned,        duongDan: '/assignments' },
     { nhan: 'Chờ duyệt điểm',    mau: 'cam',        so: dem.pendingApproval, duongDan: '/score-approvals' },
     { nhan: 'Chờ duyệt đăng',    mau: 'xanh-la',    so: dem.scorePublished,  duongDan: '/publishing' },
     { nhan: 'Khiếu nại đang mở', mau: 'hong',       so: dem.openAppeals,     duongDan: '/appeals' },
@@ -78,8 +77,8 @@ function taoCacNhom(dem) {
  * MUC LUC (so dong - ten - tac dung)
  *   15  gopDanhSachViec()               Gop viec cua Truong ban thanh 1 danh sach "Cho xu ly"
  *   64  taoCacNhom()                    Cac o dem ben phai. Khac don vi (bai / khieu nai) nen khong hien tong.
- *   84  HeadHome()                      xem tom tat dau file
- *   88    useEffect                     tai du lieu khi mo trang
+ *   83  HeadHome()                      xem tom tat dau file
+ *   87    useEffect                     tai du lieu khi mo trang
  */
 export default function HeadHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)   // null = dang tai

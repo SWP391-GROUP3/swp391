@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
  * API tham so nhap bai cho man Configure Intake Parameters (UC-13, chi Admin - xem SecurityConfig).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   32  field                           service duoc inject
- *   36  getIntakeParameters()           lay 5 tham so nhap bai [GET /api/system-parameters/intake]
- *   43  updateIntakeParameters()        sua 5 tham so nhap bai [PUT /api/system-parameters/intake]
+ *   31  field                           service duoc inject
+ *   35  getIntakeParameters()           lay intake parameters [GET /api/system-parameters/intake]
+ *   42  updateIntakeParameters()        cap nhat intake parameters [PUT /api/system-parameters/intake]
  */
 @RestController
 @RequestMapping("/api/system-parameters")
@@ -30,14 +30,14 @@ public class SystemParameterController {
 
     private final SystemParameterService systemParameterService;
 
-    // GET /api/system-parameters/intake: 5 tham so nhap bai hien tai
+    // GET /api/system-parameters/intake: 6 tham so nhap bai hien tai
     @GetMapping("/intake")
     public ResponseEntity<ApiResponse<SystemParameterIntakeResponse>> getIntakeParameters() {
         SystemParameterIntakeResponse data = systemParameterService.getIntakeParameters();
         return ResponseEntity.ok(ApiResponse.success("Lấy tham số nhập bài thành công", data));
     }
 
-    // PUT /api/system-parameters/intake: Admin sua 5 tham so nhap bai
+    // PUT /api/system-parameters/intake: Admin sua 6 tham so nhap bai
     @PutMapping("/intake")
     public ResponseEntity<ApiResponse<SystemParameterIntakeResponse>> updateIntakeParameters(
             @Valid @RequestBody SystemParameterIntakeUpdateRequest request,

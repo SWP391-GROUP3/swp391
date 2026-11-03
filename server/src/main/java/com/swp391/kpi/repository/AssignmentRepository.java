@@ -15,7 +15,7 @@ import java.util.Optional;
  * MUC LUC (so dong - ten - tac dung)
  *   24  findByArticleId()               Tim luot phan cong theo ma bai viet (quan he 1-1)
  *   27  findByEditorIdOrderByAssignedAtDesc()  Lay danh sach bai viet duoc phan cong cho mot BTV (UC-21)
- *   31  countAssignedArticlesByEditorId()  Dem so bai viet ma mot BTV dang phu trach (chua hoan thanh) de goi y BTV it viec nhat (UC-19, BR-QA-04)
+ *   31  countAssignedArticlesByEditorId()  Dem so bai viet ma mot BTV dang phu trach (chua hoan thanh) de goi y BTV it viec nhat (UC-19, BR-SC-04)
  */
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Integer> {
@@ -26,7 +26,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Integer>
     // Lấy danh sách bài viết được phân công cho một BTV (UC-21)
     List<Assignment> findByEditorIdOrderByAssignedAtDesc(Integer editorId);
 
-    // Đếm số bài viết mà một BTV đang phụ trách (chưa hoàn thành) để gợi ý BTV ít việc nhất (UC-19, BR-QA-04)
+    // Đếm số bài viết mà một BTV đang phụ trách (chưa hoàn thành) để gợi ý BTV ít việc nhất (UC-19, BR-SC-04)
     @Query("SELECT COUNT(a) FROM Assignment a WHERE a.editorId = :editorId")
     long countAssignedArticlesByEditorId(@Param("editorId") Integer editorId);
 }

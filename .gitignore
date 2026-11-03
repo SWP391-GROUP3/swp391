@@ -51,3 +51,6 @@ docs/review/
 # File tam cua Word khi dang mo .docx
 ~$*
 
+
+# Anh/video BF-01 upload khi chay server (nhom chot 01/11, A1)
+server/uploads/

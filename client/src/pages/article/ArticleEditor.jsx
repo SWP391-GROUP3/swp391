@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  createArticle, getArticleDetail, getCoAuthorCandidates, getGenres,
+  checkDuplication, createArticle, estimateRoyalty, getArticleDetail, getCoAuthorCandidates, getGenres, getOpenEvents,
   resubmitArticle, submitArticle, updateArticle,
 } from '../../api/articleApi.js'
 import { NATURE_LABELS, statusLabel } from '../../utils/articleLabels.js'
+import { formatMoney } from '../../utils/formatMoney.js'
 import Icon from '../../components/common/Icon.jsx'
+import ArticleAttachments from './ArticleAttachments.jsx'
+import ArticleDuplicationResult from './ArticleDuplicationResult.jsx'
 import '../../styles/ArticleEditor.css'
 
 /**
@@ -17,60 +20,76 @@ import '../../styles/ArticleEditor.css'
  * MO TRANG NAY TAI: /my-articles/new, /my-articles/:id/edit
  *
  * MUC LUC (so dong - ten - tac dung)
- *   36  ArticleEditor()                 xem tom tat dau file
- *   56    useEffect                     Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
- *   99    changeField()                 Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat)
- *  104    changeShare()                 Doi ty le cua 1 tac gia
- *  109    addCoAuthor()                 Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap
- *  117    removeCoAuthor()              Bo 1 dong tac gia (UC-04 A1: phai chia lai ty le truoc khi luu)
- *  122    buildPayload()                Du lieu gui server: dung ten field cua ArticleSaveRequest
- *  133    save()                        Luu nhap; alsoSubmit = true thi luu xong nop luon (UC-05) hoac nop lai (UC-10)
+ *   44  ArticleEditor()                 xem tom tat dau file
+ *   72    useEffect                     Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
+ *  118    changeField()                 Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat)
+ *  125    changeShare()                 Doi ty le cua 1 tac gia
+ *  131    addCoAuthor()                 Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap
+ *  139    removeCoAuthor()              Bo 1 dong tac gia (UC-04 A1: phai chia lai ty le truoc khi luu)
+ *  144    buildPayload()                Du lieu gui server: dung ten field cua ArticleSaveRequest
+ *  160    save()                        Luu nhap; alsoCheck = true thi luu xong kiem trung noi dung (UC-05 buoc 2) va hien ket qua, nguoi dung bam "X…
+ *  184    confirmSubmit()               UC-05 buoc 3 / UC-10 buoc 3: xac nhan nop (kem giai trinh neu can), server kiem trung lai roi moi nop
+ *  196    runEstimate()                 UC-09: uoc tinh nhuan but theo the loai, tinh chat, su kien dang chon (khong luu gi)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  163  [< Chi tiet bai / Bai cua toi]  quay ve /my-articles/:id (dang sua) hoac /my-articles (bai moi), khong luu
- *  232  [Bo] o dong dong tac gia        bo nguoi do khoi danh sach (chua goi server, bam Luu moi luu)
- *  250  [Them]                          them nguoi chon o o 'Them dong tac gia' vao danh sach, ty le 0%
- *  256  [Luu nhap]                      bai moi: POST /api/articles roi chuyen sang /my-articles/:id/edit; bai cu: PUT /api/articles/{id}
- *  259  [Luu va nop bai] / [nop lai]    luu nhu tren roi POST /submit (UC-05) hoac /resubmit (UC-10), xong mo /my-articles/:id
+ *  221  [< Chi tiet bai / Bai cua toi]  quay ve /my-articles/:id (dang sua) hoac /my-articles (bai moi), khong luu
+ *  296  [Uoc tinh nhuan but]            runEstimate() -> POST /api/articles/royalty-estimate (UC-09), chi hien bang uoc tinh, khong luu
+ *  337  [Bo] o dong dong tac gia        bo nguoi do khoi danh sach (chua goi server, bam Luu moi luu)
+ *  355  [Them]                          them nguoi chon o o 'Them dong tac gia' vao danh sach, ty le 0%
+ *  361  [Luu nhap]                      bai moi: POST /api/articles roi chuyen sang /my-articles/:id/edit; bai cu: PUT /api/articles/{id}
+ *  364  [Luu va kiem tra de nop] / [nop lai]  luu nhu tren roi POST /api/articles/{id}/duplication-check (UC-05 buoc 2): hien ket qua kiem trung, CHUA nop
+ *  383  [De sau]                        dong khung ket qua kiem trung, bai van la Nhap
+ *  385  [Xac nhan nop] / [Xac nhan nop lai]  an khi BLOCKED; POST /submit (UC-05) hoac /resubmit (UC-10) kem giai trinh, server kiem trung lai roi moi nop -> mo /my-articles/:id
  */
 export default function ArticleEditor({ nguoiDung }) {
   const { id } = useParams()            // khong co id = bai moi
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({ title: '', content: '', declaredCategoryId: '', declaredNature: '' })
+  const [form, setForm] = useState({ title: '', content: '', declaredCategoryId: '', declaredNature: '', eventId: '' })
   // Gom ca tac gia chinh (dong dau, khong xoa duoc). sharePercent giu dang chuoi cho o nhap so
   const [authors, setAuthors] = useState([
     { userId: nguoiDung.id, fullName: nguoiDung.hoTen, sharePercent: '100', main: true },
   ])
   const [genres, setGenres] = useState([])
+  const [events, setEvents] = useState([])           // su kien dang mo (UC-03, BR-IN-03)
+  const [estimate, setEstimate] = useState(null)     // ket qua uoc tinh nhuan but (UC-09)
+  const [estimating, setEstimating] = useState(false)
   const [candidates, setCandidates] = useState([])
   const [status, setStatus] = useState('DRAFT')       // trang thai bai dang sua
+  const [canEdit, setCanEdit] = useState(true)        // server cho sua khong (bai moi luon sua duoc)
   const [returnNote, setReturnNote] = useState('')    // nhan xet BTV khi tra bai (UC-10 buoc 1)
   const [pickedUserId, setPickedUserId] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  // UC-05 buoc 2-3: ket qua kiem trung truoc khi xac nhan nop, giai trinh (UC-08), ma bai vua luu
+  const [check, setCheck] = useState(null)
+  const [explanation, setExplanation] = useState('')
+  const [savedId, setSavedId] = useState(null)
 
   // Tai the loai, danh sach phong vien va (neu dang sua) noi dung bai
   useEffect(() => {
     let isMounted = true
 
     const loadArticle = id ? getArticleDetail(id) : Promise.resolve(null)
-    Promise.all([getGenres(), getCoAuthorCandidates(), loadArticle])
-      .then(([genreList, candidateList, article]) => {
+    Promise.all([getGenres(), getCoAuthorCandidates(), loadArticle, getOpenEvents()])
+      .then(([genreList, candidateList, article, eventList]) => {
         if (!isMounted) return
         setGenres(genreList)
+        setEvents(eventList)
         setCandidates(candidateList)
         if (article) {
           if (!article.canEdit) {
             setError('Bài này không sửa được (chỉ tác giả chính sửa khi bài ở trạng thái Nháp hoặc Trả về – cần sửa).')
           }
+          setCanEdit(article.canEdit)
           setForm({
             title: article.title,
             content: article.content || '',
             declaredCategoryId: String(article.declaredCategoryId),
             declaredNature: article.declaredNature,
+            eventId: article.eventId ? String(article.eventId) : '',
           })
           // Tac gia chinh dung dau
           const rows = article.authors.map((author) => ({
@@ -98,11 +117,14 @@ export default function ArticleEditor({ nguoiDung }) {
   /** Go vao 1 o cua form (tieu de, noi dung, the loai, tinh chat). */
   function changeField(field, value) {
     setForm({ ...form, [field]: value })
+    setEstimate(null)   // doi khai bao thi so uoc tinh cu khong con dung
+    setCheck(null)      // doi noi dung / tinh chat thi phai kiem trung lai
   }
 
   /** Doi ty le cua 1 tac gia. */
   function changeShare(userId, value) {
     setAuthors(authors.map((author) => (author.userId === userId ? { ...author, sharePercent: value } : author)))
+    setCheck(null)
   }
 
   /** Them dong tac gia da chon o o chon; ty le de 0 cho nguoi dung tu nhap. */
@@ -125,30 +147,64 @@ export default function ArticleEditor({ nguoiDung }) {
       content: form.content,
       declaredCategoryId: form.declaredCategoryId ? Number(form.declaredCategoryId) : null,
       declaredNature: form.declaredNature || null,
+      // Luon gui lai su kien dang chon: bai da phan cong ma gui khac su kien da khoa thi server chan (B13)
+      eventId: form.eventId ? Number(form.eventId) : null,
       authors: authors.map((author) => ({ userId: author.userId, sharePercent: Number(author.sharePercent) })),
     }
   }
 
-  /** Luu nhap; alsoSubmit = true thi luu xong nop luon (UC-05) hoac nop lai (UC-10). */
-  function save(alsoSubmit) {
+  /**
+   * Luu nhap; alsoCheck = true thi luu xong kiem trung noi dung (UC-05 buoc 2) va hien ket qua,
+   * nguoi dung bam "Xác nhận nộp" moi nop that (confirmSubmit).
+   */
+  function save(alsoCheck) {
     setSaving(true)
     setError('')
     setSuccess('')
     const saveRequest = id ? updateArticle(id, buildPayload()) : createArticle(buildPayload())
     saveRequest
       .then((article) => {
-        if (!alsoSubmit) {
+        if (!alsoCheck) {
           setSuccess('Đã lưu bản nháp.')
           if (!id) navigate(`/my-articles/${article.id}/edit`, { replace: true })
           return null
         }
-        const submitRequest = article.status === 'REVISION_REQUESTED'
-          ? resubmitArticle(article.id)
-          : submitArticle(article.id)
-        return submitRequest.then(() => navigate(`/my-articles/${article.id}`))
+        // Bai moi chua co id tren URL -> giu ma bai vua tao de nop (khong chuyen trang de giu ket qua kiem)
+        setSavedId(article.id)
+        return checkDuplication(article.id).then((data) => {
+          setCheck(data)
+          setExplanation('')
+        })
       })
       .catch((err) => setError(err.message))
       .finally(() => setSaving(false))
+  }
+
+  /** UC-05 buoc 3 / UC-10 buoc 3: xac nhan nop (kem giai trinh neu can), server kiem trung lai roi moi nop. */
+  function confirmSubmit() {
+    setSaving(true)
+    setError('')
+    const duLieu = { explanation: explanation.trim() || null }
+    const submitRequest = isResubmit ? resubmitArticle(savedId, duLieu) : submitArticle(savedId, duLieu)
+    submitRequest
+      .then(() => navigate(`/my-articles/${savedId}`))
+      .catch((err) => setError(err.message))
+      .finally(() => setSaving(false))
+  }
+
+  /** UC-09: uoc tinh nhuan but theo the loai, tinh chat, su kien dang chon (khong luu gi). */
+  function runEstimate() {
+    setEstimating(true)
+    setError('')
+    estimateRoyalty({
+      declaredCategoryId: form.declaredCategoryId ? Number(form.declaredCategoryId) : null,
+      declaredNature: form.declaredNature || null,
+      eventId: form.eventId ? Number(form.eventId) : null,
+      articleId: id ? Number(id) : null,   // bai da tung phan cong thi server dung ty le da khoa (BR-IN-07)
+    })
+      .then((data) => setEstimate(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setEstimating(false))
   }
 
   // Tong ty le dang nhap, hien ngay khi go (UC-04 buoc 3)
@@ -157,6 +213,8 @@ export default function ArticleEditor({ nguoiDung }) {
   const addedIds = authors.map((author) => author.userId)
   const freeCandidates = candidates.filter((item) => !addedIds.includes(item.id))
   const isResubmit = status === 'REVISION_REQUESTED'
+  // Su kien cua bai khong con trong danh sach dang mo (vd da khoa tu lan nop dau) thi van hien de khong mat
+  const eventInList = !form.eventId || events.some((event) => String(event.id) === form.eventId)
 
   return (
     <div className="article-editor">
@@ -183,16 +241,28 @@ export default function ArticleEditor({ nguoiDung }) {
 
       {!loading && (
         <div className="article-editor__grid">
-          {/* Cot trai: noi dung */}
-          <section className="article-editor__section">
-            <label className="nhan" htmlFor="article-title">Tiêu đề *</label>
-            <input id="article-title" className="o-nhap" value={form.title} maxLength={300}
-              onChange={(e) => changeField('title', e.target.value)} />
+          {/* Cot trai: noi dung + anh/video (dung lai class xep doc cua cot phai) */}
+          <div className="article-editor__side">
+            <section className="article-editor__section">
+              <label className="nhan" htmlFor="article-title">Tiêu đề *</label>
+              <input id="article-title" className="o-nhap" value={form.title} maxLength={300}
+                onChange={(e) => changeField('title', e.target.value)} />
 
-            <label className="nhan" htmlFor="article-content">Nội dung (bắt buộc khi nộp)</label>
-            <textarea id="article-content" className="o-nhap article-editor__content" value={form.content}
-              onChange={(e) => changeField('content', e.target.value)} />
-          </section>
+              <label className="nhan" htmlFor="article-content">Nội dung (bắt buộc khi nộp)</label>
+              <textarea id="article-content" className="o-nhap article-editor__content" value={form.content}
+                onChange={(e) => changeField('content', e.target.value)} />
+            </section>
+
+            {/* Iter 3: anh/video gan vao bai da luu (can ma bai), nen bai moi phai Luu nhap truoc */}
+            {id ? (
+              <ArticleAttachments articleId={id} canEdit={canEdit} authors={authors} />
+            ) : (
+              <section className="article-editor__section">
+                <h2 className="article-editor__section-title">Ảnh / video</h2>
+                <p className="article-editor__muted">Bấm "Lưu nháp" trước, sau đó thêm ảnh/video cho bài.</p>
+              </section>
+            )}
+          </div>
 
           {/* Cot phai: khai bao + tac gia */}
           <div className="article-editor__side">
@@ -212,7 +282,42 @@ export default function ArticleEditor({ nguoiDung }) {
                 <option value="">-- Chọn tính chất --</option>
                 {Object.entries(NATURE_LABELS).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
               </select>
+              {/* UC-03, BR-IN-03: chon su kien dang mo; bai da phan cong (bi tra ve) giu su kien da khoa (B13) */}
+              <label className="nhan" htmlFor="article-event">Sự kiện</label>
+              <select id="article-event" className="o-nhap" value={form.eventId} disabled={isResubmit}
+                onChange={(e) => changeField('eventId', e.target.value)}>
+                <option value="">-- Không thuộc sự kiện --</option>
+                {events.map((event) => <option key={event.id} value={event.id}>{event.name}</option>)}
+                {!eventInList && <option value={form.eventId}>Sự kiện mã {form.eventId} (đã khóa)</option>}
+              </select>
               <p className="article-editor__muted">Khai báo bị khóa khi nộp bài, chỉ đổi được khi sửa và nộp lại.</p>
+
+              {/* UC-09: uoc tinh nhuan but o 3 muc diem, chi phan bai viet */}
+              <button type="button" className="nut-nhe" disabled={estimating} onClick={runEstimate}>
+                {estimating ? 'Đang tính…' : 'Ước tính nhuận bút'}
+              </button>
+              {estimate && (
+                <table className="article-editor__estimate">
+                  <thead>
+                    <tr><th>Điểm</th><th>Bão hòa</th><th>Hệ số</th><th>Tiền bài viết</th></tr>
+                  </thead>
+                  <tbody>
+                    {estimate.items.map((item) => (
+                      <tr key={item.score}>
+                        <td>{item.score}</td>
+                        <td>{Number(item.saturationRate)}%</td>
+                        <td>{Number(item.finalFactor)}</td>
+                        <td>{formatMoney(item.amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {estimate && (
+                <p className="article-editor__muted">
+                  Đơn giá hôm nay {formatMoney(estimate.unitPrice)} · chưa gồm ảnh/video · số thật tính khi chấm nhuận bút.
+                </p>
+              )}
             </section>
 
             <section className="article-editor__section">
@@ -257,9 +362,33 @@ export default function ArticleEditor({ nguoiDung }) {
                 Lưu nháp
               </button>
               <button type="button" className="nut-chinh-fm" disabled={saving} onClick={() => save(true)}>
-                {saving ? 'Đang lưu…' : (isResubmit ? 'Lưu và nộp lại' : 'Lưu và nộp bài')}
+                {saving ? 'Đang lưu…' : (isResubmit ? 'Lưu và kiểm tra để nộp lại' : 'Lưu và kiểm tra để nộp')}
               </button>
             </div>
+
+            {/* UC-05 buoc 2-3, UC-08: ket qua kiem trung + giai trinh + xac nhan nop */}
+            {check && (
+              <section className="article-editor__section">
+                <h2 className="article-editor__section-title">Kiểm tra trùng nội dung</h2>
+                <ArticleDuplicationResult check={check} />
+                {check.result === 'NEED_EXPLAIN' && (
+                  <>
+                    <label className="nhan" htmlFor="article-explanation">Giải trình *</label>
+                    <textarea id="article-explanation" className="o-nhap" rows={4} maxLength={1000}
+                      value={explanation} onChange={(e) => setExplanation(e.target.value)}
+                      placeholder="Vì sao bài có đoạn trùng với bài khác (trích dẫn, cùng nguồn tin…)" />
+                  </>
+                )}
+                <div className="article-editor__actions">
+                  <button type="button" className="nut-nhe" disabled={saving} onClick={() => setCheck(null)}>Để sau</button>
+                  {check.result !== 'BLOCKED' && (
+                    <button type="button" className="nut-chinh-fm" disabled={saving} onClick={confirmSubmit}>
+                      {saving ? 'Đang nộp…' : (isResubmit ? 'Xác nhận nộp lại' : 'Xác nhận nộp')}
+                    </button>
+                  )}
+                </div>
+              </section>
+            )}
           </div>
         </div>
       )}

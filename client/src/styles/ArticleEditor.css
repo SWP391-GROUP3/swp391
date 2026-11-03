@@ -4,13 +4,14 @@
    Bo cuc giong chi tiet bai: cot trai noi dung, cot phai khai bao + tac gia + nut.
 
    MUC LUC (so dong - khoi CSS)
-     16  tieu de, bo cuc dau trang
-     55  Nhan xet cua BTV khi tra bai (UC-10)
-     65  Luoi 2 cot
-     98  Tac gia va ty le
-    139  Nut luu / nop
-    146  Man hinh hep: 2 cot thanh 1 cot
-    147  man hinh hep (@media)
+     17  tieu de, bo cuc dau trang
+     56  Nhan xet cua BTV khi tra bai (UC-10)
+     66  Luoi 2 cot
+     99  Tac gia va ty le
+    140  Nut luu / nop
+    147  UC-09: bang uoc tinh nhuan but 3 muc diem
+    166  Man hinh hep: 2 cot thanh 1 cot
+    167  man hinh hep (@media)
    =========================================================================== */
 
 .article-editor__back {
@@ -141,6 +142,25 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+/* UC-09: bang uoc tinh nhuan but 3 muc diem */
+.article-editor__estimate {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.article-editor__estimate th,
+.article-editor__estimate td {
+  padding: 6px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--fm-vien);
+}
+
+.article-editor__estimate th {
+  font-weight: 500;
+  color: var(--fm-chu-nhat);
 }
 
 /* Man hinh hep: 2 cot thanh 1 cot */

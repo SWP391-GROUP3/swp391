@@ -6,6 +6,7 @@ import com.swp391.kpi.dto.PublishingResponse;
 import com.swp391.kpi.dto.ScoreApprovalDecisionRequest;
 import com.swp391.kpi.dto.ScoreApprovalItemResponse;
 import com.swp391.kpi.dto.ScoreApprovalResponse;
+import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.*;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
@@ -55,6 +56,15 @@ class ScoreApprovalServiceTest {
     @Mock
     private GenreService genreService;
 
+    @Mock
+    private AppealRuleConfigService appealRuleConfigService;
+
+    @Mock
+    private AppealEffectiveScoreService appealEffectiveScoreService;
+
+    @Mock
+    private UserReadService userReadService;
+
     @InjectMocks
     private ScoreApprovalService scoreApprovalService;
 
@@ -84,19 +94,23 @@ class ScoreApprovalServiceTest {
         mockReviewer = new User();
         mockReviewer.setId(3);
         mockReviewer.setFullName("Lê Hoàng Cường");
+
+        // Truong ban (id 2 trong test) thuoc ban 1
+        lenient().when(userReadService.requireActive(2, "HEAD_OF_DEPARTMENT"))
+                .thenReturn(new UserAccessResponse(2, "Trưởng ban", "HEAD_OF_DEPARTMENT", 1, "Ban 1", "ACTIVE"));
     }
 
     @Test
     @DisplayName("Lấy danh sách chờ duyệt điểm thành công (UC-29)")
     void getPendingApprovals_Success() {
-        when(articleRepository.findByStatusOrderByUpdatedAtDesc(ArticleStatus.PENDING_APPROVAL))
+        when(articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.PENDING_APPROVAL, 1))
                 .thenReturn(List.of(mockArticle));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10))
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL))
                 .thenReturn(Optional.of(mockAttempt));
         when(userRepository.findById(3))
                 .thenReturn(Optional.of(mockReviewer));
 
-        List<ScoreApprovalItemResponse> result = scoreApprovalService.getPendingApprovals(null);
+        List<ScoreApprovalItemResponse> result = scoreApprovalService.getPendingApprovals(2);
 
         assertEquals(1, result.size());
         assertEquals("Bài viết phân tích chuyển đổi số", result.get(0).getArticleTitle());
@@ -105,10 +119,10 @@ class ScoreApprovalServiceTest {
     }
 
     @Test
-    @DisplayName("Duyệt điểm thành công (UC-32, BR-SC-10)")
+    @DisplayName("Duyệt điểm thành công (UC-31, BR-SC-10)")
     void approveScore_Success() {
         when(articleRepository.findById(10)).thenReturn(Optional.of(mockArticle));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(mockAttempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(mockAttempt));
         when(scoreApprovalRepository.findByScoringAttemptId(100)).thenReturn(Optional.empty());
 
         ScoreApproval savedApproval = new ScoreApproval();
@@ -155,7 +169,7 @@ class ScoreApprovalServiceTest {
     void approveScore_NotSubmitted_ThrowsException() {
         mockAttempt.setSubmittedAt(null);
         when(articleRepository.findById(10)).thenReturn(Optional.of(mockArticle));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(mockAttempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(mockAttempt));
 
         BusinessException ex = assertThrows(BusinessException.class, () ->
                 scoreApprovalService.approveScore(10, 2)
@@ -165,10 +179,10 @@ class ScoreApprovalServiceTest {
     }
 
     @Test
-    @DisplayName("Yêu cầu chấm lại thành công (UC-31, BR-SC-10)")
+    @DisplayName("Yêu cầu chấm lại thành công (UC-32, BR-SC-10)")
     void returnScore_Success() {
         when(articleRepository.findById(10)).thenReturn(Optional.of(mockArticle));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(mockAttempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(mockAttempt));
         when(scoreApprovalRepository.findByScoringAttemptId(100)).thenReturn(Optional.empty());
 
         ScoreApproval savedApproval = new ScoreApproval();
@@ -204,7 +218,7 @@ class ScoreApprovalServiceTest {
     }
 
     @Test
-    @DisplayName("Yêu cầu chấm lại thất bại nếu không nhập lý do (BR-SC-10, UC-31 Exception E2)")
+    @DisplayName("Yêu cầu chấm lại thất bại nếu không nhập lý do (BR-SC-10, UC-32 Exception E2)")
     void returnScore_EmptyReason_ThrowsException() {
         ScoreApprovalDecisionRequest emptyRequest = new ScoreApprovalDecisionRequest("   ");
 
@@ -240,11 +254,11 @@ class ScoreApprovalServiceTest {
         mockGenre.setCode("PHONG_SU");
         mockGenre.setName("Phóng sự");
 
-        when(articleRepository.findByStatusOrderByUpdatedAtDesc(ArticleStatus.SCORE_PUBLISHED))
+        when(articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.SCORE_PUBLISHED, 1))
                 .thenReturn(List.of(publishedScoreArticle));
         when(genreService.getActiveGenres())
                 .thenReturn(List.of(mockGenre));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(20))
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(20, AttemptType.APPEAL))
                 .thenReturn(Optional.of(mockAttempt));
         when(userRepository.findById(3))
                 .thenReturn(Optional.of(mockReviewer));
@@ -253,7 +267,9 @@ class ScoreApprovalServiceTest {
         when(scoreApprovalRepository.findByScoringAttemptId(mockAttempt.getId()))
                 .thenReturn(Optional.of(mockApproval));
 
-        List<PublishingItemResponse> result = scoreApprovalService.getPendingPublishing(null);
+        when(appealRuleConfigService.getAppealDeadline(any())).thenAnswer(inv -> ((LocalDateTime) inv.getArgument(0)).plusDays(7));
+        when(appealEffectiveScoreService.getEffectiveScore(20, mockAttempt.getTotalScore())).thenReturn(mockAttempt.getTotalScore());
+        List<PublishingItemResponse> result = scoreApprovalService.getPendingPublishing(2);
 
         assertEquals(1, result.size());
         PublishingItemResponse item = result.get(0);
@@ -271,6 +287,7 @@ class ScoreApprovalServiceTest {
     void approvePublishing_Success() {
         Article article = new Article();
         article.setId(20);
+        article.setSectionId(1);
         article.setStatus(ArticleStatus.SCORE_PUBLISHED);
 
         when(articleRepository.findById(20)).thenReturn(Optional.of(article));
@@ -292,6 +309,7 @@ class ScoreApprovalServiceTest {
     void approvePublishing_WrongStatus_ThrowsException() {
         Article article = new Article();
         article.setId(20);
+        article.setSectionId(1);
         article.setStatus(ArticleStatus.PENDING_APPROVAL);
 
         when(articleRepository.findById(20)).thenReturn(Optional.of(article));

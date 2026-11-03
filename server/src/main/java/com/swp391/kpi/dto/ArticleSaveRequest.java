@@ -38,4 +38,8 @@ public class ArticleSaveRequest {
     // Gom ca tac gia chinh. Rong / khong gui = chi tac gia chinh 100%
     @Valid
     private List<ArticleAuthorShareRequest> authors;
+
+    // Su kien bai viet ve (UC-03, BR-IN-03). Khong gui / null = bai khong thuoc su kien nao.
+    // Su kien con mo hay khong kiem trong service luc nop (B14), khong kiem o day
+    private Integer eventId;
 }

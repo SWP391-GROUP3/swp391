@@ -17,6 +17,5 @@ public class AssignmentCreateRequest {
 
     private Integer articleId;
     private Integer editorId;
-    private Integer assignedBy;
     private Boolean wasSuggested = false;
 }

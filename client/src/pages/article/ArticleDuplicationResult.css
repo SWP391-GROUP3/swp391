@@ -1,0 +1,61 @@
+/* ===========================================================================
+   pages/article/ArticleDuplicationResult.jsx - Ket qua kiem trung noi dung (UC-06, UC-08).
+   Tien to class: .trung-noi-dung__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+
+   MUC LUC (so dong - khoi CSS)
+      9  tieu de, bo cuc dau trang
+   =========================================================================== */
+
+.trung-noi-dung__tong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 13.5px;
+}
+
+.trung-noi-dung__muted {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--fm-chu-nhat);
+}
+
+.trung-noi-dung__badge {
+  padding: 2px 8px;
+  font-size: 11.5px;
+  border-radius: 10px;
+}
+
+.trung-noi-dung__badge--tot { background: var(--fm-tot-nen); color: var(--fm-tot); }
+.trung-noi-dung__badge--loi { background: var(--fm-loi-nen); color: var(--fm-loi); }
+.trung-noi-dung__badge--canh-bao { background: var(--fm-chu-y-nen); color: var(--fm-chu-y); }
+
+.trung-noi-dung__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.trung-noi-dung__bai {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.trung-noi-dung__doan {
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  background: var(--fm-chu-y-nen);
+  border-left: 3px solid var(--fm-chu-y);
+  border-radius: 4px;
+}
+
+.trung-noi-dung__giai-trinh {
+  margin: 8px 0 0;
+  font-size: 13px;
+}

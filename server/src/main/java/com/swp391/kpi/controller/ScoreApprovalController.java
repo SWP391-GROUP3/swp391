@@ -22,10 +22,10 @@ import java.util.List;
  * MUC LUC (so dong - ten - tac dung)
  *   35  field                           service duoc inject
  *   41  getPendingApprovals()           Lay danh sach bai viet cho duyet diem (UC-29) [GET /api/score-approvals]
- *   51  approveScore()                  Truong ban phe duyet diem danh gia (UC-32) [POST /api/score-approvals/article/{articleId}/approve]
- *   63  returnScore()                   Truong ban yeu cau cham lai (UC-31) [POST /api/score-approvals/article/{articleId}/return]
- *   76  getPendingPublishing()          Lay danh sach bai viet cho duyet xuat ban (UC-33) [GET /api/score-approvals/publishing]
- *   86  approvePublishing()             Truong ban phe duyet xuat ban bai viet (UC-33) [POST /api/score-approvals/article/{articleId}/publish]
+ *   52  approveScore()                  Truong ban phe duyet diem danh gia (UC-31) [POST /api/score-approvals/article/{articleId}/approve]
+ *   64  returnScore()                   Truong ban yeu cau cham lai (UC-32) [POST /api/score-approvals/article/{articleId}/return]
+ *   77  getPendingPublishing()          Lay danh sach bai viet cho duyet xuat ban (UC-33) [GET /api/score-approvals/publishing]
+ *   88  approvePublishing()             Truong ban phe duyet xuat ban bai viet (UC-33) [POST /api/score-approvals/article/{articleId}/publish]
  */
 @RestController
 @RequestMapping("/api/score-approvals")
@@ -39,13 +39,14 @@ public class ScoreApprovalController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<ScoreApprovalItemResponse>>> getPendingApprovals(
-            @RequestParam(required = false) Integer sectionId) {
-        List<ScoreApprovalItemResponse> list = scoreApprovalService.getPendingApprovals(sectionId);
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        List<ScoreApprovalItemResponse> list = scoreApprovalService.getPendingApprovals(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách chờ duyệt điểm thành công", list));
     }
 
     /**
-     * Truong ban phe duyet diem danh gia (UC-32).
+     * Truong ban phe duyet diem danh gia (UC-31).
      */
     @PostMapping("/article/{articleId}/approve")
     public ResponseEntity<ApiResponse<ScoreApprovalResponse>> approveScore(
@@ -57,7 +58,7 @@ public class ScoreApprovalController {
     }
 
     /**
-     * Truong ban yeu cau cham lai (UC-31).
+     * Truong ban yeu cau cham lai (UC-32).
      */
     @PostMapping("/article/{articleId}/return")
     public ResponseEntity<ApiResponse<ScoreApprovalResponse>> returnScore(
@@ -74,8 +75,9 @@ public class ScoreApprovalController {
      */
     @GetMapping("/publishing")
     public ResponseEntity<ApiResponse<List<PublishingItemResponse>>> getPendingPublishing(
-            @RequestParam(required = false) Integer sectionId) {
-        List<PublishingItemResponse> list = scoreApprovalService.getPendingPublishing(sectionId);
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        List<PublishingItemResponse> list = scoreApprovalService.getPendingPublishing(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách chờ duyệt xuất bản thành công", list));
     }
 

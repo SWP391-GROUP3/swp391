@@ -1,13 +1,16 @@
 package com.swp391.kpi.service;
 
 import com.swp391.kpi.dto.ArticleAuthorResponse;
+import com.swp391.kpi.dto.ArticleAuthorShareResponse;
 import com.swp391.kpi.dto.ArticleCoAuthorInviteResponse;
 import com.swp391.kpi.dto.ArticleDetailResponse;
 import com.swp391.kpi.dto.ArticlePageResponse;
+import com.swp391.kpi.dto.ArticleReadResponse;
 import com.swp391.kpi.dto.ArticleRevisionRequestResponse;
 import com.swp391.kpi.dto.ArticleStatusCountResponse;
 import com.swp391.kpi.dto.ArticleStatusLogResponse;
 import com.swp391.kpi.dto.ArticleSummaryResponse;
+import com.swp391.kpi.dto.ArticleVersionReadResponse;
 import com.swp391.kpi.dto.GenreResponse;
 import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.Article;
@@ -15,11 +18,13 @@ import com.swp391.kpi.entity.ArticleAuthor;
 import com.swp391.kpi.entity.ArticleAuthorConfirmStatus;
 import com.swp391.kpi.entity.ArticleStatus;
 import com.swp391.kpi.entity.ArticleStatusLog;
+import com.swp391.kpi.entity.ArticleVersion;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.ArticleAuthorRepository;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.ArticleStatusLogRepository;
+import com.swp391.kpi.repository.ArticleVersionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,24 +44,34 @@ import java.util.Map;
  * de ghi kem 1 dong article_status_logs (AGENTS.md muc 2).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   66  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   73  field                           repository / service duoc inject
+ *   81  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   88  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   86  getMyArticles()                 UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau
- *  133  getArticleDetail()              UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai
- *  148  withdrawArticle()               UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAFT (BR-IN-08)
- *  172  publishArticle()                Cho BF-02 (UC-33 duyet dang): bai SCORE_PUBLISHED -> PUBLISHED
- *  187  getMyStatusCounts()             Trang chu Phong vien: so bai cua nguoi dung o tung trang thai
- *  208  getMyRevisionRequests()         Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can sua, kem ghi chu cua lan tra ve gan nh…
- *  228  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi (UC-12), sap het han xep truoc
- *  268  updateArticleStatus()           Ham dung chung cho cac luong khac (BF-02, BF-03, BF-04) doi trang thai bai viet va tu dong ghi 1 dong lich su…
+ *  102  getMyArticles()                 UC-01: bai ma nguoi dung la tac gia chinh hoac dong tac gia, sua gan nhat len dau
+ *  149  getArticleDetail()              UC-02: xem noi dung, khai bao, tac gia va lich su trang thai cua 1 bai
+ *  166  buildArticleDetail()            UC-02 cho nguoi xem khong phai tac gia (BTV duoc giao, Truong ban): dung chi tiet bai, KHONG kiem quyen
+ *  175  withdrawArticle()               UC-11: tac gia chinh rut bai da nop khi chua phan cong BTV, bai ve DRAFT (BR-IN-08)
+ *  204  publishArticle()                Cho BF-02 (UC-33 duyet dang): bai SCORE_PUBLISHED -> PUBLISHED
+ *  219  getMyStatusCounts()             Trang chu Phong vien: so bai cua nguoi dung o tung trang thai
+ *  240  getMyRevisionRequests()         Trang chu Phong vien: bai cua nguoi dung (tac gia chinh) bi tra ve can sua, kem ghi chu cua lan tra ve gan nh…
+ *  260  getMyCoAuthorInvites()          Trang chu Phong vien: loi moi dong tac gia dang cho nguoi dung tra loi (UC-12), sap het han xep truoc
+ *  284  isAuthorOrCoAuthor()            Cho BF-02 (Duong, 02/11): nguoi dung la tac gia chinh hoac dong tac gia cua bai thi tra true
+ *  310  getVersionForRead()             1 ban luu cua bai (article_versions), dung de cham mu / cham lai dung ban da nop
+ *  321  getPublishedByAuthor()          Bai da cong bo diem hoac da dang cua 1 tac gia chinh
+ *  332  getArticleForRead()             Thong tin ngan cua 1 bai (tac gia, ban, tieu de, trang thai); khong co bai -> 404
+ *  338  getAuthors()                    Moi tac gia cua bai kem ty le nhuan but, ty le cao truoc
+ *  348  getAuthorShares()               Ty le nhuan but cua 1 nguoi trong nhieu bai (bai nguoi do khong co ten thi khong co dong)
+ *  357  existsArticle()                 kiem tra ton tai article
+ *  366  changeCategory()                M-A4: BF-02 doi the loai ap dung cua bai (UC-23)
+ *  378  updateArticleStatus()           Ham dung chung cho cac luong khac (BF-02, BF-03, BF-04) doi trang thai bai viet va tu dong ghi 1 dong lich su…
  *  ---- Ham phu (private, chi dung trong file) ----
- *  250  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  256  isAuthor()                      Tac gia chinh (articles.author_id) hoac co dong trong article_authors
- *  273  changeStatus()                  doi status
- *  292  toDetailResponse()              Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
- *  337  loadGenreNames()                Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
- *  346  loadUserNames()                 Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien
+ *  292  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  298  isAuthor()                      Tac gia chinh (articles.author_id) hoac co dong trong article_authors
+ *  383  changeStatus()                  doi status
+ *  402  toReadResponse()                Bai -> DTO doc ngan cho luong khac (M-D2)
+ *  408  toDetailResponse()              Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)
+ *  453  loadGenreNames()                Map genreId -> ten the loai (chi the loai dang dung; the loai da tat -> khong co ten)
+ *  462  loadUserNames()                 Map userId -> ho ten, de doi ma nguoi dung thanh ten khi tra ve giao dien
  */
 @Service
 @RequiredArgsConstructor
@@ -73,6 +88,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ArticleStatusLogRepository articleStatusLogRepository;
+    private final ArticleVersionRepository articleVersionRepository;
     // Ho ten nguoi dung la du lieu luong admin -> goi service cua ho, khong query bang users (AGENTS.md muc 2)
     private final UserReadService userReadService;
     // Ten the loai la du lieu luong admin -> goi GenreService
@@ -133,12 +149,23 @@ public class ArticleService {
     public ArticleDetailResponse getArticleDetail(Integer articleId, Integer currentUserId) {
         Article article = findArticle(articleId);
 
-        // Iter 1 chi tac gia chinh va dong tac gia duoc xem (BR-IN-01: dong tac gia chi xem).
-        // TODO(BF-02): cho them BTV duoc giao va Truong ban khi co AssignmentService, User
+        // Chi tac gia chinh va dong tac gia (BR-IN-01: dong tac gia chi xem). Ham nay de cac service BF-01
+        // tra lai bai sau khi luu / nop / xac nhan; API GET /api/articles/{id} kiem quyen o ArticleViewService
         if (!isAuthor(article, currentUserId)) {
             throw new BusinessException("Bạn không phải tác giả của bài viết này nên không được xem.");
         }
         return toDetailResponse(article, currentUserId);
+    }
+
+    /**
+     * UC-02 cho nguoi xem khong phai tac gia (BTV duoc giao, Truong ban): dung chi tiet bai, KHONG kiem quyen.
+     * Chi goi tu ArticleViewService sau khi da kiem quyen (ArticleService khong goi duoc AssignmentService
+     * vi AssignmentService da goi ArticleService -> vong phu thuoc).
+     */
+    @Transactional(readOnly = true)
+    public ArticleDetailResponse buildArticleDetail(Integer articleId, Integer viewerId) {
+        Article article = findArticle(articleId);
+        return toDetailResponse(article, viewerId);
     }
 
     /**
@@ -159,6 +186,11 @@ public class ArticleService {
 
         // Theo comment bang articles: rut bai thi ghi withdrawn_at
         article.setWithdrawnAt(LocalDateTime.now());
+        // B11 (Quang 01/11): bai SUBMITTED chua tung phan cong BTV -> bo su kien + hang + ty le da khoa,
+        // nop lai thi chon lai su kien va dem hang moi. Hang cua bai khac khong tinh lai
+        article.setEventId(null);
+        article.setSaturationRank(null);
+        article.setSaturationRate(null);
         changeStatus(article, ArticleStatus.DRAFT, currentUserId, ACTION_WITHDRAW, null);
         return toDetailResponse(article, currentUserId);
     }
@@ -244,6 +276,16 @@ public class ArticleService {
         return result;
     }
 
+    /**
+     * Cho BF-02 (Duong, 02/11): nguoi dung la tac gia chinh hoac dong tac gia cua bai thi tra true.
+     * Dung de kiem quyen xem phieu cham (getLatestAttemptForUser). Bai khong ton tai -> 404.
+     */
+    @Transactional(readOnly = true)
+    public boolean isAuthorOrCoAuthor(Integer articleId, Integer userId) {
+        Article article = findArticle(articleId);
+        return isAuthor(article, userId);
+    }
+
     // ---------------------------------------------------------------- ham phu
 
     // Tim bai theo ma, khong co thi bao 404 (NotFoundException)
@@ -258,6 +300,74 @@ public class ArticleService {
             return true;
         }
         return articleAuthorRepository.existsByArticleIdAndUserId(article.getId(), userId);
+    }
+
+    // ---------------------------------------------------------------- M-D2: ham doc cho luong khac
+    // (BF-03, BF-04, BF-05 goi cac ham nay thay vi doc thang bang cua BF-01 bang repository / JdbcTemplate)
+
+    // 1 ban luu cua bai (article_versions), dung de cham mu / cham lai dung ban da nop
+    @Transactional(readOnly = true)
+    public ArticleVersionReadResponse getVersionForRead(Integer articleId, Integer versionId) {
+        ArticleVersion version = articleVersionRepository.findById(versionId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên bản bài viết."));
+        if (!version.getArticleId().equals(articleId)) {
+            throw new NotFoundException("Không tìm thấy phiên bản bài viết.");
+        }
+        return new ArticleVersionReadResponse(version.getId(), version.getArticleId(), version.getTitle(), version.getContent());
+    }
+
+    // Bai da cong bo diem hoac da dang cua 1 tac gia chinh
+    @Transactional(readOnly = true)
+    public List<ArticleReadResponse> getPublishedByAuthor(Integer authorId) {
+        List<ArticleReadResponse> result = new ArrayList<>();
+        for (Article article : articleRepository.findByAuthorIdAndStatusIn(authorId,
+                List.of(ArticleStatus.SCORE_PUBLISHED, ArticleStatus.PUBLISHED))) {
+            result.add(toReadResponse(article));
+        }
+        return result;
+    }
+
+    // Thong tin ngan cua 1 bai (tac gia, ban, tieu de, trang thai); khong co bai -> 404
+    @Transactional(readOnly = true)
+    public ArticleReadResponse getArticleForRead(Integer articleId) {
+        return toReadResponse(findArticle(articleId));
+    }
+
+    // Moi tac gia cua bai kem ty le nhuan but, ty le cao truoc
+    @Transactional(readOnly = true)
+    public List<ArticleAuthorShareResponse> getAuthors(Integer articleId) {
+        List<ArticleAuthorShareResponse> result = new ArrayList<>();
+        for (ArticleAuthor author : articleAuthorRepository.findByArticleIdOrderBySharePercentDesc(articleId)) {
+            result.add(new ArticleAuthorShareResponse(author.getArticleId(), author.getUserId(), author.getSharePercent()));
+        }
+        return result;
+    }
+
+    // Ty le nhuan but cua 1 nguoi trong nhieu bai (bai nguoi do khong co ten thi khong co dong)
+    @Transactional(readOnly = true)
+    public List<ArticleAuthorShareResponse> getAuthorShares(Integer userId, List<Integer> articleIds) {
+        List<ArticleAuthorShareResponse> result = new ArrayList<>();
+        for (ArticleAuthor author : articleAuthorRepository.findByUserIdAndArticleIdIn(userId, articleIds)) {
+            result.add(new ArticleAuthorShareResponse(author.getArticleId(), author.getUserId(), author.getSharePercent()));
+        }
+        return result;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsArticle(Integer articleId) {
+        return articleRepository.existsById(articleId);
+    }
+
+    /**
+     * M-A4: BF-02 doi the loai ap dung cua bai (UC-23). Chi doi articles.category_id;
+     * dong log category_change_logs do BF-02 ghi (bang cua BF-02, comment bang articles trong schema.sql).
+     */
+    @Transactional
+    public void changeCategory(Integer articleId, Integer newCategoryId) {
+        Article article = findArticle(articleId);
+        article.setCategoryId(newCategoryId);
+        article.setUpdatedAt(LocalDateTime.now());
+        articleRepository.save(article);
     }
 
     /**
@@ -286,6 +396,12 @@ public class ArticleService {
         article.setStatus(newStatus);
         article.setUpdatedAt(now);
         articleRepository.save(article);
+    }
+
+    // Bai -> DTO doc ngan cho luong khac (M-D2)
+    private ArticleReadResponse toReadResponse(Article article) {
+        return new ArticleReadResponse(article.getId(), article.getAuthorId(), article.getSectionId(),
+                article.getTitle(), article.getStatus().name());
     }
 
     // Gom bai + tac gia + lich su (kem ho ten) thanh DTO chi tiet bai (UC-02)

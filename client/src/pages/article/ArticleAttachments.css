@@ -1,0 +1,122 @@
+/* ===========================================================================
+   pages/article/ArticleAttachments.jsx - Khoi anh / video cua bai (Iter 3, UC-03, UC-07).
+   Tien to class: .anh-bai__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+   Khung giong cac khoi khac cua man soan bai / chi tiet bai.
+
+   MUC LUC (so dong - khoi CSS)
+     12  tieu de, bo cuc dau trang
+     31  Danh sach
+    102  Form them anh / video
+   =========================================================================== */
+
+.anh-bai {
+  padding: 20px 24px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.anh-bai__title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.anh-bai__muted {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--fm-chu-nhat);
+}
+
+/* ---- Danh sach ---- */
+.anh-bai__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.anh-bai__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--fm-vien);
+}
+
+.anh-bai__thumb {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--fm-nen);
+}
+
+.anh-bai__thumb--trong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  color: var(--fm-chu-nhat);
+}
+
+.anh-bai__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.anh-bai__name {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.anh-bai__link {
+  display: block;
+  font-size: 12.5px;
+  color: var(--fm-chinh);
+  word-break: break-all;
+}
+
+.anh-bai__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.anh-bai__badge {
+  padding: 2px 8px;
+  font-size: 11.5px;
+  border-radius: 10px;
+  background: var(--fm-nen);
+  color: var(--fm-chu-nhat);
+}
+
+.anh-bai__badge--tot { background: var(--fm-tot-nen); color: var(--fm-tot); }
+.anh-bai__badge--loi { background: var(--fm-loi-nen); color: var(--fm-loi); }
+.anh-bai__badge--canh-bao { background: var(--fm-chu-y-nen); color: var(--fm-chu-y); }
+
+/* ---- Form them anh / video ---- */
+.anh-bai__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.anh-bai__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.anh-bai__row > .o-nhap {
+  flex: 1;
+  min-width: 140px;
+}
+
+.anh-bai__radio {
+  font-size: 13px;
+}

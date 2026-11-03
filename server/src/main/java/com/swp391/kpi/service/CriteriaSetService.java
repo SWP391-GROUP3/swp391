@@ -23,19 +23,15 @@ import java.util.Optional;
 /**
  * Service xử lý nghiệp vụ Quản lý bộ tiêu chí chấm (Luồng BF-02 / Admin).
  * Thực thi các Use Cases: UC-14, UC-15, UC-16, UC-17 và Business Rules:
- * BR-QA-01, 02, 03.
+ * BR-SC-01, 02, 03.
  *
  * MUC LUC (so dong - ten - tac dung)
- * 37 field repository / service duoc inject
- * 40 CriteriaSetService() ham khoi tao
- * 50 getVersionsByCategory() Lay toan bo danh sach phien ban bo tieu chi cua
- * mot the loai (UC-14)
- * 67 getActiveVersionByCategory() Lay phien ban bo tieu chi dang ACTIVE cua mot
- * the loai (BR-QA-03)
- * 82 createDraftVersion() Tao phien ban bo tieu chi moi o trang thai DRAFT
- * (UC-15, UC-16)
- * 143 activateVersion() Kich hoat mot phien ban DRAFT thanh ACTIVE (UC-17,
- * BR-QA-03)
+ *   39  field                           repository / service duoc inject
+ *   42  CriteriaSetService()            ham khoi tao
+ *   53  getVersionsByCategory()         Lay toan bo danh sach phien ban bo tieu chi cua mot the loai (UC-14)
+ *   71  getActiveVersionByCategory()    Lay phien ban bo tieu chi dang ACTIVE cua mot the loai (BR-SC-03)
+ *   88  createDraftVersion()            Tao phien ban bo tieu chi moi o trang thai DRAFT (UC-15, UC-16)
+ *  151  activateVersion()               Kich hoat mot phien ban DRAFT thanh ACTIVE (UC-17, BR-SC-02)
  */
 @Service
 public class CriteriaSetService {
@@ -68,8 +64,8 @@ public class CriteriaSetService {
     }
 
     /**
-     * Lấy phiên bản bộ tiêu chí đang ACTIVE của một thể loại (BR-QA-03).
-     * Sử dụng khi BTV mở bài để nạp tiêu chí chấm (UC-22, BR-QA-06).
+     * Lấy phiên bản bộ tiêu chí đang ACTIVE của một thể loại (BR-SC-03).
+     * Sử dụng khi BTV mở bài để nạp tiêu chí chấm (UC-22, BR-SC-03).
      */
     @Transactional(readOnly = true)
     public CriteriaSetVersionResponse getActiveVersionByCategory(Integer categoryId) {
@@ -85,11 +81,11 @@ public class CriteriaSetService {
 
     /**
      * Tạo phiên bản bộ tiêu chí mới ở trạng thái DRAFT (UC-15, UC-16).
-     * Kiểm tra tổng trọng số phải đúng 100.00% (BR-QA-01).
-     * Version mới luôn có version_no = max(version_no) + 1 (BR-QA-02).
+     * Kiểm tra tổng trọng số phải đúng 100.00% (BR-SC-01).
+     * Version mới luôn có version_no = max(version_no) + 1 (BR-SC-02).
      */
     @Transactional
-    public CriteriaSetVersionResponse createDraftVersion(CriteriaSetVersionCreateRequest request) {
+    public CriteriaSetVersionResponse createDraftVersion(CriteriaSetVersionCreateRequest request, Integer currentUserId) {
         List<CriteriaItemDTO> items = request.getCriteria();
 
         // Kiểm tra tối thiểu 2 tiêu chí
@@ -97,7 +93,7 @@ public class CriteriaSetService {
             throw new BusinessException("Bộ tiêu chí phải có ít nhất 2 tiêu chí thành phần");
         }
 
-        // BR-QA-01: Kiểm tra tổng trọng số phải chính xác 100.00%
+        // BR-SC-01: Kiểm tra tổng trọng số phải chính xác 100.00%
         BigDecimal totalWeight = BigDecimal.ZERO;
         for (CriteriaItemDTO item : items) {
             if (item.getWeight() == null || item.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
@@ -111,7 +107,7 @@ public class CriteriaSetService {
                     + totalWeight + "%");
         }
 
-        // BR-QA-02: Xác định version_no kế tiếp
+        // BR-SC-02: Xác định version_no kế tiếp
         Optional<CriteriaSetVersion> maxVersion = criteriaSetVersionRepository
                 .findTopByCategoryIdOrderByVersionNoDesc(request.getCategoryId());
         int nextVersionNo = maxVersion.map(v -> v.getVersionNo() + 1).orElse(1);
@@ -121,7 +117,8 @@ public class CriteriaSetService {
         newVersion.setCategoryId(request.getCategoryId());
         newVersion.setVersionNo(nextVersionNo);
         newVersion.setStatus(CriteriaSetStatus.DRAFT);
-        newVersion.setCreatedBy(request.getCreatedBy() != null ? request.getCreatedBy() : 1);
+        // M-A3: nguoi tao la Admin dang dang nhap (lay tu token)
+        newVersion.setCreatedBy(currentUserId);
         newVersion.setCreatedAt(LocalDateTime.now());
 
         CriteriaSetVersion savedVersion = criteriaSetVersionRepository.save(newVersion);
@@ -147,11 +144,11 @@ public class CriteriaSetService {
     }
 
     /**
-     * Kích hoạt một phiên bản DRAFT thành ACTIVE (UC-17, BR-QA-03).
+     * Kích hoạt một phiên bản DRAFT thành ACTIVE (UC-17, BR-SC-02).
      * Phiên bản ACTIVE cũ của cùng thể loại sẽ tự động chuyển thành RETIRED.
      */
     @Transactional
-    public CriteriaSetVersionResponse activateVersion(Integer versionId, Integer activatedBy) {
+    public CriteriaSetVersionResponse activateVersion(Integer versionId, Integer currentUserId) {
         CriteriaSetVersion versionToActivate = criteriaSetVersionRepository.findById(versionId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên bản bộ tiêu chí với ID: " + versionId));
 
@@ -178,7 +175,7 @@ public class CriteriaSetService {
 
         // Cập nhật phiên bản mới thành ACTIVE
         versionToActivate.setStatus(CriteriaSetStatus.ACTIVE);
-        versionToActivate.setActivatedBy(activatedBy != null ? activatedBy : 1);
+        versionToActivate.setActivatedBy(currentUserId);
         versionToActivate.setActivatedAt(LocalDateTime.now());
 
         CriteriaSetVersion activated = criteriaSetVersionRepository.saveAndFlush(versionToActivate);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import {
   layDanhSachChoDuyetDiem,
   layPhieuChamMoiNhat,
@@ -15,33 +16,36 @@ import '../../styles/Flow2.css'
  * MO TRANG NAY TAI: /score-approvals, /score-approvals/:id
  *
  * MUC LUC (so dong - ten - tac dung)
- *   44  ScoreApprovalQueue()            score approval queue
- *   59    useEffect                     tai du lieu khi mo trang
- *   63    taiDanhSach()                 tai danh sach
- *   76    xemChiTiet()                  xem chi tiet
- *   89    xuLyDuyetDiem()               xu ly duyet diem
- *  108    moModalChamLai()              mo modal cham lai
- *  114    xacNhanChamLai()              xac nhan cham lai
- *  135    dinhDangNgay()                dinh dang ngay
- *  148    renderNhanDeXuat()            render nhan de xuat
+ *   46  ScoreApprovalQueue()            score approval queue
+ *   63    useEffect                     tai du lieu khi mo trang
+ *   67    useEffect                     tai du lieu khi mo trang
+ *   74    taiDanhSach()                 UC-29: bai PENDING_APPROVAL cua ban minh
+ *   88    xemChiTiet()                  UC-30: mo phieu cham moi nhat cua bai (diem tung tieu chi, nhan xet)
+ *  102    xuLyDuyetDiem()               UC-31: duyet diem -> bai SCORE_PUBLISHED, bat dau han khieu nai
+ *  122    moModalChamLai()              UC-32: mo hop nhap ly do yeu cau cham lai
+ *  129    xacNhanChamLai()              UC-32: gui yeu cau cham lai (bat buoc ly do) -> bai ve dung BTV cu
+ *  151    dinhDangNgay()                Ngay gio kieu Viet Nam de hien trong bang
+ *  165    renderNhanDeXuat()            Nhan mau cho quyet dinh cua BTV (ACCEPT / REVISION / REJECT)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  174  [Dang tai... / Lam moi danh sach]  taiDanhSach() -> goi GET /api/score-approvals{query}
- *  242  [Xem chi tiet]                  xemChiTiet() -> goi GET /api/scoring-attempts/article/{articleId}/latest
- *  251  [Duyet diem]                    xuLyDuyetDiem() -> hoi xac nhan; goi POST /api/score-approvals/article/{articleId}/approve, GET /api/score-approvals{query}
- *  260  [Cham lai]                      moModalChamLai() -> tren trang: bai viet cham lai, dong/xoa ly do cham lai, dong/xoa loi
- *  277  [vung nen ngoai hop thoai]      tren trang: dong/xoa phieu xem chi tiet
- *  285  [✕]                             tren trang: dong/xoa phieu xem chi tiet
- *  356  [Dong]                          tren trang: dong/xoa phieu xem chi tiet
- *  364  [Yeu cau cham lai]              tren trang: bai viet cham lai, dong/xoa ly do cham lai, dong/xoa loi
- *  376  [Phe duyet diem nay]            xuLyDuyetDiem() -> hoi xac nhan; goi POST /api/score-approvals/article/{articleId}/approve, GET /api/score-approvals{query}
- *  388  [vung nen ngoai hop thoai]      tren trang: dong/xoa bai viet cham lai
- *  396  [✕]                             tren trang: dong/xoa bai viet cham lai
- *  422  [Huy bo]                        tren trang: dong/xoa bai viet cham lai
- *  431  [Dang gui... / Xac nhan yeu cau cham lai]  xacNhanChamLai() -> goi POST /api/score-approvals/article/{articleId}/return, GET /api/score-approvals{query}
+ *  191  [Dang tai... / Lam moi danh sach]  taiDanhSach() UC-29: bai PENDING_APPROVAL cua ban minh -> goi GET /api/score-approvals
+ *  259  [Xem chi tiet]                  xemChiTiet() UC-30: mo phieu cham moi nhat cua bai (diem tung tieu chi, nhan xet) -> goi GET /api/scoring-attempts/article/{articleId}/latest
+ *  268  [Duyet diem]                    xuLyDuyetDiem() UC-31: duyet diem -> bai SCORE_PUBLISHED, bat dau han khieu nai -> hoi xac nhan; goi POST /api/score-approvals/article/{articleId}/approve, GET…
+ *  277  [Cham lai]                      moModalChamLai() UC-32: mo hop nhap ly do yeu cau cham lai -> tren trang: bai viet cham lai, dong/xoa ly do cham lai, dong/xoa loi
+ *  294  [vung nen ngoai hop thoai]      tren trang: dong/xoa phieu xem chi tiet
+ *  302  [✕]                             tren trang: dong/xoa phieu xem chi tiet
+ *  373  [Dong]                          tren trang: dong/xoa phieu xem chi tiet
+ *  381  [Yeu cau cham lai]              tren trang: bai viet cham lai, dong/xoa ly do cham lai, dong/xoa loi
+ *  393  [Phe duyet diem nay]            xuLyDuyetDiem() UC-31: duyet diem -> bai SCORE_PUBLISHED, bat dau han khieu nai -> hoi xac nhan; goi POST /api/score-approvals/article/{articleId}/approve, GET…
+ *  405  [vung nen ngoai hop thoai]      tren trang: dong/xoa bai viet cham lai
+ *  413  [✕]                             tren trang: dong/xoa bai viet cham lai
+ *  439  [Huy bo]                        tren trang: dong/xoa bai viet cham lai
+ *  448  [Dang gui... / Xac nhan yeu cau cham lai]  xacNhanChamLai() UC-32: gui yeu cau cham lai (bat buoc ly do) -> bai ve dung BTV cu -> goi POST /api/score-approvals/article/{articleId}/return, GET /api/score…
  */
 
-export default function ScoreApprovalQueue({ nguoiDung }) {
+export default function ScoreApprovalQueue() {
+  // /score-approvals/:id (link tu trang chu Truong ban): id = ma bai, mo san phieu cham cua bai do
+  const { id } = useParams()
   const [danhSach, setDanhSach] = useState([])
   const [dangTai, setDangTai] = useState(false)
   const [thongBao, setThongBao] = useState('')
@@ -51,7 +55,7 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
   const [phieuXemChiTiet, setPhieuXemChiTiet] = useState(null)
   const [dangTaiChiTiet, setDangTaiChiTiet] = useState(false)
 
-  // Modal yêu cầu chấm lại (UC-31)
+  // Modal yêu cầu chấm lại (UC-32)
   const [baiVietChamLai, setBaiVietChamLai] = useState(null)
   const [lyDoChamLai, setLyDoChamLai] = useState('')
   const [dangXuLy, setDangXuLy] = useState(false)
@@ -60,11 +64,18 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
     taiDanhSach()
   }, [])
 
+  useEffect(() => {
+    if (id) {
+      xemChiTiet(Number(id))
+    }
+  }, [id])
+
+  // UC-29: bai PENDING_APPROVAL cua ban minh
   async function taiDanhSach() {
     setDangTai(true)
     setLoi('')
     try {
-      const data = await layDanhSachChoDuyetDiem(nguoiDung?.sectionId)
+      const data = await layDanhSachChoDuyetDiem()
       setDanhSach(data || [])
     } catch (err) {
       setLoi(err.message || 'Không thể tải danh sách chờ duyệt điểm')
@@ -73,6 +84,7 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
     }
   }
 
+  // UC-30: mo phieu cham moi nhat cua bai (diem tung tieu chi, nhan xet)
   async function xemChiTiet(articleId) {
     setDangTaiChiTiet(true)
     setLoi('')
@@ -86,6 +98,7 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
     }
   }
 
+  // UC-31: duyet diem -> bai SCORE_PUBLISHED, bat dau han khieu nai
   async function xuLyDuyetDiem(articleId) {
     if (!window.confirm('Bạn có chắc chắn muốn phê duyệt điểm đánh giá cho bài viết này? Điểm sẽ được chính thức công bố.')) {
       return
@@ -105,12 +118,14 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
     }
   }
 
+  // UC-32: mo hop nhap ly do yeu cau cham lai
   function moModalChamLai(item) {
     setBaiVietChamLai(item)
     setLyDoChamLai('')
     setLoi('')
   }
 
+  // UC-32: gui yeu cau cham lai (bat buoc ly do) -> bai ve dung BTV cu
   async function xacNhanChamLai() {
     if (!lyDoChamLai.trim()) {
       setLoi('Vui lòng nhập lý do yêu cầu BTV chấm lại.')
@@ -132,6 +147,7 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
     }
   }
 
+  // Ngay gio kieu Viet Nam de hien trong bang
   function dinhDangNgay(dateStr) {
     if (!dateStr) return '—'
     try {
@@ -145,6 +161,7 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
     }
   }
 
+  // Nhan mau cho quyet dinh cua BTV (ACCEPT / REVISION / REJECT)
   function renderNhanDeXuat(decision) {
     switch (decision) {
       case 'ACCEPT':
@@ -383,7 +400,7 @@ export default function ScoreApprovalQueue({ nguoiDung }) {
         </div>
       )}
 
-      {/* Modal Yêu Cầu Chấm Lại (UC-31) */}
+      {/* Modal Yêu Cầu Chấm Lại (UC-32) */}
       {baiVietChamLai && (
         <div className="duyet-diem__modal-nen" onClick={() => setBaiVietChamLai(null)}>
           <div className="duyet-diem__modal-hop" style={{ maxWidth: 500 }} onClick={(e) => e.stopPropagation()}>

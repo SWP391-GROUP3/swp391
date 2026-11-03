@@ -4,11 +4,13 @@ import com.swp391.kpi.dto.AssignmentCreateRequest;
 import com.swp391.kpi.dto.AssignmentResponse;
 import com.swp391.kpi.dto.EditorWorkloadDTO;
 import com.swp391.kpi.dto.PendingAssignmentResponse;
+import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleStatus;
 import com.swp391.kpi.entity.Assignment;
 import com.swp391.kpi.entity.Genre;
 import com.swp391.kpi.entity.User;
+import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.AssignmentRepository;
 import com.swp391.kpi.repository.GenreRepository;
@@ -47,6 +49,13 @@ class AssignmentServiceTest {
     @Mock
     private GenreRepository genreRepository;
 
+    @Mock
+    private UserReadService userReadService;
+
+    // Truong ban ban 1 (duc.vm id 5) va BTV ban 1 (cuong.lh id 3) nhu data.sql
+    private static final UserAccessResponse HEAD = new UserAccessResponse(5, "Vũ Minh Đức", "HEAD_OF_DEPARTMENT", 1, "Ban 1", "ACTIVE");
+    private static final UserAccessResponse EDITOR = new UserAccessResponse(3, "Lê Hoàng Cường", "EDITOR", 1, "Ban 1", "ACTIVE");
+
     @InjectMocks
     private AssignmentService assignmentService;
 
@@ -70,12 +79,13 @@ class AssignmentServiceTest {
         genre.setId(2);
         genre.setName("Tin sâu");
 
+        when(userReadService.requireActive(5, "HEAD_OF_DEPARTMENT")).thenReturn(HEAD);
         when(articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.SUBMITTED, 1))
                 .thenReturn(List.of(article));
         when(userRepository.findById(1)).thenReturn(Optional.of(author));
         when(genreRepository.findById(2)).thenReturn(Optional.of(genre));
 
-        List<PendingAssignmentResponse> result = assignmentService.getPendingAssignments(1);
+        List<PendingAssignmentResponse> result = assignmentService.getPendingAssignments(5);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -91,7 +101,6 @@ class AssignmentServiceTest {
         AssignmentCreateRequest req = new AssignmentCreateRequest();
         req.setArticleId(101);
         req.setEditorId(3);
-        req.setAssignedBy(5);
         req.setWasSuggested(false);
 
         Assignment assignment = new Assignment();
@@ -101,15 +110,58 @@ class AssignmentServiceTest {
         assignment.setAssignedBy(5);
         assignment.setAssignedAt(LocalDateTime.now());
 
+        Article article = new Article();
+        article.setId(101);
+        article.setSectionId(1);
+        article.setStatus(ArticleStatus.SUBMITTED);
+        when(userReadService.requireActive(5, "HEAD_OF_DEPARTMENT")).thenReturn(HEAD);
+        when(userReadService.getUsers()).thenReturn(List.of(HEAD, EDITOR));
+        when(articleRepository.findById(101)).thenReturn(Optional.of(article));
         when(assignmentRepository.findByArticleId(101)).thenReturn(Optional.empty());
         when(assignmentRepository.save(any(Assignment.class))).thenReturn(assignment);
 
-        AssignmentResponse res = assignmentService.assignArticle(req);
+        AssignmentResponse res = assignmentService.assignArticle(req, 5);
 
         assertNotNull(res);
         assertEquals(101, res.getArticleId());
         assertEquals(3, res.getEditorId());
         verify(articleService).updateArticleStatus(eq(101), eq(ArticleStatus.ASSIGNED), eq(5), eq("ASSIGN"), anyString());
+    }
+
+    @Test
+    @DisplayName("assignArticle: M-A4 bài không ở SUBMITTED (vd đã đăng) thì báo lỗi, không đổi trạng thái")
+    void testAssignArticle_NotSubmitted_ThrowsException() {
+        AssignmentCreateRequest req = new AssignmentCreateRequest();
+        req.setArticleId(101);
+        req.setEditorId(3);
+        Article article = new Article();
+        article.setId(101);
+        article.setSectionId(1);
+        article.setStatus(ArticleStatus.PUBLISHED);
+        when(userReadService.requireActive(5, "HEAD_OF_DEPARTMENT")).thenReturn(HEAD);
+        when(articleRepository.findById(101)).thenReturn(Optional.of(article));
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> assignmentService.assignArticle(req, 5));
+
+        assertEquals("Bài viết không còn chờ phân công.", ex.getMessage());
+        verify(articleService, never()).updateArticleStatus(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("assignArticle: người được chọn không phải BTV của ban thì báo lỗi (UC-20 E2)")
+    void testAssignArticle_NotEditorOfSection_ThrowsException() {
+        AssignmentCreateRequest req = new AssignmentCreateRequest();
+        req.setArticleId(101);
+        req.setEditorId(5);
+        Article article = new Article();
+        article.setId(101);
+        article.setSectionId(1);
+        article.setStatus(ArticleStatus.SUBMITTED);
+        when(userReadService.requireActive(5, "HEAD_OF_DEPARTMENT")).thenReturn(HEAD);
+        when(userReadService.getUsers()).thenReturn(List.of(HEAD, EDITOR));
+        when(articleRepository.findById(101)).thenReturn(Optional.of(article));
+
+        assertThrows(BusinessException.class, () -> assignmentService.assignArticle(req, 5));
     }
 
     @Test

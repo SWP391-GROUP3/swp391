@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -52,6 +53,7 @@ class SystemParameterServiceTest {
         assertEquals(Integer.valueOf(20), result.getDupWarnPercent());
         assertEquals(Integer.valueOf(50), result.getDupBlockPercent());
         assertEquals(Integer.valueOf(5), result.getDhashMaxBits());
+        assertEquals(Integer.valueOf(5), result.getShingleSize());
     }
 
     @Test
@@ -98,7 +100,7 @@ class SystemParameterServiceTest {
 
     // ------------------------------------------------------------ du lieu mau
 
-    // 5 tham so giong data.sql, id 1..5 theo thu tu; tra ve de test kiem tra gia tri sau khi sua
+    // 6 tham so giong data.sql, id 1..6 theo thu tu; tra ve de test kiem tra gia tri sau khi sua
     private Map<String, SystemParameter> stubIntakeParameters() {
         Map<String, SystemParameter> stored = new HashMap<>();
         stored.put("MAX_AUTHORS_PER_ARTICLE", parameter(1, "MAX_AUTHORS_PER_ARTICLE", "5"));
@@ -106,6 +108,7 @@ class SystemParameterServiceTest {
         stored.put("DUP_WARN_PERCENT", parameter(3, "DUP_WARN_PERCENT", "20"));
         stored.put("DUP_BLOCK_PERCENT", parameter(4, "DUP_BLOCK_PERCENT", "50"));
         stored.put("DHASH_MAX_BITS", parameter(5, "DHASH_MAX_BITS", "5"));
+        stored.put("SHINGLE_SIZE", parameter(6, "SHINGLE_SIZE", "5"));
         for (SystemParameter parameter : stored.values()) {
             when(systemParameterRepository.findByParamKey(parameter.getParamKey()))
                     .thenReturn(Optional.of(parameter));
@@ -130,6 +133,25 @@ class SystemParameterServiceTest {
         request.setDupWarnPercent(warn);
         request.setDupBlockPercent(block);
         request.setDhashMaxBits(dhash);
+        request.setShingleSize(5);   // giu nguyen gia tri mac dinh, test chi doi 5 o kia
         return request;
+    }
+
+    @Test
+    void getIntValueAndDecimalValue_readParameterByKey() {
+        when(systemParameterRepository.findByParamKey("DUP_WARN_PERCENT"))
+                .thenReturn(Optional.of(parameter(3, "DUP_WARN_PERCENT", " 20 ")));
+        when(systemParameterRepository.findByParamKey("SOME_RATE"))
+                .thenReturn(Optional.of(parameter(9, "SOME_RATE", "1.25")));
+
+        assertEquals(20, systemParameterService.getIntValue("DUP_WARN_PERCENT"));
+        assertEquals(new BigDecimal("1.25"), systemParameterService.getDecimalValue("SOME_RATE"));
+    }
+
+    @Test
+    void getIntValue_missingKey_throwsBusinessException() {
+        when(systemParameterRepository.findByParamKey("KHONG_CO")).thenReturn(Optional.empty());
+
+        assertThrows(BusinessException.class, () -> systemParameterService.getIntValue("KHONG_CO"));
     }
 }

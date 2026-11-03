@@ -55,7 +55,7 @@ class ScoreCalculatorTest {
     }
 
     @Test
-    @DisplayName("Điểm < 50 bắt buộc phải có nhận xét (BR-QA-08) - Nếu thiếu thì ném ngoại lệ")
+    @DisplayName("Điểm < 50 bắt buộc phải có nhận xét (BR-SC-06) - Nếu thiếu thì ném ngoại lệ")
     void testValidate_ScoreUnder50_MissingComment() {
         List<CriteriaScoreInput> items = Collections.singletonList(
                 new CriteriaScoreInput(1, "Văn phong", new BigDecimal("100.00"), new BigDecimal("45.00"), "   ")

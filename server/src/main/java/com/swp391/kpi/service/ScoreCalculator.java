@@ -1,8 +1,6 @@
 package com.swp391.kpi.service;
 
-import org.springframework.stereotype.Component;
 import com.swp391.kpi.dto.CriteriaScoreInput;
-import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -15,18 +13,11 @@ import java.util.List;
  * và GBR-08.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   33  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   43  calculateTotalScore()           Tinh tong diem co trong so tu danh sach diem thanh phan
- *   67  validateItem()                  Kiem tra tinh hop le cua diem thanh phan (0 - 100)
- *   91  isCommentRequired()             Kiem tra tieu chi co bat buoc nhap nhan xet hay khong (BR-QA-08: score < 50.00)
- * 23 hang so - hang so dung trong file
- * 32 calculateTotalScore() - Tính tổng điểm có trọng số từ danh sách điểm thành
- * phần.
- * 56 validateItem() - Kiểm tra tính hợp lệ của điểm thành phần (0 - 100).
- * 78 isCommentRequired() - Kiểm tra tiêu chí có bắt buộc nhập nhận xét hay
- * không (BR-QA-08: score …
+ *   24  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   34  calculateTotalScore()           Tinh tong diem co trong so tu danh sach diem thanh phan
+ *   58  validateItem()                  Kiem tra tinh hop le cua diem thanh phan (0 - 100)
+ *   82  isCommentRequired()             Kiem tra tieu chi co bat buoc nhap nhan xet hay khong (BR-SC-06: score < 50.00)
  */
-@Component
 
 public class ScoreCalculator {
 
@@ -76,7 +67,7 @@ public class ScoreCalculator {
                     "Điểm tiêu chí phải nằm trong khoảng 0 đến 100 (Hiện tại: " + item.getScore() + ")");
         }
 
-        // BR-QA-08: Nếu điểm < 50 thì bắt buộc phải có nhận xét
+        // BR-SC-06: Nếu điểm < 50 thì bắt buộc phải có nhận xét
         if (isCommentRequired(item.getScore())) {
             if (item.getComment() == null || item.getComment().trim().isEmpty()) {
                 throw new IllegalArgumentException("Tiêu chí đạt dưới 50 điểm bắt buộc phải nhập nhận xét lý do!");
@@ -85,7 +76,7 @@ public class ScoreCalculator {
     }
 
     /**
-     * Kiểm tra tiêu chí có bắt buộc nhập nhận xét hay không (BR-QA-08: score <
+     * Kiểm tra tiêu chí có bắt buộc nhập nhận xét hay không (BR-SC-06: score <
      * 50.00).
      */
     public boolean isCommentRequired(BigDecimal score) {
