@@ -7,6 +7,7 @@ import {
   nopPhieuCham
 } from '../../api/assessmentApi.js'
 import { getGenres } from '../../api/adminApi.js'
+import { goiApi } from '../../api/goiApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_BAI_DUOC_GIAO, BT_TIEU_CHI, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
@@ -40,10 +41,12 @@ import '../../styles/Flow2.css'
  */
 
 export default function ScoringSheet({ nguoiDung }) {
+export default function ScoringSheet({ nguoiDung, articleIdProp, onBack }) {
   const params = useParams()
   const navigate = useNavigate()
   const articleId = Number(params.articleId)
 
+  const [genres, setGenres] = useState([])
   const [attempt, setAttempt] = useState(null)
   const [details, setDetails] = useState([])
   const [newCategoryId, setNewCategoryId] = useState('')
@@ -60,13 +63,9 @@ export default function ScoringSheet({ nguoiDung }) {
   const [selectedDecision, setSelectedDecision] = useState('')
   const [decisionNote, setDecisionNote] = useState('')
 
+  // Tai the loai thuc te tu database
   useEffect(() => {
-    let ignore = false
-
-    async function loadScoringSheet() {
-      setLoading(true)
-      setError('')
-      setSuccess('')
+    async function fetchGenres() {
       try {
         const [data, danhSachTheLoai] = await Promise.all([moPhieuCham(articleId), getGenres()])
         if (!ignore) {
@@ -74,24 +73,36 @@ export default function ScoringSheet({ nguoiDung }) {
           setDetails(data.details || [])
           setNewCategoryId(data.categoryId)
           setGenres(danhSachTheLoai || [])
+        const data = await goiApi('/api/genres')
+        if (Array.isArray(data)) {
+          setGenres([...data].sort((a, b) => a.id - b.id))
         }
       } catch (err) {
-        if (!ignore) {
-          setError('Lỗi tải phiếu chấm: ' + err.message)
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false)
-        }
+        console.error('Không tải được thể loại:', err)
       }
     }
+    fetchGenres()
+  }, [])
 
+  async function loadScoringSheet() {
+    setLoading(true)
+    setError('')
+    setSuccess('')
+    try {
+      const data = await moPhieuCham(articleId)
+      setAttempt(data)
+      setDetails(data.details || [])
+      setNewCategoryId(data.categoryId || 1)
+    } catch (err) {
+      setError('Lỗi tải phiếu chấm: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     if (articleId) {
       loadScoringSheet()
-    }
-
-    return () => {
-      ignore = true
     }
   }, [articleId])
 
@@ -177,11 +188,14 @@ export default function ScoringSheet({ nguoiDung }) {
   // Mo modal de nop quyet dinh
   function handleOpenDecisionModal(decision) {
     setError('')
-    // Neu la ACCEPT thi phai luu diem truoc
+    // Neu la ACCEPT thi kiem tra tinh hop le cua diem va nhan xet truoc
     if (decision === 'ACCEPT') {
-      if (!attempt.totalScore && Number(calculatedTotalScore) === 0) {
-        alert('Vui lòng nhập điểm và lưu điểm trước khi chọn Đồng ý (ACCEPT)!')
-        return
+      for (const d of details) {
+        const s = Number(d.score)
+        if (s < 50 && (!d.comment || !d.comment.trim())) {
+          setError(`Tiêu chí "${d.criterionName}" đạt dưới 50 điểm (${s}) bắt buộc phải nhập nhận xét lý do!`)
+          return
+        }
       }
     }
     setSelectedDecision(decision)
@@ -204,6 +218,18 @@ export default function ScoringSheet({ nguoiDung }) {
     setError('')
     setSuccess('')
     try {
+      // Neu chap nhan diem (ACCEPT), tu dong luu diem tieu chi hien tai truoc khi nop diem
+      if (selectedDecision === 'ACCEPT') {
+        const payload = details.map(d => ({
+          criterionId: d.criterionId,
+          score: Number(d.score) || 0,
+          comment: d.comment || null
+        }))
+        const savedDraft = await luuDiemTieuChi(articleId, payload)
+        setAttempt(savedDraft)
+        setDetails(savedDraft.details || [])
+      }
+
       const data = await nopPhieuCham(articleId, selectedDecision, decisionNote)
       setAttempt(data)
       setDetails(data.details || [])
@@ -263,7 +289,14 @@ export default function ScoringSheet({ nguoiDung }) {
         )}
       </div>
 
-      {error && <div className="thong-bao-loi" style={{ marginBottom: 16 }}>{error}</div>}
+      {error && (
+        <div className="thong-bao-loi" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{error}</span>
+          <button type="button" onClick={loadScoringSheet} className="nut-nhe" style={{ marginLeft: 12 }}>
+            Thử lại
+          </button>
+        </div>
+      )}
       {success && <div className="thong-bao-thanh-cong" style={{ marginBottom: 16 }}>{success}</div>}
 
       {loading ? (
@@ -309,6 +342,11 @@ export default function ScoringSheet({ nguoiDung }) {
                 <div>
                   <span className="bf02__nhan">Thể loại áp dụng:</span>{' '}
                   <strong>{genres.find(c => c.id === attempt.categoryId)?.name || 'Thể loại #' + attempt.categoryId}</strong>
+                  <strong>
+                    {genres.find(c => c.id === attempt.categoryId)?.name
+                      ? `${attempt.categoryId} - ${genres.find(c => c.id === attempt.categoryId).name}`
+                      : (attempt.categoryName || `Thể loại #${attempt.categoryId}`)}
+                  </strong>
                 </div>
 
                 {!isSubmitted && (
@@ -321,6 +359,7 @@ export default function ScoringSheet({ nguoiDung }) {
                     >
                       {genres.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
+                        <option key={c.id} value={c.id}>{c.id} - {c.name}</option>
                       ))}
                     </select>
                     <button

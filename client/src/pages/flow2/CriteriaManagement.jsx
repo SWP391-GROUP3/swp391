@@ -7,6 +7,7 @@ import {
   kichHoatBoTieuChi
 } from '../../api/assessmentApi.js'
 import { getGenres } from '../../api/adminApi.js'
+import { goiApi } from '../../api/goiApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_TIEU_CHI, BT_DANH_SACH, BT_THEM, BT_THONG_TIN, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
@@ -42,6 +43,8 @@ export default function CriteriaManagement({ nguoiDung }) {
   const [searchParams] = useSearchParams()
   const [genres, setGenres] = useState([])
   const [categoryId, setCategoryId] = useState(null)
+  const [genres, setGenres] = useState([])
+  const [categoryId, setCategoryId] = useState(1)
   const [activeVersion, setActiveVersion] = useState(null)
   const [allVersions, setAllVersions] = useState([])
   const [previewVersion, setPreviewVersion] = useState(null)
@@ -62,6 +65,25 @@ export default function CriteriaManagement({ nguoiDung }) {
   const totalWeight = criteriaList.reduce((sum, c) => sum + (Number(c.weight) || 0), 0)
 
   // Mo trang: tai the loai; ?genreId= (link tu trang chu Admin) thi mo san the loai do
+  // Tải danh mục thể loại thực tế từ database
+  useEffect(() => {
+    async function fetchGenres() {
+      try {
+        const data = await goiApi('/api/genres')
+        if (Array.isArray(data) && data.length > 0) {
+          const sorted = [...data].sort((a, b) => a.id - b.id)
+          setGenres(sorted)
+          if (!sorted.some(g => g.id === categoryId)) {
+            setCategoryId(sorted[0].id)
+          }
+        }
+      } catch (err) {
+        console.error('Không tải được danh sách thể loại:', err)
+      }
+    }
+    fetchGenres()
+  }, [])
+
   useEffect(() => {
     getGenres()
       .then(data => {
@@ -208,8 +230,17 @@ export default function CriteriaManagement({ nguoiDung }) {
           {genres.map(g => (
             <option key={g.id} value={g.id}>{g.name}</option>
           ))}
+          {genres.length > 0 ? (
+            genres.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.id} - {g.name}
+              </option>
+            ))
+          ) : (
+            <option value={categoryId}>{categoryId} - Đang tải thể loại...</option>
+          )}
         </select>
-        <button type="button" onClick={() => loadActiveVersion(categoryId)} className="nut-nhe">
+        <button type="button" onClick={() => loadCategoryData(categoryId)} className="nut-nhe">
           Tải lại
         </button>
       </div>
