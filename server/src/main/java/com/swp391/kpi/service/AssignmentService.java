@@ -8,11 +8,13 @@ import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleStatus;
 import com.swp391.kpi.entity.Assignment;
 import com.swp391.kpi.entity.Genre;
+import com.swp391.kpi.entity.ScoringAttempt;
 import com.swp391.kpi.entity.User;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.AssignmentRepository;
 import com.swp391.kpi.repository.GenreRepository;
+import com.swp391.kpi.repository.ScoringAttemptRepository;
 import com.swp391.kpi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class AssignmentService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final GenreRepository genreRepository;
+    private final ScoringAttemptRepository scoringAttemptRepository;
 
     /**
      * Lấy danh sách bài viết SUBMITTED cho Trưởng ban phân công (UC-18).
@@ -129,13 +132,56 @@ public class AssignmentService {
 
     /**
      * Lấy danh sách các bài viết được phân công cho 1 BTV (Hàng việc của BTV - UC-21).
+     * Bổ sung thông tin tiêu đề, thể loại và trạng thái đã chấm / chưa chấm để BTV xem trước.
      */
     @Transactional(readOnly = true)
     public List<AssignmentResponse> getAssignmentsByEditorId(Integer editorId) {
-        return assignmentRepository.findByEditorIdOrderByAssignedAtDesc(editorId)
-                .stream()
-                .map(AssignmentResponse::from)
-                .toList();
+        List<Assignment> assignments = assignmentRepository.findByEditorIdOrderByAssignedAtDesc(editorId);
+        List<AssignmentResponse> result = new ArrayList<>();
+
+        for (Assignment a : assignments) {
+            AssignmentResponse dto = AssignmentResponse.from(a);
+
+            // Lay thong tin bai viet
+            if (a.getArticleId() != null) {
+                articleRepository.findById(a.getArticleId()).ifPresent(art -> {
+                    dto.setArticleTitle(art.getTitle());
+                    if (art.getStatus() != null) {
+                        dto.setArticleStatus(art.getStatus().name());
+                    }
+                    Integer catId = art.getCategoryId() != null ? art.getCategoryId() : art.getDeclaredCategoryId();
+                    if (catId != null) {
+                        genreRepository.findById(catId).ifPresent(g -> dto.setCategoryName(g.getName()));
+                    }
+                });
+
+                // Lay thong tin lan cham gan nhat de xac dinh da cham / chua cham
+                Optional<ScoringAttempt> latestAttempt = scoringAttemptRepository
+                        .findTopByArticleIdOrderByAttemptNoDesc(a.getArticleId());
+
+                if (latestAttempt.isPresent()) {
+                    ScoringAttempt sa = latestAttempt.get();
+                    if (sa.getSubmittedAt() != null) {
+                        dto.setScoringStatus("DA_CHAM");
+                        dto.setTotalScore(sa.getTotalScore());
+                        if (sa.getDecision() != null) {
+                            dto.setDecision(sa.getDecision().name());
+                        }
+                    } else {
+                        dto.setScoringStatus("DANG_CHAM");
+                        dto.setTotalScore(sa.getTotalScore());
+                    }
+                } else {
+                    dto.setScoringStatus("CHUA_CHAM");
+                }
+            } else {
+                dto.setScoringStatus("CHUA_CHAM");
+            }
+
+            result.add(dto);
+        }
+
+        return result;
     }
 
     /**
