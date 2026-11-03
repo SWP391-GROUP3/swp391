@@ -64,4 +64,16 @@ class MediaFactorServiceTest {
         assertEquals("Không tìm thấy loại ảnh/video có ID: 99", ex.getMessage());
         verify(mediaFactorRepository, never()).save(any());
     }
+
+    @Test
+    void getFactor_returnsFactorOfMediaKind() {
+        MediaFactor photo = new MediaFactor();
+        photo.setMediaKind("PHOTO");
+        photo.setFactor(new BigDecimal("1.00"));
+        when(mediaFactorRepository.findByMediaKind("PHOTO")).thenReturn(Optional.of(photo));
+        when(mediaFactorRepository.findByMediaKind("AUDIO")).thenReturn(Optional.empty());
+
+        assertEquals(new BigDecimal("1.00"), mediaFactorService.getFactor("PHOTO"));
+        assertThrows(NotFoundException.class, () -> mediaFactorService.getFactor("AUDIO"));
+    }
 }

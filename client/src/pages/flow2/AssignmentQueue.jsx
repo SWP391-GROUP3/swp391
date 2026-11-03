@@ -5,6 +5,7 @@ import {
   phanCongBaiViet,
   layDanhSachChoPhanCong
 } from '../../api/assessmentApi.js'
+import { layDanhSachBienTapVien } from '../../api/reviewerProfileApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_PHAN_CONG, BT_THONG_TIN, BT_BIEU_DO } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
@@ -16,32 +17,33 @@ import '../../styles/Flow2.css'
  * MO TRANG NAY TAI: /assignments
  *
  * MUC LUC (so dong - ten - tac dung)
- *   30  AssignmentQueue()               assignment queue
- *   54    useEffect                     tai du lieu khi mo trang
- *   58    useEffect                     tai du lieu khi mo trang
- *   62    loadWorkload()                tai workload
- *   71    loadCurrentAssignment()       tai current assignment
- *   81    handleAssign()                xu ly assign
+ *   37  AssignmentQueue()               assignment queue
+ *   55    useEffect                     Mo trang: tai hang cho phan cong va danh sach BTV cung ban
+ *   61    useEffect                     Doi BTV dang chon: tai so bai BTV do dang giu (UC-19 goi y BTV it viec)
+ *   68    useEffect                     Doi bai dang chon: xem bai da co phan cong chua
+ *   77    loadPendingArticles()         UC-18: bai SUBMITTED cua ban Truong ban dang dang nhap (server lay ban tu token)
+ *  100    loadEditors()                 UC-19: BTV cung ban, chi giu BTV dang ACTIVE; chon san BTV dau tien
+ *  114    loadWorkload()                So bai BTV dang giu, hien canh o chon BTV
+ *  124    loadCurrentAssignment()       Phan cong hien tai cua bai; chua co thi server tra 404 -> bo qua
+ *  135    handleAssign()                UC-20: bam Xac nhan phan cong -> POST /api/assignments, xong tai lai hang cho
+ *  169    dinhDangNgay()                Ngay gio kieu Viet Nam de hien trong bang
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  145  [Dang chon / Chon]              tren trang: selected article id
- *  173  form, nut [Dang luu... / Xac nhan Phan cong ba…]  handleAssign() -> goi POST /api/assignments, GET /api/assignments/editor/{editorId}/workload
+ *  198  [Dang tai... / Lam moi danh sach]  loadPendingArticles() UC-18: bai SUBMITTED cua ban Truong ban dang dang nhap (server lay ban tu token) -> goi GET /api/assignments/pending
+ *  249  [Dang chon / Chon]              tren trang: selected article id
+ *  277  form, nut [Dang luu... / Xac nhan Phan cong ba…]  handleAssign() UC-20: bam Xac nhan phan cong -> POST /api/assignments, xong tai lai hang cho -> goi POST /api/assignments, GET /api/assignments/pending, GET /a…
  */
 
-export default function AssignmentQueue({ nguoiDung }) {
+export default function AssignmentQueue() {
   // Danh sách bài viết chờ phân công (SUBMITTED) tải động từ Database theo ban của Trưởng ban (UC-18)
   const [articles, setArticles] = useState([])
   const [loadingArticles, setLoadingArticles] = useState(false)
 
-  // Danh sách BTV để chọn giao việc (theo data.sql: cuong.lh id=3, giang.nt id=9)
-  const editors = [
-    { id: 3, name: 'Lê Hoàng Cường (Editor Thời sự)', username: 'cuong.lh' },
-    { id: 9, name: 'Ngô Thu Giang (Editor Kinh tế)', username: 'giang.nt' },
-    { id: 4, name: 'Phạm Thu Dung (Thư ký toà soạn)', username: 'dung.pt' }
-  ]
+  // M-A3: BTV dang hoat dong cua ban Truong ban, lay tu GET /api/reviewers (UC-20 E2: BTV bi khoa khong chon duoc)
+  const [editors, setEditors] = useState([])
 
   const [selectedArticleId, setSelectedArticleId] = useState(null)
-  const [selectedEditorId, setSelectedEditorId] = useState(3)
+  const [selectedEditorId, setSelectedEditorId] = useState(null)
   const [wasSuggested, setWasSuggested] = useState(false)
   const [workload, setWorkload] = useState(null)
   const [currentAssignment, setCurrentAssignment] = useState(null)
@@ -49,14 +51,20 @@ export default function AssignmentQueue({ nguoiDung }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Mo trang: tai hang cho phan cong va danh sach BTV cung ban
   useEffect(() => {
     loadPendingArticles()
-  }, [nguoiDung?.sectionId])
+    loadEditors()
+  }, [])
 
+  // Doi BTV dang chon: tai so bai BTV do dang giu (UC-19 goi y BTV it viec)
   useEffect(() => {
-    loadWorkload(selectedEditorId)
+    if (selectedEditorId) {
+      loadWorkload(selectedEditorId)
+    }
   }, [selectedEditorId])
 
+  // Doi bai dang chon: xem bai da co phan cong chua
   useEffect(() => {
     if (selectedArticleId) {
       loadCurrentAssignment(selectedArticleId)
@@ -65,11 +73,12 @@ export default function AssignmentQueue({ nguoiDung }) {
     }
   }, [selectedArticleId])
 
+  // UC-18: bai SUBMITTED cua ban Truong ban dang dang nhap (server lay ban tu token)
   async function loadPendingArticles() {
     setLoadingArticles(true)
     setError('')
     try {
-      const data = await layDanhSachChoPhanCong(nguoiDung?.sectionId)
+      const data = await layDanhSachChoPhanCong()
       setArticles(data || [])
       if (data && data.length > 0) {
         setSelectedArticleId(prev => {
@@ -87,6 +96,21 @@ export default function AssignmentQueue({ nguoiDung }) {
     }
   }
 
+  // UC-19: BTV cung ban, chi giu BTV dang ACTIVE; chon san BTV dau tien
+  async function loadEditors() {
+    try {
+      const data = await layDanhSachBienTapVien()
+      const dangHoatDong = (data || []).filter(ed => ed.status === 'ACTIVE')
+      setEditors(dangHoatDong)
+      if (dangHoatDong.length > 0) {
+        setSelectedEditorId(dangHoatDong[0].editorId)
+      }
+    } catch (err) {
+      setError('Lỗi tải danh sách Biên tập viên: ' + err.message)
+    }
+  }
+
+  // So bai BTV dang giu, hien canh o chon BTV
   async function loadWorkload(editorId) {
     try {
       const data = await layKhoiLuongCongViecBtv(editorId)
@@ -96,6 +120,7 @@ export default function AssignmentQueue({ nguoiDung }) {
     }
   }
 
+  // Phan cong hien tai cua bai; chua co thi server tra 404 -> bo qua
   async function loadCurrentAssignment(articleId) {
     setCurrentAssignment(null)
     try {
@@ -106,10 +131,15 @@ export default function AssignmentQueue({ nguoiDung }) {
     }
   }
 
+  // UC-20: bam Xac nhan phan cong -> POST /api/assignments, xong tai lai hang cho
   async function handleAssign(e) {
     e.preventDefault()
     if (!selectedArticleId) {
       setError('Vui lòng chọn một bài viết để phân công!')
+      return
+    }
+    if (!selectedEditorId) {
+      setError('Ban chưa có Biên tập viên đang hoạt động để giao bài.')
       return
     }
 
@@ -121,7 +151,6 @@ export default function AssignmentQueue({ nguoiDung }) {
       const payload = {
         articleId: Number(selectedArticleId),
         editorId: Number(selectedEditorId),
-        assignedBy: nguoiDung?.id || 5, // ID của Trưởng ban Vũ Minh Đức
         wasSuggested: wasSuggested
       }
 
@@ -136,6 +165,7 @@ export default function AssignmentQueue({ nguoiDung }) {
     }
   }
 
+  // Ngay gio kieu Viet Nam de hien trong bang
   function dinhDangNgay(chuoiNgay) {
     if (!chuoiNgay) return '—'
     try {
@@ -155,7 +185,7 @@ export default function AssignmentQueue({ nguoiDung }) {
 
   return (
     <div className="bf02__the">
-      {/* UC-18, UC-20; BR-QA-04: Trưởng ban phân công bài viết */}
+      {/* UC-18, UC-20; BR-SC-04: Trưởng ban phân công bài viết */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h3 className="bf02__tieu-de"><Icon>{BT_PHAN_CONG}</Icon>Hàng chờ phân công bài viết</h3>
@@ -239,7 +269,7 @@ export default function AssignmentQueue({ nguoiDung }) {
           <div className="bf02__thong-tin">
             <Icon>{BT_THONG_TIN}</Icon>
             <span>
-              Bài này hiện đã được giao cho <strong>BTV #{currentAssignment.editorId}</strong> vào lúc {new Date(currentAssignment.assignedAt).toLocaleString('vi-VN')}. (Phân công lại sẽ cập nhật BTV mới).
+              Bài này hiện đã được giao cho <strong>BTV #{currentAssignment.editorId}</strong> vào lúc {new Date(currentAssignment.assignedAt).toLocaleString('vi-VN')}.
             </span>
           </div>
         )}
@@ -251,12 +281,12 @@ export default function AssignmentQueue({ nguoiDung }) {
             </label>
             <select
               id="phan-cong-btv"
-              value={selectedEditorId}
+              value={selectedEditorId ?? ''}
               onChange={(e) => setSelectedEditorId(Number(e.target.value))}
               className="o-nhap-ngan bf02__o-nhap"
             >
               {editors.map(ed => (
-                <option key={ed.id} value={ed.id}>{ed.name} ({ed.username})</option>
+                <option key={ed.editorId} value={ed.editorId}>{ed.editorName} – {ed.sectionName}</option>
               ))}
             </select>
 

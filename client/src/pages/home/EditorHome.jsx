@@ -59,13 +59,13 @@ function gopDanhSachViec(duLieu) {
   // UC-36, 37: cham mu - khong duoc xem diem va nhan xet cu
   for (const phieu of duLieu.reReviewTasks) {
     danhSach.push({
-      khoa: `khieu-nai-${phieu.appealId}`,
+      khoa: `khieu-nai-${phieu.taskId}`,
       loai: 'Chấm lại do khiếu nại',
       mau: 'cam',
       tieuDe: phieu.title,
       moTa: `Chấm mù, không xem điểm cũ · giao ${formatDate(phieu.assignedAt)}`,
       hanChot: null,
-      duongDan: `/re-reviews/${phieu.appealId}`,
+      duongDan: `/re-reviews/${phieu.taskId}`,
       nut: 'Mở phiếu',
     })
   }
@@ -91,9 +91,9 @@ function gopDanhSachViec(duLieu) {
       loai: 'Chấm chéo',
       mau: 'xanh-duong',
       tieuDe: phieu.title,
-      moTa: `${phieu.batchName} · không ảnh hưởng điểm chính thức`,
+      moTa: 'Không ảnh hưởng điểm chính thức',
       hanChot: null,
-      duongDan: '/re-reviews',
+      duongDan: `/cross-review-tasks/${phieu.taskId}`,
       nut: 'Mở phiếu',
     })
   }
@@ -148,8 +148,7 @@ export default function EditorHome({ nguoiDung }) {
         loi={loi}
         cacDong={thang ? [
           { nhan: 'Bài đã chấm xong', giaTri: thang.scoredCount },
-          { nhan: 'Điểm trung bình đã cho', giaTri: formatNumber(thang.avgScore) },
-          { nhan: 'Bài bị khiếu nại', giaTri: thang.appealedCount, canhBao: thang.appealedCount > 0 },
+          { nhan: 'Điểm trung bình đã cho', giaTri: thang.avgScore == null ? '—' : formatNumber(thang.avgScore) },
         ] : []}
         lienKet={{ to: '/my-scorings', chu: 'Xem lịch sử chấm' }}
       />

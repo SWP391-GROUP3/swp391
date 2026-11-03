@@ -23,8 +23,6 @@ public class CriteriaSetVersionCreateRequest {
     @NotNull(message = "Mã thể loại bài viết không được để trống")
     private Integer categoryId;
 
-    private Integer createdBy;
-
     // Tùy chọn kích hoạt ngay sau khi tạo
     private Boolean autoActivate = false;
 

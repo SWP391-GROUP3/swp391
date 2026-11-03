@@ -3,9 +3,13 @@ package com.swp391.kpi.service;
 import com.swp391.kpi.dto.ArticleAuthorShareRequest;
 import com.swp391.kpi.dto.ArticleCoAuthorCandidateResponse;
 import com.swp391.kpi.dto.ArticleDetailResponse;
+import com.swp391.kpi.dto.ArticleRoyaltyEstimateRequest;
 import com.swp391.kpi.dto.ArticleSaveRequest;
 import com.swp391.kpi.dto.AssignmentResponse;
+import com.swp391.kpi.dto.DuplicationCheckResponse;
+import com.swp391.kpi.dto.EventResponse;
 import com.swp391.kpi.dto.GenreResponse;
+import com.swp391.kpi.dto.RoyaltyEstimateResponse;
 import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleAuthor;
@@ -15,15 +19,12 @@ import com.swp391.kpi.entity.ArticleStatusLog;
 import com.swp391.kpi.entity.ArticleVersion;
 import com.swp391.kpi.entity.ArticleVersionChangeType;
 import com.swp391.kpi.entity.ArticleVersionKind;
-import com.swp391.kpi.entity.DuplicationCheck;
-import com.swp391.kpi.entity.DuplicationResult;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.repository.ArticleAuthorRepository;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.ArticleStatusLogRepository;
 import com.swp391.kpi.repository.ArticleVersionRepository;
-import com.swp391.kpi.repository.DuplicationCheckRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -43,27 +45,31 @@ import java.util.Optional;
  * Doi articles.status luon goi ArticleService.updateArticleStatus() de ghi kem article_status_logs.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   73  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   86  field                           repository / service duoc inject
+ *   79  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   92  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *  103  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia (Phong vien dang ACTIVE, tru chinh minh)
- *  118  createDraft()                   UC-03 + UC-04: tao ban nhap moi, nguoi tao la tac gia chinh
- *  170  updateDraft()                   UC-03 + UC-04: sua ban nhap
- *  194  submitArticle()                 UC-05: nop bai DRAFT. Bai da tung phan cong BTV (vd dot xac nhan khi nop lai bi tu choi, bai ve DRAFT) van ti…
- *  209  resubmitArticle()               UC-10: nop lai bai bi tra ve
+ *  114  getCoAuthorCandidates()         UC-04: phong vien co the chon lam dong tac gia (Phong vien dang ACTIVE, tru chinh minh)
+ *  129  createDraft()                   UC-03 + UC-04: tao ban nhap moi, nguoi tao la tac gia chinh
+ *  181  updateDraft()                   UC-03 + UC-04: sua ban nhap
+ *  209  submitArticle()                 UC-05: nop bai DRAFT. Bai da tung phan cong BTV (vd dot xac nhan khi nop lai bi tu choi, bai ve DRAFT) van ti…
+ *  224  resubmitArticle()               UC-10: nop lai bai bi tra ve
+ *  240  estimateRoyalty()               UC-09: uoc tinh nhuan but phan bai viet truoc khi nop, khong luu gi
  *  ---- Ham phu (private, chi dung trong file) ----
- *  225  doSubmit()                      Phan chung cua nop / nop lai: kiem du lieu -> chup ban SUBMISSION -> kiem trung (ban tam) -> dat han xac nhan…
- *  324  saveAuthors()                   Luu danh sach tac gia: sua tai cho (khong xoa roi them lai cung khoa chinh)
- *  367  copyDeclarations()              Chep khai bao tu request vao bai
- *  380  authorsOrMainOnly()             Khong gui danh sach tac gia -> chi tac gia chinh 100%
- *  391  validateShares()                BR-IN-02 + dong tac gia phai la Phong vien dang ACTIVE (UC-04 buoc 2 "selects a reporter")
- *  416  shareErrorOfRows()              Kiem lai ty le tren cac dong da luu (luc nop)
- *  427  checkCategory()                 The loai phai la the loai dang dung (GenreService cua luong admin)
- *  437  checkMainAuthor()               BR-IN-01: chi tac gia chinh (articles.author_id) duoc sua / nop / nop lai
- *  444  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  450  findUser()                      Tim tai khoan qua UserReadService (luong admin), khong co thi 404
- *  460  readIntParam()                  Tham so so nguyen cua BF-01 trong system_parameters, khong viet cung so trong code
- *  469  shorten()                       notifications.message toi da 500 ky tu (tieu de bai co the dai toi 300)
+ *  270  doSubmit()                      Phan chung cua nop / nop lai: kiem du lieu -> kiem trung noi dung (chan neu can) -> chup ban SUBMISSION -> lu…
+ *  379  saveAuthors()                   Luu danh sach tac gia: sua tai cho (khong xoa roi them lai cung khoa chinh)
+ *  422  copyDeclarations()              Chep khai bao tu request vao bai
+ *  436  authorsOrMainOnly()             Khong gui danh sach tac gia -> chi tac gia chinh 100%
+ *  447  validateShares()                BR-IN-02 + dong tac gia phai la Phong vien dang ACTIVE (UC-04 buoc 2 "selects a reporter")
+ *  472  shareErrorOfRows()              Kiem lai ty le tren cac dong da luu (luc nop)
+ *  487  lockSaturation()                Khoa hang + ty le bao hoa luc nop lan dau (BR-IN-03)
+ *  500  findOpenEvent()                 B14: su kien phai con mo luc nop (EventService.getOpenEvents: dang bat, hom nay trong khoang ngay)
+ *  515  countSaturationRank()           B10 (Quang 01/11): hang bao hoa cua bai luc nop = so bai khac cung su kien da khoa hang, co lan nop (log SUBM…
+ *  532  checkCategory()                 The loai phai la the loai dang dung (GenreService cua luong admin)
+ *  542  checkMainAuthor()               BR-IN-01: chi tac gia chinh (articles.author_id) duoc sua / nop / nop lai
+ *  549  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  555  findUser()                      Tim tai khoan qua UserReadService (luong admin), khong co thi 404
+ *  565  readIntParam()                  Tham so so nguyen cua BF-01 trong system_parameters, khong viet cung so trong code
+ *  574  shorten()                       notifications.message toi da 500 ky tu (tieu de bai co the dai toi 300)
  */
 @Service
 @RequiredArgsConstructor
@@ -87,7 +93,6 @@ public class ArticleEditorService {
     private final ArticleAuthorRepository articleAuthorRepository;
     private final ArticleStatusLogRepository articleStatusLogRepository;
     private final ArticleVersionRepository articleVersionRepository;
-    private final DuplicationCheckRepository duplicationCheckRepository;
     private final ArticleService articleService;
     // Du lieu luong khac -> goi service cua ho (AGENTS.md muc 2)
     private final UserReadService userReadService;
@@ -95,6 +100,12 @@ public class ArticleEditorService {
     private final SystemParameterService systemParameterService;
     private final AssignmentService assignmentService;
     private final NotificationService notificationService;
+    private final EventService eventService;
+    private final RoyaltyGradingService royaltyGradingService;
+    // Iter 3: kiem trung anh/video + gan vao ban nop (UC-07)
+    private final ArticleAttachmentService articleAttachmentService;
+    // Iter 3: kiem trung noi dung + giai trinh (UC-06, UC-08)
+    private final DuplicationCheckService duplicationCheckService;
 
     /**
      * UC-04: phong vien co the chon lam dong tac gia (Phong vien dang ACTIVE, tru chinh minh).
@@ -130,7 +141,7 @@ public class ArticleEditorService {
         article.setAuthorId(currentUserId);
         article.setSectionId(me.sectionId());
         article.setStatus(ArticleStatus.DRAFT);
-        // Iter 2 chua cho chon su kien: event_id, saturation_* de NULL (nhom truong 24/10, A4)
+        // event_id chep trong copyDeclarations; saturation_rank / saturation_rate chi khoa luc nop (BR-IN-03)
         article.setCreatedAt(now);
         copyDeclarations(article, request, true);
         articleRepository.save(article);
@@ -179,6 +190,10 @@ public class ArticleEditorService {
 
         // Bai da tung phan cong BTV thi category_id la the loai BTV ap dung -> giu nguyen
         boolean everAssigned = assignmentService.getAssignmentByArticleId(articleId).isPresent();
+        // B13 (Quang 01/11): bai da tung phan cong BTV thi giu su kien va ty le bao hoa da khoa (BR-IN-07)
+        if (everAssigned && !Objects.equals(article.getEventId(), request.getEventId())) {
+            throw new BusinessException("Bài đã được phân công Biên tập viên nên không đổi được sự kiện.");
+        }
         copyDeclarations(article, request, !everAssigned);
         articleRepository.save(article);
 
@@ -191,13 +206,13 @@ public class ArticleEditorService {
      * bai ve DRAFT) van tinh la nop lai -> ve dung BTV cu (quyet dinh 12/10, B9).
      */
     @Transactional
-    public ArticleDetailResponse submitArticle(Integer articleId, Integer currentUserId) {
+    public ArticleDetailResponse submitArticle(Integer articleId, Integer currentUserId, String explanation) {
         Article article = findArticle(articleId);
         checkMainAuthor(article, currentUserId, "Chỉ tác giả chính mới được nộp bài.");
         if (article.getStatus() != ArticleStatus.DRAFT) {
             throw new BusinessException("Chỉ nộp được bài ở trạng thái Nháp. Bài bị trả về thì dùng Nộp lại.");
         }
-        doSubmit(article, currentUserId);
+        doSubmit(article, currentUserId, explanation);
         return articleService.getArticleDetail(articleId, currentUserId);
     }
 
@@ -206,23 +221,53 @@ public class ArticleEditorService {
      * xac nhan lai (BR-IN-07). Bai REJECTED khong vao duoc day (E2).
      */
     @Transactional
-    public ArticleDetailResponse resubmitArticle(Integer articleId, Integer currentUserId) {
+    public ArticleDetailResponse resubmitArticle(Integer articleId, Integer currentUserId, String explanation) {
         Article article = findArticle(articleId);
         checkMainAuthor(article, currentUserId, "Chỉ tác giả chính mới được nộp lại bài.");
         if (article.getStatus() != ArticleStatus.REVISION_REQUESTED) {
             throw new BusinessException("Chỉ nộp lại được bài đang ở trạng thái Trả về – cần sửa.");
         }
-        doSubmit(article, currentUserId);
+        doSubmit(article, currentUserId, explanation);
         return articleService.getArticleDetail(articleId, currentUserId);
+    }
+
+    /**
+     * UC-09: uoc tinh nhuan but phan bai viet truoc khi nop, khong luu gi. Thu tu theo B16 (Quang 01/11):
+     * dem hang "neu nop ngay luc nay" (B10) -> doi ra ty le (EventService) -> RoyaltyGradingService.
+     * Gui articleId cua bai da tung phan cong BTV -> dung ty le da khoa lan dau (BR-IN-07, quyet dinh 03/11).
+     */
+    @Transactional(readOnly = true)
+    public RoyaltyEstimateResponse estimateRoyalty(Integer currentUserId, ArticleRoyaltyEstimateRequest request) {
+        Integer eventId = request.getEventId();
+        BigDecimal saturationRate = null;   // null = khong thuoc su kien (BF-04 coi la 100%)
+
+        boolean usesLockedRate = false;
+        if (request.getArticleId() != null) {
+            Article article = findArticle(request.getArticleId());
+            checkMainAuthor(article, currentUserId, "Chỉ tác giả chính mới được ước tính nhuận bút của bài.");
+            if (assignmentService.getAssignmentByArticleId(article.getId()).isPresent()) {
+                eventId = article.getEventId();
+                saturationRate = article.getSaturationRate();
+                usesLockedRate = true;
+            }
+        }
+        if (!usesLockedRate && eventId != null) {
+            EventResponse event = findOpenEvent(eventId);
+            int rank = countSaturationRank(event, request.getArticleId(), LocalDateTime.now());
+            saturationRate = eventService.getSaturationRate(eventId, rank);
+        }
+        return royaltyGradingService.estimateRoyalty(request.getDeclaredCategoryId(),
+                request.getDeclaredNature().name(), eventId, saturationRate);
     }
 
     // ---------------------------------------------------------------- ham phu
 
     /**
-     * Phan chung cua nop / nop lai: kiem du lieu -> chup ban SUBMISSION -> kiem trung (ban tam)
-     * -> dat han xac nhan -> doi trang thai -> bao tin.
+     * Phan chung cua nop / nop lai: kiem du lieu -> kiem trung noi dung (chan neu can) -> chup ban SUBMISSION
+     * -> luu ket qua kiem trung + kiem trung anh/video -> dat han xac nhan -> doi trang thai -> bao tin.
+     * explanation: giai trinh khi trung tu DUP_WARN_PERCENT (UC-08), co the null.
      */
-    private void doSubmit(Article article, Integer currentUserId) {
+    private void doSubmit(Article article, Integer currentUserId, String explanation) {
         // UC-05 Preconditions + E2: thieu du lieu thi liet ke het loi, bai giu nguyen trang thai
         List<String> errors = new ArrayList<>();
         if (article.getContent() == null || article.getContent().isBlank()) {
@@ -236,13 +281,26 @@ public class ArticleEditorService {
         if (shareError != null) {
             errors.add(shareError);
         }
+        // BR-IN-05 / B23: tac gia moi anh/video phai con trong danh sach tac gia (co the vua bo dong tac gia)
+        String mediaAuthorError = articleAttachmentService.findAuthorError(article.getId(), article.getAuthorId(), rows);
+        if (mediaAuthorError != null) {
+            errors.add(mediaAuthorError);
+        }
         if (!errors.isEmpty()) {
             throw new BusinessException(String.join(" ", errors));
         }
 
+        // UC-06 / BR-IN-04: kiem trung truoc khi xac nhan dong tac gia; BLOCKED hoac thieu giai trinh -> 409, bai giu nguyen
+        DuplicationCheckResponse duplication = duplicationCheckService.checkBeforeSubmit(article, explanation);
+
         LocalDateTime now = LocalDateTime.now();
         Optional<AssignmentResponse> assignment = assignmentService.getAssignmentByArticleId(article.getId());
         boolean isResubmit = assignment.isPresent();   // quyet dinh 12/10: da co dong assignments = nop lai
+
+        // BR-IN-03: nop lan dau thi khoa hang + ty le bao hoa; nop lai giu ty le da khoa (BR-IN-07)
+        if (!isResubmit) {
+            lockSaturation(article, now);
+        }
 
         // Chup ban SUBMISSION (bang article_versions chi INSERT). Lan dau INITIAL, nop lai MAJOR (B10 - gia dinh)
         boolean hasEarlierSubmission = articleVersionRepository
@@ -264,14 +322,11 @@ public class ArticleEditorService {
         version.setCreatedAt(now);
         articleVersionRepository.save(version);
 
-        // BR-IN-04 ban tam Iter 2: luon 0% NORMAL; thuat toan cum 5 am tiet thay o Iter 3 (Coding Plan 05/10)
-        DuplicationCheck check = new DuplicationCheck();
-        check.setArticleId(article.getId());
-        check.setVersionId(version.getId());
-        check.setMaxOverlapPercent(BigDecimal.ZERO);
-        check.setResult(DuplicationResult.NORMAL);
-        check.setCheckedAt(now);
-        duplicationCheckRepository.save(check);
+        // UC-07: kiem trung anh/video, roi gan tat ca anh/video cua bai vao ban SUBMISSION nay (quyet dinh 03/11)
+        articleAttachmentService.checkAndAttachToSubmission(article.getId(), version.getId());
+
+        // B5: luu ket qua kiem trung noi dung gan voi ban nop vua tao (version_id NOT NULL)
+        duplicationCheckService.saveResult(article.getId(), version.getId(), duplication, explanation, now);
 
         article.setSubmittedAt(now);
 
@@ -373,6 +428,7 @@ public class ArticleEditorService {
             article.setCategoryId(request.getDeclaredCategoryId());
         }
         article.setDeclaredNature(request.getDeclaredNature());
+        article.setEventId(request.getEventId());
         article.setUpdatedAt(LocalDateTime.now());
     }
 
@@ -421,6 +477,55 @@ public class ArticleEditorService {
             shares.add(row.getSharePercent());
         }
         return new ArticleShareValidator(readIntParam(PARAM_MAX_AUTHORS)).findError(mainAuthorId, userIds, shares);
+    }
+
+    /**
+     * Khoa hang + ty le bao hoa luc nop lan dau (BR-IN-03). Thu tu theo B16 (Quang 01/11):
+     * kiem su kien con mo (B14) -> dem hang (B10) -> doi hang ra ty le (EventService, GBR-09).
+     * Khong chon su kien -> de NULL (comment bang articles; BF-04 coi NULL = 100%).
+     */
+    private void lockSaturation(Article article, LocalDateTime submitTime) {
+        if (article.getEventId() == null) {
+            article.setSaturationRank(null);
+            article.setSaturationRate(null);
+            return;
+        }
+        EventResponse event = findOpenEvent(article.getEventId());
+        int rank = countSaturationRank(event, article.getId(), submitTime);
+        article.setSaturationRank(rank);
+        article.setSaturationRate(eventService.getSaturationRate(event.getId(), rank));
+    }
+
+    // B14: su kien phai con mo luc nop (EventService.getOpenEvents: dang bat, hom nay trong khoang ngay)
+    private EventResponse findOpenEvent(Integer eventId) {
+        for (EventResponse event : eventService.getOpenEvents()) {
+            if (event.getId().equals(eventId)) {
+                return event;
+            }
+        }
+        throw new BusinessException("Sự kiện đã kết thúc, vui lòng chọn lại.");
+    }
+
+    /**
+     * B10 (Quang 01/11): hang bao hoa cua bai luc nop = so bai khac cung su kien da khoa hang,
+     * co lan nop (log SUBMIT moi nhat - quyet dinh 03/11) trong windowDays ngay truoc luc nop, cong 1.
+     * Bai REJECTED van giu hang nen van duoc dem (B12); bai rut ve DRAFT da xoa hang nen khong dem (B11).
+     * articleId = bai dang xet (bo khoi so dem); null khi uoc tinh cho bai chua luu (UC-09).
+     */
+    private int countSaturationRank(EventResponse event, Integer articleId, LocalDateTime submitTime) {
+        LocalDateTime windowStart = submitTime.minusDays(event.getWindowDays());
+        int count = 0;
+        for (Article other : articleRepository.findByEventIdAndSaturationRankIsNotNull(event.getId())) {
+            if (other.getId().equals(articleId)) {
+                continue;
+            }
+            Optional<ArticleStatusLog> lastSubmit = articleStatusLogRepository
+                    .findFirstByArticleIdAndActionOrderByCreatedAtDescIdDesc(other.getId(), ACTION_SUBMIT);
+            if (lastSubmit.isPresent() && !lastSubmit.get().getCreatedAt().isBefore(windowStart)) {
+                count++;
+            }
+        }
+        return count + 1;
     }
 
     // The loai phai la the loai dang dung (GenreService cua luong admin)

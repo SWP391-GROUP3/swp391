@@ -11,7 +11,7 @@ import lombok.Setter;
  * Kiem tra tung o o day; "nguong canh bao < nguong chan" can ca 2 gia tri nen kiem trong service.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   21  field                           cac truong client gui len (kem kiem tra @NotNull, @Min, @Max)
+ *   24  field                           cac truong client gui len (kem kiem tra @NotNull, @Size...)
  */
 @Getter
 @Setter

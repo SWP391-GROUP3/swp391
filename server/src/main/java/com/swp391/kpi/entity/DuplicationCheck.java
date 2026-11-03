@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 /**
  * 1 lan kiem trung noi dung tren 1 ban nop (bang duplication_checks, BR-IN-04).
- * Iter 2 la ban tam: moi lan nop ghi 1 dong 0% NORMAL; thuat toan cum 5 am tiet lam o Iter 3.
+ * Iter 3: tinh theo cum am tiet (DuplicationShingleCalculator), cac bai bi trung luu o duplication_matches.
  *
  * MUC LUC (so dong - ten - tac dung)
  *   34  field                           cac cot cua bang (khop schema.sql)

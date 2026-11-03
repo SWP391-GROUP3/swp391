@@ -10,11 +10,11 @@ import java.util.List;
  * Repository truy van bang cua entity CategoryChangeLog (Spring Data JPA). Chi service cung luong goi.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   19  findByAssignmentIdOrderByChangedAtDesc()  Lay lich su doi the loai cua mot luot phan cong (UC-23, BR-QA-07)
+ *   19  findByAssignmentIdOrderByChangedAtDesc()  Lay lich su doi the loai cua mot luot phan cong (UC-23, BR-SC-05)
  */
 @Repository
 public interface CategoryChangeLogRepository extends JpaRepository<CategoryChangeLog, Integer> {
 
-    // Lấy lịch sử đổi thể loại của một lượt phân công (UC-23, BR-QA-07)
+    // Lấy lịch sử đổi thể loại của một lượt phân công (UC-23, BR-SC-05)
     List<CategoryChangeLog> findByAssignmentIdOrderByChangedAtDesc(Integer assignmentId);
 }

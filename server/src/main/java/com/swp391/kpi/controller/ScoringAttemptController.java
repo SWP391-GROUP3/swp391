@@ -2,6 +2,7 @@ package com.swp391.kpi.controller;
 
 import com.swp391.kpi.dto.ApiResponse;
 import com.swp391.kpi.dto.CategoryChangeRequest;
+import com.swp391.kpi.dto.ScoringAttemptMyItemResponse;
 import com.swp391.kpi.dto.ScoringAttemptResponse;
 import com.swp391.kpi.service.ScoringAttemptService;
 import jakarta.validation.Valid;
@@ -11,18 +12,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 // Controller xu ly mo phieu cham, snapshot tieu chi va doi the loai (UC-22, UC-23, UC-30)
 /**
  * API phieu cham cua BTV (UC-22...28): mo phieu cham (chup bo tieu chi dang ACTIVE), doi the loai, luu
  * diem nhap, nop quyet dinh, xem lan cham moi nhat.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   32  field                           service duoc inject
- *   36  openScoringAttempt()            Mo phieu cham cho bai viet va snapshot bo tieu chi ACTI… [POST /api/scoring-attempts/article/{articleId}/open]
- *   46  changeCategory()                BTV doi the loai bai viet truoc khi cham (UC… [POST /api/scoring-attempts/article/{articleId}/change-category]
- *   57  saveScores()                    BTV luu diem tung tieu chi va tinh tong diem theo tron… [PUT /api/scoring-attempts/article/{articleId}/scores]
- *   68  submitDecision()                BTV nop phieu cham voi quyet dinh ACCEPT, REVISION ho… [POST /api/scoring-attempts/article/{articleId}/submit]
- *   79  getLatestAttempt()              Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34) [GET /api/scoring-attempts/article/{articleId}/latest]
+ *   36  field                           service duoc inject
+ *   40  getMyScorings()                 M-A7: lich su cham cua BTV dang dang nhap (bai duoc giao + lan cham moi nhat) [GET /api/scoring-attempts/mine]
+ *   48  openScoringAttempt()            Mo phieu cham cho bai viet va snapshot bo tieu chi ACTI… [POST /api/scoring-attempts/article/{articleId}/open]
+ *   58  changeCategory()                BTV doi the loai bai viet truoc khi cham (UC… [POST /api/scoring-attempts/article/{articleId}/change-category]
+ *   69  saveScores()                    BTV luu diem tung tieu chi va tinh tong diem theo tron… [PUT /api/scoring-attempts/article/{articleId}/scores]
+ *   80  submitDecision()                BTV nop phieu cham voi quyet dinh ACCEPT, REVISION ho… [POST /api/scoring-attempts/article/{articleId}/submit]
+ *   91  getLatestAttempt()              Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34) [GET /api/scoring-attempts/article/{articleId}/latest]
  */
 @RestController
 @RequestMapping("/api/scoring-attempts")
@@ -30,6 +34,14 @@ import org.springframework.web.bind.annotation.*;
 public class ScoringAttemptController {
 
     private final ScoringAttemptService scoringAttemptService;
+
+    // M-A7: lich su cham cua BTV dang dang nhap (bai duoc giao + lan cham moi nhat)
+    @GetMapping("/mine")
+    public ResponseEntity<ApiResponse<List<ScoringAttemptMyItemResponse>>> getMyScorings(@AuthenticationPrincipal Jwt jwt) {
+        Integer editorId = Integer.valueOf(jwt.getSubject());
+        List<ScoringAttemptMyItemResponse> list = scoringAttemptService.getMyScorings(editorId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy lịch sử chấm thành công", list));
+    }
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE (UC-22, BR-SC-06)
     @PostMapping("/article/{articleId}/open")

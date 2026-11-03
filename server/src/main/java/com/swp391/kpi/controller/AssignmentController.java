@@ -9,7 +9,10 @@ import com.swp391.kpi.exception.NotFoundException;
 import com.swp391.kpi.service.AssignmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +22,12 @@ import java.util.List;
  * cua tung BTV.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   32  field                           service duoc inject
- *   38  assignArticle()                 Truong ban giao bai viet cho BTV cham chat luong (UC-18, UC-20) [POST /api/assignments]
- *   47  getAssignmentByArticleId()      Lay thong tin phan cong cua bai viet [GET /api/assignments/article/{articleId}]
- *   57  getAssignmentsByEditorId()      Lay danh sach bai viet duoc giao cua mot BTV (Hang viec BTV - UC-21) [GET /api/assignments/editor/{editorId}]
- *   66  getEditorWorkload()             Xem khoi luong cong viec cua mot BTV (so bai dang giu - UC-… [GET /api/assignments/editor/{editorId}/workload]
+ *   37  field                           service duoc inject
+ *   43  getPendingAssignments()         Lay danh sach bai viet SUBMITTED cho Truong ban phan cong (UC-18) [GET /api/assignments/pending]
+ *   54  assignArticle()                 Truong ban giao bai viet cho BTV cham chat luong (UC-18, UC-20) [POST /api/assignments]
+ *   67  getAssignmentByArticleId()      Lay thong tin phan cong cua bai viet [GET /api/assignments/article/{articleId}]
+ *   77  getAssignmentsByEditorId()      Lay danh sach bai viet duoc giao cua mot BTV (Hang viec BTV - UC-21) [GET /api/assignments/editor/{editorId}]
+ *   86  getEditorWorkload()             Xem khoi luong cong viec cua mot BTV (so bai dang giu - UC-… [GET /api/assignments/editor/{editorId}/workload]
  */
 @RestController
 @RequestMapping("/api/assignments")
@@ -37,8 +41,9 @@ public class AssignmentController {
      */
     @GetMapping("/pending")
     public ResponseEntity<ApiResponse<List<PendingAssignmentResponse>>> getPendingAssignments(
-            @RequestParam(required = false) Integer sectionId) {
-        List<PendingAssignmentResponse> list = assignmentService.getPendingAssignments(sectionId);
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        List<PendingAssignmentResponse> list = assignmentService.getPendingAssignments(currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách bài chờ phân công thành công", list));
     }
 
@@ -46,9 +51,13 @@ public class AssignmentController {
      * Trưởng ban giao bài viết cho BTV chấm chất lượng (UC-18, UC-20).
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<AssignmentResponse>> assignArticle(@Valid @RequestBody AssignmentCreateRequest request) {
-        AssignmentResponse response = assignmentService.assignArticle(request);
-        return ResponseEntity.ok(ApiResponse.success("Phân công bài viết thành công", response));
+    public ResponseEntity<ApiResponse<AssignmentResponse>> assignArticle(@Valid @RequestBody AssignmentCreateRequest request,
+                                                                     @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        AssignmentResponse response = assignmentService.assignArticle(request, currentUserId);
+        // M-B5: tao moi phan cong -> 201 (AGENTS.md muc 3.6)
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Phân công bài viết thành công", response));
     }
 
     /**

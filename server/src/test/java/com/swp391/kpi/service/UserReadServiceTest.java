@@ -4,6 +4,8 @@ import com.swp391.kpi.repository.UserReadRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -37,5 +39,16 @@ class UserReadServiceTest {
     }
     private UserAccessResponse user(String status, String role) {
         return new UserAccessResponse(3, "Test", role, 1, "Ban 1", status);
+    }
+
+    @Test void activeUsersByRoleAndNamesByIds() {
+        UserAccessResponse reporter = new UserAccessResponse(1, "An", "REPORTER", 1, "Ban 1", "ACTIVE");
+        UserAccessResponse locked = new UserAccessResponse(2, "Bình", "REPORTER", 1, "Ban 1", "LOCKED");
+        UserAccessResponse editor = new UserAccessResponse(3, "Cường", "EDITOR", 1, "Ban 1", "ACTIVE");
+        when(repository.findAll()).thenReturn(List.of(editor, locked, reporter));
+
+        assertEquals(List.of(reporter), service.getActiveUsersByRole("REPORTER"));
+        assertEquals(Map.of(1, "An", 3, "Cường"), service.getUserNames(Set.of(1, 3)));
+        assertEquals(editor, service.getUserAccess(3));
     }
 }

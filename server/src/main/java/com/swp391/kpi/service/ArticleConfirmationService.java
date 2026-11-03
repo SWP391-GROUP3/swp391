@@ -27,17 +27,18 @@ import java.util.Optional;
  * va job het han 3 ngay (UC-12 A2). Doi trang thai bai qua ArticleService.updateArticleStatus().
  *
  * MUC LUC (so dong - ten - tac dung)
- *   47  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   53  field                           repository / service duoc inject
+ *   48  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   54  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   66  acceptCoAuthorship()            UC-12 buoc 2-4: dong tac gia dong y
- *  103  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi kem ly do
- *  141  expireOverdueConfirmations()    UC-12 A2 (job chay moi gio): dong tac gia khong tra loi qua han -> EXPIRED, bai ve DRAFT, bao moi tac gia
+ *   67  acceptCoAuthorship()            UC-12 buoc 2-4: dong tac gia dong y
+ *  104  rejectCoAuthorship()            UC-12 A1: dong tac gia tu choi kem ly do
+ *  143  expireOverdueConfirmations()    UC-12 A2 (job chay moi gio): dong tac gia khong tra loi qua han -> EXPIRED, bai ve DRAFT, bao moi tac gia
  *  ---- Ham phu (private, chi dung trong file) ----
- *  185  findMyPendingRow()              UC-12 Preconditions: bai PENDING_CONFIRMATION, nguoi dung la dong tac gia dang PENDING, chua qua han
- *  211  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
- *  217  userName()                      Ho ten nguoi dung de ghi vao thong bao (qua UserReadService)
- *  227  shorten()                       notifications.message toi da 500 ky tu
+ *  188  findMyPendingRow()              UC-12 Preconditions: bai PENDING_CONFIRMATION, nguoi dung la dong tac gia dang PENDING, chua qua han
+ *  215  clearSaturationIfNeverAssigned()  B11 (Quang 01/11): bai ve DRAFT ma chua tung phan cong BTV -> bo su kien + hang + ty le da khoa
+ *  225  findArticle()                   Tim bai theo ma, khong co thi bao 404 (NotFoundException)
+ *  231  userName()                      Ho ten nguoi dung de ghi vao thong bao (qua UserReadService)
+ *  241  shorten()                       notifications.message toi da 500 ky tu
  */
 @Service
 @RequiredArgsConstructor
@@ -124,6 +125,7 @@ public class ArticleConfirmationService {
             articleAuthorRepository.save(row);
         }
 
+        clearSaturationIfNeverAssigned(article);
         articleService.updateArticleStatus(articleId, ArticleStatus.DRAFT, currentUserId, ACTION_CO_REJECT, trimmedReason);
         notificationService.notifyUser(article.getAuthorId(), articleId, shorten(
                 userName(currentUserId) + " từ chối làm đồng tác giả bài \"" + article.getTitle()
@@ -163,6 +165,7 @@ public class ArticleConfirmationService {
                 row.setConfirmStatus(ArticleAuthorConfirmStatus.EXPIRED);
                 articleAuthorRepository.save(row);
             }
+            clearSaturationIfNeverAssigned(article);
             articleService.updateArticleStatus(article.getId(), ArticleStatus.DRAFT, null, ACTION_EXPIRE,
                     "Quá hạn xác nhận đồng tác giả.");
 
@@ -205,6 +208,17 @@ public class ArticleConfirmationService {
             throw new BusinessException("Đã quá hạn xác nhận đồng tác giả.");
         }
         return myRow;
+    }
+
+    // B11 (Quang 01/11): bai ve DRAFT ma chua tung phan cong BTV -> bo su kien + hang + ty le da khoa.
+    // Da tung phan cong (dot nop lai bi tu choi) thi giu ty le khoa lan dau (BR-IN-07)
+    private void clearSaturationIfNeverAssigned(Article article) {
+        if (assignmentService.getAssignmentByArticleId(article.getId()).isPresent()) {
+            return;
+        }
+        article.setEventId(null);
+        article.setSaturationRank(null);
+        article.setSaturationRate(null);
     }
 
     // Tim bai theo ma, khong co thi bao 404 (NotFoundException)

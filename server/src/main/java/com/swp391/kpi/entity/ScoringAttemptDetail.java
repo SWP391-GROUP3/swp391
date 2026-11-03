@@ -37,7 +37,7 @@ public class ScoringAttemptDetail {
     @Column(name = "score", nullable = false, precision = 5, scale = 2)
     private BigDecimal score;
 
-    // Nhận xét (bắt buộc nếu điểm < 50 theo BR-QA-08)
+    // Nhận xét (bắt buộc nếu điểm < 50 theo BR-SC-06)
     @Column(name = "comment", length = 1000)
     private String comment;
 }

@@ -6,9 +6,11 @@ import com.swp391.kpi.dto.PublishingResponse;
 import com.swp391.kpi.dto.ScoreApprovalDecisionRequest;
 import com.swp391.kpi.dto.ScoreApprovalItemResponse;
 import com.swp391.kpi.dto.ScoreApprovalResponse;
+import com.swp391.kpi.dto.UserAccessResponse;
 import com.swp391.kpi.entity.ApprovalDecision;
 import com.swp391.kpi.entity.Article;
 import com.swp391.kpi.entity.ArticleStatus;
+import com.swp391.kpi.entity.AttemptType;
 import com.swp391.kpi.entity.ScoreApproval;
 import com.swp391.kpi.entity.ScoringAttempt;
 import com.swp391.kpi.entity.User;
@@ -28,17 +30,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service xu ly phe duyet diem danh gia va duyet xuat ban cua Truong ban bien tap (UC-29, UC-31, UC-32, UC-33, BR-SC-10, BR-SC-11).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   47  field                           repository / service duoc inject
- *   60  getPendingApprovals()           Lay danh sach cac bai viet cho Truong ban duyet diem (UC-29)
- *   87  approveScore()                  Truong ban phe duyet diem danh gia (UC-32, BR-SC-10)
- *  135  returnScore()                   Truong ban yeu cau cham lai (UC-31, BR-SC-10)
- *  192  getPendingPublishing()          Lay danh sach cac bai viet cho Truong ban duyet xuat ban (UC-33)
- *  264  approvePublishing()             Truong ban phe duyet xuat ban bai viet (UC-33, BR-SC-11)
+ *   54  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   71  getPendingApprovals()           Lay danh sach cac bai viet cho Truong ban duyet diem (UC-29)
+ *   98  approveScore()                  Truong ban phe duyet diem danh gia (UC-31, BR-SC-10)
+ *  146  returnScore()                   Truong ban yeu cau cham lai (UC-32, BR-SC-10)
+ *  203  getPendingPublishing()          Lay danh sach cac bai viet cho Truong ban duyet xuat ban (UC-33)
+ *  277  approvePublishing()             Truong ban phe duyet xuat ban bai viet (UC-33, BR-SC-11)
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  299  findLatestAttempt()             M-A2: lan cham moi nhat cua BF-02 (INITIAL / RESCORE), bo qua lan cham APPEAL do BF-03 ghi
+ *  304  checkHeadOfSection()            Truong ban chi duyet bai cua ban minh (users.section_id = articles.section_id)
  */
 @Service
 @RequiredArgsConstructor
@@ -51,21 +58,25 @@ public class ScoreApprovalService {
     private final ArticleService articleService;
     private final ScoringAttemptService scoringAttemptService;
     private final GenreService genreService;
+    // Du lieu BF-03 -> goi service cua Quang (Q-D1, Q-D2)
+    private final AppealRuleConfigService appealRuleConfigService;
+    private final AppealEffectiveScoreService appealEffectiveScoreService;
+    private final UserReadService userReadService;   // service luong admin: lay ban cua Truong ban
 
     /**
      * Lay danh sach cac bai viet cho Truong ban duyet diem (UC-29).
      * Chi lay cac bai co status = PENDING_APPROVAL.
      */
     @Transactional(readOnly = true)
-    public List<ScoreApprovalItemResponse> getPendingApprovals(Integer sectionId) {
-        List<Article> articles = (sectionId != null)
-                ? articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.PENDING_APPROVAL, sectionId)
-                : articleRepository.findByStatusOrderByUpdatedAtDesc(ArticleStatus.PENDING_APPROVAL);
+    public List<ScoreApprovalItemResponse> getPendingApprovals(Integer currentUserId) {
+        // M-A3: chi bai cua ban Truong ban dang dang nhap
+        Integer sectionId = userReadService.requireActive(currentUserId, "HEAD_OF_DEPARTMENT").sectionId();
+        List<Article> articles = articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(
+                ArticleStatus.PENDING_APPROVAL, sectionId);
 
         List<ScoreApprovalItemResponse> result = new ArrayList<>();
         for (Article article : articles) {
-            ScoringAttempt attempt = scoringAttemptRepository
-                    .findTopByArticleIdOrderByAttemptNoDesc(article.getId())
+            ScoringAttempt attempt = findLatestAttempt(article.getId())
                     .orElse(null);
 
             if (attempt != null && attempt.getSubmittedAt() != null) {
@@ -80,20 +91,20 @@ public class ScoreApprovalService {
     }
 
     /**
-     * Truong ban phe duyet diem danh gia (UC-32, BR-SC-10).
+     * Truong ban phe duyet diem danh gia (UC-31, BR-SC-10).
      * Chuyen trang thai bai viet sang SCORE_PUBLISHED va ghi nhan thoi diem cong bo announced_at.
      */
     @Transactional
     public ScoreApprovalResponse approveScore(Integer articleId, Integer headId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+        checkHeadOfSection(headId, article);
 
         if (article.getStatus() != ArticleStatus.PENDING_APPROVAL) {
             throw new BusinessException("Chỉ có thể duyệt điểm các bài viết đang ở trạng thái Chờ duyệt điểm (PENDING_APPROVAL)");
         }
 
-        ScoringAttempt attempt = scoringAttemptRepository
-                .findTopByArticleIdOrderByAttemptNoDesc(articleId)
+        ScoringAttempt attempt = findLatestAttempt(articleId)
                 .orElseThrow(() -> new BusinessException("Bài viết chưa có lần chấm điểm nào"));
 
         if (attempt.getSubmittedAt() == null) {
@@ -128,7 +139,7 @@ public class ScoreApprovalService {
     }
 
     /**
-     * Truong ban yeu cau cham lai (UC-31, BR-SC-10).
+     * Truong ban yeu cau cham lai (UC-32, BR-SC-10).
      * Bat buoc co ly do. Chuyen trang thai bai viet ve ASSIGNED va mo lan cham moi (RESCORE) cho dung BTV do.
      */
     @Transactional
@@ -139,13 +150,13 @@ public class ScoreApprovalService {
 
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+        checkHeadOfSection(headId, article);
 
         if (article.getStatus() != ArticleStatus.PENDING_APPROVAL) {
             throw new BusinessException("Chỉ có thể yêu cầu chấm lại các bài viết đang ở trạng thái Chờ duyệt điểm (PENDING_APPROVAL)");
         }
 
-        ScoringAttempt attempt = scoringAttemptRepository
-                .findTopByArticleIdOrderByAttemptNoDesc(articleId)
+        ScoringAttempt attempt = findLatestAttempt(articleId)
                 .orElseThrow(() -> new BusinessException("Bài viết chưa có lần chấm điểm nào"));
 
         if (attempt.getSubmittedAt() == null) {
@@ -189,10 +200,11 @@ public class ScoreApprovalService {
      * Chi lay cac bai co status = SCORE_PUBLISHED.
      */
     @Transactional(readOnly = true)
-    public List<PublishingItemResponse> getPendingPublishing(Integer sectionId) {
-        List<Article> articles = (sectionId != null)
-                ? articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(ArticleStatus.SCORE_PUBLISHED, sectionId)
-                : articleRepository.findByStatusOrderByUpdatedAtDesc(ArticleStatus.SCORE_PUBLISHED);
+    public List<PublishingItemResponse> getPendingPublishing(Integer currentUserId) {
+        // M-A3: chi bai cua ban Truong ban dang dang nhap
+        Integer sectionId = userReadService.requireActive(currentUserId, "HEAD_OF_DEPARTMENT").sectionId();
+        List<Article> articles = articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(
+                ArticleStatus.SCORE_PUBLISHED, sectionId);
 
         Map<Integer, String> genreMap = new HashMap<>();
         for (GenreResponse g : genreService.getActiveGenres()) {
@@ -203,8 +215,7 @@ public class ScoreApprovalService {
         LocalDateTime now = LocalDateTime.now();
 
         for (Article article : articles) {
-            ScoringAttempt attempt = scoringAttemptRepository
-                    .findTopByArticleIdOrderByAttemptNoDesc(article.getId())
+            ScoringAttempt attempt = findLatestAttempt(article.getId())
                     .orElse(null);
 
             if (attempt != null && attempt.getSubmittedAt() != null) {
@@ -225,7 +236,8 @@ public class ScoreApprovalService {
                         ? approval.getAnnouncedAt()
                         : (approval != null ? approval.getDecidedAt() : null);
 
-                LocalDateTime appealDeadline = (scoreApprovedAt != null) ? scoreApprovedAt.plusDays(7) : null;
+                // M-A5: han khieu nai theo cau hinh dang bat (giong man khieu nai BF-03)
+                LocalDateTime appealDeadline = appealRuleConfigService.getAppealDeadline(scoreApprovedAt);
                 boolean appealOpen = appealDeadline != null && now.isBefore(appealDeadline);
                 long daysRemaining = 0;
                 if (appealOpen && scoreApprovedAt != null) {
@@ -241,7 +253,8 @@ public class ScoreApprovalService {
                         authorName,
                         article.getCategoryId(),
                         categoryName,
-                        attempt.getTotalScore(),
+                        // M-A2: diem hieu luc = diem sau khieu nai neu khieu nai da ket luan, nguoc lai diem S0
+                        appealEffectiveScoreService.getEffectiveScore(article.getId(), attempt.getTotalScore()),
                         reviewerName,
                         scoreApprovedAt,
                         appealDeadline,
@@ -264,6 +277,7 @@ public class ScoreApprovalService {
     public PublishingResponse approvePublishing(Integer articleId, Integer headId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+        checkHeadOfSection(headId, article);
 
         if (article.getStatus() != ArticleStatus.SCORE_PUBLISHED) {
             throw new BusinessException("Chỉ có thể duyệt xuất bản các bài viết đã công bố điểm (SCORE_PUBLISHED)");
@@ -279,5 +293,18 @@ public class ScoreApprovalService {
                 headId,
                 "Duyệt xuất bản bài viết thành công"
         );
+    }
+
+    // M-A2: lan cham moi nhat cua BF-02 (INITIAL / RESCORE), bo qua lan cham APPEAL do BF-03 ghi
+    private Optional<ScoringAttempt> findLatestAttempt(Integer articleId) {
+        return scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(articleId, AttemptType.APPEAL);
+    }
+
+    // Truong ban chi duyet bai cua ban minh (users.section_id = articles.section_id)
+    private void checkHeadOfSection(Integer headId, Article article) {
+        UserAccessResponse head = userReadService.requireActive(headId, "HEAD_OF_DEPARTMENT");
+        if (!article.getSectionId().equals(head.sectionId())) {
+            throw new BusinessException("Bài viết không thuộc ban của bạn.");
+        }
     }
 }

@@ -26,12 +26,19 @@ import java.util.Optional;
  * doi the loai truoc khi cham, luu diem nhap, nop quyet dinh.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   38  field                           repository / service duoc inject
- *   53  openScoringAttempt()            Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
- *  141  getLatestAttemptByArticle()     Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
- *  181  changeCategory()                BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
- *  257  saveDraftScores()               BTV luu diem tung tieu chi va tinh tong diem theo trong so (UC-24, UC-25, BR-SC-06, BR-SC-07)
- *  336  submitDecision()                BTV nop phieu cham voi 1 trong 3 quyet dinh: ACCEPT, REVISION, REJECT (UC-26, UC-27, UC-28)
+ *   47  field                           repository / service duoc inject
+ *  ---- Ham public (controller / luong khac goi) ----
+ *   63  openScoringAttempt()            Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
+ *  151  getMyScorings()                 M-A6, M-A7: "Lich su cham" cua BTV dang dang nhap - moi bai duoc giao cho BTV (assignments.editor_id) kem lan…
+ *  195  getPublishedAttempt()           M-D2 (cho BF-03, BF-04, BF-05): lan cham da duoc Truong ban duyet va cong bo diem moi nhat cua bai (diem S0)
+ *  211  getAttemptCriteria()            M-D2: diem + nhan xet tung tieu chi cua 1 lan cham, theo thu tu tieu chi
+ *  224  getLatestAttemptByArticle()     Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
+ *  267  getLatestAttemptForUser()       Lay lan cham gan nhat cua mot bai viet kem kiem tra quyen nguoi dung (UC-30, UC-34)
+ *  310  changeCategory()                BTV doi the loai bai viet truoc khi cham (UC-23, BR-SC-05)
+ *  385  saveDraftScores()               BTV luu diem tung tieu chi va tinh tong diem theo trong so (UC-24, UC-25, BR-SC-06, BR-SC-07)
+ *  464  submitDecision()                BTV nop phieu cham voi 1 trong 3 quyet dinh: ACCEPT, REVISION, REJECT (UC-26, UC-27, UC-28)
+ *  ---- Ham phu (private, chi dung trong file) ----
+ *  541  findLatestAttempt()             M-A2: lan cham moi nhat cua BF-02 (INITIAL / RESCORE), bo qua lan cham APPEAL do BF-03 ghi
  */
 @Service
 @RequiredArgsConstructor
@@ -49,6 +56,7 @@ public class ScoringAttemptService {
     private final ArticleService articleService;
     private final ScoreApprovalRepository scoreApprovalRepository;
     private final UserRepository userRepository;
+    private final AppealRuleConfigService appealRuleConfigService;   // M-A5: so ngay khieu nai lay tu cau hinh BF-03
 
     // Mo phieu cham cho bai viet va snapshot bo tieu chi ACTIVE
     @Transactional
@@ -63,8 +71,8 @@ public class ScoringAttemptService {
             throw new BusinessException("Bạn không được phân công chấm bài viết này!");
         }
 
-        Optional<ScoringAttempt> openAttemptOpt = scoringAttemptRepository
-                .findTopByArticleIdOrderByAttemptNoDesc(articleId);
+        // M-A2: bo qua lan cham APPEAL (BF-03) -> BTV goc khong thay / khong tiep tuc ban nhap cham khieu nai
+        Optional<ScoringAttempt> openAttemptOpt = findLatestAttempt(articleId);
 
         // Neu da co attempt:
         // 1. Chua nop (submitted_at == null): tra ve de tiep tuc cham.
@@ -98,8 +106,10 @@ public class ScoringAttemptService {
                 .findFirstByArticleIdAndKindOrderByVersionNoDesc(articleId, ArticleVersionKind.SUBMISSION)
                 .orElseThrow(() -> new BusinessException("Bài viết chưa có bản nộp nào"));
 
-        int nextAttemptNo = openAttemptOpt.map(a -> a.getAttemptNo() + 1).orElse(1);
-        AttemptType attemptType = (nextAttemptNo == 1) ? AttemptType.INITIAL : AttemptType.RESCORE;
+        // So attempt_no tiep theo tinh tren moi lan cham, ke ca APPEAL (UNIQUE article_id, attempt_no)
+        int nextAttemptNo = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+                .map(a -> a.getAttemptNo() + 1).orElse(1);
+        AttemptType attemptType = openAttemptOpt.isEmpty() ? AttemptType.INITIAL : AttemptType.RESCORE;
 
         ScoringAttempt attempt = new ScoringAttempt();
         attempt.setArticleId(articleId);
@@ -133,13 +143,89 @@ public class ScoringAttemptService {
         return ScoringAttemptResponse.from(savedAttempt, detailResponses, article.getTitle(), article.getContent());
     }
 
+    /**
+     * M-A6, M-A7: "Lich su cham" cua BTV dang dang nhap - moi bai duoc giao cho BTV (assignments.editor_id)
+     * kem lan cham BF-02 moi nhat. Bai bi Truong ban tra cham lai thi kem ly do (UC-32).
+     */
+    @Transactional(readOnly = true)
+    public List<ScoringAttemptMyItemResponse> getMyScorings(Integer editorId) {
+        List<ScoringAttemptMyItemResponse> result = new ArrayList<>();
+        for (Assignment assignment : assignmentRepository.findByEditorIdOrderByAssignedAtDesc(editorId)) {
+            Article article = articleRepository.findById(assignment.getArticleId()).orElse(null);
+            if (article == null) {
+                continue;
+            }
+            ScoringAttemptMyItemResponse item = new ScoringAttemptMyItemResponse();
+            item.setArticleId(article.getId());
+            item.setTitle(article.getTitle());
+            item.setArticleStatus(article.getStatus());
+            Integer categoryId = article.getCategoryId() != null ? article.getCategoryId() : article.getDeclaredCategoryId();
+            item.setCategoryName(genreRepository.findById(categoryId).map(Genre::getName).orElse("Thể loại #" + categoryId));
+            item.setAssignedAt(assignment.getAssignedAt());
+
+            Optional<ScoringAttempt> latest = findLatestAttempt(article.getId());
+            if (latest.isPresent()) {
+                ScoringAttempt attempt = latest.get();
+                item.setAttemptId(attempt.getId());
+                item.setAttemptNo(attempt.getAttemptNo());
+                item.setAttemptType(attempt.getAttemptType());
+                item.setTotalScore(attempt.getTotalScore());
+                item.setDecision(attempt.getDecision());
+                item.setSubmittedAt(attempt.getSubmittedAt());
+                // Lan cham lai (RESCORE) thay cho lan bi Truong ban tra ve -> lay ly do tra
+                if (attempt.getReplacesAttempt() != null) {
+                    scoreApprovalRepository.findByScoringAttemptId(attempt.getReplacesAttempt().getId())
+                            .filter(approval -> approval.getDecision() == ApprovalDecision.RETURNED)
+                            .ifPresent(approval -> {
+                                item.setReturnReason(approval.getReason());
+                                item.setReturnedAt(approval.getDecidedAt());
+                            });
+                }
+            }
+            result.add(item);
+        }
+        return result;
+    }
+
+    /**
+     * M-D2 (cho BF-03, BF-04, BF-05): lan cham da duoc Truong ban duyet va cong bo diem moi nhat cua bai (diem S0).
+     * Lan cham APPEAL khong co dong duyet nen khong bao gio duoc chon. Chua cong bo diem -> null.
+     */
+    @Transactional(readOnly = true)
+    public ScoringReadResponse getPublishedAttempt(Integer articleId) {
+        List<ScoreApproval> approvals = scoreApprovalRepository
+                .findByScoringAttemptArticleIdAndDecisionAndAnnouncedAtIsNotNullOrderByAnnouncedAtDesc(
+                        articleId, ApprovalDecision.APPROVED);
+        if (approvals.isEmpty()) {
+            return null;
+        }
+        ScoreApproval approval = approvals.get(0);
+        ScoringAttempt attempt = approval.getScoringAttempt();
+        return new ScoringReadResponse(attempt.getId(), attempt.getArticleId(), attempt.getReviewerId(),
+                attempt.getAttemptType().name(), attempt.getTotalScore(), attempt.getSubmittedAt(),
+                approval.getAnnouncedAt(), attempt.getAppealId());
+    }
+
+    // M-D2: diem + nhan xet tung tieu chi cua 1 lan cham, theo thu tu tieu chi
+    @Transactional(readOnly = true)
+    public List<ScoringCriterionResponse> getAttemptCriteria(Integer attemptId) {
+        List<ScoringCriterionResponse> result = new ArrayList<>();
+        for (ScoringAttemptDetail detail : scoringAttemptDetailRepository.findByScoringAttemptId(attemptId)) {
+            Criteria criterion = detail.getCriterion();
+            result.add(new ScoringCriterionResponse(criterion.getId(), criterion.getName(),
+                    detail.getScore(), detail.getComment()));
+        }
+        result.sort(java.util.Comparator.comparing(ScoringCriterionResponse::criterionId));
+        return result;
+    }
+
     // Lay lan cham gan nhat cua mot bai viet (UC-30, UC-34)
     @Transactional(readOnly = true)
     public ScoringAttemptResponse getLatestAttemptByArticle(Integer articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
 
-        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+        ScoringAttempt attempt = findLatestAttempt(articleId)
                 .orElseThrow(() -> new NotFoundException("Bài viết này chưa có lần chấm điểm nào"));
 
         List<ScoringAttemptDetail> details = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
@@ -155,11 +241,12 @@ public class ScoringAttemptService {
                     .ifPresent(u -> res.setReviewerName(u.getFullName()));
         }
 
-        // Bo sung thong tin cong bo diem va thoi han khieu nai 7 ngay (BR-SC-10, UC-34)
+        // Bo sung thong tin cong bo diem va thoi han khieu nai (BR-SC-10, UC-34)
         scoreApprovalRepository.findByScoringAttemptId(attempt.getId()).ifPresent(approval -> {
             if (approval.getAnnouncedAt() != null) {
                 LocalDateTime announcedAt = approval.getAnnouncedAt();
-                LocalDateTime deadline = announcedAt.plusDays(7);
+                // M-A5: han = luc cong bo + appeal_window_days cua cau hinh dang bat (BF-03, Q-D2)
+                LocalDateTime deadline = appealRuleConfigService.getAppealDeadline(announcedAt);
                 boolean open = LocalDateTime.now().isBefore(deadline);
                 long days = open ? java.time.temporal.ChronoUnit.DAYS.between(LocalDateTime.now(), deadline) : 0;
 
@@ -195,7 +282,7 @@ public class ScoringAttemptService {
             Assignment assignment = assignmentRepository.findByArticleId(articleId).orElse(null);
             boolean isAssignedEditor = assignment != null && assignment.getEditorId().equals(currentUserId);
 
-            ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId).orElse(null);
+            ScoringAttempt attempt = findLatestAttempt(articleId).orElse(null);
             boolean isReviewer = attempt != null && currentUserId.equals(attempt.getReviewerId());
 
             if (!isAssignedEditor && !isReviewer) {
@@ -204,8 +291,8 @@ public class ScoringAttemptService {
             return getLatestAttemptByArticle(articleId);
         }
 
-        // Tac gia cua bai viet
-        if (article.getAuthorId().equals(currentUserId)) {
+        // Tac gia chinh hoac dong tac gia cua bai viet (UC-34: "main author or a co-author")
+        if (articleService.isAuthorOrCoAuthor(articleId, currentUserId)) {
             // Chi duoc xem khi diem da cong bo hoac bai bi tra ve / tu choi
             ArticleStatus status = article.getStatus();
             if (status == ArticleStatus.SCORE_PUBLISHED || status == ArticleStatus.PUBLISHED
@@ -239,10 +326,10 @@ public class ScoringAttemptService {
             throw new BusinessException("Thể loại mới phải khác với thể loại hiện tại của bài viết!");
         }
 
-        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+        ScoringAttempt attempt = findLatestAttempt(articleId)
                 .orElseGet(() -> {
                     openScoringAttempt(articleId, editorId);
-                    return scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId).orElseThrow();
+                    return findLatestAttempt(articleId).orElseThrow();
                 });
 
         if (attempt.getSubmittedAt() != null) {
@@ -268,9 +355,8 @@ public class ScoringAttemptService {
         log.setChangedAt(LocalDateTime.now());
         categoryChangeLogRepository.save(log);
 
-        // Cap nhat the loai bai viet
-        article.setCategoryId(newCategoryId);
-        articleRepository.save(article);
+        // M-A4: doi the loai bai qua ArticleService (AGENTS.md muc 2: khong ghi thang bang cua BF-01)
+        articleService.changeCategory(articleId, newCategoryId);
 
         // Cap nhat the loai va snapshot bo tieu chi moi cho attempt
         attempt.setCategoryId(newCategoryId);
@@ -307,7 +393,7 @@ public class ScoringAttemptService {
             throw new BusinessException("Bạn không được phân công chấm bài viết này!");
         }
 
-        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+        ScoringAttempt attempt = findLatestAttempt(articleId)
                 .orElseThrow(() -> new NotFoundException("Bài viết này chưa mở phiếu chấm điểm"));
 
         if (attempt.getSubmittedAt() != null) {
@@ -386,7 +472,7 @@ public class ScoringAttemptService {
             throw new BusinessException("Bạn không được phân công chấm bài viết này!");
         }
 
-        ScoringAttempt attempt = scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(articleId)
+        ScoringAttempt attempt = findLatestAttempt(articleId)
                 .orElseThrow(() -> new NotFoundException("Bài viết này chưa mở phiếu chấm điểm"));
 
         if (attempt.getSubmittedAt() != null) {
@@ -449,5 +535,10 @@ public class ScoringAttemptService {
                 .toList();
 
         return ScoringAttemptResponse.from(savedAttempt, detailResponses, article.getTitle(), article.getContent());
+    }
+
+    // M-A2: lan cham moi nhat cua BF-02 (INITIAL / RESCORE), bo qua lan cham APPEAL do BF-03 ghi
+    private Optional<ScoringAttempt> findLatestAttempt(Integer articleId) {
+        return scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(articleId, AttemptType.APPEAL);
     }
 }

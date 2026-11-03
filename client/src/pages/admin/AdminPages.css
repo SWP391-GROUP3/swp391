@@ -1,0 +1,78 @@
+/* ===========================================================================
+   Khung chung cua 3 man Admin luong admin (Minh): SystemParameters, GenreList, UserList.
+   Tien to class: .trang-qt__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
+
+   MUC LUC (so dong - khoi CSS)
+     11  tieu de, bo cuc dau trang
+     48  Form tham so
+     76  man hinh hep (@media)
+   =========================================================================== */
+
+.trang-qt__header {
+  margin-bottom: 16px;
+}
+
+.trang-qt__title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.trang-qt__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--fm-chu-nhat);
+}
+
+.trang-qt__card {
+  padding: 20px 24px;
+  background: var(--fm-the);
+  border: 1px solid var(--fm-vien);
+  border-radius: 8px;
+}
+
+.trang-qt__muted {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--fm-chu-nhat);
+}
+
+.trang-qt__scroll {
+  overflow-x: auto;
+}
+
+.trang-qt__number {
+  text-align: right;
+}
+
+/* ---- Form tham so ---- */
+.trang-qt__group {
+  display: contents;   /* nhom chi de gom o trong JSX, cac o van xep theo luoi cua form */
+}
+
+.trang-qt__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+
+.trang-qt__field .o-nhap {
+  max-width: 160px;
+}
+
+.trang-qt__group-title {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.trang-qt__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 760px) {
+  .trang-qt__form { grid-template-columns: 1fr; }
+}

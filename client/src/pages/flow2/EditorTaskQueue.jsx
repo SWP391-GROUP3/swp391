@@ -14,24 +14,25 @@ import '../../styles/Flow2.css'
  *
  * MUC LUC (so dong - ten - tac dung)
  *   24  EditorTaskQueue()               editor task queue
- *   32    useEffect                     tai du lieu khi mo trang
- *   36    loadEditorTasks()             tai editor tasks
+ *   33    useEffect                     Mo trang: tai hang viec cua BTV
+ *   38    loadEditorTasks()             Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   68  [Lam moi]                       loadEditorTasks() -> goi GET /api/assignments/editor/{editorId}
- *  109  [Bat dau Cham bai]              bao len component cha (onSelectTaskToScore)
+ *   61  [Lam moi]                       loadEditorTasks() Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap) -> goi GET /api/assignments/editor/{editorId}
+ *  102  [Bat dau Cham bai]              xu ly tren trang
  */
 
-export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
+export default function EditorTaskQueue({ nguoiDung }) {
   const navigate = useNavigate()
-  // Lấy ID BTV: Nếu đang đăng nhập thì lấy ID (ví dụ cuong.lh = 3), hoặc mặc định là 3
-  const [editorId, setEditorId] = useState(nguoiDung?.id || 3)
+  // M-A3: BTV chi xem hang viec cua chinh minh (id lay tu tai khoan dang dang nhap)
+  const editorId = nguoiDung.id
   const [tasks, setTasks] = useState([])
   const [genres, setGenres] = useState([])
   const [filterType, setFilterType] = useState('ALL') // 'ALL' | 'UNSCORED' | 'SCORED'
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
+  // Mo trang: tai hang viec cua BTV
   // Tải danh mục thể loại từ database
   useEffect(() => {
     async function fetchGenres() {
@@ -49,6 +50,7 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
     loadEditorTasks()
   }, [editorId])
 
+  // Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap)
   async function loadEditorTasks() {
     setLoading(true)
     setMessage('')
@@ -110,19 +112,10 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
       {/* UC-21: Hàng việc của Biên tập viên */}
       <h3 className="bf02__tieu-de"><Icon>{BT_BAI_DUOC_GIAO}</Icon>Hàng việc của Biên tập viên</h3>
       <p className="bf02__mo-ta">
-        Danh sách tất cả các bài viết được Trưởng ban phân công cho BTV này. BTV chọn bài để tiến hành đọc bài và chấm điểm chất lượng.
+        Danh sách các bài viết Trưởng ban đã phân công cho bạn. BTV chọn bài để tiến hành đọc bài và chấm điểm chất lượng.
       </p>
 
-      {/* Bộ lọc xem theo BTV */}
       <div className="bf02__hang">
-        <label className="bf02__nhan" htmlFor="btv-ma">Mã BTV cần xem việc:</label>
-        <input
-          id="btv-ma"
-          type="number"
-          value={editorId}
-          onChange={(e) => setEditorId(Number(e.target.value))}
-          className="o-nhap-ngan bf02__o-nhap--so"
-        />
         <button type="button" onClick={loadEditorTasks} className="nut-nhe">
           Làm mới
         </button>
@@ -159,7 +152,7 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
         <p className="bf02__nhat">Đang tải danh sách bài được giao...</p>
       ) : tasks.length === 0 ? (
         <div className="bf02__trong">
-          Hiện tại BTV #{editorId} chưa được phân công bài viết nào. (Hãy qua tab "Phân công bài viết" để giao việc thử).
+          Hiện tại bạn chưa được phân công bài viết nào.
         </div>
       ) : filteredTasks.length === 0 ? (
         <div className="bf02__trong">
@@ -180,6 +173,29 @@ export default function EditorTaskQueue({ nguoiDung, onSelectTaskToScore }) {
               </tr>
             </thead>
             <tbody>
+              {tasks.map((task, idx) => (
+                <tr key={task.id}>
+                  <td className="bf02__giua">{idx + 1}</td>
+                  <td className="bf02__dam">#{task.articleId}</td>
+                  <td>{new Date(task.assignedAt).toLocaleString('vi-VN')}</td>
+                  <td>
+                    {task.wasSuggested ? (
+                      <span className="nhan-tt nhan-tt--tot"><Icon>{BT_DAU_TICH}</Icon>Đúng (Thuật toán)</span>
+                    ) : (
+                      <span className="bf02__nhat">Trưởng ban chọn tay</span>
+                    )}
+                  </td>
+                  <td className="bf02__giua">
+                    <button
+                      type="button"
+                      onClick={() => navigate('/assigned-articles/' + task.articleId)}
+                      className="nut-chinh-fm"
+                    >
+                      Bắt đầu Chấm bài
+                    </button>
+                  </td>
+                </tr>
+              ))}
               {filteredTasks.map((task, idx) => {
                 const isScored = task.scoringStatus === 'DA_CHAM'
                 const isDraft = task.scoringStatus === 'DANG_CHAM'

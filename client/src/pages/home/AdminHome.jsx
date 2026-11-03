@@ -38,14 +38,25 @@ function gopDanhSachViec(duLieu) {
       tieuDe: `${boTieuChi.genreName} · phiên bản ${boTieuChi.versionNo}`,
       moTa: `Tạo ${formatDate(boTieuChi.createdAt)} · cần kích hoạt mới dùng để chấm`,
       hanChot: null,
-      duongDan: `/criteria-sets/${boTieuChi.versionId}`,
+      duongDan: `/criteria-sets?genreId=${boTieuChi.genreId}`,
       nut: 'Xem & kích hoạt',
     })
   }
 
   // UC-63: so lieu doc gia nhap hang ngay, dung cho KPI va bao cao (BF-05)
   const nhap = duLieu.readerImport
-  if (!nhap.importedToday) {
+  if (!nhap) {
+    danhSach.push({
+      khoa: 'nhap-csv',
+      loai: 'Số liệu độc giả',
+      mau: 'xanh-duong',
+      tieuDe: 'Chưa nhập số liệu độc giả lần nào',
+      moTa: 'Nhập file CSV để có số liệu cho KPI và báo cáo',
+      hanChot: null,
+      duongDan: '/reader-imports',
+      nut: 'Nhập CSV',
+    })
+  } else if (!nhap.importedToday) {
     danhSach.push({
       khoa: 'nhap-csv',
       loai: 'Số liệu độc giả',
@@ -67,7 +78,7 @@ function taoCacNhom(dem) {
     { nhan: 'Tài khoản hoạt động', mau: 'xanh-la',    so: dem.activeUsers,       duongDan: '/users?status=ACTIVE' },
     { nhan: 'Tài khoản bị khoá',   mau: 'xam-dam',    so: dem.lockedUsers,       duongDan: '/users?status=LOCKED' },
     { nhan: 'Thể loại đang dùng',  mau: 'xanh-duong', so: dem.activeGenres,      duongDan: '/genres' },
-    { nhan: 'Bộ tiêu chí nháp',    mau: 'cam',        so: dem.draftCriteriaSets, duongDan: '/criteria-sets?status=DRAFT' },
+    { nhan: 'Bộ tiêu chí nháp',    mau: 'cam',        so: dem.draftCriteriaSets, duongDan: '/criteria-sets' },
   ]
 }
 
@@ -78,9 +89,9 @@ function taoCacNhom(dem) {
  *
  * MUC LUC (so dong - ten - tac dung)
  *   15  gopDanhSachViec()               Gop viec cua Admin thanh 1 danh sach "Cho xu ly"
- *   65  taoCacNhom()                    Cac o dem ben phai. Khac don vi (tai khoan / the loai / bo tieu chi) nen khong hien tong.
- *   85  AdminHome()                     xem tom tat dau file
- *   91    useEffect                     tai du lieu khi mo trang
+ *   76  taoCacNhom()                    Cac o dem ben phai. Khac don vi (tai khoan / the loai / bo tieu chi) nen khong hien tong.
+ *   96  AdminHome()                     xem tom tat dau file
+ *  102    useEffect                     tai du lieu khi mo trang
  */
 export default function AdminHome({ nguoiDung }) {
   const [duLieu, setDuLieu] = useState(null)         // null = dang tai

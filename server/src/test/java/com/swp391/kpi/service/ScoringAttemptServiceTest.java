@@ -62,6 +62,9 @@ class ScoringAttemptServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AppealRuleConfigService appealRuleConfigService;
+
     @InjectMocks
     private ScoringAttemptService scoringAttemptService;
 
@@ -104,7 +107,7 @@ class ScoringAttemptServiceTest {
     void testOpenScoringAttempt_SuccessInitial() {
         when(articleRepository.findById(10)).thenReturn(Optional.of(article));
         when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.empty());
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.empty());
         when(criteriaSetVersionRepository.findByCategoryIdAndStatus(2, CriteriaSetStatus.ACTIVE))
                 .thenReturn(Optional.of(activeCriteriaSet));
         when(criteriaRepository.findByCriteriaSetVersionIdOrderBySortOrderAsc(1))
@@ -140,6 +143,37 @@ class ScoringAttemptServiceTest {
     }
 
     @Test
+    @DisplayName("M-A2: bỏ qua lần chấm APPEAL khi tìm phiếu BF-02, nhưng attempt_no mới vẫn nối tiếp sau lần APPEAL")
+    void testOpenScoringAttempt_SkipAppealAttempt_NextAttemptNoAfterAppeal() {
+        ScoringAttempt appealAttempt = new ScoringAttempt();
+        appealAttempt.setId(509);
+        appealAttempt.setArticleId(10);
+        appealAttempt.setAttemptNo(2);
+        appealAttempt.setAttemptType(AttemptType.APPEAL);
+
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
+        // Khong co lan cham BF-02 nao (chi co lan APPEAL do BF-03 ghi)
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL))
+                .thenReturn(Optional.empty());
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(appealAttempt));
+        when(criteriaSetVersionRepository.findByCategoryIdAndStatus(2, CriteriaSetStatus.ACTIVE))
+                .thenReturn(Optional.of(activeCriteriaSet));
+        when(criteriaRepository.findByCriteriaSetVersionIdOrderBySortOrderAsc(1)).thenReturn(List.of(criterion1));
+        ArticleVersion articleVersion = new ArticleVersion();
+        articleVersion.setId(201);
+        when(articleVersionRepository.findFirstByArticleIdAndKindOrderByVersionNoDesc(10, ArticleVersionKind.SUBMISSION))
+                .thenReturn(Optional.of(articleVersion));
+        when(scoringAttemptRepository.save(any(ScoringAttempt.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(scoringAttemptDetailRepository.save(any(ScoringAttemptDetail.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ScoringAttemptResponse res = scoringAttemptService.openScoringAttempt(10, 3);
+
+        assertEquals(3, res.getAttemptNo());
+        assertEquals(AttemptType.INITIAL, res.getAttemptType());
+    }
+
+    @Test
     @DisplayName("Mở lại phiếu chấm đang làm dở (chưa nộp) thì trả về attempt hiện tại không tạo mới")
     void testOpenScoringAttempt_ReturnExistingOpenAttempt() {
         ScoringAttempt existingAttempt = new ScoringAttempt();
@@ -158,7 +192,7 @@ class ScoringAttemptServiceTest {
 
         when(articleRepository.findById(10)).thenReturn(Optional.of(article));
         when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10))
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL))
                 .thenReturn(Optional.of(existingAttempt));
         when(scoringAttemptDetailRepository.findByScoringAttemptId(502))
                 .thenReturn(List.of(existingDetail));
@@ -193,7 +227,7 @@ class ScoringAttemptServiceTest {
 
         when(articleRepository.findById(10)).thenReturn(Optional.of(article));
         when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10))
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL))
                 .thenReturn(Optional.of(submittedAttempt));
         when(scoringAttemptDetailRepository.findByScoringAttemptId(503))
                 .thenReturn(List.of(detail));
@@ -226,7 +260,7 @@ class ScoringAttemptServiceTest {
     void testOpenScoringAttempt_NoActiveCriteriaSet_ThrowsException() {
         when(articleRepository.findById(10)).thenReturn(Optional.of(article));
         when(assignmentRepository.findByArticleId(10)).thenReturn(Optional.of(assignment));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.empty());
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.empty());
         when(criteriaSetVersionRepository.findByCategoryIdAndStatus(2, CriteriaSetStatus.ACTIVE))
                 .thenReturn(Optional.empty());
 
@@ -251,7 +285,7 @@ class ScoringAttemptServiceTest {
         attempt.setCategoryId(2);
         attempt.setAttemptType(AttemptType.INITIAL);
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         CriteriaSetVersion newActiveCriteria = new CriteriaSetVersion();
         newActiveCriteria.setId(2);
@@ -281,7 +315,7 @@ class ScoringAttemptServiceTest {
         assertEquals(1, res.getDetails().size());
         assertEquals("Kỹ năng phỏng vấn", res.getDetails().get(0).getCriterionName());
         verify(categoryChangeLogRepository, times(1)).save(any(CategoryChangeLog.class));
-        verify(articleRepository, times(1)).save(article);
+        verify(articleService, times(1)).changeCategory(10, 4);
     }
 
     @Test
@@ -312,7 +346,7 @@ class ScoringAttemptServiceTest {
         submittedAttempt.setCategoryId(2);
         submittedAttempt.setAttemptType(AttemptType.INITIAL);
         submittedAttempt.setSubmittedAt(LocalDateTime.now()); // Đã nộp
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(submittedAttempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(submittedAttempt));
 
         BusinessException ex = assertThrows(BusinessException.class, () ->
                 scoringAttemptService.changeCategory(10, 4, 3)
@@ -333,7 +367,7 @@ class ScoringAttemptServiceTest {
         attempt.setReviewerId(3);
         attempt.setAttemptNo(1);
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         Criteria c1 = new Criteria();
         c1.setId(1);
@@ -382,7 +416,7 @@ class ScoringAttemptServiceTest {
         ScoringAttempt attempt = new ScoringAttempt();
         attempt.setId(505);
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         Criteria c1 = new Criteria();
         c1.setId(1);
@@ -420,7 +454,7 @@ class ScoringAttemptServiceTest {
         attempt.setReviewerId(3);
         attempt.setTotalScore(new BigDecimal("75.50"));
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
         when(scoringAttemptRepository.save(any(ScoringAttempt.class))).thenAnswer(i -> i.getArgument(0));
 
         com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
@@ -446,7 +480,7 @@ class ScoringAttemptServiceTest {
         attempt.setId(507);
         attempt.setTotalScore(null); // Chưa có điểm
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
                 ScoringDecision.ACCEPT, null
@@ -468,7 +502,7 @@ class ScoringAttemptServiceTest {
         ScoringAttempt attempt = new ScoringAttempt();
         attempt.setId(508);
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
         when(scoringAttemptRepository.save(any(ScoringAttempt.class))).thenAnswer(i -> i.getArgument(0));
 
         com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
@@ -491,7 +525,7 @@ class ScoringAttemptServiceTest {
         ScoringAttempt attempt = new ScoringAttempt();
         attempt.setId(509);
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
                 ScoringDecision.REVISION, ""
@@ -513,7 +547,7 @@ class ScoringAttemptServiceTest {
         ScoringAttempt attempt = new ScoringAttempt();
         attempt.setId(510);
         attempt.setSubmittedAt(null);
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         com.swp391.kpi.dto.ScoringSubmitRequest req = new com.swp391.kpi.dto.ScoringSubmitRequest(
                 ScoringDecision.REJECT, null
@@ -538,7 +572,7 @@ class ScoringAttemptServiceTest {
         attempt.setTotalScore(new BigDecimal("88.00"));
         attempt.setDecision(ScoringDecision.ACCEPT);
         attempt.setSubmittedAt(LocalDateTime.now().minusDays(1));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.of(attempt));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.of(attempt));
 
         ScoringAttemptDetail detail = new ScoringAttemptDetail();
         detail.setId(1);
@@ -556,6 +590,7 @@ class ScoringAttemptServiceTest {
         approval.setAnnouncedAt(LocalDateTime.now().minusDays(2));
         when(scoreApprovalRepository.findByScoringAttemptId(510)).thenReturn(Optional.of(approval));
 
+        when(appealRuleConfigService.getAppealDeadline(any())).thenAnswer(inv -> ((LocalDateTime) inv.getArgument(0)).plusDays(7));
         com.swp391.kpi.dto.ScoringAttemptResponse res = scoringAttemptService.getLatestAttemptByArticle(10);
 
         assertNotNull(res);
@@ -573,10 +608,47 @@ class ScoringAttemptServiceTest {
     @DisplayName("Ném NotFoundException khi bài viết chưa có phiếu chấm nào (UC-34)")
     void testGetLatestAttemptByArticle_NotFound_ThrowsException() {
         when(articleRepository.findById(10)).thenReturn(Optional.of(article));
-        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(10)).thenReturn(Optional.empty());
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () ->
                 scoringAttemptService.getLatestAttemptByArticle(10)
         );
+    }
+
+    @Test
+    @DisplayName("M-A7: lịch sử chấm của BTV kèm lý do Trưởng ban trả chấm lại (UC-32)")
+    void testGetMyScorings_WithReturnReason() {
+        article.setStatus(ArticleStatus.ASSIGNED);
+        assignment.setAssignedAt(LocalDateTime.now().minusDays(2));
+
+        ScoringAttempt returned = new ScoringAttempt();
+        returned.setId(520);
+        ScoringAttempt rescore = new ScoringAttempt();
+        rescore.setId(521);
+        rescore.setAttemptNo(2);
+        rescore.setAttemptType(AttemptType.RESCORE);
+        rescore.setReplacesAttempt(returned);
+
+        ScoreApproval approval = new ScoreApproval();
+        approval.setDecision(ApprovalDecision.RETURNED);
+        approval.setReason("Chấm tiêu chí nguồn tin quá cao");
+
+        Genre genre = new Genre();
+        genre.setId(2);
+        genre.setName("Tin sâu");
+
+        when(assignmentRepository.findByEditorIdOrderByAssignedAtDesc(3)).thenReturn(List.of(assignment));
+        when(articleRepository.findById(10)).thenReturn(Optional.of(article));
+        when(genreRepository.findById(2)).thenReturn(Optional.of(genre));
+        when(scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(10, AttemptType.APPEAL))
+                .thenReturn(Optional.of(rescore));
+        when(scoreApprovalRepository.findByScoringAttemptId(520)).thenReturn(Optional.of(approval));
+
+        List<com.swp391.kpi.dto.ScoringAttemptMyItemResponse> list = scoringAttemptService.getMyScorings(3);
+
+        assertEquals(1, list.size());
+        assertEquals("Tin sâu", list.get(0).getCategoryName());
+        assertEquals(AttemptType.RESCORE, list.get(0).getAttemptType());
+        assertEquals("Chấm tiêu chí nguồn tin quá cao", list.get(0).getReturnReason());
     }
 }

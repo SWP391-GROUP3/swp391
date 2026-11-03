@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +19,10 @@ import java.util.List;
  * vao royalty_media_items.factor nen khong doi theo.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   29  field                           repository / service duoc inject
- *   33  getAllMediaFactors()            Danh sach loai anh/video va he so
- *   43  updateFactor()                  Admin sua he so cua 1 loai anh/video
+ *   31  field                           repository / service duoc inject
+ *   35  getAllMediaFactors()            Danh sach loai anh/video va he so
+ *   45  updateFactor()                  Admin sua he so cua 1 loai anh/video
+ *   57  getFactor()                     M-D2 (cho BF-04): he so cua 1 loai anh/video (media_factors.media_kind: PHOTO / GRAPHIC / VIDEO)
  */
 @Service
 @RequiredArgsConstructor
@@ -48,5 +50,13 @@ public class MediaFactorService {
 
         MediaFactor saved = mediaFactorRepository.save(mediaFactor);
         return MediaFactorResponse.from(saved);
+    }
+
+    // M-D2 (cho BF-04): he so cua 1 loai anh/video (media_factors.media_kind: PHOTO / GRAPHIC / VIDEO)
+    @Transactional(readOnly = true)
+    public BigDecimal getFactor(String mediaKind) {
+        MediaFactor mediaFactor = mediaFactorRepository.findByMediaKind(mediaKind)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy hệ số cho loại: " + mediaKind));
+        return mediaFactor.getFactor();
     }
 }

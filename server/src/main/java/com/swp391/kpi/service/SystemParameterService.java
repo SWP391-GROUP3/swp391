@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,31 +18,35 @@ import java.util.Map;
 /**
  * Cung cap tham so he thong cho cac luong. Luong khac goi service nay,
  * khong goi thang SystemParameterRepository (AGENTS.md muc 2).
- * Admin xem/sua 5 tham so nhap bai cua BF-01 (UC-13); moi tham so doi gia tri ghi 1 dong audit_logs.
+ * Admin xem/sua 6 tham so nhap bai cua BF-01 (UC-13); moi tham so doi gia tri ghi 1 dong audit_logs.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   40  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   48  field                           repository / service duoc inject
+ *   44  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   53  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   53  getValuesByFlow()               Moi tham so cua 1 luong (cot flow, vd "BF-04") thanh Map param_key -> param_value
- *   63  getIntakeParameters()           UC-13: 5 tham so nhap bai hien tai cho man Admin
- *   77  updateIntakeParameters()        UC-13: Admin sua 5 tham so nhap bai
+ *   58  getValuesByFlow()               Moi tham so cua 1 luong (cot flow, vd "BF-04") thanh Map param_key -> param_value
+ *   68  getIntakeParameters()           UC-13: 6 tham so nhap bai hien tai cho man Admin (Q1 02/11: gui/nhan ca 6 trong 1 object)
+ *   83  updateIntakeParameters()        UC-13: Admin sua 6 tham so nhap bai
+ *  139  getIntValue()                   M-D2: doc 1 tham so he thong dang so nguyen theo ten (thay cho cac ban readInt viet rieng o luong khac)
+ *  145  getDecimalValue()               M-D2: doc 1 tham so he thong dang so thap phan theo ten
  *  ---- Ham phu (private, chi dung trong file) ----
- *   94  updateIfChanged()               Chi ghi tham so thuc su doi gia tri: luu nguoi sua, luc sua va 1 dong audit_logs
- *  109  findParameter()                 tim tham so theo ten, khong co thi NotFoundException
- *  115  readInt()                       Lay 1 tham so dang so nguyen
- *  126  toAuditJson()                   Gia tri cu/moi ghi vao audit_logs dang JSON
+ *  101  updateIfChanged()               Chi ghi tham so thuc su doi gia tri: luu nguoi sua, luc sua va 1 dong audit_logs (gia tri cu -> moi)
+ *  116  findParameter()                 tim tham so theo ten, khong co thi NotFoundException
+ *  122  readInt()                       Lay 1 tham so dang so nguyen
+ *  133  toAuditJson()                   Gia tri cu/moi ghi vao audit_logs dang JSON (schema: old_value/new_value luu dang JSON)
+ *  155  findParameterOrBusiness()       Luong khac doc tham so: thieu tham so la loi cau hinh nghiep vu -> BusinessException tieng Viet (plan M-D2)
  */
 @Service
 @RequiredArgsConstructor
 public class SystemParameterService {
 
-    // Ten param_key cua 5 tham so UC-13 (xem database/data.sql)
+    // Ten param_key cua 6 tham so UC-13 (xem database/data.sql)
     private static final String PARAM_MAX_AUTHORS = "MAX_AUTHORS_PER_ARTICLE";
     private static final String PARAM_CONFIRM_DAYS = "CO_AUTHOR_CONFIRM_DAYS";
     private static final String PARAM_DUP_WARN = "DUP_WARN_PERCENT";
     private static final String PARAM_DUP_BLOCK = "DUP_BLOCK_PERCENT";
     private static final String PARAM_DHASH_MAX_BITS = "DHASH_MAX_BITS";
+    private static final String PARAM_SHINGLE_SIZE = "SHINGLE_SIZE";
     private static final String AUDIT_ACTION_UPDATE = "UPDATE";           // audit_logs.action_type
     private static final String AUDIT_ENTITY = "system_parameters";       // audit_logs.entity_type = ten bang
 
@@ -58,7 +63,7 @@ public class SystemParameterService {
         return values;
     }
 
-    // UC-13: 5 tham so nhap bai hien tai cho man Admin
+    // UC-13: 6 tham so nhap bai hien tai cho man Admin (Q1 02/11: gui/nhan ca 6 trong 1 object)
     @Transactional(readOnly = true)
     public SystemParameterIntakeResponse getIntakeParameters() {
         SystemParameterIntakeResponse response = new SystemParameterIntakeResponse();
@@ -67,10 +72,11 @@ public class SystemParameterService {
         response.setDupWarnPercent(readInt(findParameter(PARAM_DUP_WARN)));
         response.setDupBlockPercent(readInt(findParameter(PARAM_DUP_BLOCK)));
         response.setDhashMaxBits(readInt(findParameter(PARAM_DHASH_MAX_BITS)));
+        response.setShingleSize(readInt(findParameter(PARAM_SHINGLE_SIZE)));
         return response;
     }
 
-    // UC-13: Admin sua 5 tham so nhap bai. Gioi han tung o da kiem bang @Valid o request;
+    // UC-13: Admin sua 6 tham so nhap bai. Gioi han tung o da kiem bang @Valid o request;
     // o day kiem luat can nhieu o va ghi lai. Chi anh huong bai nop SAU khi sua
     // (ket qua kiem trung, han xac nhan cua bai cu da luu, khong tinh lai).
     @Transactional
@@ -86,6 +92,7 @@ public class SystemParameterService {
         updateIfChanged(PARAM_DUP_WARN, request.getDupWarnPercent(), adminId, now);
         updateIfChanged(PARAM_DUP_BLOCK, request.getDupBlockPercent(), adminId, now);
         updateIfChanged(PARAM_DHASH_MAX_BITS, request.getDhashMaxBits(), adminId, now);
+        updateIfChanged(PARAM_SHINGLE_SIZE, request.getShingleSize(), adminId, now);
         return getIntakeParameters();
     }
 
@@ -125,5 +132,28 @@ public class SystemParameterService {
     // Gia tri cu/moi ghi vao audit_logs dang JSON (schema: old_value/new_value luu dang JSON)
     private static String toAuditJson(String key, String value) {
         return "{\"param_key\":\"" + key + "\",\"param_value\":\"" + value + "\"}";
+    }
+
+    // M-D2: doc 1 tham so he thong dang so nguyen theo ten (thay cho cac ban readInt viet rieng o luong khac)
+    @Transactional(readOnly = true)
+    public int getIntValue(String key) {
+        return readInt(findParameterOrBusiness(key));
+    }
+
+    // M-D2: doc 1 tham so he thong dang so thap phan theo ten
+    @Transactional(readOnly = true)
+    public BigDecimal getDecimalValue(String key) {
+        SystemParameter parameter = findParameterOrBusiness(key);
+        try {
+            return new BigDecimal(parameter.getParamValue().trim());
+        } catch (NumberFormatException e) {
+            throw new BusinessException("Tham số hệ thống " + key + " không phải là số: " + parameter.getParamValue());
+        }
+    }
+
+    // Luong khac doc tham so: thieu tham so la loi cau hinh nghiep vu -> BusinessException tieng Viet (plan M-D2)
+    private SystemParameter findParameterOrBusiness(String key) {
+        return systemParameterRepository.findByParamKey(key)
+                .orElseThrow(() -> new BusinessException("Chưa cấu hình tham số hệ thống: " + key));
     }
 }

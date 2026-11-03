@@ -13,14 +13,14 @@ import java.util.Optional;
  * goi.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  findByCategoryIdAndStatus()     Lay phien ban dang ACTIVE cua mot the loai (BR-QA-03)
+ *   24  findByCategoryIdAndStatus()     Lay phien ban dang ACTIVE cua mot the loai (BR-SC-03)
  *   27  findTopByCategoryIdOrderByVersionNoDesc()  Lay phien ban co so version_no lon nhat cua mot the loai
  *   30  findByCategoryIdOrderByVersionNoDesc()  Lay tat ca cac phien ban cua mot the loai sap xep theo version_no giam dan (UC-14)
  */
 @Repository
 public interface CriteriaSetVersionRepository extends JpaRepository<CriteriaSetVersion, Integer> {
 
-    // Lấy phiên bản đang ACTIVE của một thể loại (BR-QA-03)
+    // Lấy phiên bản đang ACTIVE của một thể loại (BR-SC-03)
     Optional<CriteriaSetVersion> findByCategoryIdAndStatus(Integer categoryId, CriteriaSetStatus status);
 
     // Lấy phiên bản có số version_no lớn nhất của một thể loại

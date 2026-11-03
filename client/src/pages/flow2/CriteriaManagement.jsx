@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   layBoTieuChiActive,
   layDanhSachBoTieuChi,
   taoBoTieuChiDraft,
   kichHoatBoTieuChi
 } from '../../api/assessmentApi.js'
+import { getGenres } from '../../api/adminApi.js'
 import { goiApi } from '../../api/goiApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_TIEU_CHI, BT_DANH_SACH, BT_THEM, BT_THONG_TIN, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
@@ -14,28 +16,33 @@ import '../../styles/Flow2.css'
  * Man quan ly bo tieu chi cham (UC-14...17): xem phien ban bo tieu chi theo the loai, tao phien ban
  * moi voi danh sach tieu chi va trong so.
  *
- * MO TRANG NAY TAI: /criteria-sets, /criteria-sets/:id
+ * MO TRANG NAY TAI: /criteria-sets
  *
  * MUC LUC (so dong - ten - tac dung)
- *   37  CriteriaManagement()            criteria management
- *   58    useEffect                     tai du lieu khi mo trang
- *   62    loadCategoryData()            tai category data
- *   89    handleAddCriterion()          xu ly add criterion
- *   96    handleRemoveCriterion()       xu ly remove criterion
- *  104    handleCriterionChange()       xu ly criterion change
- *  110    handleCreateNewVersion()      xu ly create new version
- *  147    handleActivate()              xu ly activate
+ *   40  CriteriaManagement()            criteria management
+ *   65    useEffect                     Mo trang: tai the loai; ?genreId= (link tu trang chu Admin) thi mo san the loai do
+ *   81    useEffect                     Doi the loai dang chon: tai lai cac phien ban bo tieu chi cua the loai do
+ *   88    loadCategoryData()            UC-14: phien ban ACTIVE + moi phien ban cua 1 the loai (chua co ACTIVE thi de trong)
+ *  116    handleAddCriterion()          Them 1 dong tieu chi trong form tao phien ban moi (chua goi server)
+ *  124    handleRemoveCriterion()       Bo 1 dong tieu chi trong form (chua goi server)
+ *  133    handleCriterionChange()       Go vao 1 o cua dong tieu chi (ten, mo ta, trong so)
+ *  140    handleCreateNewVersion()      UC-15, UC-16: kiem tong trong so 100% roi POST /api/criteria-sets; tick Kich hoat ngay thi server kich hoat l…
+ *  178    handleActivate()              UC-17: kich hoat 1 phien ban DRAFT, phien ban ACTIVE cu chuyen RETIRED
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  182  [Tai lai]                       xu ly tren trang
- *  203  [{BT_DAU_TICH} Kich hoat (ACTIVE) ngay]  handleActivate() -> goi PUT /api/criteria-sets/{versionId}/activate, GET /api/criteria-sets/category/{categoryId}/active, GET /api/criteria-sets/category/{cate…
- *  300  [{BT_DAU_TICH} Kich hoat (ACTIVE)]  handleActivate() -> goi PUT /api/criteria-sets/{versionId}/activate, GET /api/criteria-sets/category/{categoryId}/active, GET /api/criteria-sets/category/{cate…
- *  319  form, nut [Luu Phien ban Moi]   handleCreateNewVersion() -> goi POST /api/criteria-sets, GET /api/criteria-sets/category/{categoryId}/active, GET /api/criteria-sets/category/{categoryId}
- *  373  [{BT_DAU_X}]                    handleRemoveCriterion() -> tren trang: criteria list
- *  387  [{BT_THEM} Them tieu chi]       handleAddCriterion() -> tren trang: criteria list
+ *  212  [Tai lai]                       xu ly tren trang
+ *  233  [{BT_DAU_TICH} Kich hoat (ACTIVE) ngay]  handleActivate() UC-17: kich hoat 1 phien ban DRAFT, phien ban ACTIVE cu chuyen RETIRED -> goi PUT /api/criteria-sets/{versionId}/activate, GET /api/criteria-s…
+ *  330  [{BT_DAU_TICH} Kich hoat (ACTIVE)]  handleActivate() UC-17: kich hoat 1 phien ban DRAFT, phien ban ACTIVE cu chuyen RETIRED -> goi PUT /api/criteria-sets/{versionId}/activate, GET /api/criteria-s…
+ *  349  form, nut [Luu Phien ban Moi]   handleCreateNewVersion() UC-15, UC-16: kiem tong trong so 100% roi POST /api/criteria-sets; tick Kich hoat ngay thi server kich hoat l… -> goi POST /api/criter…
+ *  403  [{BT_DAU_X}]                    handleRemoveCriterion() Bo 1 dong tieu chi trong form (chua goi server) -> tren trang: criteria list
+ *  417  [{BT_THEM} Them tieu chi]       handleAddCriterion() Them 1 dong tieu chi trong form tao phien ban moi (chua goi server) -> tren trang: criteria list
  */
 
 export default function CriteriaManagement({ nguoiDung }) {
+  // M-A3: the loai lay tu GET /api/genres; chon san the loai dau tien khi tai xong
+  const [searchParams] = useSearchParams()
+  const [genres, setGenres] = useState([])
+  const [categoryId, setCategoryId] = useState(null)
   const [genres, setGenres] = useState([])
   const [categoryId, setCategoryId] = useState(1)
   const [activeVersion, setActiveVersion] = useState(null)
@@ -57,6 +64,7 @@ export default function CriteriaManagement({ nguoiDung }) {
   // Tính tổng trọng số
   const totalWeight = criteriaList.reduce((sum, c) => sum + (Number(c.weight) || 0), 0)
 
+  // Mo trang: tai the loai; ?genreId= (link tu trang chu Admin) thi mo san the loai do
   // Tải danh mục thể loại thực tế từ database
   useEffect(() => {
     async function fetchGenres() {
@@ -77,9 +85,28 @@ export default function CriteriaManagement({ nguoiDung }) {
   }, [])
 
   useEffect(() => {
-    loadCategoryData(categoryId)
+    getGenres()
+      .then(data => {
+        setGenres(data || [])
+        // ?genreId=... (link tu trang chu Admin) -> mo san the loai do, khong co thi the loai dau tien
+        const genreId = Number(searchParams.get('genreId'))
+        if (data && data.some(g => g.id === genreId)) {
+          setCategoryId(genreId)
+        } else if (data && data.length > 0) {
+          setCategoryId(data[0].id)
+        }
+      })
+      .catch(err => setError('Lỗi tải danh sách thể loại: ' + err.message))
+  }, [])
+
+  // Doi the loai dang chon: tai lai cac phien ban bo tieu chi cua the loai do
+  useEffect(() => {
+    if (categoryId) {
+      loadCategoryData(categoryId)
+    }
   }, [categoryId])
 
+  // UC-14: phien ban ACTIVE + moi phien ban cua 1 the loai (chua co ACTIVE thi de trong)
   async function loadCategoryData(catId) {
     setLoading(true)
     setError('')
@@ -107,6 +134,7 @@ export default function CriteriaManagement({ nguoiDung }) {
     }
   }
 
+  // Them 1 dong tieu chi trong form tao phien ban moi (chua goi server)
   function handleAddCriterion() {
     setCriteriaList([
       ...criteriaList,
@@ -114,6 +142,7 @@ export default function CriteriaManagement({ nguoiDung }) {
     ])
   }
 
+  // Bo 1 dong tieu chi trong form (chua goi server)
   function handleRemoveCriterion(index) {
     if (criteriaList.length <= 1) {
       alert('Bộ tiêu chí phải có ít nhất 1 tiêu chí!')
@@ -122,12 +151,14 @@ export default function CriteriaManagement({ nguoiDung }) {
     setCriteriaList(criteriaList.filter((_, i) => i !== index))
   }
 
+  // Go vao 1 o cua dong tieu chi (ten, mo ta, trong so)
   function handleCriterionChange(index, field, value) {
     const updated = [...criteriaList]
     updated[index][field] = value
     setCriteriaList(updated)
   }
 
+  // UC-15, UC-16: kiem tong trong so 100% roi POST /api/criteria-sets; tick Kich hoat ngay thi server kich hoat luon
   async function handleCreateNewVersion(e) {
     e.preventDefault()
     setError('')
@@ -165,6 +196,7 @@ export default function CriteriaManagement({ nguoiDung }) {
     }
   }
 
+  // UC-17: kich hoat 1 phien ban DRAFT, phien ban ACTIVE cu chuyen RETIRED
   async function handleActivate(versionId) {
     setError('')
     setMessage('')
@@ -180,7 +212,7 @@ export default function CriteriaManagement({ nguoiDung }) {
 
   return (
     <div className="bf02__the">
-      {/* UC-14 đến UC-17; BR-QA-01: Admin cấu hình bộ tiêu chí chấm điểm */}
+      {/* UC-14 đến UC-17; BR-SC-01: Admin cấu hình bộ tiêu chí chấm điểm */}
       <h3 className="bf02__tieu-de"><Icon>{BT_TIEU_CHI}</Icon>Cấu hình Bộ tiêu chí chấm điểm</h3>
       <p className="bf02__mo-ta">
         Thiết lập các tiêu chí chất lượng cho từng thể loại. Mỗi tiêu chí có trọng số riêng, tổng các trọng số bắt buộc bằng 100%.
@@ -191,10 +223,13 @@ export default function CriteriaManagement({ nguoiDung }) {
         <label className="bf02__nhan" htmlFor="tieu-chi-the-loai">Thể loại bài viết:</label>
         <select
           id="tieu-chi-the-loai"
-          value={categoryId}
+          value={categoryId || ''}
           onChange={(e) => setCategoryId(Number(e.target.value))}
           className="o-nhap-ngan"
         >
+          {genres.map(g => (
+            <option key={g.id} value={g.id}>{g.name}</option>
+          ))}
           {genres.length > 0 ? (
             genres.map((g) => (
               <option key={g.id} value={g.id}>
@@ -341,7 +376,7 @@ export default function CriteriaManagement({ nguoiDung }) {
         )}
       </div>
 
-      {/* Form tạo phiên bản mới - UC-15, BR-QA-02 */}
+      {/* Form tạo phiên bản mới - UC-15, BR-SC-02 */}
       <form onSubmit={handleCreateNewVersion}>
         <h4 className="bf02__tieu-de-nho"><Icon>{BT_THEM}</Icon>Tạo Phiên bản Bộ tiêu chí mới</h4>
 

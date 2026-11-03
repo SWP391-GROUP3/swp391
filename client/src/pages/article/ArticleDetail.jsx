@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  acceptCoAuthorship, getArticleDetail, rejectCoAuthorship, submitArticle, withdrawArticle,
+  acceptCoAuthorship, getArticleDetail, getDuplicationCheck, rejectCoAuthorship, withdrawArticle,
 } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import { STATUS_COLORS, statusLabel, natureLabel, confirmLabel } from '../../utils/articleLabels.js'
 import Icon from '../../components/common/Icon.jsx'
 import ArticleScoreCard from '../flow2/ArticleScoreCard.jsx'
+import ArticleAttachments from './ArticleAttachments.jsx'
+import ArticleDuplicationResult from './ArticleDuplicationResult.jsx'
 import '../../styles/ArticleDetail.css'
 
 /**
@@ -14,29 +16,35 @@ import '../../styles/ArticleDetail.css'
  * lich su trang thai. Tac gia chinh rut duoc bai dang "Da nop" (UC-11, BR-IN-08):
  * server tra canWithdraw de biet co hien nut hay khong.
  *
- * MO TRANG NAY TAI: /my-articles/:id
+ * MO TRANG NAY TAI: /my-articles/:id (Phong vien), /articles/:id (BTV duoc giao, Truong ban cung ban - chi xem, Iter 3).
+ * Ai duoc xem do server kiem (ArticleViewService); nut thao tac chi hien khi server bat co (canEdit, canWithdraw...).
+ *
+ * MO TRANG NAY TAI: /my-articles/:id, /articles/:id
  *
  * MUC LUC (so dong - ten - tac dung)
- *   38  ArticleDetail()                 xem tom tat dau file
- *   51    useEffect                     Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
- *   67    handleConfirmWithdraw()       Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ban moi
- *   83    runAction()                   Goi 1 API thao tac (nop bai, dong y, tu choi) roi thay du lieu bai bang ban moi server tra ve
+ *   43  ArticleDetail()                 xem tom tat dau file
+ *   60    useEffect                     Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
+ *   77    handleConfirmWithdraw()       Bam "Xac nhan rut bai" trong hop hoi: goi API, thay du lieu bai bang ban moi
+ *   93    runAction()                   Goi 1 API thao tac (nop bai, dong y, tu choi) roi thay du lieu bai bang ban moi server tra ve
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  106  [< Bai cua toi]                 quay ve trang /my-articles (MyArticles)
- *  127  [Sua bai] / [Sua va nop lai]    chi hien khi canEdit -> mo trang /my-articles/:id/edit (ArticleEditor, UC-03/UC-10)
- *  133  [Nop bai]                       chi hien khi canSubmit -> POST /api/articles/{id}/submit (UC-05), cap nhat lai trang
- *  138  [Rut bai]                       chi hien khi canWithdraw -> mo hop hoi lai ngay ben duoi (UC-11)
- *  167  [Tu choi]                       chi hien khi canRespond -> mo o nhap ly do tu choi (UC-12 A1)
- *  171  [Dong y]                        dong tac gia dong y -> POST /api/articles/{id}/co-author/accept (UC-12)
- *  178  [Huy] (o ly do)                 dong o nhap ly do, khong gui gi
- *  182  [Gui tu choi]                   POST /api/articles/{id}/co-author/reject kem ly do -> bai ve Nhap
- *  198  [Huy] (hop rut bai)             dong hop hoi, khong rut
- *  201  [Xac nhan rut bai]              POST /api/articles/{id}/withdraw -> bai ve Nhap (BR-IN-08)
- *  210  khoi diem theo tieu chi         khong phai nut: component cua BF-02 (UC-34), chi hien khi bai SCORE_PUBLISHED / PUBLISHED
+ *  117  [< Bai cua toi]                 quay ve trang /my-articles (MyArticles)
+ *  154  [Sua bai] / [Sua va nop lai]    chi hien khi canEdit -> mo trang /my-articles/:id/edit (ArticleEditor, UC-03/UC-10)
+ *  160  [Kiem tra va nop]               chi hien khi canSubmit -> mo trang /my-articles/:id/edit de kiem trung roi xac nhan nop (UC-05, UC-06)
+ *  163  [Rut bai]                       chi hien khi canWithdraw -> mo hop hoi lai ngay ben duoi (UC-11)
+ *  192  [Tu choi]                       chi hien khi canRespond -> mo o nhap ly do tu choi (UC-12 A1)
+ *  196  [Dong y]                        dong tac gia dong y -> POST /api/articles/{id}/co-author/accept (UC-12)
+ *  203  [Huy] (o ly do)                 dong o nhap ly do, khong gui gi
+ *  207  [Gui tu choi]                   POST /api/articles/{id}/co-author/reject kem ly do -> bai ve Nhap
+ *  223  [Huy] (hop rut bai)             dong hop hoi, khong rut
+ *  226  [Xac nhan rut bai]              POST /api/articles/{id}/withdraw -> bai ve Nhap (BR-IN-08)
+ *  235  khoi diem theo tieu chi         khong phai nut: component cua BF-02 (UC-34), chi hien khi bai SCORE_PUBLISHED / PUBLISHED
  */
-export default function ArticleDetail() {
+export default function ArticleDetail({ nguoiDung }) {
   const { id } = useParams()
+  const navigate = useNavigate()
+  // PV quay ve "Bai cua toi"; BTV / Truong ban mo bai tu trang cua ho (hang cho, phieu cham) -> quay lai trang truoc
+  const laPhongVien = nguoiDung?.vaiTro?.[0] === 'REPORTER'
 
   const [article, setArticle] = useState(null)   // null = dang tai
   const [error, setError] = useState('')
@@ -46,15 +54,17 @@ export default function ArticleDetail() {
   const [busy, setBusy] = useState(false)                             // dang goi API nop bai / tra loi xac nhan
   const [rejecting, setRejecting] = useState(false)                   // dang hien o nhap ly do tu choi
   const [rejectReason, setRejectReason] = useState('')
+  const [duplication, setDuplication] = useState(null)   // ket qua kiem trung luc nop gan nhat (UC-06), null = chua nop
 
   // Tai chi tiet bai khi mo trang (hoac doi sang bai khac)
   useEffect(() => {
     let isMounted = true
 
-    getArticleDetail(id)
-      .then((data) => {
+    Promise.all([getArticleDetail(id), getDuplicationCheck(id)])
+      .then(([data, check]) => {
         if (isMounted) {
           setArticle(data)
+          setDuplication(check)
           setError('')
         }
       })
@@ -103,10 +113,27 @@ export default function ArticleDetail() {
 
   return (
     <div className="article-detail">
-      <Link to="/my-articles" className="article-detail__back">
-        <Icon><path d="M15 6l-6 6 6 6" /></Icon>
-        <span>Bài của tôi</span>
-      </Link>
+      {laPhongVien ? (
+        <Link to="/my-articles" className="article-detail__back">
+          <Icon><path d="M15 6l-6 6 6 6" /></Icon>
+          <span>Bài của tôi</span>
+        </Link>
+      ) : (
+        // Mo bai trong tab moi thi khong co trang truoc -> di theo link ve trang chu
+        <Link
+          to="/main"
+          className="article-detail__back"
+          onClick={(e) => {
+            if (window.history.length > 1) {
+              e.preventDefault()
+              navigate(-1)
+            }
+          }}
+        >
+          <Icon><path d="M15 6l-6 6 6 6" /></Icon>
+          <span>Quay lại</span>
+        </Link>
+      )}
 
       {error && <p className="thong-bao-loi" role="alert">{error}</p>}
       {!article && !error && <p className="article-detail__loading">Đang tải…</p>}
@@ -128,11 +155,9 @@ export default function ArticleDetail() {
                   {article.canResubmit ? 'Sửa và nộp lại' : 'Sửa bài'}
                 </Link>
               )}
+              {/* UC-05 buoc 2-3: nop phai kiem trung truoc -> mo man soan bai de kiem tra va xac nhan nop */}
               {article.canSubmit && (
-                <button type="button" className="nut-chinh-fm" disabled={busy}
-                  onClick={() => runAction(submitArticle(article.id), 'Đã nộp bài.')}>
-                  {busy ? 'Đang nộp…' : 'Nộp bài'}
-                </button>
+                <Link to={`/my-articles/${article.id}/edit`} className="nut-chinh-fm">Kiểm tra và nộp</Link>
               )}
               {article.canWithdraw && !confirmingWithdraw && (
                 <button type="button" className="nut-nhe article-detail__withdraw-button" onClick={() => setConfirmingWithdraw(true)}>
@@ -211,11 +236,24 @@ export default function ArticleDetail() {
           )}
 
           <div className="article-detail__grid">
-            {/* Cot trai: noi dung bai */}
-            <section className="article-detail__section">
-              <h2 className="article-detail__section-title">Nội dung</h2>
-              <div className="article-detail__content">{article.content || 'Chưa có nội dung.'}</div>
-            </section>
+            {/* Cot trai: noi dung bai + anh/video (dung lai class xep doc cua cot phai) */}
+            <div className="article-detail__side">
+              <section className="article-detail__section">
+                <h2 className="article-detail__section-title">Nội dung</h2>
+                <div className="article-detail__content">{article.content || 'Chưa có nội dung.'}</div>
+              </section>
+
+              {/* Iter 3: anh/video kem ket qua kiem trung (UC-07), chi xem; sua o man soan bai */}
+              <ArticleAttachments articleId={article.id} canEdit={false} />
+
+              {/* UC-06 / UC-08: ket qua kiem trung noi dung luc nop gan nhat, kem giai trinh (B8) */}
+              {duplication && (
+                <section className="article-detail__section">
+                  <h2 className="article-detail__section-title">Kiểm tra trùng nội dung</h2>
+                  <ArticleDuplicationResult check={duplication} />
+                </section>
+              )}
+            </div>
 
             {/* Cot phai: khai bao, tac gia, lich su */}
             <div className="article-detail__side">
@@ -227,6 +265,8 @@ export default function ArticleDetail() {
                   <dt>Thể loại áp dụng</dt><dd>{article.categoryName || `Mã ${article.categoryId}`}</dd>
                   <dt>Tính chất</dt><dd>{natureLabel(article.declaredNature)}</dd>
                   <dt>Sự kiện</dt><dd>{article.eventId ? `Mã ${article.eventId}` : 'Không'}</dd>
+                  {/* BR-IN-03: ty le bao hoa khoa luc nop bai dau tien */}
+                  {article.saturationRate != null && (<><dt>Tỷ lệ bão hòa</dt><dd>{Number(article.saturationRate)}%</dd></>)}
                   <dt>Ngày tạo</dt><dd>{formatDate(article.createdAt)}</dd>
                   <dt>Nộp gần nhất</dt><dd>{formatDate(article.submittedAt)}</dd>
                   {article.withdrawnAt && (<><dt>Rút gần nhất</dt><dd>{formatDate(article.withdrawnAt)}</dd></>)}
