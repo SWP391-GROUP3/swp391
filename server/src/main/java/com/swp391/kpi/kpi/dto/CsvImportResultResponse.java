@@ -1,0 +1,27 @@
+package com.swp391.kpi.kpi.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * DTO phan hoi ket qua sau khi thuc hien import file CSV (UC-63).
+ *
+ * MUC LUC (so dong - ten - tac dung)
+ *   19  field                           cac truong tra ve cho giao dien
+ */
+@Getter
+@Setter
+public class CsvImportResultResponse {
+
+    private Integer logId;
+    private String fileName;
+    private int totalRecords;
+    private int successRecords;
+    private int insertedRecords;
+    private int overwrittenRecords;
+    private int skippedRecords;
+    private List<String> warnings = new ArrayList<>();
+}

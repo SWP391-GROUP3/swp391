@@ -180,27 +180,27 @@ Chưa có `docs/ui-images/` trong repo được khảo sát. UC42 dùng các tra
 
 | File | Trách nhiệm và tác động |
 |---|---|
-| [AppealController.java](../../../server/src/main/java/com/swp391/kpi/controller/AppealController.java) | Các endpoint Reporter hiện có; giữ tương thích |
-| [AppealService.java](../../../server/src/main/java/com/swp391/kpi/service/AppealService.java) | Gửi/xem appeal, thời hạn, tác giả, tiêu chí, lưu cấu hình áp dụng; không nhét toàn bộ Iter2 vào đây |
-| [AppealRuleConfigService.java](../../../server/src/main/java/com/swp391/kpi/service/AppealRuleConfigService.java) | Chọn bản luật đang hiệu lực và tạo phiên bản mới, dùng cho UC44/35 |
-| [AppealAuditQueryService.java](../../../server/src/main/java/com/swp391/kpi/service/AppealAuditQueryService.java) | Chỉ đọc audit trong phạm vi được phép; kiểm tra thêm log phân công/giao lại sau khi có dữ liệu mới |
-| [ReviewerDeviationService.java](../../../server/src/main/java/com/swp391/kpi/service/ReviewerDeviationService.java) | Lấy báo cáo theo kỳ/BTV/ban, kiểm tra phạm vi |
-| [ReviewerDeviationRefreshService.java](../../../server/src/main/java/com/swp391/kpi/service/ReviewerDeviationRefreshService.java) | Tổng hợp dữ liệu nguồn và cập nhật chỉ số theo tháng |
-| [ReviewerDeviationCalculator.java](../../../server/src/main/java/com/swp391/kpi/service/ReviewerDeviationCalculator.java) | Phép tính thuần: độ lệch tuyệt đối, tỷ lệ đổi điểm, làm tròn; dùng test không cần DB |
-| [AppealRepository.java](../../../server/src/main/java/com/swp391/kpi/repository/AppealRepository.java) | Bổ sung query/khóa appeal cho hàng chờ và chuyển trạng thái khi đã đến bước backend |
-| [Appeal.java](../../../server/src/main/java/com/swp391/kpi/entity/Appeal.java), [AppealStatus.java](../../../server/src/main/java/com/swp391/kpi/entity/AppealStatus.java) | Giữ ba trạng thái persisted; không thêm trạng thái DB để biểu diễn màn hình |
+| [AppealController.java](../../../server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java) | Các endpoint Reporter hiện có; giữ tương thích |
+| [AppealService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java) | Gửi/xem appeal, thời hạn, tác giả, tiêu chí, lưu cấu hình áp dụng; không nhét toàn bộ Iter2 vào đây |
+| [AppealRuleConfigService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/AppealRuleConfigService.java) | Chọn bản luật đang hiệu lực và tạo phiên bản mới, dùng cho UC44/35 |
+| [AppealAuditQueryService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/AppealAuditQueryService.java) | Chỉ đọc audit trong phạm vi được phép; kiểm tra thêm log phân công/giao lại sau khi có dữ liệu mới |
+| [ReviewerDeviationService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerDeviationService.java) | Lấy báo cáo theo kỳ/BTV/ban, kiểm tra phạm vi |
+| [ReviewerDeviationRefreshService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerDeviationRefreshService.java) | Tổng hợp dữ liệu nguồn và cập nhật chỉ số theo tháng |
+| [ReviewerDeviationCalculator.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerDeviationCalculator.java) | Phép tính thuần: độ lệch tuyệt đối, tỷ lệ đổi điểm, làm tròn; dùng test không cần DB |
+| [AppealRepository.java](../../../server/src/main/java/com/swp391/kpi/appeal/repository/AppealRepository.java) | Bổ sung query/khóa appeal cho hàng chờ và chuyển trạng thái khi đã đến bước backend |
+| [Appeal.java](../../../server/src/main/java/com/swp391/kpi/appeal/entity/Appeal.java), [AppealStatus.java](../../../server/src/main/java/com/swp391/kpi/appeal/entity/AppealStatus.java) | Giữ ba trạng thái persisted; không thêm trạng thái DB để biểu diễn màn hình |
 
 Backend UC42 đã tạo:
 
-- [ReviewerProfileController.java](../../../server/src/main/java/com/swp391/kpi/controller/ReviewerProfileController.java) → [ReviewerProfileService.java](../../../server/src/main/java/com/swp391/kpi/service/ReviewerProfileService.java): directory, hồ sơ và lịch sử; lấy actor từ JWT, giới hạn Head theo ban, Admin xem các ban.
+- [ReviewerProfileController.java](../../../server/src/main/java/com/swp391/kpi/appeal/controller/ReviewerProfileController.java) → [ReviewerProfileService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerProfileService.java): directory, hồ sơ và lịch sử; lấy actor từ JWT, giới hạn Head theo ban, Admin xem các ban.
 - DTO `ReviewerDirectoryResponse`, `ReviewerProfileResponse`, `ReviewerScoringHistoryResponse`, `ReviewerCrossReviewResponse`: chỉ trả trường cần hiển thị, không trả password/token hay entity trực tiếp.
 - Workload hiện tại: số phân công gốc có bài `ASSIGNED`, số chấm chéo `PENDING`, số phiếu APPEAL chưa nộp (`pendingAppealReviewCount`). Không dùng tổng mọi phân công hoặc tổng phiếu đã nộp làm số việc đang chờ.
 - Chỉ số hồ sơ tính từ dữ liệu nguồn qua phép tính thuần UC41, không ghi `reviewer_deviation_indices` khi mở hồ sơ. Không có so sánh thì trả `null`, không tạo độ lệch 0 giả.
 
 Backend UC38/43 đã tạo:
 
-- [AppealManagementController.java](../../../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java) → [AppealManagementService.java](../../../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java): danh sách/chi tiết/phân công/giao lại, tách khỏi service gửi appeal của Reporter. Controller nhận JWT/DTO, service kiểm tra Head ACTIVE cùng ban và transaction.
-- [ScoringAppealService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java): điểm tích hợp BF02 đã được cho phép. Tạo phiếu nháp giữ version/assignment/category/criteria-set gốc; giao lại cùng phiếu, audit nháp cũ rồi xóa điểm/nhận xét nháp khỏi phiếu mới giao. `lockedDraft` gọi `EntityManager.refresh(..., PESSIMISTIC_WRITE)` vì query có khóa không tự làm mới entity đã cache; sau đó mới kiểm tra submittedAt/người được giao và chụp audit. `requireOwnedDraft` dùng cùng cơ chế để từ chối BTV cũ.
+- [AppealManagementController.java](../../../server/src/main/java/com/swp391/kpi/appeal/controller/AppealManagementController.java) → [AppealManagementService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java): danh sách/chi tiết/phân công/giao lại, tách khỏi service gửi appeal của Reporter. Controller nhận JWT/DTO, service kiểm tra Head ACTIVE cùng ban và transaction.
+- [ScoringAppealService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java): điểm tích hợp BF02 đã được cho phép. Tạo phiếu nháp giữ version/assignment/category/criteria-set gốc; giao lại cùng phiếu, audit nháp cũ rồi xóa điểm/nhận xét nháp khỏi phiếu mới giao. `lockedDraft` gọi `EntityManager.refresh(..., PESSIMISTIC_WRITE)` vì query có khóa không tự làm mới entity đã cache; sau đó mới kiểm tra submittedAt/người được giao và chụp audit. `requireOwnedDraft` dùng cùng cơ chế để từ chối BTV cũ.
 - DTO `AppealManagementResponse`, `AppealReviewerCandidateResponse`, `AppealAssignRequest`, `AppealReassignRequest`: dữ liệu màn Trưởng ban. Request giao lại có người mới, lý do và mã phiếu đang giao để phát hiện thao tác cũ.
 - Các class nằm trong thư mục tầng hiện có (`controller`, `service`, `dto`), không tạo package con theo luồng, không tự dựng interface + Impl cho mỗi service.
 
@@ -208,13 +208,13 @@ Backend UC38/43 đã tạo:
 
 | Source | Đã cung cấp | Thiếu cho Iter2 / cách xử lý |
 |---|---|---|
-| [UserReadService.java](../../../server/src/main/java/com/swp391/kpi/service/UserReadService.java) | User, role, status, section; `requireActive` | Tái dùng để kiểm tra quyền và lọc BTV, không gọi repository user trực tiếp |
-| [ArticleReadService.java](../../../server/src/main/java/com/swp391/kpi/service/ArticleReadService.java) | Thông tin bài, tác giả, ban | Tái dùng kiểm tra ban; không đổi trạng thái bài khi giao người chấm appeal |
-| [ScoringReadService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringReadService.java) | Lần chấm đã nộp/công bố và tiêu chí | Dùng cho dữ liệu đã nộp; nháp đi qua `ScoringAppealService`, không query BF02 trực tiếp từ BF03 |
-| [ScoringAppealService.java](../../../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java) | Snapshot, tạo/giao lại nháp, kiểm tra chủ phiếu, workload APPEAL | Hợp đồng Iter2 đã triển khai; Iter3 phải tái dùng kiểm tra chủ phiếu trong transaction và bổ sung kiểm tra appeal status |
-| [AssignmentService.java](../../../server/src/main/java/com/swp391/kpi/service/AssignmentService.java) | Khối lượng công việc/phân công BF02 | Có thể gọi hàm đọc khối lượng UC42; không gọi `assignArticle` để giao lại appeal vì sẽ sửa phân công gốc |
-| [AuditService.java](../../../server/src/main/java/com/swp391/kpi/service/AuditService.java) | `log(actorId, actionType, entityType, entityId, oldValue, newValue)` | Tái dùng để ghi log; UI đọc qua query service đã kiểm tra phạm vi, không mở đường vòng audit không giới hạn |
-| [NotificationService.java](../../../server/src/main/java/com/swp391/kpi/service/NotificationService.java) | Gửi Trưởng ban/theo role/riêng người bằng `notifyUser` | Bổ sung riêng người đã được chấp thuận; cùng transaction, thông báo không chứa điểm/lý do khiếu nại |
+| [UserReadService.java](../../../server/src/main/java/com/swp391/kpi/admin/service/UserReadService.java) | User, role, status, section; `requireActive` | Tái dùng để kiểm tra quyền và lọc BTV, không gọi repository user trực tiếp |
+| [ArticleReadService.java](../../../server/src/main/java/com/swp391/kpi/article/service/ArticleReadService.java) | Thông tin bài, tác giả, ban | Tái dùng kiểm tra ban; không đổi trạng thái bài khi giao người chấm appeal |
+| [ScoringReadService.java](../../../server/src/main/java/com/swp391/kpi/assessment/service/ScoringReadService.java) | Lần chấm đã nộp/công bố và tiêu chí | Dùng cho dữ liệu đã nộp; nháp đi qua `ScoringAppealService`, không query BF02 trực tiếp từ BF03 |
+| [ScoringAppealService.java](../../../server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java) | Snapshot, tạo/giao lại nháp, kiểm tra chủ phiếu, workload APPEAL | Hợp đồng Iter2 đã triển khai; Iter3 phải tái dùng kiểm tra chủ phiếu trong transaction và bổ sung kiểm tra appeal status |
+| [AssignmentService.java](../../../server/src/main/java/com/swp391/kpi/assessment/service/AssignmentService.java) | Khối lượng công việc/phân công BF02 | Có thể gọi hàm đọc khối lượng UC42; không gọi `assignArticle` để giao lại appeal vì sẽ sửa phân công gốc |
+| [AuditService.java](../../../server/src/main/java/com/swp391/kpi/common/service/AuditService.java) | `log(actorId, actionType, entityType, entityId, oldValue, newValue)` | Tái dùng để ghi log; UI đọc qua query service đã kiểm tra phạm vi, không mở đường vòng audit không giới hạn |
+| [NotificationService.java](../../../server/src/main/java/com/swp391/kpi/common/service/NotificationService.java) | Gửi Trưởng ban/theo role/riêng người bằng `notifyUser` | Bổ sung riêng người đã được chấp thuận; cùng transaction, thông báo không chứa điểm/lý do khiếu nại |
 
 ## 7. Hợp đồng API
 

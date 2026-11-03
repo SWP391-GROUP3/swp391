@@ -167,7 +167,7 @@ export function layToken() {
 
 ### 1.2 Back-end
 
-**Bước 7: Controller nhận request** — [AuthController.java:29-34](../server/src/main/java/com/swp391/kpi/controller/AuthController.java)
+**Bước 7: Controller nhận request** — [AuthController.java:29-34](../server/src/main/java/com/swp391/kpi/common/controller/AuthController.java)
 
 ```java
 // POST /api/auth/login  body: { "login": "an.nv@toasoan.vn", "password": "123456" }
@@ -181,7 +181,7 @@ public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody Logi
 *Làm gì:* kiểm `@Valid`, chuyển cho service, trả `ApiResponse`.
 *Vì sao:* controller không có logic nghiệp vụ.
 
-**Bước 8: Service kiểm tài khoản và mật khẩu** — [AuthService.java:39-63](../server/src/main/java/com/swp391/kpi/service/AuthService.java)
+**Bước 8: Service kiểm tài khoản và mật khẩu** — [AuthService.java:39-63](../server/src/main/java/com/swp391/kpi/common/service/AuthService.java)
 
 ```java
 @Transactional(readOnly = true)
@@ -215,7 +215,7 @@ public LoginResponse login(LoginRequest request) {
 *Làm gì:* tìm user, so mật khẩu BCrypt, kiểm trạng thái `ACTIVE`, rồi tạo token.
 *Vì sao:* kiểm mật khẩu trước, rồi mới kiểm trạng thái, để người không biết mật khẩu không biết tài khoản có bị khóa không. Thông báo lỗi giống nhau cho sai tên và sai mật khẩu.
 
-**Bước 9: Tạo JWT** — [TokenService.java:40-51](../server/src/main/java/com/swp391/kpi/service/TokenService.java)
+**Bước 9: Tạo JWT** — [TokenService.java:40-51](../server/src/main/java/com/swp391/kpi/common/service/TokenService.java)
 
 ```java
 public String createToken(User user) {
@@ -265,7 +265,7 @@ Phần này để hiểu dữ liệu Trưởng ban nhận được.
     <Route path="/my-appeals/new" element={<AppealCreatePage />} />
 ```
 
-**Bước 12: Lấy bài đủ điều kiện** — [AppealCreatePage.jsx:42-48](../client/src/pages/appeal/AppealCreatePage.jsx) → [appealApi.js:38-40](../client/src/api/appealApi.js) → [AppealController.java:41-47](../server/src/main/java/com/swp391/kpi/controller/AppealController.java)
+**Bước 12: Lấy bài đủ điều kiện** — [AppealCreatePage.jsx:42-48](../client/src/pages/appeal/AppealCreatePage.jsx) → [appealApi.js:38-40](../client/src/api/appealApi.js) → [AppealController.java:41-47](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java)
 
 ```jsx
 useEffect(() => {
@@ -293,9 +293,9 @@ public ResponseEntity<ApiResponse<List<AppealEligibilityResponse>>> getEligibleA
 }
 ```
 
-*Làm gì:* lấy `userId` từ token, gọi service. Service gọi `getEligibility()` cho từng bài ([AppealService.java:174-179](../server/src/main/java/com/swp391/kpi/service/AppealService.java)).
+*Làm gì:* lấy `userId` từ token, gọi service. Service gọi `getEligibility()` cho từng bài ([AppealService.java:174-179](../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java)).
 
-**Bước 13: Xem điều kiện của một bài** — [AppealCreatePage.jsx:50-69](../client/src/pages/appeal/AppealCreatePage.jsx) → [appealApi.js:26-28](../client/src/api/appealApi.js) → [AppealController.java:67-72](../server/src/main/java/com/swp391/kpi/controller/AppealController.java)
+**Bước 13: Xem điều kiện của một bài** — [AppealCreatePage.jsx:50-69](../client/src/pages/appeal/AppealCreatePage.jsx) → [appealApi.js:26-28](../client/src/api/appealApi.js) → [AppealController.java:67-72](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java)
 
 Khi người dùng chọn bài, `articleId` trên URL đổi và effect chạy lại:
 
@@ -375,7 +375,7 @@ export async function guiKhieuNai(articleId, criteria) {
 
 *Làm gì:* kiểm ở client rằng có tiêu chí và có lý do, rồi gửi `POST /api/appeals`.
 
-**Bước 15: Controller nhận khiếu nại** — [AppealController.java:49-57](../server/src/main/java/com/swp391/kpi/controller/AppealController.java)
+**Bước 15: Controller nhận khiếu nại** — [AppealController.java:49-57](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java)
 
 ```java
 @PostMapping("/appeals")
@@ -389,7 +389,7 @@ public ResponseEntity<ApiResponse<AppealResponse>> submitAppeal(
 }
 ```
 
-**Bước 16: Service lưu khiếu nại** — [AppealService.java:105-139](../server/src/main/java/com/swp391/kpi/service/AppealService.java)
+**Bước 16: Service lưu khiếu nại** — [AppealService.java:105-139](../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java)
 
 ```java
 @Transactional
@@ -432,7 +432,7 @@ public AppealResponse submitAppeal(AppealCreateRequest request, Integer currentU
 *Làm gì:* kiểm role, kiểm dữ liệu, lưu `appeals` và `appeal_criteria`, báo Trưởng ban, ghi nhật ký.
 *Vì sao:* UNIQUE trong DB là lưới an toàn khi hai request gửi cùng lúc. `catch` đổi lỗi đó thành thông báo tiếng Việt.
 
-**Bước 17: Kiểm dữ liệu khiếu nại** — [AppealService.java:202-235](../server/src/main/java/com/swp391/kpi/service/AppealService.java)
+**Bước 17: Kiểm dữ liệu khiếu nại** — [AppealService.java:202-235](../server/src/main/java/com/swp391/kpi/appeal/service/AppealService.java)
 
 ```java
 private void validateSubmission(
@@ -523,7 +523,7 @@ export function layHangChoKhieuNai(boLoc = {}) {
 
 *Làm gì:* gửi `GET /api/appeals` với bộ lọc trên URL. Khi bộ lọc đổi thì `khoa` đổi và tải lại.
 
-**Bước 20: Controller hàng chờ** — [AppealManagementController.java:34-42](../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java)
+**Bước 20: Controller hàng chờ** — [AppealManagementController.java:34-42](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealManagementController.java)
 
 ```java
 @GetMapping
@@ -537,7 +537,7 @@ public ResponseEntity<ApiResponse<Page<AppealManagementResponse>>> getQueue(@Aut
 }
 ```
 
-**Bước 21: Service lọc hàng chờ** — [AppealManagementService.java:61-85](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java)
+**Bước 21: Service lọc hàng chờ** — [AppealManagementService.java:61-85](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java)
 
 ```java
 public Page<AppealManagementResponse> getQueue(Integer userId, String status, Integer articleId,
@@ -569,7 +569,7 @@ public Page<AppealManagementResponse> getQueue(Integer userId, String status, In
 *Vì sao:* Trưởng ban chỉ thấy khiếu nại của ban mình (dòng `head.sectionId()`).
 *Lưu ý:* lọc bằng Java sau `findAll()`. Chạy được với số lượng hiện tại, nhưng chậm khi có nhiều khiếu nại.
 
-**Bước 22: Mở chi tiết và lấy danh sách BTV** — [AppealDetailPage.jsx:40-48](../client/src/pages/appeal/AppealDetailPage.jsx) → [AppealManagementController.java:44-56](../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java)
+**Bước 22: Mở chi tiết và lấy danh sách BTV** — [AppealDetailPage.jsx:40-48](../client/src/pages/appeal/AppealDetailPage.jsx) → [AppealManagementController.java:44-56](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealManagementController.java)
 
 ```jsx
 const coTheGiao = khieuNai && (khieuNai.status === 'SUBMITTED' || (khieuNai.status === 'IN_REVIEW' && phieu && !phieu.submittedAt))
@@ -601,7 +601,7 @@ public ResponseEntity<ApiResponse<List<AppealReviewerCandidateResponse>>> getCan
 
 *Làm gì:* tải chi tiết khiếu nại và danh sách BTV có thể giao. `coTheGiao` quyết định có hiện form phân công hay không.
 
-**Danh sách BTV có thể giao** — [AppealManagementService.java:189-214](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java)
+**Danh sách BTV có thể giao** — [AppealManagementService.java:189-214](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java)
 
 ```java
 private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) {
@@ -674,7 +674,7 @@ export function phanCongKhieuNai(id, reviewerId, reason) {
 }
 ```
 
-**Bước 25: Controller phân công** — [AppealManagementController.java:58-63](../server/src/main/java/com/swp391/kpi/controller/AppealManagementController.java)
+**Bước 25: Controller phân công** — [AppealManagementController.java:58-63](../server/src/main/java/com/swp391/kpi/appeal/controller/AppealManagementController.java)
 
 ```java
 @PostMapping("/{id}/assign")
@@ -685,7 +685,7 @@ public ResponseEntity<ApiResponse<AppealManagementResponse>> assign(@PathVariabl
 }
 ```
 
-**Bước 26: Service phân công** — [AppealManagementService.java:104-117](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java)
+**Bước 26: Service phân công** — [AppealManagementService.java:104-117](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java)
 
 ```java
 @Transactional
@@ -708,7 +708,7 @@ public AppealManagementResponse assign(Integer id, AppealAssignRequest request, 
 *Làm gì:* khóa, kiểm trạng thái, kiểm BTV, tạo phiếu chấm, đổi trạng thái khiếu nại, ghi nhật ký, báo BTV.
 *Vì sao:* thứ tự này để nếu bước nào lỗi thì cả giao dịch được hoàn tác (`@Transactional`).
 
-**Bước 27: Kiểm quyền và khóa khi phân công** — [AppealManagementService.java:166-178](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java)
+**Bước 27: Kiểm quyền và khóa khi phân công** — [AppealManagementService.java:166-178](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java)
 
 ```java
 private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) {
@@ -730,7 +730,7 @@ private Appeal scopedAppeal(Integer id, Integer userId, boolean lock) {
 *Làm gì:* kiểm role, khóa toàn cục, khóa dòng khiếu nại, khóa các phiếu gốc, rồi kiểm đúng ban.
 *Vì sao:* hai Trưởng ban không được phân công cùng lúc cho một khiếu nại.
 
-**Bước 28: Kiểm BTV được chọn** — [AppealManagementService.java:216-224](../server/src/main/java/com/swp391/kpi/service/AppealManagementService.java)
+**Bước 28: Kiểm BTV được chọn** — [AppealManagementService.java:216-224](../server/src/main/java/com/swp391/kpi/appeal/service/AppealManagementService.java)
 
 ```java
 private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign) {
@@ -746,7 +746,7 @@ private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer 
 
 *Làm gì:* kiểm BTV có trong danh sách hợp lệ không. Nếu khác ban thì phải có lý do.
 
-**Bước 29: Khóa toàn cục** — [ReviewerDeviationRefreshService.java:47-56](../server/src/main/java/com/swp391/kpi/service/ReviewerDeviationRefreshService.java)
+**Bước 29: Khóa toàn cục** — [ReviewerDeviationRefreshService.java:47-56](../server/src/main/java/com/swp391/kpi/appeal/service/ReviewerDeviationRefreshService.java)
 
 ```java
 public void lockWorkflow() {
@@ -764,7 +764,7 @@ public void lockWorkflow() {
 *Làm gì:* lấy khóa ứng dụng tên `BF03_SCORE_WRITES`, chờ tối đa 15 giây. Khóa tự nhả khi giao dịch kết thúc.
 *Vì sao:* mọi thao tác ghi BF-03 xếp hàng, không chạy song song.
 
-**Bước 30: Tạo phiếu chấm mù** — [ScoringAppealService.java:182-203](../server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java)
+**Bước 30: Tạo phiếu chấm mù** — [ScoringAppealService.java:182-203](../server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java)
 
 ```java
 @Transactional

@@ -1,7 +1,7 @@
 package com.swp391.kpi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.swp391.kpi.service.ScoringAppealService;
+import com.swp391.kpi.appeal.service.ScoringAppealService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,11 +29,11 @@ class BF03AppealManagementIT {
     @Autowired ScoringAppealService scoring;
     @Autowired jakarta.persistence.EntityManager em;
     @Autowired org.springframework.transaction.PlatformTransactionManager txManager;
-    @Autowired com.swp391.kpi.service.AppealManagementService management;
-    @Autowired com.swp391.kpi.repository.AppealRepository appealRepository;
-    @Autowired com.swp391.kpi.repository.ScoringAttemptRepository attemptRepository;
+    @Autowired com.swp391.kpi.appeal.service.AppealManagementService management;
+    @Autowired com.swp391.kpi.appeal.repository.AppealRepository appealRepository;
+    @Autowired com.swp391.kpi.assessment.repository.ScoringAttemptRepository attemptRepository;
     @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
-    com.swp391.kpi.service.NotificationService notifications;
+    com.swp391.kpi.common.service.NotificationService notifications;
 
     @Test void assignmentFreezesSnapshotKeepsOriginalAndNotifiesOnlyAssignedEditor() throws Exception {
         var f = fixture(1); int editor = editor(1);
@@ -149,7 +149,7 @@ class BF03AppealManagementIT {
         var tx = new org.springframework.transaction.support.TransactionTemplate(txManager);
         assertThrows(IllegalStateException.class, () -> tx.executeWithoutResult(status -> {
             var f = fixture(1); article[0] = f.article; int reviewer = editor(1);
-            var request = new com.swp391.kpi.dto.AppealAssignRequest(); request.setReviewerId(reviewer);
+            var request = new com.swp391.kpi.appeal.dto.AppealAssignRequest(); request.setReviewerId(reviewer);
             management.assign(f.appeal, request, 5);
         }));
         assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM articles WHERE id=?", Integer.class, article[0]));
@@ -167,12 +167,12 @@ class BF03AppealManagementIT {
         var tx = new org.springframework.transaction.support.TransactionTemplate(txManager);
         assertThrows(IllegalStateException.class, () -> tx.executeWithoutResult(status -> {
             var f = fixture(1); int first = editor(1); int second = editor(1);
-            var assign = new com.swp391.kpi.dto.AppealAssignRequest(); assign.setReviewerId(first);
+            var assign = new com.swp391.kpi.appeal.dto.AppealAssignRequest(); assign.setReviewerId(first);
             int draft = management.assign(f.appeal, assign, 5).currentAttempt().id();
             org.mockito.Mockito.doThrow(new IllegalStateException("test new reviewer notification failure"))
                     .when(notifications).notifyUser(org.mockito.ArgumentMatchers.eq(second),
                             org.mockito.ArgumentMatchers.eq(f.article), org.mockito.ArgumentMatchers.anyString());
-            var request = new com.swp391.kpi.dto.AppealReassignRequest(); request.setAttemptId(draft);
+            var request = new com.swp391.kpi.appeal.dto.AppealReassignRequest(); request.setAttemptId(draft);
             request.setExpectedReviewerId(first); request.setReviewerId(second); request.setReason("test rollback");
             management.reassign(f.appeal, request, 5);
         }));

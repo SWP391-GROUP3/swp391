@@ -54,8 +54,8 @@
 ### Task 2: Kiểm chứng nghiệp vụ UC44 ở backend
 
 **Files:**
-- Inspect: `server/src/main/java/com/swp391/kpi/service/AppealRuleConfigService.java`, `dto/AppealRuleConfigCreateRequest.java`, `repository/AppealRuleConfigRepository.java` cùng package gốc.
-- Test: `server/src/test/java/com/swp391/kpi/service/AppealRuleConfigServiceTest.java`.
+- Inspect: `server/src/main/java/com/swp391/kpi/appeal/service/AppealRuleConfigService.java`, `dto/AppealRuleConfigCreateRequest.java`, `repository/AppealRuleConfigRepository.java` cùng package gốc.
+- Test: `server/src/test/java/com/swp391/kpi/appeal/service/AppealRuleConfigServiceTest.java`.
 - Integration reference: `server/src/test/java/com/swp391/kpi/BF03Iteration1IT.java`.
 
 **Interfaces:** giữ getActiveConfig(currentUserId), getAllConfigs(currentUserId), createConfig(request, currentUserId). Chưa quyết định sửa service: chỉ sửa nếu có test chỉ ra sai so với SRS.

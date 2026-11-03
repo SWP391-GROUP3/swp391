@@ -15,9 +15,9 @@ Mục này thay thế trạng thái dừng 19/10 bên dưới. Tiếp tục trê
 
 ### Source thay đổi trong phiên tiếp tục
 
-- `server/src/main/java/com/swp391/kpi/service/ScoringAppealService.java`: inject EntityManager, refresh dưới khóa trong `lockedDraft` — cùng một nơi bảo vệ cả giao lại và kiểm tra người được giao.
+- `server/src/main/java/com/swp391/kpi/appeal/service/ScoringAppealService.java`: inject EntityManager, refresh dưới khóa trong `lockedDraft` — cùng một nơi bảo vệ cả giao lại và kiểm tra người được giao.
 - `server/src/test/java/com/swp391/kpi/BF03AppealManagementIT.java`: hai regression freshness mới; giữ ca đã nộp cũ.
-- `server/src/test/java/com/swp391/kpi/service/ScoringAppealServiceTest.java`: truyền EntityManager mock vào constructor; hành vi DB kiểm tra bằng IT thật.
+- `server/src/test/java/com/swp391/kpi/appeal/service/ScoringAppealServiceTest.java`: truyền EntityManager mock vào constructor; hành vi DB kiểm tra bằng IT thật.
 - `client/src/pages/appeal/ReviewerProfilePage.jsx`: giữ `location.state` trên cả đổi tháng, trang trước và trang sau.
 - `client/src/pages/appeal/AuditLogPage.jsx`: nội dung có query key; đổi scope reset form/data/error và cleanup request đang tải của scope cũ.
 - `client/tests/browser/bf03Filters.smoke.js`: callback chạy bằng Playwright CLI, không dùng framework hoặc dependency mới.
@@ -86,10 +86,10 @@ Workload UC42 hiện gồm phân công gốc có bài `ASSIGNED` và chấm ché
 - `client/src/pages/appeal/ReviewerProfilePage.jsx` và `.css`: màn hồ sơ.
 - `client/src/pages/appeal/ReviewerDeviationPage.jsx`: directory và đường dẫn hồ sơ.
 - `client/src/routes/AppRoutes.jsx`: thay placeholder hồ sơ Head/Admin, bỏ route Admin trùng; không sửa route các luồng khác.
-- `server/src/main/java/com/swp391/kpi/controller/ReviewerProfileController.java`: 3 endpoint directory/hồ sơ/lịch sử, actor từ JWT.
-- `server/src/main/java/com/swp391/kpi/service/ReviewerProfileService.java`: quyền, tháng/phân trang, tổng hợp dữ liệu qua service BF02, không ghi chỉ số.
-- DTO: `ReviewerDirectoryResponse`, `ReviewerProfileResponse`, `ReviewerScoringHistoryResponse`, `ReviewerCrossReviewResponse` trong `server/src/main/java/com/swp391/kpi/dto/`.
-- `server/src/test/java/com/swp391/kpi/service/ReviewerProfileServiceTest.java`: 9 unit test.
+- `server/src/main/java/com/swp391/kpi/appeal/controller/ReviewerProfileController.java`: 3 endpoint directory/hồ sơ/lịch sử, actor từ JWT.
+- `server/src/main/java/com/swp391/kpi/appeal/service/ReviewerProfileService.java`: quyền, tháng/phân trang, tổng hợp dữ liệu qua service BF02, không ghi chỉ số.
+- DTO: `ReviewerDirectoryResponse`, `ReviewerProfileResponse`, `ReviewerScoringHistoryResponse`, `ReviewerCrossReviewResponse` trong `server/src/main/java/com/swp391/kpi/appeal/dto/`.
+- `server/src/test/java/com/swp391/kpi/appeal/service/ReviewerProfileServiceTest.java`: 9 unit test.
 - `server/src/test/java/com/swp391/kpi/BF03ReviewerProfileIT.java`: 2 integration test, rollback.
 - `server/src/test/java/com/swp391/kpi/BF03Iteration1IT.java`: bổ sung 2 ca, tổng 7 ca.
 

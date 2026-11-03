@@ -80,13 +80,13 @@ Người nộp code phải **tự giải thích được từng dòng** khi th�
 
 ## 2. Ai sở hữu gì
 
-Backend **chia theo tầng** (mục 3.1): mọi luồng dùng chung các thư mục `controller/`, `service/`, `entity/`... File thuộc luồng nào thì nhận ra bằng **tiền tố tên class**. Người phụ trách luồng nào chủ yếu sửa các file có tiền tố của luồng đó.
+Backend **chia theo luồng** (mục 3.1, từ 03/11/2026): mỗi luồng 1 thư mục `com/swp391/kpi/<luồng>/`, bên trong mới chia tầng `controller/`, `service/`, `repository/`, `dto/`, `entity/`. Người phụ trách luồng nào chủ yếu sửa file trong thư mục luồng đó. Tên class vẫn giữ **tiền tố** của luồng (bảng dưới) để tìm nhanh bằng tên.
 
 Package gốc: `com.swp391.kpi`
 
-| Luồng | Người phụ trách (từ 02/11/2026) | Tiền tố tên class | Bảng sở hữu |
+| Luồng (= thư mục) | Người phụ trách (từ 02/11/2026) | Tiền tố tên class | Bảng sở hữu |
 |---|---|---|---|
-| Dùng chung — **sửa phải báo cả nhóm** | Quang: `exception/`, `config/`, `data.sql`, `index.css`, `goiApi.js`. Minh: `AppRoutes.jsx`, `components/common/`, `utils/` | không có tiền tố: `ApiResponse`, file trong `exception/`, `config/` | `notifications`, `audit_logs` |
+| Dùng chung — **sửa phải báo cả nhóm** | Quang: `common/`, `exception/`, `config/`, `data.sql`, `index.css`, `goiApi.js`. Minh: `AppRoutes.jsx`, `components/common/`, `utils/` | không có tiền tố: `ApiResponse`, đăng nhập (`Auth`, `Token`, `Login`), `Audit`, `Notification` → `common/`; file trong `exception/`, `config/` | `notifications`, `audit_logs` |
 | `admin` — Nền tảng / Admin | Minh | `Role`, `Section`, `User`, `Genre`, `MediaFactor`, `SystemParameter` | `roles`, `sections`, `users`, `genres`, `media_factors`, `system_parameters` |
 | `article` — BF-01 Viết & nộp bài | Minh | `Article`, `Duplication` | `articles`, `article_authors`, `article_versions`, `article_attachments`, `article_status_logs`, `duplication_checks`, `duplication_matches` |
 | `assessment` — BF-02 Phân công, đánh giá chất lượng & duyệt đăng (UC-33) | Minh (nhận lại từ Dương) | `Assignment`, `CategoryChange`, `Criteria`, `ScoringAttempt`, `ScoreApproval`, `Publishing` | `assignments`, `category_change_logs`, `criteria_set_versions`, `criteria`, `scoring_attempts`, `scoring_attempt_details`, `score_approvals` |
@@ -96,9 +96,11 @@ Package gốc: `com.swp391.kpi`
 
 Cột **Tiền tố** và **Bảng sở hữu** lấy theo danh sách bảng ở đầu `schema.sql`. Thêm bảng hoặc tiền tố mới → sửa bảng này **và** `FLOW_DOCS` trong `.claude/hooks/require-docs-read.js`.
 
+Vài class cũ không theo tiền tố nhưng vẫn nằm đúng thư mục luồng: `Reviewer*`, `ScoringAppeal*` → `appeal/`; `ScoringRead*`, `ScoreCalculator`, `AttemptType`, `ApprovalDecision` → `assessment/`; `ReporterKpi*`, `DepartmentKpi*`, `GenreReport*`, `GenrePopularity*`, `TrendingEvent*` → `kpi/`. Class mới thì đặt tên theo tiền tố của luồng.
+
 **Từ 02/11/2026 nhóm chỉ còn Quang và Minh** (Dương, Vũ, Khang đã giao lại code). Việc cụ thể của từng người trước demo 04/11 nằm ở `docs/KE_HOACH_THU4_QUANG.md` và `docs/KE_HOACH_THU4_MINH.md`. Mở phiên AI mới thì đọc file của người đang làm.
 
-**Không** tạo package theo luồng (`com.swp391.kpi.royalty`...) và **không** tạo thư mục con theo luồng bên trong tầng (`entity/royalty/`...).
+Class mới luôn đặt ở `com.swp391.kpi.<luồng>.<tầng>` (vd `com.swp391.kpi.royalty.service.RoyaltyPeriodService`). **Không** tạo thư mục tầng ở ngoài luồng (`com.swp391.kpi.service`...), **không** tạo thêm cấp con khác bên trong tầng, và **không** đặt class của luồng mình vào thư mục luồng khác.
 
 **Dùng dữ liệu của luồng khác:**
 - Cần dữ liệu luồng khác → gọi **Service** của luồng đó, không gọi Repository của họ, không tự viết query vào bảng của họ.
@@ -107,21 +109,32 @@ Cột **Tiền tố** và **Bảng sở hữu** lấy theo danh sách bảng ở
 
 ## 3. Backend
 
-### 3.1 Cấu trúc thư mục (chia theo tầng)
+### 3.1 Cấu trúc thư mục (chia theo luồng, trong luồng chia theo tầng)
 
 ```
 server/src/main/java/com/swp391/kpi/
 ├── KpiApplication.java
-├── config/       Cấu hình (Security, ...)                 — dùng chung
-├── controller/   ArticleController, RoyaltyPeriodController...
-├── dto/          ApiResponse (dùng chung), RoyaltyPeriodResponse, RoyaltyPeriodCreateRequest...
-├── entity/       Article, RoyaltyPeriod, RoyaltyPeriodStatus (enum)...
+├── config/       Cấu hình (Security, Jwt)                                 — dùng chung
 ├── exception/    GlobalExceptionHandler, NotFoundException, BusinessException — dùng chung
-├── repository/   ArticleRepository, RoyaltyPeriodRepository...
-└── service/      ArticleService, RoyaltyPeriodService...
+├── common/       ApiResponse, đăng nhập (Auth, Token), AuditLog, Notification — dùng chung
+├── admin/        Role, Section, User, Genre, MediaFactor, SystemParameter
+├── article/      BF-01
+├── assessment/   BF-02
+├── appeal/       BF-03
+├── royalty/      BF-04
+└── kpi/          BF-05
+
+Mỗi thư mục luồng (vd royalty/) có đủ 5 tầng:
+royalty/
+├── controller/   RoyaltyPeriodController, RoyaltyPaymentController...
+├── dto/          RoyaltyPeriodResponse, RoyaltyPeriodCreateRequest...
+├── entity/       RoyaltyPeriod, RoyaltyPeriodStatus (enum)...
+├── repository/   RoyaltyPeriodRepository...
+└── service/      RoyaltyPeriodService, RoyaltyCalculator...
 ```
 
-- Tên file trên là **ví dụ đặt tên**, hiện repo chưa có code mẫu của luồng nào.
+- Test để cùng package với class được test: `server/src/test/java/com/swp391/kpi/royalty/service/RoyaltyPeriodServiceTest.java`.
+- Dùng class của luồng khác thì `import` package của luồng đó, vd `import com.swp391.kpi.article.service.ArticlePublishedService;`. Thấy `import com.swp391.kpi.<luồng khác>.repository...` trong code của mình là đang vi phạm mục 2 (phải gọi Service).
 - Enum để chung thư mục `entity/` với entity dùng nó.
 - **Không có thư mục `mapper/`**: đổi entity → DTO bằng hàm `from()` trong DTO (mục 3.4).
 - Logic tính toán thuần (chia tiền, tính điểm...) để trong `service/`, là class thường không có `@Service` (mục 3.9).
@@ -184,7 +197,7 @@ DB **có** CHECK/UNIQUE constraint (xem `schema.sql`), nhưng chúng chỉ là l
 
 ### 3.6 Response & lỗi
 
-Mọi API trả `com.swp391.kpi.dto.ApiResponse`:
+Mọi API trả `com.swp391.kpi.common.dto.ApiResponse`:
 
 ```json
 { "success": true,  "message": "Tạo kỳ nhuận bút thành công", "data": { } }
@@ -212,7 +225,7 @@ Mọi API trả `com.swp391.kpi.dto.ApiResponse`:
 
 ### 3.8 Đăng nhập & người thao tác
 
-Đã có: Spring Security + JWT, mật khẩu BCrypt (`users.password_hash`). File dùng chung: `config/SecurityConfig.java`, `config/JwtConfig.java`, `service/AuthService.java`, `service/TokenService.java`.
+Đã có: Spring Security + JWT, mật khẩu BCrypt (`users.password_hash`). File dùng chung: `config/SecurityConfig.java`, `config/JwtConfig.java`, `common/service/AuthService.java`, `common/service/TokenService.java`.
 
 - Đăng nhập: `POST /api/auth/login` body `{ "login": "<email hoặc username>", "password": "..." }` → trả `token` + thông tin user. Tài khoản mẫu trong `data.sql`, mật khẩu chung `123456`.
 - **Mọi API khác bắt buộc gửi** header `Authorization: Bearer <token>`. Thiếu / sai / hết hạn → 401.
@@ -303,7 +316,7 @@ client/src/
 ### 8.1 Hỏi rõ trước khi code (mỗi phiên code)
 
 Đầu **mỗi phiên code** (mỗi lần mở AI mới / mỗi task mới), trước khi tạo hay sửa file code, AI phải hỏi và nhận câu trả lời rõ ràng từ người dùng về:
-- Người dùng phụ trách **luồng** nào (xem tiền tố tên class ở mục 2).
+- Người dùng phụ trách **luồng** nào (xem thư mục luồng ở mục 2).
 - Cần làm **chính xác việc gì**: chức năng nào, UC nào, API/màn hình nào.
 - **Phạm vi**: chỉ backend, chỉ frontend hay cả hai; những gì **không** làm trong phiên này.
 - Kết quả mong muốn: làm xong thế nào thì coi là đạt.
@@ -322,7 +335,7 @@ Yêu cầu còn mơ hồ hoặc có nhiều cách hiểu → hỏi tiếp, **kh�
 
 1. Chưa rõ người dùng phụ trách luồng nào → hỏi trước khi viết code (xem 8.1).
 2. Làm đủ **Bước 0** (đọc tài liệu) trước khi code. Viết entity/query → đọc lại đúng bảng đó trong `database/schema.sql` (cả comment phía trên bảng: nhiều luật nghiệp vụ nằm ở đó).
-3. Chỉ sửa file có tiền tố của luồng người dùng (mục 2). Cần sửa file dùng chung (`ApiResponse`, `exception/`, `config/`), file của luồng khác, `schema.sql`, `pom.xml`, `package.json` → **dừng lại**, nói rõ cần sửa gì để người dùng báo nhóm.
+3. Chỉ sửa file trong thư mục luồng của người dùng (mục 2). Cần sửa file dùng chung (`common/`, `exception/`, `config/`), file của luồng khác, `schema.sql`, `pom.xml`, `package.json` → **dừng lại**, nói rõ cần sửa gì để người dùng báo nhóm.
 4. Không đổi `ddl-auto`, không thêm thư viện, không tạo pattern/abstraction ngoài mục 1.
 5. Viết xong backend → chạy `mvn -f server/pom.xml compile` (có DB thì chạy `spring-boot:run` và gọi thử API). Frontend → `npm run build` trong `client/`.
 6. Không commit/push khi người dùng chưa yêu cầu.

@@ -11,9 +11,9 @@ const COMMON_DOCS = [
 ];
 
 // Tai lieu rieng cua tung luong.
-// Backend chia theo tang (controller/, service/, entity/...) nen nhan ra luong
-// bang TIEN TO TEN FILE (vd RoyaltyPeriodService.java -> royalty).
-// Frontend van chia theo luong nen nhan ra bang thu muc (vd pages/royalty/).
+// Backend va frontend deu chia theo luong nen nhan ra luong bang THU MUC
+// (vd com/swp391/kpi/royalty/..., pages/royalty/). Tien to ten file giu lai lam
+// cach phu cho file nam ngoai thu muc luong.
 // prefixes: tien to ten class, viet thuong (lay theo ten bang trong schema.sql)
 const FLOW_DOCS = [
   {
@@ -51,9 +51,12 @@ function normalizePath(path) {
   return String(path || '').replace(/\\/g, '/');
 }
 
-// File nay thuoc luong nao? Khong dung '/kpi/' cua backend vi package goc
-// com/swp391/kpi chua MOI file Java.
+// File nay thuoc luong nao? Backend so voi '/com/swp391/kpi/<luong>/' (khong so
+// '/kpi/' tran vi package goc com/swp391/kpi chua MOI file Java).
 function belongsToFlow(filePath, item) {
+  if (filePath.includes('/com/swp391/kpi/' + item.flow + '/')) {
+    return true;
+  }
   const fileName = filePath.substring(filePath.lastIndexOf('/') + 1).toLowerCase();
   for (const prefix of item.prefixes) {
     if (fileName.startsWith(prefix)) {

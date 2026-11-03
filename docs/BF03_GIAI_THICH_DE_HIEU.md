@@ -2,7 +2,7 @@
 
 > Bản này thay cho cách học "thuộc câu trả lời" ở [BF03_HOC_LUONG_CHO_SINH_VIEN.md](BF03_HOC_LUONG_CHO_SINH_VIEN.md). Mỗi phần chỉ có 3 thứ: **chuyện gì xảy ra**, **code nằm ở dòng nào**, **vì sao làm vậy**.
 > Số dòng lấy từ nhánh `VuNQ` lúc viết. Sửa file thì dòng sẽ lệch vài số, cứ tìm theo tên hàm.
-> Đường dẫn rút gọn: `S/` = `server/src/main/java/com/swp391/kpi/service/`, `C/` = `client/src/`.
+> Đường dẫn rút gọn: `S/` = `server/src/main/java/com/swp391/kpi/appeal/service/`, `C/` = `client/src/`.
 
 ---
 
@@ -48,7 +48,7 @@ Nhớ 5 chặng, mỗi chặng một dòng:
 | 2 | Trang bấm nút | `C/pages/appeal/AppealCreatePage.jsx:102` | `await guiKhieuNai(articleId, criteria)` |
 | 3 | Hàm gọi API | `C/api/appealApi.js:30-31` | Gói thành `POST /api/appeals` rồi đưa cho `goiApi` |
 | 4 | `goiApi` | `C/api/goiApi.js:26-35` | Gắn token vào header rồi `fetch`; `:47-52` nếu server báo lỗi thì ném `Error` tiếng Việt |
-| 5 | Controller | `server/src/main/java/com/swp391/kpi/controller/AppealController.java:49-54` | Lấy id người dùng từ token (`:53`), gọi đúng 1 hàm service (`:54`) |
+| 5 | Controller | `server/src/main/java/com/swp391/kpi/appeal/controller/AppealController.java:49-54` | Lấy id người dùng từ token (`:53`), gọi đúng 1 hàm service (`:54`) |
 
 Hai điều hay bị hỏi:
 
