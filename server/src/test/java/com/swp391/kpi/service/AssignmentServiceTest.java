@@ -12,6 +12,7 @@ import com.swp391.kpi.entity.User;
 import com.swp391.kpi.repository.ArticleRepository;
 import com.swp391.kpi.repository.AssignmentRepository;
 import com.swp391.kpi.repository.GenreRepository;
+import com.swp391.kpi.repository.ScoringAttemptRepository;
 import com.swp391.kpi.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,9 @@ class AssignmentServiceTest {
 
     @Mock
     private GenreRepository genreRepository;
+
+    @Mock
+    private ScoringAttemptRepository scoringAttemptRepository;
 
     @InjectMocks
     private AssignmentService assignmentService;
@@ -122,6 +126,39 @@ class AssignmentServiceTest {
         assertNotNull(workload);
         assertEquals(3, workload.getEditorId());
         assertEquals(5L, workload.getActiveArticleCount());
+    }
+
+    @Test
+    @DisplayName("getAssignmentsByEditorId: Lấy danh sách kèm trạng thái đã chấm/chưa chấm")
+    void testGetAssignmentsByEditorId_Success() {
+        Assignment assignment = new Assignment();
+        assignment.setId(1);
+        assignment.setArticleId(101);
+        assignment.setEditorId(3);
+        assignment.setAssignedAt(LocalDateTime.now());
+
+        Article article = new Article();
+        article.setId(101);
+        article.setTitle("Bài viết số 101");
+        article.setStatus(ArticleStatus.ASSIGNED);
+        article.setCategoryId(2);
+
+        Genre genre = new Genre();
+        genre.setId(2);
+        genre.setName("Tin sâu");
+
+        when(assignmentRepository.findByEditorIdOrderByAssignedAtDesc(3)).thenReturn(List.of(assignment));
+        when(articleRepository.findById(101)).thenReturn(Optional.of(article));
+        when(genreRepository.findById(2)).thenReturn(Optional.of(genre));
+        when(scoringAttemptRepository.findTopByArticleIdOrderByAttemptNoDesc(101)).thenReturn(Optional.empty());
+
+        List<AssignmentResponse> results = assignmentService.getAssignmentsByEditorId(3);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals("Bài viết số 101", results.get(0).getArticleTitle());
+        assertEquals("Tin sâu", results.get(0).getCategoryName());
+        assertEquals("CHUA_CHAM", results.get(0).getScoringStatus());
     }
 }
 

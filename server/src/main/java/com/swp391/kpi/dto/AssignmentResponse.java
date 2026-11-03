@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -21,10 +22,16 @@ public class AssignmentResponse {
 
     private Integer id;
     private Integer articleId;
+    private String articleTitle;
+    private String articleStatus;
+    private String categoryName;
     private Integer editorId;
     private Integer assignedBy;
     private LocalDateTime assignedAt;
     private Boolean wasSuggested;
+    private String scoringStatus; // "CHUA_CHAM", "DANG_CHAM", "DA_CHAM"
+    private BigDecimal totalScore;
+    private String decision;
 
     public static AssignmentResponse from(Assignment entity) {
         if (entity == null) return null;
