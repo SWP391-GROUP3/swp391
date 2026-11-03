@@ -53,10 +53,12 @@ class AssignmentServiceTest {
     @Mock
     private UserReadService userReadService;
 
+    @Mock
+    private ScoringAttemptRepository scoringAttemptRepository;
+
     // Truong ban ban 1 (duc.vm id 5) va BTV ban 1 (cuong.lh id 3) nhu data.sql
     private static final UserAccessResponse HEAD = new UserAccessResponse(5, "Vũ Minh Đức", "HEAD_OF_DEPARTMENT", 1, "Ban 1", "ACTIVE");
     private static final UserAccessResponse EDITOR = new UserAccessResponse(3, "Lê Hoàng Cường", "EDITOR", 1, "Ban 1", "ACTIVE");
-    private ScoringAttemptRepository scoringAttemptRepository;
 
     @InjectMocks
     private AssignmentService assignmentService;
