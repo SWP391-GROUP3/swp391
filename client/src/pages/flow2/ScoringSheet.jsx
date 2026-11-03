@@ -7,7 +7,6 @@ import {
   nopPhieuCham
 } from '../../api/assessmentApi.js'
 import { getGenres } from '../../api/adminApi.js'
-import { goiApi } from '../../api/goiApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_BAI_DUOC_GIAO, BT_TIEU_CHI, BT_DAU_TICH, BT_DAU_X } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
@@ -19,34 +18,34 @@ import '../../styles/Flow2.css'
  * MO TRANG NAY TAI: /assigned-articles/:articleId
  *
  * MUC LUC (so dong - ten - tac dung)
- *   42  ScoringSheet()                  scoring sheet
- *   63    useEffect                     tai du lieu khi mo trang
- *  106    handleScoreChange()           Cap nhat diem cua 1 tieu chi
- *  113    handleCommentChange()         Cap nhat nhan xet cua 1 tieu chi
- *  120    handleChangeCategory()        UC-23: BTV doi the loai bai viet
- *  146    handleSaveDraft()             UC-24, UC-25: Luu nhap diem tieu chi
- *  178    handleOpenDecisionModal()     Mo modal de nop quyet dinh
- *  193    handleSubmitDecision()        UC-26, UC-27, UC-28: Nop phieu cham
- *  222    handleGoBack()                Quay ve hang viec cua BTV
+ *   44  ScoringSheet()                  scoring sheet
+ *   66    loadScoringSheet()            Mo phieu cham + tai the loai; nut "Thu lai" o khung loi cung goi lai ham nay
+ *   83    useEffect                     tai du lieu khi mo trang
+ *   97    handleScoreChange()           Cap nhat diem cua 1 tieu chi
+ *  104    handleCommentChange()         Cap nhat nhan xet cua 1 tieu chi
+ *  111    handleChangeCategory()        UC-23: BTV doi the loai bai viet
+ *  137    handleSaveDraft()             UC-24, UC-25: Luu nhap diem tieu chi
+ *  169    handleOpenDecisionModal()     Mo modal de nop quyet dinh
+ *  187    handleSubmitDecision()        UC-26, UC-27, UC-28: Nop phieu cham
+ *  228    handleGoBack()                Quay ve hang viec cua BTV
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  231  [<- Quay lai danh sach bai duoc giao]  handleGoBack() Quay ve hang viec cua BTV -> chuyen sang /assigned-articles (EditorTaskQueue)
- *  328  [Doi the loai]                  handleChangeCategory() UC-23: BTV doi the loai bai viet -> hoi xac nhan; goi POST /api/scoring-attempts/article/{articleId}/change-category
- *  411  [Luu nhap diem]                 handleSaveDraft() UC-24, UC-25: Luu nhap diem tieu chi -> goi PUT /api/scoring-attempts/article/{articleId}/scores
- *  420  [Yeu cau sua (RETURN)]          handleOpenDecisionModal() Mo modal de nop quyet dinh -> tren trang: dong/xoa error, selected decision, dong/xoa decision note
- *  430  [Tu choi bai (REJECT)]          handleOpenDecisionModal() Mo modal de nop quyet dinh -> tren trang: dong/xoa error, selected decision, dong/xoa decision note
- *  440  [{BT_DAU_TICH} Duyet dat & Nop (ACCEPT)]  handleOpenDecisionModal() Mo modal de nop quyet dinh -> tren trang: dong/xoa error, selected decision, dong/xoa decision note
- *  513  [Huy bo]                        tren trang: dong/xoa modal open
- *  521  [Dang nop... / Xac nhan nop]    handleSubmitDecision() UC-26, UC-27, UC-28: Nop phieu cham -> goi POST /api/scoring-attempts/article/{articleId}/submit
+ *  237  [<- Quay lai danh sach bai duoc giao]  handleGoBack() Quay ve hang viec cua BTV -> chuyen sang /assigned-articles (EditorTaskQueue)
+ *  275  [Thu lai]                       loadScoringSheet() Mo phieu cham + tai the loai; nut "Thu lai" o khung loi cung goi lai ham nay -> goi POST /api/scoring-attempts/article/{articleId}/open, GET…
+ *  341  [Doi the loai]                  handleChangeCategory() UC-23: BTV doi the loai bai viet -> hoi xac nhan; goi POST /api/scoring-attempts/article/{articleId}/change-category
+ *  424  [Luu nhap diem]                 handleSaveDraft() UC-24, UC-25: Luu nhap diem tieu chi -> goi PUT /api/scoring-attempts/article/{articleId}/scores
+ *  433  [Yeu cau sua (RETURN)]          handleOpenDecisionModal() Mo modal de nop quyet dinh -> tren trang: dong/xoa error, error, selected decision
+ *  443  [Tu choi bai (REJECT)]          handleOpenDecisionModal() Mo modal de nop quyet dinh -> tren trang: dong/xoa error, error, selected decision
+ *  453  [{BT_DAU_TICH} Duyet dat & Nop (ACCEPT)]  handleOpenDecisionModal() Mo modal de nop quyet dinh -> tren trang: dong/xoa error, error, selected decision
+ *  526  [Huy bo]                        tren trang: dong/xoa modal open
+ *  534  [Dang nop... / Xac nhan nop]    handleSubmitDecision() UC-26, UC-27, UC-28: Nop phieu cham -> goi PUT /api/scoring-attempts/article/{articleId}/scores, POST /api/scoring-attempts/article/{art…
  */
 
 export default function ScoringSheet({ nguoiDung }) {
-export default function ScoringSheet({ nguoiDung, articleIdProp, onBack }) {
   const params = useParams()
   const navigate = useNavigate()
   const articleId = Number(params.articleId)
 
-  const [genres, setGenres] = useState([])
   const [attempt, setAttempt] = useState(null)
   const [details, setDetails] = useState([])
   const [newCategoryId, setNewCategoryId] = useState('')
@@ -63,36 +62,17 @@ export default function ScoringSheet({ nguoiDung, articleIdProp, onBack }) {
   const [selectedDecision, setSelectedDecision] = useState('')
   const [decisionNote, setDecisionNote] = useState('')
 
-  // Tai the loai thuc te tu database
-  useEffect(() => {
-    async function fetchGenres() {
-      try {
-        const [data, danhSachTheLoai] = await Promise.all([moPhieuCham(articleId), getGenres()])
-        if (!ignore) {
-          setAttempt(data)
-          setDetails(data.details || [])
-          setNewCategoryId(data.categoryId)
-          setGenres(danhSachTheLoai || [])
-        const data = await goiApi('/api/genres')
-        if (Array.isArray(data)) {
-          setGenres([...data].sort((a, b) => a.id - b.id))
-        }
-      } catch (err) {
-        console.error('Không tải được thể loại:', err)
-      }
-    }
-    fetchGenres()
-  }, [])
-
+  // Mo phieu cham + tai the loai; nut "Thu lai" o khung loi cung goi lai ham nay
   async function loadScoringSheet() {
     setLoading(true)
     setError('')
     setSuccess('')
     try {
-      const data = await moPhieuCham(articleId)
+      const [data, danhSachTheLoai] = await Promise.all([moPhieuCham(articleId), getGenres()])
       setAttempt(data)
       setDetails(data.details || [])
-      setNewCategoryId(data.categoryId || 1)
+      setNewCategoryId(data.categoryId)
+      setGenres(danhSachTheLoai || [])
     } catch (err) {
       setError('Lỗi tải phiếu chấm: ' + err.message)
     } finally {
@@ -341,12 +321,7 @@ export default function ScoringSheet({ nguoiDung, articleIdProp, onBack }) {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                 <div>
                   <span className="bf02__nhan">Thể loại áp dụng:</span>{' '}
-                  <strong>{genres.find(c => c.id === attempt.categoryId)?.name || 'Thể loại #' + attempt.categoryId}</strong>
-                  <strong>
-                    {genres.find(c => c.id === attempt.categoryId)?.name
-                      ? `${attempt.categoryId} - ${genres.find(c => c.id === attempt.categoryId).name}`
-                      : (attempt.categoryName || `Thể loại #${attempt.categoryId}`)}
-                  </strong>
+                  <strong>{genres.find(c => c.id === attempt.categoryId)?.name || attempt.categoryName || 'Thể loại #' + attempt.categoryId}</strong>
                 </div>
 
                 {!isSubmitted && (
@@ -359,7 +334,6 @@ export default function ScoringSheet({ nguoiDung, articleIdProp, onBack }) {
                     >
                       {genres.map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
-                        <option key={c.id} value={c.id}>{c.id} - {c.name}</option>
                       ))}
                     </select>
                     <button

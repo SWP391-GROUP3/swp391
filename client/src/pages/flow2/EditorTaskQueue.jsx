@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { layBaiDuocGiaoCuaBtv, layPhieuChamMoiNhat } from '../../api/assessmentApi.js'
-import { goiApi } from '../../api/goiApi.js'
+import { getGenres } from '../../api/adminApi.js'
 import Icon from '../../components/common/Icon.jsx'
 import { BT_BAI_DUOC_GIAO, BT_DAU_TICH } from './bieuTuongBf02.jsx'
 import '../../styles/Flow2.css'
@@ -13,13 +13,17 @@ import '../../styles/Flow2.css'
  * MO TRANG NAY TAI: /assigned-articles
  *
  * MUC LUC (so dong - ten - tac dung)
- *   24  EditorTaskQueue()               editor task queue
- *   33    useEffect                     Mo trang: tai hang viec cua BTV
- *   38    loadEditorTasks()             Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap)
+ *   29  EditorTaskQueue()               editor task queue
+ *   40    useEffect                     Mo trang: tai the loai (de hien ten) va hang viec cua BTV
+ *   46    useEffect                     tai du lieu khi mo trang
+ *   51    loadEditorTasks()             Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap)
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *   61  [Lam moi]                       loadEditorTasks() Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap) -> goi GET /api/assignments/editor/{editorId}
- *  102  [Bat dau Cham bai]              xu ly tren trang
+ *  116  [Lam moi]                       loadEditorTasks() Bai duoc giao cho BTV (id lay tu tai khoan dang dang nhap) -> goi GET /api/assignments/editor/{editorId}, GET /api/scoring-attempts/article/{…
+ *  125  [Tat ca ( {tasks.length} )]     tren trang: loc type
+ *  132  [Chua cham ( {unscoredCount} )]  tren trang: loc type
+ *  139  [Da cham ( {scoredCount} )]     tren trang: loc type
+ *  230  [Xem lai phieu / Tiep tuc cham / Bat dau…]  xu ly tren trang
  */
 
 export default function EditorTaskQueue({ nguoiDung }) {
@@ -32,18 +36,11 @@ export default function EditorTaskQueue({ nguoiDung }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  // Mo trang: tai hang viec cua BTV
-  // Tải danh mục thể loại từ database
+  // Mo trang: tai the loai (de hien ten) va hang viec cua BTV
   useEffect(() => {
-    async function fetchGenres() {
-      try {
-        const data = await goiApi('/api/genres')
-        if (Array.isArray(data)) setGenres(data)
-      } catch (e) {
-        console.error('Không tải được thể loại:', e)
-      }
-    }
-    fetchGenres()
+    getGenres()
+      .then(data => setGenres(data || []))
+      .catch(err => setMessage('Lỗi tải danh sách thể loại: ' + err.message))
   }, [])
 
   useEffect(() => {
@@ -173,29 +170,6 @@ export default function EditorTaskQueue({ nguoiDung }) {
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task, idx) => (
-                <tr key={task.id}>
-                  <td className="bf02__giua">{idx + 1}</td>
-                  <td className="bf02__dam">#{task.articleId}</td>
-                  <td>{new Date(task.assignedAt).toLocaleString('vi-VN')}</td>
-                  <td>
-                    {task.wasSuggested ? (
-                      <span className="nhan-tt nhan-tt--tot"><Icon>{BT_DAU_TICH}</Icon>Đúng (Thuật toán)</span>
-                    ) : (
-                      <span className="bf02__nhat">Trưởng ban chọn tay</span>
-                    )}
-                  </td>
-                  <td className="bf02__giua">
-                    <button
-                      type="button"
-                      onClick={() => navigate('/assigned-articles/' + task.articleId)}
-                      className="nut-chinh-fm"
-                    >
-                      Bắt đầu Chấm bài
-                    </button>
-                  </td>
-                </tr>
-              ))}
               {filteredTasks.map((task, idx) => {
                 const isScored = task.scoringStatus === 'DA_CHAM'
                 const isDraft = task.scoringStatus === 'DANG_CHAM'
@@ -253,10 +227,7 @@ export default function EditorTaskQueue({ nguoiDung }) {
                     <td className="bf02__giua">
                       <button
                         type="button"
-                        onClick={() => {
-                          if (onSelectTaskToScore) onSelectTaskToScore(task)
-                          else navigate('/assigned-articles/' + task.articleId)
-                        }}
+                        onClick={() => navigate('/assigned-articles/' + task.articleId)}
                         className={isScored ? 'nut-nhe' : 'nut-chinh-fm'}
                       >
                         {isScored ? 'Xem lại phiếu' : isDraft ? 'Tiếp tục chấm' : 'Bắt đầu chấm bài'}

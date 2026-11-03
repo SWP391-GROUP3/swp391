@@ -33,15 +33,15 @@ import java.util.Optional;
  * luong viec de goi y BTV.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   48  field                           repository / service duoc inject
+ *   50  field                           repository / service duoc inject
  *  ---- Ham public (controller / luong khac goi) ----
- *   60  getPendingAssignments()         Lay danh sach bai viet SUBMITTED cho Truong ban phan cong (UC-18)
- *   95  assignArticle()                 Truong ban phan cong mot bai viet cho mot BTV cham chat luong (UC-18, UC-20, BR-SC-04)
- *  143  getAssignmentByArticleId()      Lay thong tin phan cong hien tai cua bai viet
- *  152  getAssignmentsByEditorId()      Lay danh sach cac bai viet duoc phan cong cho 1 BTV (Hang viec cua BTV - UC-21)
- *  163  getEditorWorkload()             Thong ke khoi luong cong viec hien tai cua mot BTV de phuc vu goi y phan cong (UC-19)
+ *   63  getPendingAssignments()         Lay danh sach bai viet SUBMITTED cho Truong ban phan cong (UC-18)
+ *   98  assignArticle()                 Truong ban phan cong mot bai viet cho mot BTV cham chat luong (UC-18, UC-20, BR-SC-04)
+ *  146  getAssignmentByArticleId()      Lay thong tin phan cong hien tai cua bai viet
+ *  156  getAssignmentsByEditorId()      Lay danh sach cac bai viet duoc phan cong cho 1 BTV (Hang viec cua BTV - UC-21)
+ *  209  getEditorWorkload()             Thong ke khoi luong cong viec hien tai cua mot BTV de phuc vu goi y phan cong (UC-19)
  *  ---- Ham phu (private, chi dung trong file) ----
- *  169  checkEditorOfSection()          UC-20 E2: nguoi duoc giao phai la BTV dang ACTIVE cung ban voi Truong ban
+ *  215  checkEditorOfSection()          UC-20 E2: nguoi duoc giao phai la BTV dang ACTIVE cung ban voi Truong ban
  */
 @Service
 @RequiredArgsConstructor
