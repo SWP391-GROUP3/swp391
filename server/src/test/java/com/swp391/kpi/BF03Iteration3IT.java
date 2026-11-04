@@ -97,8 +97,8 @@ class BF03Iteration3IT {
         submit(s2,second,body(f,40));
         finalizeAppeal(f,s1).andExpect(status().isConflict());
         finalizeAppeal(f,s2).andExpect(status().isOk());
-        assertEquals("55.00",jdbc.queryForObject("SELECT effective_score FROM appeal_resolutions WHERE appeal_id=?",java.math.BigDecimal.class,f.appeal).toPlainString());
-        assertEquals("AVERAGE_S0_S2",jdbc.queryForObject("SELECT rule_applied FROM appeal_resolutions WHERE appeal_id=?",String.class,f.appeal));
+        assertEquals("70.00",jdbc.queryForObject("SELECT effective_score FROM appeal_resolutions WHERE appeal_id=?",java.math.BigDecimal.class,f.appeal).toPlainString());
+        assertEquals("MEDIAN_S0_S1_S2",jdbc.queryForObject("SELECT rule_applied FROM appeal_resolutions WHERE appeal_id=?",String.class,f.appeal));
         assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM scoring_attempts WHERE appeal_id=?",Integer.class,f.appeal));
     }
 

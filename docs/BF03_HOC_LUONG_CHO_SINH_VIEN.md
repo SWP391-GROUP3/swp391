@@ -216,11 +216,9 @@ Iter3 gồm **UC-36, UC-37, UC-39, UC-40** và hoàn thiện **UC-38**. Có thay
 |---|---|---|
 | \|S1 − S0\| ≤ T | S1 | `USE_S1` |
 | vượt T, chưa có S2 | chờ S2, chưa chốt | — |
-| S2 gần S0 hơn | (S0 + S2) / 2 | `AVERAGE_S0_S2` |
-| S2 gần S1 hơn | (S1 + S2) / 2 | `AVERAGE_S1_S2` |
-| hai khoảng cách bằng nhau | S2 | `USE_S2_TIE` |
+| có S2 | trung vị của S0, S1, S2 = S2 kẹp vào `min(S0,S1)`..`max(S0,S1)` | `MEDIAN_S0_S1_S2` |
 
-**Ví dụ kiểm chứng:** S0 = 50, S1 = 90, S2 = 40 → D0 = 10, D1 = 50 → (50 + 40) / 2 = 45. Dữ liệu demo trong DB: khiếu nại #210 có S0 = 70, S1 = 90, S2 = 40 → 55.
+**Ví dụ kiểm chứng:** S0 = 70, S1 = 90, S2 = 40, T = 5 → \|90 − 70\| = 20 > 5 nên cần S2; sắp xếp 40, 70, 90 → trung vị **70**. Dữ liệu mẫu trong DB (`database/seeds/BF03_sample_appeals.sql`): khiếu nại bài [BF03-DEMO-03] có S0 = 82, S1 = 98, S2 = 90 → trung vị 90; bài [BF03-DEMO-02] có S0 = 77, S1 = 95 đang chờ S2, màn so sánh hiện khoảng 77–95.
 
 **Thầy hỏi:** `T` lấy ở đâu?
 
@@ -264,7 +262,7 @@ BF-04 và BF-05 chỉ gọi hàm này. Chưa có hợp đồng tự đồng bộ
 | Thầy hỏi | Em trả lời ngắn |
 |---|---|
 | Vì sao không cho Phóng viên gửi khiếu nại cho đồng tác giả? | BR-QC-01: chỉ tác giả chính `articles.author_id`, vì một người đứng tên khiếu nại thì không được chia lượt. |
-| Vì sao điểm mới có thể tăng hoặc giảm? | Quy tắc S2 không có sàn S0 (BR-QC-07). Điểm ngoài cặp chỉ là "lệch so với nhóm", không tự kết luận vi phạm. |
+| Vì sao điểm mới có thể tăng hoặc giảm? | Quy tắc S2 không có sàn S0 (BR-QC-07). Điểm không được trung vị chọn chỉ là "lệch so với nhóm", không tự kết luận vi phạm. |
 | Vì sao có `rule_config_id` trong `appeals`? | BR-QC-12: khiếu nại giữ luật lúc gửi, cấu hình mới không làm đổi kết quả đang xử lý. |
 | Vì sao audit không có API sửa/xoá? | BR-QC-09: nhật ký bất biến. Đây là ràng buộc nghiệp vụ, không chỉ là chọn không làm. |
 | Vì sao cần `lockWorkflow()`? | Các thao tác ghi BF-03 không được chạy song song. Khoá ứng dụng `BF03_SCORE_WRITES` có thời hạn 15 giây. |

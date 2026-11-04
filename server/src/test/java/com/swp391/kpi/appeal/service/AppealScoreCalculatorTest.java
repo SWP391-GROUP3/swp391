@@ -28,22 +28,27 @@ class AppealScoreCalculatorTest {
         }
     }
 
-    @Test void s2ClosestToOriginalUsesTheirAverageWithoutOriginalFloor() {
+    @Test void s2BelowBothUsesLowerOfS0AndS1() {
         var result = calculator.compare(n("50"), n("90"), n("40"), n("5"));
-        assertEquals(n("45.00"), result.effectiveScore());
-        assertEquals(AppealResolutionRule.AVERAGE_S0_S2, result.rule());
+        assertEquals(n("50.00"), result.effectiveScore());
+        assertEquals(AppealResolutionRule.MEDIAN_S0_S1_S2, result.rule());
     }
 
-    @Test void s2ClosestToS1UsesTheirAverageAndHalfUp() {
-        var result = calculator.compare(n("50"), n("90"), n("89.99"), n("5"));
+    @Test void s2AboveBothUsesHigherOfS0AndS1() {
+        var result = calculator.compare(n("50"), n("90"), n("95"), n("5"));
         assertEquals(n("90.00"), result.effectiveScore());
-        assertEquals(AppealResolutionRule.AVERAGE_S1_S2, result.rule());
+        assertEquals(AppealResolutionRule.MEDIAN_S0_S1_S2, result.rule());
     }
 
-    @Test void equalDistancesUseS2() {
-        var result = calculator.compare(n("50"), n("90"), n("70"), n("5"));
-        assertEquals(n("70.00"), result.effectiveScore());
-        assertEquals(AppealResolutionRule.USE_S2_TIE, result.rule());
+    @Test void s2BetweenBothUsesS2() {
+        var result = calculator.compare(n("50"), n("90"), n("89.99"), n("5"));
+        assertEquals(n("89.99"), result.effectiveScore());
+        assertEquals(AppealResolutionRule.MEDIAN_S0_S1_S2, result.rule());
+    }
+
+    @Test void medianHasNoJumpAroundMidpoint() {
+        assertEquals(n("69.99"), calculator.compare(n("50"), n("90"), n("69.99"), n("5")).effectiveScore());
+        assertEquals(n("70.01"), calculator.compare(n("50"), n("90"), n("70.01"), n("5")).effectiveScore());
     }
 
     @Test void zeroThresholdAndScoreBoundariesWork() {

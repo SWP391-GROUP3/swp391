@@ -16,7 +16,7 @@
 - Một khiếu nại có nhiều nhất **hai đợt chấm lại**: `S1` là điểm chấm lại lần 1, `S2` là điểm chấm lại lần 2. `S0` là điểm gốc đã công bố và không tính là một đợt chấm lại.
 - Cả `S0`, `S1`, `S2` dùng cùng phiên bản bài, thể loại, bộ tiêu chí và trọng số; mỗi tiêu chí và tổng điểm đều theo thang 0–100.
 - Nếu `ABS(S1 - S0) <= T`, điểm đề xuất cuối là `S1`. Nếu `ABS(S1 - S0) > T`, bắt buộc có `S2` và dùng quy tắc trọng tài `S2` tại BR-QC-07.
-- Điểm cuối có thể tăng hoặc giảm so với `S0`; không có sàn bảo vệ điểm gốc. Điểm nằm ngoài cặp gần nhất chỉ được coi là **điểm lệch so với nhóm** để tính kết quả, không tự động kết luận người chấm vi phạm.
+- Điểm cuối có thể tăng hoặc giảm so với `S0`; không có sàn bảo vệ điểm gốc. Điểm không được trung vị chọn chỉ được coi là **điểm lệch so với nhóm** để tính kết quả, không tự động kết luận người chấm vi phạm.
 
 - **Trigger (mục 2.3):** Phóng viên gửi khiếu nại.
 - **End condition (mục 2.3):** Nhận khiếu nại và chấm lại, sau đó cập nhật chỉ số.
@@ -32,7 +32,7 @@ Mô tả sơ đồ (3 làn: Reporter/Author | Editor | Head of Department):
 3. Editor: Receive the Blind Review assignment → Independently Review the Article → Submit the review results to the Head.
 4. Head: Review the Blind Review results → **Is this the final score?**
    - Chỉ có `S0` và `S1`: nếu `ABS(S1 - S0) <= T` → dùng `S1`; nếu lớn hơn `T` → quay lại bước 2 để giao BTV thứ ba thực hiện đợt chấm lại lần 2 (`S2`).
-   - Đã có `S2` → so sánh `D0 = ABS(S2 - S0)` và `D1 = ABS(S2 - S1)`, lấy trung bình của cặp gồm `S2` và điểm gần `S2` hơn; nếu `D0 = D1` thì dùng `S2`.
+   - Đã có `S2` → điểm đề xuất là trung vị của `S0`, `S1`, `S2`, tức `S2` kẹp vào khoảng từ `min(S0, S1)` đến `max(S0, S1)`.
 5. Mọi nhánh → Complete Audit Log recording & control reporting → Update the deviation indices for the editors → End.
 
 > **Quy tắc chốt:** `T` là `variance_threshold` của cấu hình được gắn với khiếu nại, giá trị nghiệp vụ mặc định là 5 điểm. Chênh lệch được lấy theo trị tuyệt đối nên cả trường hợp tăng và giảm quá `T` đều phát sinh `S2`. Nếu chênh lệch đúng bằng `T` thì dùng `S1` và không chấm lại lần 2. Kiểm tra ngày 26/10/2026: `database/data.sql` đã đặt mặc định 5 điểm; cấu hình cũ gắn với từng appeal vẫn được giữ nguyên.
@@ -134,7 +134,7 @@ Actor chính: Reporter, Head of ED, Editor · 11 use case · ID 35–45
 3. System shows the third Editor the same article version, category, and criteria set version while hiding all prior scores, comments, reviewer identities, and variance information.
 4. Third Editor completes and submits the scorecard under the same validation rules as UC-36.
 5. System saves and locks `S2`. No further re-evaluation can be created for this appeal.
-6. System calculates `D0 = ABS(S2 - S0)` and `D1 = ABS(S2 - S1)`. If `D0 < D1`, the proposed final score is `(S0 + S2) / 2`; if `D1 < D0`, it is `(S1 + S2) / 2`; if `D0 = D1`, it is `S2`. An average is rounded to at most two decimal places using `HALF_UP` (BR-QC-07).
+6. System proposes the median of `S0`, `S1`, and `S2`: `S2` if it lies between `S0` and `S1`, otherwise the nearer of `min(S0, S1)` and `max(S0, S1)` (BR-QC-07).
 7. Head confirms the proposed numeric score. System records `finalized_by`, resolves the appeal, writes the audit log, notifies the main author and affected roles, and propagates the effective score to BF-04 and BF-05 where applicable (BR-QC-10).
 
 **Alternative / Exceptions**
@@ -179,7 +179,7 @@ Actor chính: Reporter, Head of ED, Editor · 11 use case · ID 35–45
 1. System displays the original and completed re-evaluation results by criterion to the Head of Department and identifies `S0`, `S1`, and `S2` when available.
 2. System reads the variance threshold `T` bound when the appeal was submitted and calculates `difference = ABS(S1 - S0)` (BR-QC-06).
 3. If `difference <= T`, system proposes `S1` as the final score and does not create `S2`. If `difference > T`, system requires UC-37 and keeps the appeal IN_REVIEW.
-4. When `S2` exists, system applies the `S2` arbitration rule in BR-QC-07. For example, `S0 = 50`, `S1 = 90`, `S2 = 40` produces `(50 + 40) / 2 = 45`; the score 90 is outside the pair selected by `S2`, but this does not automatically establish reviewer misconduct.
+4. When `S2` exists, system applies the `S2` arbitration rule in BR-QC-07. For example, `S0 = 50`, `S1 = 90`, `S2 = 40` produces the median `50`; the score 40 is outside the range of `S0` and `S1`, but this does not automatically establish reviewer misconduct. As soon as `S1` is submitted and `ABS(S1 - S0) > T`, the screen also shows the range `min(S0, S1)` to `max(S0, S1)` while it waits for `S2`.
 5. The proposed score may be higher or lower than `S0`; the system does not apply a floor based on the original score.
 6. Head reviews and confirms the proposal. System records the numeric effective score, sets the appeal to RESOLVED, preserves every attempt, writes the audit log, and notifies the main author and Head of Department.
 7. System sends the effective score to royalty and KPI calculations; if the related royalty period is already LOCKED, BF-04 creates an adjustment line in the next OPEN period (BR-QC-10).
@@ -333,7 +333,7 @@ Actor chính: Reporter, Head of ED, Editor · 11 use case · ID 35–45
 | BR-QC-04 | An eligible blind reviewer is an ACTIVE user with role EDITOR who did not perform the original scoring or any earlier evaluation of the same appeal. Same-department Editors are preferred. A cross-department assignment through UC-43 requires a reason and must be audited. |
 | BR-QC-05 | Every evaluation uses the same article version, category, criteria-set version, and locked weights as the appealed attempt. Each criterion score is from 0 to 100; a comment is mandatory below 50. The total is `SUM(criterion score * criterion weight / 100)`, must be from 0 to 100, and is stored with at most two decimal places using `HALF_UP` rounding. |
 | BR-QC-06 | Let `S0` be the original total, `S1` the first re-evaluation total, and `T` the variance threshold bound to the appeal, with a business default of 5 points. Calculate `difference = ABS(S1 - S0)`. If `difference <= T`, propose `S1` as final and create no more review; if `difference > T`, require exactly one second re-evaluation (`S2`). An appeal may therefore have no more than two re-evaluation attempts. |
-| BR-QC-07 | `S2` is the arbitration score. Calculate `D0 = ABS(S2 - S0)` and `D1 = ABS(S2 - S1)`. If `D0 < D1`, propose `(S0 + S2) / 2`; if `D1 < D0`, propose `(S1 + S2) / 2`; if `D0 = D1`, propose `S2`. This rule compares only the two distances from `S2`; it does not independently select the nearest pair among all three possible pairs. A calculated average uses `HALF_UP` rounding and at most two decimal places. The result may increase or decrease from `S0`; no original-score floor applies. A score outside the pair selected by `S2` is an analytical outlier only and does not by itself prove reviewer misconduct. The Head confirms the numeric result before the appeal becomes RESOLVED. |
+| BR-QC-07 | `S2` is the arbitration score. The proposed final score is the median of `S0`, `S1`, and `S2`, which equals `S2` limited to the range from `min(S0, S1)` to `max(S0, S1)`: if `S2` lies between `S0` and `S1` the result is `S2`; if `S2` is lower than both the result is `min(S0, S1)`; if `S2` is higher than both the result is `max(S0, S1)`. No average is calculated, so the result is always one of the three scores and does not jump when `S2` changes slightly. The result may increase or decrease from `S0`; no original-score floor applies. A score not chosen by the median is an analytical outlier only and does not by itself prove reviewer misconduct. The Head confirms the numeric result before the appeal becomes RESOLVED. Resolutions saved before 04/11/2026 keep the earlier codes `AVERAGE_S0_S2`, `AVERAGE_S1_S2` and `USE_S2_TIE` for history. |
 | BR-QC-08 | Cross-review campaign scores are analytical only and never change an official or effective article score. `avg_deviation` uses absolute deviations; `overturn_rate` is the percentage of resolved appeals whose confirmed effective score differs from `S0`, or 0 when there is no resolved appeal in the period. |
 | BR-QC-09 | All appeal submissions, reviewer assignments, scoring attempts, comparisons, score updates, configuration changes, and workflow transitions are stored in immutable audit logs. Historical scores remain stored but are hidden from blind reviewers. |
 | BR-QC-10 | The resolved numeric effective score is the canonical score source for royalty and KPI processes. A LOCKED or PAID royalty period never changes; a score difference discovered after locking creates an adjustment line in the next OPEN period. A FINALIZED KPI snapshot remains immutable. |
@@ -353,7 +353,7 @@ Actor chính: Reporter, Head of ED, Editor · 11 use case · ID 35–45
 **Nguồn điểm hiệu lực duy nhất:**
 
 1. Nếu chưa có appeal RESOLVED, dùng scoring attempt đã được `score_approvals` APPROVED và công bố.
-2. Nếu có appeal RESOLVED, dùng điểm số hiệu lực đã được Trưởng ban xác nhận trong `appeal_resolutions`; điểm này có thể là `S1`, `S2`, hoặc trung bình của cặp gồm `S2` và điểm gần `S2` hơn.
+2. Nếu có appeal RESOLVED, dùng điểm số hiệu lực đã được Trưởng ban xác nhận trong `appeal_resolutions`; điểm này có thể là `S1`, `S2`, hoặc trung vị của `S0`, `S1`, `S2` (từ 04/11/2026; khiếu nại cũ có thể là trung bình của cặp gồm `S2` và điểm gần `S2` hơn).
 3. Trong khi appeal còn SUBMITTED hoặc IN_REVIEW, điểm cũ tạm thời vẫn có hiệu lực; quy trình xuất bản không bị dừng.
 4. Appeal chỉ thay điểm hiệu lực, không tự thay đổi quyết định xuất bản hoặc trạng thái bài.
 
@@ -363,12 +363,12 @@ Người dùng đã duyệt đề xuất Iter3, bao gồm thay đổi CHECK và 
 
 1. `data.sql` đã đặt ngưỡng mặc định 5. Không ghi đè cấu hình của appeal đang xử lý.
 2. Đã có `effective_score DECIMAL(5,2) NULL`: NULL chỉ dùng cho dữ liệu lịch sử; kết quả mới luôn ghi điểm số. `effective_attempt_id` tham chiếu S1 hoặc S2, không thay thế điểm trung bình đã chốt.
-3. Enum bổ sung `USE_S1`, `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE`; giữ hai mã cũ để đọc lịch sử.
+3. Enum bổ sung `USE_S1`, `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE`; giữ hai mã cũ để đọc lịch sử. Cập nhật 04/11/2026: thêm `MEDIAN_S0_S1_S2` cho BR-QC-07 (trung vị); ba mã `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE` chỉ còn để đọc lịch sử. Migration giữ dữ liệu: `database/migrations/BF03_median_rule.sql`.
 4. APPEAL đã nộp không bắt buộc decision; INITIAL/RESCORE vẫn bắt buộc. `assignment_id` giữ FK của phân công gốc, không tạo quyết định xuất bản giả.
 5. Đã có `appeals.rule_config_id` và UNIQUE `appeals(article_id)` từ Iter1.
 6. Migration giữ dữ liệu: `database/migrations/BF03_iter3_safe.sql`. Không chạy lại `schema.sql` trên database chung.
 7. **Chưa tích hợp ghi BF04/BF05:** cần chủ luồng chốt hợp đồng tính lại OPEN, điều chỉnh LOCKED/PAID, xử lý CLOSED và bảo vệ FINALIZED. BF03 cung cấp `AppealEffectiveScoreService`, ghi audit `PENDING_INTEGRATION`; không tuyên bố đã tự đồng bộ tiền/KPI.
-8. GBR-07 trong Overview đã đồng bộ công thức S2. Ảnh gốc dùng làm tham khảo, không được dùng để suy ra luật trung vị khác với đặc tả này.
+8. GBR-07 trong Overview đã đồng bộ công thức S2 (trung vị từ 04/11/2026). Ảnh gốc dùng làm tham khảo, không được dùng để suy ra luật khác với đặc tả này.
 
 ## Luật chung liên quan
 

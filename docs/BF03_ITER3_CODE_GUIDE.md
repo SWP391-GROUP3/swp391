@@ -59,11 +59,11 @@ Chấm mù được thực hiện ở **response backend**: không trả điểm
 |---|---|---|
 | ABS(S1-S0)<=T | S1 | USE_S1 |
 | VượtT, chưa có S2 | Chờ S2, không chốt | chưa có |
-| ABS(S2-S0)<ABS(S2-S1) | (S0+S2)/2 | AVERAGE_S0_S2 |
-| ABS(S2-S1)<ABS(S2-S0) | (S1+S2)/2 | AVERAGE_S1_S2 |
-| Hai khoảng cách bằng nhau | S2 | USE_S2_TIE |
+| Có S2 | Trung vị của S0, S1, S2 (S2 kẹp vào `min(S0,S1)`..`max(S0,S1)`) | MEDIAN_S0_S1_S2 |
 
-Tổng điểm = `SUM(score * weight /100)`. Tính bằng `BigDecimal`, chỉ làm tròn tổng/trung bình ở cuối bằng HALF_UP, hai chữ số thập phân. Điểm có thể giảm:70/90/40 dẫn đến55. Không lấy trung vị và không giữ sàn S0.
+> Cập nhật 04/11/2026: Iter3 ban đầu dùng trung bình `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE`. Ba mã này chỉ còn để đọc lịch sử; kết quả mới dùng `MEDIAN_S0_S1_S2` (BR-QC-07).
+
+Tổng điểm = `SUM(score * weight /100)`. Tính bằng `BigDecimal`, chỉ làm tròn tổng ở cuối bằng HALF_UP, hai chữ số thập phân. Điểm có thể giảm khi S1 thấp hơn S0; ví dụ 70/90/40 cho trung vị 70. Không giữ sàn S0.
 
 ## 4. Source code tác động và ý nghĩa
 

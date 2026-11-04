@@ -263,11 +263,9 @@ AppealDetailPage: Link /appeals/{appealId}/comparison
 |---|---|
 | `ABS(S1-S0) <= T` | Đề xuất S1, không cần S2 |
 | Vượt T và chưa có S2 | Chờ giao/nộp S2, chưa được chốt |
-| S2 gần S0 hơn | Trung bình S0 và S2 |
-| S2 gần S1 hơn | Trung bình S1 và S2 |
-| Hai khoảng cách từ S2 bằng nhau | Dùng S2 |
+| Có S2 | Trung vị của S0, S1, S2 (S2 kẹp vào khoảng `min(S0,S1)` đến `max(S0,S1)`), mã `MEDIAN_S0_S1_S2` |
 
-Ví dụ S0=70, S1=90, S2=40 → `(70+40)/2=55`. Đây không phải trung vị90/70/40 và không có sàn giữ70. `weightedTotal()` và `compare()` dùng BigDecimal, HALF_UP hai chữ số thập phân.
+Ví dụ S0=70, S1=90, S2=40 → trung vị `70`. Khi S1 thấp hơn S0 (ví dụ S0=70, S1=50, S2=40) điểm cuối là `50`, thấp hơn S0; không có sàn giữ S0. Ngay khi S1 nộp xong mà lệch quá T, màn so sánh hiện khoảng `min(S0,S1)`–`max(S0,S1)` trong lúc chờ S2. `weightedTotal()` và `compare()` dùng BigDecimal, HALF_UP hai chữ số thập phân.
 
 ### 7.2 Bấm Phân công S2
 
@@ -297,7 +295,7 @@ Service khóa/refresh dữ liệu, kiểm tra IN_REVIEW, đúng phiếu cuối �
 
 Ghi `AppealResolutionRepository.save()` vào `appeal_resolutions` với `effectiveScore`, `ruleApplied`, `effectiveAttemptId`, `finalizedBy`, `finalizedAt`; đổi `appeals` sang RESOLVED và đặt `resolvedAt`. Sau audit/thông báo, `ReviewerDeviationRefreshService.refreshSection()` tính lại chỉ số tháng.
 
-`effective_attempt_id` chỉ tham chiếu một phiếu; nếu kết quả là trung bình thì phải dùng **effective_score**, không đọc tổng của FK thay cho55. Dữ liệu lịch sử thiếu effective_score dùng fallback của `AppealEffectiveScoreService.getEffectiveScore()`.
+`effective_attempt_id` chỉ tham chiếu một phiếu; nếu kết quả là trung vị hoặc trung bình thì phải dùng **effective_score**, không đọc tổng của FK thay cho55. Dữ liệu lịch sử thiếu effective_score dùng fallback của `AppealEffectiveScoreService.getEffectiveScore()`.
 
 ## 8. Tạo và thực hiện chấm chéo — UC40
 

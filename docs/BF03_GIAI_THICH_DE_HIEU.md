@@ -152,14 +152,17 @@ Hàm cốt lõi, ngắn nhất mà quan trọng nhất: `S/AppealScoreCalculator
 
 **Trường hợp 2 — lệch nhiều, chưa có S2** (`:38`): trả "cần chấm S2", **chưa có điểm** (`requiresSecondReview = true`). Trưởng ban phải phân công S2 (`AppealManagementService.java:120-129`).
 
-**Trường hợp 3 — đã có S2** (`:39-43`): S2 là người phân xử. Xem S2 **gần ai hơn**:
-- S2 gần S0 hơn (`:41`) → lấy trung bình (S0 + S2) / 2.
-- S2 gần S1 hơn (`:42`) → lấy trung bình (S1 + S2) / 2.
-- S2 cách đều hai bên (`:43`) → lấy S2.
+**Trường hợp 3 — đã có S2**: S2 là người phân xử, kết quả là **trung vị** của S0, S1, S2 (mã `MEDIAN_S0_S1_S2`). Cách nghĩ dễ nhất là "kẹp" S2 vào khoảng giữa S0 và S1:
+- S2 nằm giữa S0 và S1 → lấy S2.
+- S2 thấp hơn cả hai → lấy điểm thấp hơn trong S0 và S1.
+- S2 cao hơn cả hai → lấy điểm cao hơn trong S0 và S1.
+
+Kết quả luôn là một trong ba điểm đã chấm, không có điểm trung bình "không ai chấm", và S2 nhích rất ít thì kết quả cũng nhích rất ít (luật trung bình cũ có thể nhảy hàng chục điểm).
 
 Ví dụ để tự kiểm tra: S0 = 50, S1 = 90, S2 = 40, T = 10.
-|90−50| = 40 > T nên cần S2. S2 cách S0 là 10, cách S1 là 50 → S2 gần S0 hơn → (50+40)/2 = **45**.
-Để ý: điểm cuối có thể **thấp hơn** S0 (45 < 50). Đó là chủ ý của luật (BR-QC-07), khiếu nại không đảm bảo tăng điểm.
+|90−50| = 40 > T nên cần S2. Sắp xếp 40, 50, 90 → trung vị là **50** (S2 thấp hơn cả hai nên lấy `min(S0,S1)` = 50).
+Để ý: điểm cuối vẫn có thể **thấp hơn** S0 khi S1 thấp hơn S0 (ví dụ S0 = 70, S1 = 50, S2 = 40 → 50). Đó là chủ ý của luật (BR-QC-07), khiếu nại không đảm bảo tăng điểm.
+Ngay khi S1 nộp xong mà lệch quá T, màn so sánh hiện luôn khoảng `min(S0,S1)`–`max(S0,S1)` trong lúc chờ S2.
 
 ### Bấm "Xác nhận điểm hiệu lực" — `S/AppealReviewService.java:103-130` (`finalizeAppeal`)
 
