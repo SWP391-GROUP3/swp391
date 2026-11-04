@@ -26,7 +26,7 @@ import './ReviewWorkflow.css'
  *  112  link [Xem nhat ky]              mo trang /audit-logs?appealId={id} (AuditLogPage)
  */
 
-const TEN_LUAT = { USE_S1: 'Dùng điểm S1', AVERAGE_S0_S2: 'Trung bình S0 và S2', AVERAGE_S1_S2: 'Trung bình S1 và S2', USE_S2_TIE: 'Dùng S2 khi hai khoảng cách bằng nhau', KEEP_ORIGINAL: 'Giữ điểm gốc (lịch sử)', USE_RESCORE: 'Dùng điểm chấm lại (lịch sử)' }
+const TEN_LUAT = { USE_S1: 'Dùng điểm S1', MEDIAN_S0_S1_S2: 'Trung vị của S0, S1 và S2', AVERAGE_S0_S2: 'Trung bình S0 và S2', AVERAGE_S1_S2: 'Trung bình S1 và S2', USE_S2_TIE: 'Dùng S2 khi hai khoảng cách bằng nhau', KEEP_ORIGINAL: 'Giữ điểm gốc (lịch sử)', USE_RESCORE: 'Dùng điểm chấm lại (lịch sử)' }
 
 export default function AppealComparisonPage() {
   const { id } = useParams()
@@ -99,6 +99,7 @@ function ComparisonContent({ id }) {
       </table></div>
       {daChot ? <div className="luong-qc__the"><h2>Đã giải quyết</h2><p>Điểm hiệu lực: <strong>{duLieu.confirmedScore}/100</strong> · {TEN_LUAT[duLieu.confirmedRule] || duLieu.confirmedRule}</p></div>
         : deXuat?.requiresSecondReview ? <section className="luong-qc__the"><h2>Cần chấm S2</h2><p>Chênh lệch S1 và S0 vượt ngưỡng, phải có người chấm độc lập thứ ba.</p>
+          <p>Khoảng hiện tại: từ {Math.min(duLieu.original.totalScore, duLieu.first.totalScore)} đến {Math.max(duLieu.original.totalScore, duLieu.first.totalScore)}. Điểm cuối sẽ nằm trong khoảng này.</p>
           {ketQua.ungVien.length ? <form className="luong-qc__form" onSubmit={giaoLanHai}>
             <label>Người chấm S2<select name="reviewerId" required defaultValue="" disabled={dangLuu}><option value="" disabled>Chọn biên tập viên</option>
               {ketQua.ungVien.map((item) => <option key={item.reviewerId} value={item.reviewerId}>{item.reviewerName} · {item.sectionName}{item.crossDepartment ? ' · Khác ban' : ''}</option>)}</select></label>

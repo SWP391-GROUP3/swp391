@@ -25,11 +25,10 @@ import java.util.List;
 public class AppealScoreCalculator {
     private static final BigDecimal MAX_SCORE = new BigDecimal("100");
     private static final BigDecimal COMMENT_THRESHOLD = new BigDecimal("50");
-    private static final BigDecimal TWO = new BigDecimal("2");
     public record Item(Integer criterionId, BigDecimal weight, BigDecimal score, String comment) {}
     public record Result(boolean requiresSecondReview, BigDecimal effectiveScore, AppealResolutionRule rule) {}
 
-    public Result compare(BigDecimal s0, BigDecimal s1, BigDecimal s2, BigDecimal threshold) { // [LUONG 4 - SO SANH & CHOT] buoc 7/7 cong thuc: |S1-S0|<=T lay S1; lech hon thi cho S2; co S2 thi trung binh voi diem GAN S2 hon (bang nhau lay S2)
+    public Result compare(BigDecimal s0, BigDecimal s1, BigDecimal s2, BigDecimal threshold) { // [LUONG 4 - SO SANH & CHOT] buoc 7/7 cong thuc: |S1-S0|<=T lay S1; lech hon thi cho S2; co S2 thi lay trung vi cua S0, S1, S2
         requireScore(s0); requireScore(s1); requireScore(threshold);
         if (s1.subtract(s0).abs().compareTo(threshold) <= 0) {
             if (s2 != null) throw new BusinessException("Không được chấm S2 khi chênh lệch chưa vượt ngưỡng.");
@@ -37,10 +36,9 @@ public class AppealScoreCalculator {
         }
         if (s2 == null) return new Result(true, null, null);
         requireScore(s2);
-        int distance = s2.subtract(s0).abs().compareTo(s2.subtract(s1).abs());
-        if (distance < 0) return result(s0.add(s2).divide(TWO), AppealResolutionRule.AVERAGE_S0_S2);
-        if (distance > 0) return result(s1.add(s2).divide(TWO), AppealResolutionRule.AVERAGE_S1_S2);
-        return result(s2, AppealResolutionRule.USE_S2_TIE);
+        // Trung vi cua ba diem = S2 kep vao khoang [min(S0,S1), max(S0,S1)]
+        BigDecimal median = s2.max(s0.min(s1)).min(s0.max(s1));
+        return result(median, AppealResolutionRule.MEDIAN_S0_S1_S2);
     }
 
     public BigDecimal weightedTotal(List<Item> items, boolean complete) { // [LUONG 3 - CHAM MU] buoc 7/7 cong thuc: tong = cong(diem * trong so / 100), trong so tong phai = 100%, diem < 50 phai co nhan xet

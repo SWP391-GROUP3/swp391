@@ -149,11 +149,9 @@ Source: [BlindReviewQueuePage.jsx](../client/src/pages/appeal/BlindReviewQueuePa
 |---|---|---|
 | `ABS(S1 - S0) <= T` | S1 | `USE_S1` |
 | Vượt T, chưa có S2 | Phải chấm S2, chưa được chốt | Chưa có |
-| S2 gần S0 hơn | `(S0 + S2) / 2` | `AVERAGE_S0_S2` |
-| S2 gần S1 hơn | `(S1 + S2) / 2` | `AVERAGE_S1_S2` |
-| S2 cách đều S0 và S1 | S2 | `USE_S2_TIE` |
+| Có S2 | Trung vị của S0, S1, S2 = S2 kẹp vào khoảng `min(S0,S1)` đến `max(S0,S1)` | `MEDIAN_S0_S1_S2` |
 
-Ví dụ `S0=70, S1=90, S2=40` → `(70+40)/2=55`. Điểm có thể giảm; không lấy trung vị, không giữ sàn S0. Tối đa hai đợt chấm lại, không có S3.
+Ví dụ `S0=70, S1=90, S2=40` → trung vị `70`. Khi S1 nộp xong mà lệch quá T, màn so sánh hiện ngay khoảng `70`–`90` trong lúc chờ S2. Điểm có thể giảm so với S0 khi S1 thấp hơn S0; không có sàn S0. Tối đa hai đợt chấm lại, không có S3. Các mã `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE` chỉ còn để đọc dữ liệu lịch sử.
 
 ### 6.3 Chốt kết quả
 
@@ -161,7 +159,7 @@ Frontend chỉ gửi `expectedAttemptId`, không gửi điểm cuối tự chọ
 
 Ghi `appeal_resolutions` gồm `effective_score`, `effective_attempt_id`, `rule_applied`, người và thời điểm chốt; đổi khiếu nại thành **RESOLVED**, ghi audit, thông báo và gọi `ReviewerDeviationRefreshService.refreshSection()`.
 
-`effective_attempt_id` chỉ là tham chiếu một phiếu. Khi kết quả là trung bình, phải dùng **effective_score**, không lấy tổng của phiếu được tham chiếu thay thế. `AppealEffectiveScoreService` cung cấp điểm hiệu lực; khi chưa RESOLVED thì vẫn dùng điểm công bố.
+`effective_attempt_id` chỉ là tham chiếu một phiếu. Khi kết quả là trung vị hoặc trung bình, phải dùng **effective_score**, không lấy tổng của phiếu được tham chiếu thay thế. `AppealEffectiveScoreService` cung cấp điểm hiệu lực; khi chưa RESOLVED thì vẫn dùng điểm công bố.
 
 Source: [AppealComparisonPage.jsx](../client/src/pages/appeal/AppealComparisonPage.jsx), [AppealScoreCalculator.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealScoreCalculator.java), [AppealReviewService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealReviewService.java), [AppealEffectiveScoreService.java](../server/src/main/java/com/swp391/kpi/appeal/service/AppealEffectiveScoreService.java).
 

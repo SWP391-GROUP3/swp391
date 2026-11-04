@@ -584,8 +584,9 @@ CREATE TABLE appeal_criteria (
 
 /* Ket qua Head xac nhan theo BR-QC-06/07. effective_score la diem chinh thuc.
    effective_attempt_id tham chieu S1 hoac S2; khong suy diem trung binh tu FK.
-   Giu KEEP_ORIGINAL/USE_RESCORE de doc lich su. Ban ghi moi dung USE_S1,
-   AVERAGE_S0_S2, AVERAGE_S1_S2 hoac USE_S2_TIE va phai co effective_score. */
+   Giu KEEP_ORIGINAL/USE_RESCORE/AVERAGE_S0_S2/AVERAGE_S1_S2/USE_S2_TIE de doc lich su.
+   Ban ghi moi dung USE_S1 hoac MEDIAN_S0_S1_S2 (trung vi S0, S1, S2) va phai co effective_score.
+   DB da co du lieu: dung database/migrations/BF03_median_rule.sql, khong chay lai file nay. */
 CREATE TABLE appeal_resolutions (
     id                    INT IDENTITY(1,1) PRIMARY KEY,
     appeal_id             INT          NOT NULL UNIQUE,
@@ -598,7 +599,7 @@ CREATE TABLE appeal_resolutions (
     CONSTRAINT fk_appeal_resolutions_attempt   FOREIGN KEY (effective_attempt_id) REFERENCES scoring_attempts(id),
     CONSTRAINT fk_appeal_resolutions_finalizer FOREIGN KEY (finalized_by)         REFERENCES users(id),
     CONSTRAINT ck_appeal_resolutions_score CHECK (effective_score BETWEEN 0 AND 100),
-    CONSTRAINT ck_appeal_resolutions_rule      CHECK (rule_applied IN ('KEEP_ORIGINAL','USE_RESCORE','USE_S1',
+    CONSTRAINT ck_appeal_resolutions_rule      CHECK (rule_applied IN ('KEEP_ORIGINAL','USE_RESCORE','USE_S1','MEDIAN_S0_S1_S2',
                                                                      'AVERAGE_S0_S2','AVERAGE_S1_S2','USE_S2_TIE'))
 );
 

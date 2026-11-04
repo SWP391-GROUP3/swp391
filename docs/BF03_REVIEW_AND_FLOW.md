@@ -32,9 +32,9 @@ Công thức (class `AppealScoreCalculator`, không dùng Spring):
 |---|---|---|
 | `\|S1−S0\| ≤ T` | điểm = S1, không có S2 | `USE_S1` |
 | `\|S1−S0\| > T`, chưa có S2 | bắt buộc chấm S2 | (chưa có) |
-| có S2, S2 gần S0 hơn | (S0+S2)/2 | `AVERAGE_S0_S2` |
-| có S2, S2 gần S1 hơn | (S1+S2)/2 | `AVERAGE_S1_S2` |
-| có S2, hai khoảng cách bằng nhau | S2 | `USE_S2_TIE` |
+| có S2 | trung vị của S0, S1, S2 (S2 kẹp vào `min(S0,S1)`..`max(S0,S1)`) | `MEDIAN_S0_S1_S2` |
+
+Ba mã `AVERAGE_S0_S2`, `AVERAGE_S1_S2`, `USE_S2_TIE` của luật trung bình cũ chỉ còn để đọc dữ liệu lịch sử (đổi luật ngày 04/11/2026).
 
 `T` lấy từ `appeal_rule_configs.variance_threshold` của cấu hình gắn với khiếu nại (mặc định 5). Làm tròn `HALF_UP`, 2 chữ số, toàn bộ `BigDecimal`.
 
