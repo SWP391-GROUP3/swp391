@@ -129,7 +129,9 @@ export default function GenrePopularityReport({ nguoiDung }) {
         <div className="bc-the-loai__card">
           <div className="bc-the-loai__card-nhan">Điểm đánh giá Bayesian chung</div>
           <div className="bc-the-loai__card-gia-tri">
-            {formatNumber(duLieu?.globalBayesianRating ?? 3.5)} / 5.0
+            {items.some((item) => (item.ratingCount ?? 0) > 0)
+              ? `${formatNumber(duLieu?.globalBayesianRating)} / 5.0`
+              : '0 / 5.0'}
           </div>
           <div className="bc-the-loai__card-phu">Hệ số chuẩn m = 10 đánh giá</div>
         </div>
@@ -203,7 +205,8 @@ export default function GenrePopularityReport({ nguoiDung }) {
                   </td>
                   <td>
                     <div className="bc-the-loai__so-chinh">
-                      {formatNumber(item.bayesianRating)} <span style={{ fontSize: '12px', color: '#667085' }}>/ 5.0</span>
+                      {formatNumber((item.ratingCount ?? 0) > 0 ? item.bayesianRating : 0)}{' '}
+                      <span style={{ fontSize: '12px', color: '#667085' }}>/ 5.0</span>
                     </div>
                     <div className="bc-the-loai__so-phu">({item.ratingCount} lượt đánh giá)</div>
                   </td>

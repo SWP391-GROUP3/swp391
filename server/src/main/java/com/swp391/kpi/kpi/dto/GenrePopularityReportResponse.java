@@ -23,6 +23,7 @@ public class GenrePopularityReportResponse {
     private long totalViews;
     private BigDecimal totalRoyaltyPaid;
     private BigDecimal globalMeanViews;
+    private long globalRatingCount;
     private BigDecimal globalBayesianRating;
 
     private List<GenrePopularityItemResponse> items;
