@@ -129,7 +129,11 @@ export default function GenrePopularityReport({ nguoiDung }) {
         <div className="bc-the-loai__card">
           <div className="bc-the-loai__card-nhan">Điểm đánh giá Bayesian chung</div>
           <div className="bc-the-loai__card-gia-tri">
-            {formatNumber(duLieu?.globalBayesianRating ?? 3.5)} / 5.0
+            {(duLieu?.globalRatingCount ?? 0) > 0
+              ? <>
+                  {formatNumber(duLieu?.globalBayesianRating)} / 5.0
+                </>
+              : '0 / 5.0'}
           </div>
           <div className="bc-the-loai__card-phu">Hệ số chuẩn m = 10 đánh giá</div>
         </div>

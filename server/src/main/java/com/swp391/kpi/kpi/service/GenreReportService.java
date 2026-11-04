@@ -220,7 +220,12 @@ public class GenreReportService {
             response.setGlobalMeanViews(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
         }
 
-        response.setGlobalBayesianRating(BigDecimal.valueOf(globalC).setScale(2, RoundingMode.HALF_UP));
+        response.setGlobalRatingCount(systemTotalRatingCount);
+        if (systemTotalRatingCount > 0) {
+            response.setGlobalBayesianRating(BigDecimal.valueOf(globalC).setScale(2, RoundingMode.HALF_UP));
+        } else {
+            response.setGlobalBayesianRating(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+        }
         response.setItems(itemResponses);
 
         return response;
