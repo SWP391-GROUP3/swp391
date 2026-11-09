@@ -10,29 +10,26 @@ import {
 
 /**
  * Màn hình Cấu hình Định mức Chuẩn (UC-58) & Giao Chỉ tiêu KPI Tháng (UC-59).
+ * Bảng hiển thị tên phóng viên + tên phòng thay cho ID số (bổ sung theo góp ý giảng viên).
  *
  * MO TRANG NAY TAI: /kpi-targets
  *
  * MUC LUC (so dong - ten - tac dung)
- *   37  MonthlyTargetSetting()          xem tom tat dau file
- *   55    useEffect                     Tai dinh muc chuan khi mo trang
- *   62    useEffect                     Tai danh sach chi tieu theo thang
- *   66    taiDanhSachChiTieu()          tai danh sach chi tieu
- *   80    moModalThemMoi()              mo modal them moi
- *   90    moModalSua()                  mo modal sua
- *  100    apDungDinhMuc()               ap dung dinh muc
- *  105    xuLyLuuForm()                 xu ly luu form
- *  142    xuLyXoa()                     xu ly xoa
+ *   32  MonthlyTargetSetting()          xem tom tat dau file
+ *   50    useEffect                     Tai dinh muc chuan khi mo trang
+ *   56    useEffect                     Tai danh sach chi tieu theo thang
+ *   60    taiDanhSachChiTieu()          tai danh sach chi tieu
+ *   74    moModalThemMoi()              mo modal them moi
+ *   84    moModalSua()                  mo modal sua
+ *   95    apDungDinhMuc()               ap dung dinh muc
+ *  100    xuLyLuuForm()                 xu ly luu form
+ *  137    xuLyXoa()                     xu ly xoa
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  164  [+ Giao chi tieu moi]           moModalThemMoi() -> tren trang: dong/xoa dang sua id, dong/xoa form reporter id, form min published
- *  202  [Tai lai]                       taiDanhSachChiTieu() -> goi GET /api/kpi-targets?year={nam}&month={thang}
- *  248  [Sua]                           moModalSua() -> tren trang: dang sua id, form reporter id, form min published
- *  255  [Xoa]                           xuLyXoa() -> hoi xac nhan; goi DELETE /api/kpi-targets/{id}, GET /api/kpi-targets?year={nam}&month={thang}
- *  277  [✕]                             tren trang: dong/xoa hien modal
- *  283  form, nut [Dang luu... / Cap nhat / Giao chi t…]  xuLyLuuForm() -> goi PUT /api/kpi-targets/{id}, POST /api/kpi-targets, GET /api/kpi-targets?year={nam}&month={thang}
- *  293  [{dm.levelName} ( {dm.defaultMinPublishe…]  apDungDinhMuc() -> tren trang: form min published, form min avg score
- *  350  [Huy]                           tren trang: dong/xoa hien modal
+ *  158  [+ Giao chi tieu moi]           moModalThemMoi()
+ *  196  [Tai lai]                       taiDanhSachChiTieu()
+ *  243  [Sua]                           moModalSua()
+ *  250  [Xoa]                           xuLyXoa()
  */
 export default function MonthlyTargetSetting({ nguoiDung }) {
   const [nam, setNam] = useState(namHienTai())
@@ -218,7 +215,8 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>ID Phóng viên</th>
+                  <th>Phóng viên</th>
+                  <th>Phòng / Ban</th>
                   <th>Kỳ đánh giá</th>
                   <th>Số bài tối thiểu</th>
                   <th>Điểm TB tối thiểu</th>
@@ -231,7 +229,12 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
                   <tr key={item.id}>
                     <td>#{item.id}</td>
                     <td>
-                      <strong>PV #{item.reporterId}</strong>
+                      {/* Hien ten thay vi ID so — backend tra ve reporterName */}
+                      <strong>{item.reporterName || `PV #${item.reporterId}`}</strong>
+                    </td>
+                    <td>
+                      {/* Ten phong/ban ma phong vien thuoc */}
+                      {item.sectionName || '—'}
                     </td>
                     <td>Tháng {item.targetMonth}/{item.targetYear}</td>
                     <td>
@@ -240,7 +243,7 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
                     <td>
                       <span className="the-diem">{item.minAvgScore} đ</span>
                     </td>
-                    <td>ID #{item.setBy}</td>
+                    <td>{item.setByName || `ID #${item.setBy}`}</td>
                     <td style={{ textAlign: 'center' }}>
                       <button
                         className="nut-thao-tac nut-sua"

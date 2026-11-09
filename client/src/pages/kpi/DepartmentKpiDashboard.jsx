@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { danhSachNam, namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { Link } from 'react-router-dom'
 import { layBangKpiBan, tongHopKpiThang } from '../../api/kpiApi.js'
+import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/DepartmentKpiDashboard.css'
 
 /**
@@ -112,7 +113,7 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
           </button>
 
           <Link
-            to="/kpi-finalization"
+            to={`/kpi-finalization?year=${nam}&month=${thang}`}
             className="bang-kpi-ban__btn-tong-hop"
             style={{ textDecoration: 'none', backgroundColor: '#e2f0d9', borderColor: '#b9e2b4', color: '#1f6f1a' }}
           >
@@ -176,7 +177,7 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
                   <td style={{ textAlign: 'center' }}>{item.minPublished}</td>
                   <td style={{ textAlign: 'center' }}>{item.minAvgScore}</td>
                   <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                    {item.actualArticles}
+                    {formatNumber(item.exactActualArticles ?? item.actualArticles)}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     {item.actualAvgScore !== null ? item.actualAvgScore : '—'}

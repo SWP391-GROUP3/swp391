@@ -24,7 +24,7 @@ public class KpiSnapshotResponse {
     private Integer reporterId;
     private Short periodYear;
     private Byte periodMonth;
-    private Integer actualArticles;
+    private BigDecimal actualArticles;
     private BigDecimal actualAvgScore;
     private KpiSnapshotStatus status;
     private String notes;

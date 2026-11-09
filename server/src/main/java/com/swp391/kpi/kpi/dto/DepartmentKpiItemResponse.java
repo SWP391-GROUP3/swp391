@@ -25,8 +25,8 @@ public class DepartmentKpiItemResponse {
     private BigDecimal minAvgScore;
 
     // Ket qua thuc te (BR-KPI-02)
-    private Integer actualArticles;
-    private BigDecimal exactActualArticles; // So thap phan chinh xac vd: 4.60 bai
+    private BigDecimal actualArticles;
+    private BigDecimal exactActualArticles; // Giu exactActualArticles de tuong thich giao dien
     private BigDecimal actualAvgScore;
 
     // Tien do hoan thanh

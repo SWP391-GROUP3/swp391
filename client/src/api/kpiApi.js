@@ -10,11 +10,11 @@
  *   53  capNhatChiTieu()                Dieu chinh chi tieu da giao (UC-59 nhanh A2) [PUT /api/kpi-targets/{id}]
  *   60  xoaChiTieu()                    Xoa chi tieu KPI. [DELETE /api/kpi-targets/{id}]
  *   67  layBangKpiBan()                 Lay du lieu bang KPI toan ban theo nam va thang (UC-61) [GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}]
- *   74  tongHopKpiThang()               Kich hoat job tong hop so lieu KPI tu dong cho ky (Automated Aggregat… [POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}]
+ *   74  tongHopKpiThang()               Kich hoat job tong hop so lieu KPI tu dong cho ky [POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}]
  *   81  layChiTietKpiPhongVien()        Lay chi tiet KPI cua mot phong vien theo chu ky thang (UC-62, UC-60) [GET /api/kpi-snapshots/reporters/{reporterId}/details?year={nam}&month={thang}]
  *   88  layBaoCaoTheLoai()              Lay bao cao muc do quan tam the loai & chi phi nhuan but (UC-64) [GET url]
- *  102  layBaoCaoSuKienXuHuong()        Lay bao cao su kien xu huong va phat hien tang dot bien (UC-65) [GET url]
- *  114  chotKpiThang()                  Chot ky KPI thang va luu snapshot bat bien (UC-66) [POST /api/kpi-snapshots/finalize]
+ * 102  layBaoCaoSuKienXuHuong()        Lay bao cao su kien xu huong va phat hien tang dot bien (UC-65) [GET url]
+ * 114  chotKpiThang()                  Chot ky KPI thang va luu snapshot bat bien (UC-66) [POST /api/kpi-snapshots/finalize]
  */
 import { goiApi } from './goiApi.js'
 
@@ -114,6 +114,3 @@ export async function layBaoCaoSuKienXuHuong(anchorDate) {
 export async function chotKpiThang(duLieu) {
   return goiApi('/api/kpi-snapshots/finalize', { method: 'POST', body: duLieu })
 }
-
-
-
