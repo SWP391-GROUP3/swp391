@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { layBangKpiBan, tongHopKpiThang, chotKpiThang } from '../../api/kpiApi.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import './MonthlyKpiFinalization.css'
@@ -24,8 +26,10 @@ import './MonthlyKpiFinalization.css'
  *  176  [🔒 Da chot ky (FINALIZED) / 🔒 Chot ky …]  xuLyChotKyKpi() -> hoi xac nhan; goi POST /api/kpi-snapshots/finalize, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
  */
 export default function MonthlyKpiFinalization({ nguoiDung }) {
-  const [nam, setNam] = useState(2026)
-  const [thang, setThang] = useState(9)
+  // Doc nam/thang tu query string neu duoc truyen tu /kpi-board (fix: dong bo ky dang xem)
+  const [searchParams] = useSearchParams()
+  const [nam, setNam] = useState(Number(searchParams.get('year')) || namHienTai())
+  const [thang, setThang] = useState(Number(searchParams.get('month')) || thangHienTai())
   const [duLieu, setDuLieu] = useState(null)
   const [ghiChuMap, setGhiChuMap] = useState({}) // reporterId -> notes
   const [dangTai, setDangTai] = useState(false)
@@ -278,7 +282,9 @@ export default function MonthlyKpiFinalization({ nguoiDung }) {
                     </div>
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    <div style={{ fontWeight: 'bold' }}>{item.actualArticles} bài</div>
+                    <div style={{ fontWeight: 'bold' }}>
+                      {formatNumber(item.exactActualArticles ?? item.actualArticles)} bài
+                    </div>
                     <div style={{ fontSize: '12px', color: 'var(--fm-chu-nhat, #707070)' }}>
                       TB: {item.actualAvgScore !== null ? `${item.actualAvgScore} đ` : '—'}
                     </div>
@@ -314,13 +320,14 @@ export default function MonthlyKpiFinalization({ nguoiDung }) {
                         {item.notes || 'Không có ghi chú.'}
                       </span>
                     ) : (
-                      <input
-                        type="text"
+                      <textarea
+                        rows={2}
                         className="chot-kpi__input-ghi-chu"
                         placeholder="Nhập nhận xét đánh giá..."
                         value={ghiChuMap[item.reporterId] || ''}
                         onChange={(e) => capNhatGhiChu(item.reporterId, e.target.value)}
                         disabled={dangXuLy}
+                        style={{ resize: 'vertical', width: '100%' }}
                       />
                     )}
                   </td>

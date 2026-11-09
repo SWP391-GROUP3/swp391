@@ -41,8 +41,8 @@ public class KpiSnapshot {
 
     private Byte periodMonth;
 
-    // So bai xuat ban quy doi theo ty le dong tac gia (>= 0)
-    private Integer actualArticles;
+    // So bai xuat ban quy doi theo ty le dong tac gia (DECIMAL(5,2), GBR-13)
+    private BigDecimal actualArticles;
 
     // Diem chat luong trung binh (thang 0-100), NULL khi chua co bai co diem
     private BigDecimal actualAvgScore;

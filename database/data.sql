@@ -307,8 +307,8 @@ INSERT INTO kpi_targets (reporter_id, target_year, target_month, min_published, 
 
 INSERT INTO kpi_snapshots (reporter_id, period_year, period_month, actual_articles, actual_avg_score,
                            status, notes, finalized_by, finalized_at) VALUES
-    (1, 2026, 8, 7, 74.50, 'FINALIZED', N'Đạt 7/8 bài, điểm TB vượt chỉ tiêu.', 5, '2026-09-01 09:00'),
-    (1, 2026, 9, 1, 77.00, 'DRAFT',     NULL,                                   NULL, NULL);
+    (1, 2026, 8, 7.00, 74.50, 'FINALIZED', N'Đạt 7/8 bài, điểm TB vượt chỉ tiêu.', 5, '2026-09-01 09:00'),
+    (1, 2026, 9, 1.70, 77.00, 'DRAFT',     NULL,                                   NULL, NULL);
 
 INSERT INTO csv_import_logs (file_name, total_records, success_records, imported_by, imported_at) VALUES
     (N'reader_2026-09-16.csv', 2, 2, 4, '2026-09-17 07:00');   -- 1

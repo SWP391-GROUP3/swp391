@@ -1,4 +1,4 @@
-﻿-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Hệ thống đánh giá chất lượng bài báo và quản lý nhuận bút
    Schema cho SQL Server 2019 trở lên. Khớp ERD tổng thể (SWP391_ERD_TongThe):
@@ -26,6 +26,8 @@
    BF03 Iter3: database/migrations/BF03_iter3_safe.sql chi ALTER CHECK.
    BF01 Iter2: database/migrations/BF01_iter2_actor_id_null.sql cho
    article_status_logs.actor_id NULL (job he thong).
+   BF05: database/migrations/BF05_actual_articles_decimal.sql cho
+   kpi_snapshots.actual_articles DECIMAL(5,2) (bai dong tac gia GBR-13).
 
    Quy ước:
    - Tên bảng/cột snake_case tiếng Anh. Spring Boot tự map
@@ -901,7 +903,7 @@ CREATE TABLE kpi_snapshots (
     reporter_id       INT             NOT NULL,
     period_year       SMALLINT        NOT NULL,
     period_month      TINYINT         NOT NULL,
-    actual_articles   INT             NOT NULL DEFAULT 0,
+    actual_articles   DECIMAL(5,2)    NOT NULL DEFAULT 0, -- Số bài quy đổi theo tỷ lệ đồng tác giả (GBR-13)
     actual_avg_score  DECIMAL(5,2)    NULL,       -- NULL khi chưa có bài nào có điểm
     status            VARCHAR(10)     NOT NULL DEFAULT 'DRAFT',
     notes             NVARCHAR(1000)  NULL,

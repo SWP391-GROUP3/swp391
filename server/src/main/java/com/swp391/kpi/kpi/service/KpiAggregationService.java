@@ -109,36 +109,10 @@ public class KpiAggregationService {
             }
         }
 
-        // 2. Lay danh sach tat ca bai viet PUBLISHED trong thang va nam tuong ung
-        LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0, 0);
-        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+        // 2. Gom nhom cac bai viet theo tung phong vien kem share_percent (BR-KPI-02)
+        Map<Integer, List<KpiCalculator.ArticleKpiItem>> reporterArticlesMap = buildReporterArticlesMap(year, month);
 
-        List<Article> allArticles = articleRepository.findAll();
-        List<Article> publishedArticlesInPeriod = new ArrayList<>();
-        for (Article a : allArticles) {
-            if (a.getStatus() == ArticleStatus.PUBLISHED && a.getPublishedAt() != null) {
-                if (!a.getPublishedAt().isBefore(startOfMonth) && !a.getPublishedAt().isAfter(endOfMonth)) {
-                    publishedArticlesInPeriod.add(a);
-                }
-            }
-        }
-
-        // 3. Gom nhom cac bai viet theo tung phong vien kem share_percent (BR-KPI-02)
-        Map<Integer, List<KpiCalculator.ArticleKpiItem>> reporterArticlesMap = new HashMap<>();
-        for (Article article : publishedArticlesInPeriod) {
-            // Diem hieu luc cua bai (BR-KPI-02, BR-QC-10): S0 da duyet hoac diem chot sau khieu nai
-            BigDecimal effectiveScore = appealEffectiveScoreService.getEffectiveScore(article.getId());
-            List<ArticleAuthor> authors = articleAuthorRepository.findByArticleIdOrderBySharePercentDesc(article.getId());
-            for (ArticleAuthor author : authors) {
-                Integer reporterId = author.getUserId();
-                BigDecimal share = author.getSharePercent() != null ? author.getSharePercent() : ONE_HUNDRED;
-
-                reporterArticlesMap.computeIfAbsent(reporterId, k -> new ArrayList<>())
-                        .add(new KpiCalculator.ArticleKpiItem(article.getId(), share, effectiveScore));
-            }
-        }
-
-        // 4. Tinh toan va luu/cap nhat snapshot
+        // 3. Tinh toan va luu/cap nhat snapshot
         List<KpiSnapshot> savedSnapshots = new ArrayList<>();
         for (User reporter : reporters) {
             Optional<KpiSnapshot> existingOpt = kpiSnapshotRepository
@@ -151,7 +125,7 @@ public class KpiAggregationService {
             }
 
             List<KpiCalculator.ArticleKpiItem> items = reporterArticlesMap.getOrDefault(reporter.getId(), Collections.emptyList());
-            int convertedArticles = kpiCalculator.calculateConvertedArticles(items);
+            BigDecimal convertedArticles = kpiCalculator.calculateConvertedArticles(items);
             BigDecimal avgScore = kpiCalculator.calculateAverageScore(items);
 
             KpiSnapshot snapshot = existingOpt.orElseGet(KpiSnapshot::new);
@@ -306,6 +280,8 @@ public class KpiAggregationService {
         response.setYear(year);
         response.setMonth(month);
 
+        Map<Integer, List<KpiCalculator.ArticleKpiItem>> reporterArticlesMap = buildReporterArticlesMap(year, month);
+
         List<DepartmentKpiItemResponse> items = new ArrayList<>();
         int passCount = 0;
         int notPassCount = 0;
@@ -327,25 +303,35 @@ public class KpiAggregationService {
             item.setMinPublished(minPublished);
             item.setMinAvgScore(minAvgScore);
 
-            // Thiet lap thuc te tu snapshot (neu co)
-            KpiSnapshot snapshot = snapshotMap.get(reporterId);
-            int actualArticles = snapshot != null ? snapshot.getActualArticles() : 0;
-            BigDecimal actualAvgScore = snapshot != null ? snapshot.getActualAvgScore() : null;
-            KpiSnapshotStatus status = snapshot != null ? snapshot.getStatus() : KpiSnapshotStatus.DRAFT;
+            // Lay danh sach bai viet thuc te quy doi exactActualArticles (BR-KPI-02)
+            List<KpiCalculator.ArticleKpiItem> kpiItems = reporterArticlesMap.getOrDefault(reporterId, Collections.emptyList());
 
-            if (status != KpiSnapshotStatus.FINALIZED) {
+            // Thiet lap thuc te: FINALIZED thi giu nguyen so da chot (BR-KPI-06); DRAFT thi tinh dong theo bai viet
+            KpiSnapshot snapshot = snapshotMap.get(reporterId);
+            KpiSnapshotStatus status = snapshot != null ? snapshot.getStatus() : KpiSnapshotStatus.DRAFT;
+            BigDecimal actualArticles;
+            BigDecimal actualAvgScore;
+
+            if (snapshot != null && status == KpiSnapshotStatus.FINALIZED) {
+                actualArticles = snapshot.getActualArticles();
+                actualAvgScore = snapshot.getActualAvgScore();
+            } else {
+                actualArticles = kpiCalculator.calculateConvertedArticles(kpiItems);
+                actualAvgScore = (snapshot != null && snapshot.getActualAvgScore() != null)
+                        ? snapshot.getActualAvgScore()
+                        : kpiCalculator.calculateAverageScore(kpiItems);
                 allFinalized = false;
             }
 
             item.setActualArticles(actualArticles);
-            item.setExactActualArticles(BigDecimal.valueOf(actualArticles).setScale(2, RoundingMode.HALF_UP));
+            item.setExactActualArticles(actualArticles);
             item.setActualAvgScore(actualAvgScore);
             item.setSnapshotStatus(status);
             item.setNotes(snapshot != null ? snapshot.getNotes() : null);
 
-            // Tinh tien do bai viet %
-            if (minPublished > 0) {
-                BigDecimal progress = BigDecimal.valueOf(actualArticles)
+            // Tinh tien do bai viet % theo actualArticles
+            if (minPublished > 0 && actualArticles != null) {
+                BigDecimal progress = actualArticles
                         .multiply(ONE_HUNDRED)
                         .divide(BigDecimal.valueOf(minPublished), 1, RoundingMode.HALF_UP);
                 item.setArticleProgressPercent(progress);
@@ -473,7 +459,7 @@ public class KpiAggregationService {
         }
 
         // 7. Tinh toan tien do va trang thai
-        int actualArticles;
+        BigDecimal actualArticles;
         BigDecimal exactActualArticles;
         BigDecimal actualAvgScore;
         KpiSnapshotStatus snapshotStatus;
@@ -484,21 +470,21 @@ public class KpiAggregationService {
         if (snapshotOpt.isPresent() && snapshotOpt.get().getStatus() == KpiSnapshotStatus.FINALIZED) {
             KpiSnapshot snap = snapshotOpt.get();
             actualArticles = snap.getActualArticles();
-            exactActualArticles = kpiCalculator.calculateExactConvertedArticles(kpiItems);
+            exactActualArticles = snap.getActualArticles();
             actualAvgScore = snap.getActualAvgScore();
             snapshotStatus = snap.getStatus();
             notes = snap.getNotes();
         } else {
             actualArticles = kpiCalculator.calculateConvertedArticles(kpiItems);
-            exactActualArticles = kpiCalculator.calculateExactConvertedArticles(kpiItems);
+            exactActualArticles = actualArticles;
             actualAvgScore = kpiCalculator.calculateAverageScore(kpiItems);
             snapshotStatus = KpiSnapshotStatus.DRAFT;
             notes = snapshotOpt.map(KpiSnapshot::getNotes).orElse(null);
         }
 
         BigDecimal progressPercent = BigDecimal.ZERO;
-        if (minPublished > 0) {
-            progressPercent = BigDecimal.valueOf(actualArticles)
+        if (minPublished > 0 && actualArticles != null) {
+            progressPercent = actualArticles
                     .multiply(ONE_HUNDRED)
                     .divide(BigDecimal.valueOf(minPublished), 1, RoundingMode.HALF_UP);
         }
@@ -529,6 +515,39 @@ public class KpiAggregationService {
     // Nguoi dung co vai tro Phong vien khong (roles.code = REPORTER)
     private static boolean isReporter(User user) {
         return user.getRole() != null && user.getRole().getCode() == RoleCode.REPORTER;
+    }
+
+    /**
+     * Gom nhom cac bai viet PUBLISHED trong ky theo phong vien kem diem hieu luc va ty le dong tac gia.
+     * Dung chung cho ca aggregateSnapshots va getDepartmentDashboard.
+     */
+    private Map<Integer, List<KpiCalculator.ArticleKpiItem>> buildReporterArticlesMap(Short year, Byte month) {
+        LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+        List<Article> allArticles = articleRepository.findAll();
+        List<Article> publishedArticlesInPeriod = new ArrayList<>();
+        for (Article a : allArticles) {
+            if (a.getStatus() == ArticleStatus.PUBLISHED && a.getPublishedAt() != null) {
+                if (!a.getPublishedAt().isBefore(startOfMonth) && !a.getPublishedAt().isAfter(endOfMonth)) {
+                    publishedArticlesInPeriod.add(a);
+                }
+            }
+        }
+
+        Map<Integer, List<KpiCalculator.ArticleKpiItem>> reporterArticlesMap = new HashMap<>();
+        for (Article article : publishedArticlesInPeriod) {
+            BigDecimal effectiveScore = appealEffectiveScoreService.getEffectiveScore(article.getId());
+            List<ArticleAuthor> authors = articleAuthorRepository.findByArticleIdOrderBySharePercentDesc(article.getId());
+            for (ArticleAuthor author : authors) {
+                Integer reporterId = author.getUserId();
+                BigDecimal share = author.getSharePercent() != null ? author.getSharePercent() : ONE_HUNDRED;
+
+                reporterArticlesMap.computeIfAbsent(reporterId, k -> new ArrayList<>())
+                        .add(new KpiCalculator.ArticleKpiItem(article.getId(), share, effectiveScore));
+            }
+        }
+        return reporterArticlesMap;
     }
 
     private void validatePeriod(Short year, Byte month) {

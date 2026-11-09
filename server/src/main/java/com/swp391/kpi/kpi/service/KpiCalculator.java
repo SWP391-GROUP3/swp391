@@ -34,11 +34,11 @@ public class KpiCalculator {
     /**
      * Tinh tong so bai viet quy doi (BR-KPI-02 & GBR-13).
      * Moi bai quy doi = sharePercent / 100 (vd: 60% = 0.6 bai, 40% = 0.4 bai).
-     * Lam tron thanh so nguyen (INT theo schema.sql actual_articles) bang HALF_UP.
+     * Luu DECIMAL(5,2) chinh xac theo schema.sql actual_articles, khong lam tron thanh int nua.
      */
-    public int calculateConvertedArticles(List<ArticleKpiItem> items) {
+    public BigDecimal calculateConvertedArticles(List<ArticleKpiItem> items) {
         if (items == null || items.isEmpty()) {
-            return 0;
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         }
 
         BigDecimal total = BigDecimal.ZERO;
@@ -48,25 +48,14 @@ public class KpiCalculator {
                 total = total.add(share);
             }
         }
-        return total.setScale(0, RoundingMode.HALF_UP).intValue();
+        return total.setScale(2, RoundingMode.HALF_UP);
     }
 
     /**
-     * Tinh tong so bai viet quy doi dang so thap phan chinh xac (dung cho hien thi Dashboard).
+     * Tinh tong so bai viet quy doi dang so thap phan chinh xac.
      */
     public BigDecimal calculateExactConvertedArticles(List<ArticleKpiItem> items) {
-        if (items == null || items.isEmpty()) {
-            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-        }
-
-        BigDecimal total = BigDecimal.ZERO;
-        for (ArticleKpiItem item : items) {
-            if (item != null && item.sharePercent() != null) {
-                BigDecimal share = item.sharePercent().divide(ONE_HUNDRED, 2, RoundingMode.HALF_UP);
-                total = total.add(share);
-            }
-        }
-        return total.setScale(2, RoundingMode.HALF_UP);
+        return calculateConvertedArticles(items);
     }
 
     /**
@@ -99,16 +88,21 @@ public class KpiCalculator {
     /**
      * Xac dinh ket qua KPI theo quy tac nhi phan PASS / NOT_PASS (BR-KPI-05).
      * PASS khi: actualArticles >= minPublished VA actualAvgScore >= minAvgScore.
-     * Nguoc lai la NOT_PASS. Cam dung xep hang A/B/C/D.
+     * So sanh tren so thap phan DECIMAL(5,2) (GBR-13 & BR-KPI-05). Cam dung xep hang A/B/C/D.
      */
-    public boolean evaluatePassStatus(int actualArticles, BigDecimal actualAvgScore,
+    public boolean evaluatePassStatus(BigDecimal actualArticles, BigDecimal actualAvgScore,
                                       int minPublished, BigDecimal minAvgScore) {
-        if (actualArticles < minPublished) {
+        if (actualArticles == null || actualArticles.compareTo(BigDecimal.valueOf(minPublished)) < 0) {
             return false;
         }
         if (actualAvgScore == null) {
             return false;
         }
         return actualAvgScore.compareTo(minAvgScore) >= 0;
+    }
+
+    public boolean evaluatePassStatus(int actualArticles, BigDecimal actualAvgScore,
+                                      int minPublished, BigDecimal minAvgScore) {
+        return evaluatePassStatus(BigDecimal.valueOf(actualArticles), actualAvgScore, minPublished, minAvgScore);
     }
 }

@@ -28,8 +28,8 @@ class KpiCalculatorTest {
                 new KpiCalculator.ArticleKpiItem(3, new BigDecimal("40.00"), new BigDecimal("75.00"))
         );
 
-        int converted = calculator.calculateConvertedArticles(items);
-        assertEquals(2, converted);
+        BigDecimal converted = calculator.calculateConvertedArticles(items);
+        assertEquals(new BigDecimal("2.00"), converted);
 
         BigDecimal exact = calculator.calculateExactConvertedArticles(items);
         assertEquals(new BigDecimal("2.00"), exact);

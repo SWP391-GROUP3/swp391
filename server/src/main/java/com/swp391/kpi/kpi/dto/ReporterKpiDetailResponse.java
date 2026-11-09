@@ -32,7 +32,7 @@ public class ReporterKpiDetailResponse {
     private BigDecimal minAvgScore;
 
     // Thuc te tich luy (kpi_snapshots hoac tinh truc tiep)
-    private Integer actualArticles;
+    private BigDecimal actualArticles;
     private BigDecimal exactActualArticles;
     private BigDecimal actualAvgScore;
     private Integer totalViews;

@@ -16,7 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Service xử lý toàn bộ logic nghiệp vụ liên quan đến chỉ tiêu KPI tháng (UC-58, UC-59).
@@ -41,13 +45,33 @@ public class KpiTargetService {
 
     /**
      * Lấy danh sách chỉ tiêu theo kỳ (năm và tháng) cho màn hình UC-59.
+     * Kèm tên phóng viên, tên phòng và tên trưởng ban giao để frontend hiển thị (không dùng ID số).
      */
     @Transactional(readOnly = true)
     public List<KpiTargetResponse> getTargetsByPeriod(Short targetYear, Byte targetMonth) {
         List<KpiTarget> targets = kpiTargetRepository.findByTargetYearAndTargetMonth(targetYear, targetMonth);
+
+        // Gom tat ca ID nguoi dung can lay ten (reporter + set_by) roi goi 1 lan duy nhat
+        Set<Integer> userIds = new HashSet<>();
+        for (KpiTarget t : targets) {
+            if (t.getReporterId() != null) userIds.add(t.getReporterId());
+            if (t.getSetBy() != null) userIds.add(t.getSetBy());
+        }
+        Map<Integer, UserAccessResponse> userMap = new HashMap<>();
+        for (UserAccessResponse u : userReadService.getUsers()) {
+            if (userIds.contains(u.id())) {
+                userMap.put(u.id(), u);
+            }
+        }
+
         List<KpiTargetResponse> result = new ArrayList<>();
         for (KpiTarget target : targets) {
-            result.add(KpiTargetResponse.from(target));
+            UserAccessResponse reporter = userMap.get(target.getReporterId());
+            UserAccessResponse setter   = userMap.get(target.getSetBy());
+            String reporterName = (reporter != null) ? reporter.fullName() : null;
+            String sectionName  = (reporter != null) ? reporter.sectionName() : null;
+            String setByName    = (setter   != null) ? setter.fullName()   : null;
+            result.add(KpiTargetResponse.from(target, reporterName, sectionName, setByName));
         }
         return result;
     }
