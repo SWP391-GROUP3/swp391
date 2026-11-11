@@ -162,7 +162,9 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
                 <th style={{ textAlign: 'center' }}>Bài thực tế</th>
                 <th style={{ textAlign: 'center' }}>Điểm TB</th>
                 <th>Tiến độ bài</th>
-                <th style={{ textAlign: 'center' }}>Trạng thái dự kiến</th>
+                <th style={{ textAlign: 'center' }}>
+                  {duLieu?.finalized ? 'Kết quả chính thức' : 'Trạng thái dự kiến'}
+                </th>
                 <th style={{ textAlign: 'center' }}>Bản ghi</th>
                 <th style={{ textAlign: 'center' }}>Thao tác</th>
               </tr>
