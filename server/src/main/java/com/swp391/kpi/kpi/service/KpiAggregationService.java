@@ -217,7 +217,7 @@ public class KpiAggregationService {
 
             // 4. Gui thong bao cho phong vien (UC-66 buoc 4, UC-67)
             String resultText = isPass ? "ĐẠT (PASS)" : "CHƯA ĐẠT (NOT_PASS)";
-            String msg = String.format("Kết quả KPI Tháng %d/%d của bạn đã được chốt chính thức: %s. Số bài quy đổi: %d, Điểm TB: %s.",
+            String msg = String.format("Kết quả KPI Tháng %d/%d của bạn đã được chốt chính thức: %s. Số bài quy đổi: %s, Điểm TB: %s.",
                     month, year, resultText, snapshot.getActualArticles(),
                     snapshot.getActualAvgScore() != null ? snapshot.getActualAvgScore() : "—");
             notificationService.notifyUser(snapshot.getReporterId(), null, msg);
