@@ -317,9 +317,7 @@ public class KpiAggregationService {
                 actualAvgScore = snapshot.getActualAvgScore();
             } else {
                 actualArticles = kpiCalculator.calculateConvertedArticles(kpiItems);
-                actualAvgScore = (snapshot != null && snapshot.getActualAvgScore() != null)
-                        ? snapshot.getActualAvgScore()
-                        : kpiCalculator.calculateAverageScore(kpiItems);
+                actualAvgScore = kpiCalculator.calculateAverageScore(kpiItems);
                 allFinalized = false;
             }
 

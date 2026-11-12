@@ -76,9 +76,9 @@ class CsvImportServiceTest {
     @Test
     void importCsv_whenValidData_insertsAndOverwritesCorrectly() {
         String csvContent = "article_id,record_date,page_views,rating_count,avg_rating\n"
-                + "10,2026-10-01,500,10,4.5\n"   // Ban ghi moi
-                + "10,2026-10-02,800,20,4.0\n"   // Ban ghi da ton tai (ghi de)
-                + "99,2026-10-01,300,5,3.0\n";    // Bai viet 99 khong ton tai (bo qua)
+                + "10,01/10/2026,500,10,4.5\n"   // Ban ghi moi (DD/MM/YYYY)
+                + "10,02/10/2026,800,20,4.0\n"   // Ban ghi da ton tai (ghi de)
+                + "99,01/10/2026,300,5,3.0\n";    // Bai viet 99 khong ton tai (bo qua)
 
         MockMultipartFile file = new MockMultipartFile("file", "readership.csv", "text/csv", csvContent.getBytes(StandardCharsets.UTF_8));
 

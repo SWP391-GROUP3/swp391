@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { namHienTai, thangHienTai } from './kyKpiMacDinh.js'
-import { layBangKpiBan, tongHopKpiThang, chotKpiThang } from '../../api/kpiApi.js'
+import { layBangKpiBan, chotKpiThang } from '../../api/kpiApi.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import './MonthlyKpiFinalization.css'
 
@@ -17,12 +17,10 @@ import './MonthlyKpiFinalization.css'
  *   26  MonthlyKpiFinalization()        xem tom tat dau file
  *   36    useEffect                     tai du lieu khi mo trang
  *   40    taiDuLieuKy()                 tai du lieu ky
- *   63    xuLyChayTongHop()             xu ly chay tong hop
  *   82    xuLyChotKyKpi()               xu ly chot ky kpi
  *  114    capNhatGhiChu()               cap nhat ghi chu
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  167  [Dang xu ly... / ⚡ Cap nhat so lieu]  xuLyChayTongHop() -> hoi xac nhan; goi POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
  *  176  [🔒 Da chot ky (FINALIZED) / 🔒 Chot ky …]  xuLyChotKyKpi() -> hoi xac nhan; goi POST /api/kpi-snapshots/finalize, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
  */
 export default function MonthlyKpiFinalization({ nguoiDung }) {
@@ -61,25 +59,6 @@ export default function MonthlyKpiFinalization({ nguoiDung }) {
       setDuLieu(null)
     } finally {
       setDangTai(false)
-    }
-  }
-
-  async function xuLyChayTongHop() {
-    if (!window.confirm(`Bạn có muốn chạy tổng hợp lại số liệu KPI mới nhất cho Tháng ${thang}/${nam}?`)) {
-      return
-    }
-
-    setDangXuLy(true)
-    setLoi('')
-    setThongBao('')
-    try {
-      await tongHopKpiThang(nam, thang)
-      setThongBao(`Đã cập nhật tổng hợp số liệu mới nhất cho Tháng ${thang}/${nam}!`)
-      await taiDuLieuKy(nam, thang)
-    } catch (err) {
-      setLoi(err.message || 'Lỗi khi tổng hợp số liệu')
-    } finally {
-      setDangXuLy(false)
     }
   }
 
@@ -164,16 +143,6 @@ export default function MonthlyKpiFinalization({ nguoiDung }) {
               </option>
             ))}
           </select>
-
-          {!daKhoa && (
-            <button
-              className="chot-kpi__btn-tong-hop"
-              onClick={xuLyChayTongHop}
-              disabled={dangXuLy || dangTai}
-            >
-              {dangXuLy ? 'Đang xử lý...' : '⚡ Cập nhật số liệu'}
-            </button>
-          )}
 
           <button
             className="chot-kpi__btn-chot"

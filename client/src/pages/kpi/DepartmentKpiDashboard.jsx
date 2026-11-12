@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { danhSachNam, namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import { Link } from 'react-router-dom'
-import { layBangKpiBan, tongHopKpiThang } from '../../api/kpiApi.js'
+import { layBangKpiBan } from '../../api/kpiApi.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import '../../styles/DepartmentKpiDashboard.css'
 
 /**
  * Man hinh Bang theo doi KPI toan ban bien tap (UC-61: View Department KPI Board).
- * Hien thi tien do thuc te, chi tieu, xet PASS/NOT_PASS theo BR-KPI-05 va cho phep chay job tong hop.
+ * Hien thi tien do thuc te, chi tieu va xet PASS/NOT_PASS theo BR-KPI-05.
  *
  * MO TRANG NAY TAI: /kpi-board
  *
@@ -15,10 +15,8 @@ import '../../styles/DepartmentKpiDashboard.css'
  *   24  DepartmentKpiDashboard()        xem tom tat dau file
  *   33    useEffect                     tai du lieu khi mo trang
  *   37    taiDuLieuDashboard()          tai du lieu dashboard
- *   51    xuLyChayTongHop()             xu ly chay tong hop
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  108  [Dang tong hop... / ⚡ Chay tong hop tu d…]  xuLyChayTongHop() -> hoi xac nhan; goi POST /api/kpi-snapshots/aggregate?year={nam}&month={thang}, GET /api/kpi-snapshots/dashboard?year={nam}&month={thang}
  *  115  link [🔒 Chot KPI thang →]      mo trang /kpi-finalization (MonthlyKpiFinalization)
  *  227  link [Chi tiet →]               mo trang /kpi-board/{item.reporterId}?year={nam}&month={thang} (ReporterKpiDetails)
  */
@@ -27,8 +25,6 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
   const [thang, setThang] = useState(thangHienTai())
   const [duLieu, setDuLieu] = useState(null)
   const [dangTai, setDangTai] = useState(false)
-  const [dangTongHop, setDangTongHop] = useState(false)
-  const [thongBao, setThongBao] = useState('')
   const [loi, setLoi] = useState('')
 
   useEffect(() => {
@@ -46,25 +42,6 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
       setDuLieu(null)
     } finally {
       setDangTai(false)
-    }
-  }
-
-  async function xuLyChayTongHop() {
-    if (!window.confirm(`Bạn có chắc chắn muốn chạy tổng hợp tự động số liệu KPI cho Tháng ${thang}/${nam}?`)) {
-      return
-    }
-
-    setDangTongHop(true)
-    setLoi('')
-    setThongBao('')
-    try {
-      await tongHopKpiThang(nam, thang)
-      setThongBao(`Đã chạy tổng hợp tự động thành công cho Tháng ${thang}/${nam}!`)
-      await taiDuLieuDashboard(nam, thang)
-    } catch (err) {
-      setLoi(err.message)
-    } finally {
-      setDangTongHop(false)
     }
   }
 
@@ -104,14 +81,6 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
             ))}
           </select>
 
-          <button
-            className="bang-kpi-ban__btn-tong-hop"
-            onClick={xuLyChayTongHop}
-            disabled={dangTongHop || dangTai}
-          >
-            {dangTongHop ? 'Đang tổng hợp...' : '⚡ Chạy tổng hợp tự động'}
-          </button>
-
           <Link
             to={`/kpi-finalization?year=${nam}&month=${thang}`}
             className="bang-kpi-ban__btn-tong-hop"
@@ -123,7 +92,6 @@ export default function DepartmentKpiDashboard({ nguoiDung }) {
       </div>
 
       {/* Thông báo */}
-      {thongBao && <div className="bang-kpi-ban__thong-bao-thanh-cong">{thongBao}</div>}
       {loi && <div className="bang-kpi-ban__thong-bao-loi">{loi}</div>}
 
       {/* Thẻ thống kê */}
