@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
  * Luat hien tai:
  * - POST /api/auth/login: ai cung goi duoc (chua co token thi moi can dang nhap)
  * - BF-04: them don gia = Ke toan, sua he so anh/video = Admin, xem ky nhuan but = Thu ky + Ke toan,
- *   cham nhuan but = Thu ky
+ *   cham nhuan but = Thu ky, quan ly su kien bao hoa = Thu ky (rieng GET /api/events/open: ai dang nhap cung goi duoc)
  * - BF-01: tao / sua / nop bai (POST, PUT /api/articles/**) = Phong vien
  * - Admin: xem / tao / khoa / mo khoa tai khoan (/api/users, /api/users/{id}/lock|unlock)
  * - moi API con lai: phai gui header "Authorization: Bearer <token>" hop le
@@ -46,9 +46,9 @@ import java.nio.charset.StandardCharsets;
  *  ---- Ham public (controller / luong khac goi) ----
  *   65  securityFilterChain()           security filter chain
  *  ---- Ham phu (private, chi dung trong file) ----
- *  131  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
- *  144  convertActiveUser()             Tai khoan da bi khoa thi tu choi token (401), con hoat dong thi doi token thanh nguoi dang dang nhap
- *  153  writeError()                  Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
+ *  135  jwtAuthenticationConverter()   Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
+ *  148  convertActiveUser()           Tai khoan da bi khoa thi tu choi token (401), con hoat dong thi doi token thanh nguoi dang dang nhap
+ *  157  writeError()                Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
  */
 @Configuration
 @RequiredArgsConstructor
@@ -90,6 +90,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/royalty-payments/**").hasRole("ACCOUNTANT")
                         // BF-04: cham nhuan but chi Thu ky toa soan (UC-46, 47, 48)
                         .requestMatchers("/api/royalty-gradings/**").hasRole("EDITORIAL_SECRETARY")
+                        // BF-04: quan ly su kien bao hoa (xem tat ca, tao, sua, bat/tat) chi Thu ky toa soan.
+                        // /api/events/open (o chon su kien luc PV nop bai) phai dat TRUOC de moi vai tro van goi duoc.
+                        .requestMatchers(HttpMethod.GET, "/api/events/open").authenticated()
+                        .requestMatchers("/api/events/**").hasRole("EDITORIAL_SECRETARY")
                         // BF-05: dinh muc chuan KPI (UC-58): Truong ban va Admin. Phai dat TRUOC /api/kpi-targets/**
                         .requestMatchers("/api/kpi-targets/benchmarks/**").hasAnyRole("HEAD_OF_DEPARTMENT", "ADMIN")
                         // BF-05: dat chi tieu thang (UC-59), bang KPI ban + tong hop (UC-61), bao cao the loai (UC-64): Truong ban

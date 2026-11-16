@@ -211,9 +211,9 @@ function AccountantReviewCard({ period, onDone }) {
         <label className="royalty__field royalty__review-note">
           Lý do trả lại (bắt buộc khi trả kỳ)
           <textarea className="royalty__input royalty__input--full royalty__textarea" rows={3}
-                    maxLength={RETURN_NOTE_MAX} value={note} disabled={isWorking}
-                    onChange={(event) => setNote(event.target.value)}
-                    placeholder="Vd: Bài 5 sai tỷ lệ đồng tác giả" />
+                    maxLength={RETURN_NOTE_MAX} value={note}
+                    disabled={isWorking}
+                    onChange={(event) => setNote(event.target.value)} />
         </label>
         <div className="royalty__actions">
           <button type="button" className="nut-phu" onClick={handleReturn} disabled={isWorking}>

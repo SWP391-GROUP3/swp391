@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,8 @@ public class CsvImportService {
     private final ReaderInteractionRepository readerInteractionRepository;
     private final ArticleRepository articleRepository;
     private final UserReadService userReadService;
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /**
      * Nhap so lieu doc gia tu file CSV (UC-63, BR-KPI-03).
@@ -147,12 +150,12 @@ public class CsvImportService {
 
             try {
                 articleId = Integer.valueOf(parts[articleCol].trim());
-                recordDate = LocalDate.parse(parts[dateCol].trim());
+                recordDate = LocalDate.parse(parts[dateCol].trim(), DATE_FORMATTER);
                 pageViews = Integer.parseInt(parts[viewsCol].trim());
                 ratingCount = Integer.parseInt(parts[countCol].trim());
                 avgRating = new BigDecimal(parts[avgCol].trim());
             } catch (DateTimeParseException | NumberFormatException ex) {
-                warnings.add("Dòng " + (rowIdx + 1) + ": Dữ liệu không đúng định dạng số/ngày (YYYY-MM-DD), bỏ qua.");
+                warnings.add("Dòng " + (rowIdx + 1) + ": Dữ liệu không đúng định dạng số/ngày (DD/MM/YYYY), bỏ qua.");
                 skippedRecords++;
                 continue;
             }
@@ -249,13 +252,13 @@ public class CsvImportService {
     }
 
     /**
-     * Mau CSV chuan de nguoi dung tai ve tham khao.
+     * Mau CSV chuan de nguoi dung tai ve tham khao (dinh dang DD/MM/YYYY).
      */
     public String getSampleCsvTemplate() {
         return "article_id,record_date,page_views,rating_count,avg_rating\n"
-                + "1,2026-10-01,1520,15,4.6\n"
-                + "2,2026-10-01,840,8,4.2\n"
-                + "3,2026-10-02,2300,30,4.8\n";
+                + "5,15/10/2026,1520,15,4.6\n"
+                + "5,16/10/2026,840,8,4.2\n"
+                + "1,15/09/2026,2300,30,4.8\n";
     }
 
     /**
