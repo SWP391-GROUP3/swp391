@@ -190,7 +190,7 @@ export default function ReaderDataImport() {
             <strong>Quy tắc nghiệp vụ CSV (BR-KPI-03, BR-KPI-04):</strong>
             <ul>
               <li>
-                File CSV yêu cầu 5 cột bắt buộc: <code>article_id, record_date, page_views, rating_count, avg_rating</code>.
+                File CSV yêu cầu 5 cột bắt buộc: <code>article_id, record_date, page_views, rating_count, avg_rating</code> (định dạng ngày: <strong>DD/MM/YYYY</strong>, ví dụ: 15/10/2026).
               </li>
               <li>
                 Nếu trùng cặp <code>(article_id, record_date)</code>, hệ thống sẽ tự động cập nhật ghi đè bản ghi cũ.
