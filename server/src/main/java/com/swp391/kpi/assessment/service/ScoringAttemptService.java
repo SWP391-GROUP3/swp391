@@ -516,6 +516,22 @@ public class ScoringAttemptService {
         ScoringDecision decision = request.getDecision();
         String decisionNote = request.getDecisionNote() != null ? request.getDecisionNote().trim() : null;
 
+        // BR-SC-06 & UC-26: Kiểm tra tất cả tiêu chí đã được cho điểm và tiêu chí < 50 phải có nhận xét
+        List<ScoringAttemptDetail> currentDetails = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
+        if (currentDetails.isEmpty()) {
+            throw new BusinessException("Phiếu chấm chưa có danh sách tiêu chí nào!");
+        }
+        for (ScoringAttemptDetail d : currentDetails) {
+            if (d.getScore() == null) {
+                throw new BusinessException("Tiêu chí '" + d.getCriterion().getName() + "' chưa được cho điểm!");
+            }
+            if (decision == ScoringDecision.ACCEPT && d.getScore().compareTo(BigDecimal.valueOf(50)) < 0) {
+                if (d.getComment() == null || d.getComment().trim().isEmpty()) {
+                    throw new BusinessException("Tiêu chí '" + d.getCriterion().getName() + "' đạt dưới 50 điểm (" + d.getScore() + ") bắt buộc phải nhập nhận xét lý do trước khi nộp!");
+                }
+            }
+        }
+
         if (decision == ScoringDecision.ACCEPT) {
             // UC-26: Phai co tong diem hop le
             if (attempt.getTotalScore() == null) {
@@ -543,7 +559,6 @@ public class ScoringAttemptService {
 
         // Tinh tong diem neu chua co de thoa man check constraint ck_scoring_attempts_submitted
         if (attempt.getTotalScore() == null) {
-            List<ScoringAttemptDetail> currentDetails = scoringAttemptDetailRepository.findByScoringAttemptId(attempt.getId());
             BigDecimal total = BigDecimal.ZERO;
             if (currentDetails != null && !currentDetails.isEmpty()) {
                 for (ScoringAttemptDetail d : currentDetails) {

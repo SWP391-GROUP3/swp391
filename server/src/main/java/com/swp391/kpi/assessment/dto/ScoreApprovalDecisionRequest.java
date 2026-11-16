@@ -1,5 +1,6 @@
 package com.swp391.kpi.assessment.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ScoreApprovalDecisionRequest {
 
+    @NotBlank(message = "Lý do yêu cầu chấm lại không được để trống")
     @Size(max = 1000, message = "Lý do không được vượt quá 1000 ký tự")
     private String reason;
 }

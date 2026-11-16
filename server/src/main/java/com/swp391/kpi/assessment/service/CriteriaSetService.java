@@ -160,6 +160,23 @@ public class CriteriaSetService {
             throw new BusinessException("Không thể kích hoạt lại phiên bản đã bị ngưng áp dụng (RETIRED)");
         }
 
+        // BR-SC-01: Kiểm tra lại các tiêu chí và tổng trọng số trước khi kích hoạt
+        List<Criteria> criteriaToCheck = criteriaRepository
+                .findByCriteriaSetVersionIdOrderBySortOrderAsc(versionToActivate.getId());
+        if (criteriaToCheck == null || criteriaToCheck.isEmpty()) {
+            throw new BusinessException("Bộ tiêu chí phải có ít nhất 1 tiêu chí thành phần trước khi kích hoạt");
+        }
+        BigDecimal checkWeight = BigDecimal.ZERO;
+        for (Criteria c : criteriaToCheck) {
+            if (c.getWeight() == null || c.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException("Mỗi tiêu chí phải có trọng số lớn hơn 0%");
+            }
+            checkWeight = checkWeight.add(c.getWeight());
+        }
+        if (checkWeight.compareTo(new BigDecimal("100.00")) != 0) {
+            throw new BusinessException("Tổng trọng số của bộ tiêu chí phải đúng 100.00% mới được kích hoạt (Hiện tại: " + checkWeight + "%)");
+        }
+
         // Chuyển phiên bản ACTIVE cũ thành RETIRED (nếu có)
         // Bắt buộc dùng saveAndFlush để ghi ngay trạng thái RETIRED xuống Database,
         // tránh vi phạm Unique Filtered Index 'uq_criteria_set_versions_active' khi
