@@ -18,7 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -131,5 +133,22 @@ class AuthServiceTest {
 
         // Khong biet mat khau thi chi nhan cau chung, khong biet tai khoan bi khoa
         assertEquals(AuthService.WRONG_LOGIN_MESSAGE, ex.getMessage());
+    }
+
+    // ---------- isActiveUser (SecurityConfig hoi o moi request co token) ----------
+
+    @Test
+    void isActiveUserReturnsTrueForActiveAccount() {
+        when(userRepository.existsByIdAndStatus(1, UserStatus.ACTIVE)).thenReturn(true);
+
+        assertTrue(authService.isActiveUser(1));
+    }
+
+    @Test
+    void isActiveUserReturnsFalseForLockedOrMissingAccount() {
+        // tai khoan bi khoa hoac khong con trong DB: khong co dong nao "id = ? AND status = ACTIVE"
+        when(userRepository.existsByIdAndStatus(1, UserStatus.ACTIVE)).thenReturn(false);
+
+        assertFalse(authService.isActiveUser(1));
     }
 }
