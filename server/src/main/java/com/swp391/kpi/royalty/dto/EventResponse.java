@@ -8,12 +8,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * 1 su kien tra ve cho o chon su kien cua BF-01 (BR-IN-03).
+ * 1 su kien tra ve cho o chon su kien cua BF-01 (BR-IN-03) va cho man quan ly su kien cua Thu ky.
  * windowDays, articlesPerLevel de BF-01 dem hang cua bai; exemptScore de biet muc diem duoc mien giam (GBR-09).
  *
  * MUC LUC (so dong - ten - tac dung)
  *   22  field                           cac truong tra ve cho giao dien
- *   32  from()                          Map tay entity -> DTO (AGENTS.md muc 3.4)
+ *   33  from()                          Map tay entity -> DTO (AGENTS.md muc 3.4)
  */
 @Getter
 @Setter
@@ -27,6 +27,7 @@ public class EventResponse {
     private Integer articlesPerLevel; // = events.k_limit: so bai moi bac bao hoa (dat ten khac vi
                                       //   getter cua "kLimit" bi Jackson doi thanh "klimit")
     private BigDecimal exemptScore;   // diem >= muc nay thi mien giam
+    private Boolean active;           // = events.is_active: Thu ky tat thi PV khong chon duoc su kien nay
 
     // Map tay entity -> DTO (AGENTS.md muc 3.4)
     public static EventResponse from(Event event) {
@@ -38,6 +39,7 @@ public class EventResponse {
         response.setWindowDays(event.getWindowDays());
         response.setArticlesPerLevel(event.getKLimit());
         response.setExemptScore(event.getExemptScore());
+        response.setActive(event.getIsActive());
         return response;
     }
 }
