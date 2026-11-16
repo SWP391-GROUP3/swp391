@@ -12,6 +12,20 @@
       "runtimeExecutable": "mvn",
       "runtimeArgs": ["-f", "server/pom.xml", "spring-boot:run"],
       "port": 8080
+    },
+    {
+      "name": "server-8081",
+      "runtimeExecutable": "mvn",
+      "runtimeArgs": ["-f", "server/pom.xml", "spring-boot:run", "-Dspring-boot.run.arguments=--server.port=8081"],
+      "port": 8081,
+      "autoPort": false
+    },
+    {
+      "name": "server-demo-db",
+      "runtimeExecutable": "mvn",
+      "runtimeArgs": ["-f", "server/pom.xml", "spring-boot:run",
+        "-Dspring-boot.run.arguments=--spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=swp391_kpi_demo;encrypt=true;trustServerCertificate=true"],
+      "port": 8080
     }
   ]
 }

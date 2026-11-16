@@ -18,9 +18,10 @@ import java.util.Optional;
  * vi server khong luu phien (STATELESS).
  *
  * MUC LUC (so dong - ten - tac dung)
- *   31  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   34  field                           repository / service duoc inject
- *   39  login()                         dang nhap
+ *   32  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   35  field                           repository / service duoc inject
+ *   40  login()                         dang nhap
+ *   69  isActiveUser()                  tai khoan con ACTIVE khong (SecurityConfig hoi o moi request co token)
  */
 @Service
 @RequiredArgsConstructor
@@ -60,5 +61,12 @@ public class AuthService {
         // 4. Tao token, tra kem thong tin user
         String token = tokenService.createToken(user);
         return LoginResponse.from(user, token);
+    }
+
+    // Token song 8 tieng, nen Admin khoa tai khoan xong thi token cu van con han.
+    // SecurityConfig goi ham nay o MOI request co token: tai khoan da bi khoa (hoac khong con) -> false.
+    @Transactional(readOnly = true)
+    public boolean isActiveUser(Integer userId) {
+        return userRepository.existsByIdAndStatus(userId, UserStatus.ACTIVE);
     }
 }

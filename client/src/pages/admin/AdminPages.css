@@ -3,9 +3,10 @@
    Tien to class: .trang-qt__ (AGENTS.md muc 4). Mau chi dung bien --fm-*.
 
    MUC LUC (so dong - khoi CSS)
-     11  tieu de, bo cuc dau trang
-     48  Form tham so
-     76  man hinh hep (@media)
+     12  tieu de, bo cuc dau trang
+     49  Form tham so
+     77  Man Tai khoan: nut tao, form tao tai khoan
+     93  man hinh hep (@media)
    =========================================================================== */
 
 .trang-qt__header {
@@ -71,6 +72,22 @@
   display: flex;
   gap: 8px;
   margin-top: 20px;
+}
+
+/* ---- Man Tai khoan: nut "Tao tai khoan" canh tieu de, form tao nam tren bang ---- */
+.trang-qt__header--co-nut {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.trang-qt__tao-tk {
+  margin-bottom: 16px;
+}
+
+.trang-qt__tao-tk .o-nhap {
+  width: 100%;
 }
 
 @media (max-width: 760px) {
