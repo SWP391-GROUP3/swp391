@@ -2,16 +2,21 @@ package com.swp391.kpi.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swp391.kpi.common.dto.ApiResponse;
+import com.swp391.kpi.common.service.AuthService;
 import com.swp391.kpi.common.service.TokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,17 +35,20 @@ import java.nio.charset.StandardCharsets;
  * - BF-04: them don gia = Ke toan, sua he so anh/video = Admin, xem ky nhuan but = Thu ky + Ke toan,
  *   cham nhuan but = Thu ky
  * - BF-01: tao / sua / nop bai (POST, PUT /api/articles/**) = Phong vien
+ * - Admin: xem / tao / khoa / mo khoa tai khoan (/api/users, /api/users/{id}/lock|unlock)
  * - moi API con lai: phai gui header "Authorization: Bearer <token>" hop le
+ * - token con han nhung tai khoan da bi khoa -> 401 ngay o request ke tiep (convertActiveUser)
  * Chan theo vai tro (vd chi Ke toan them don gia) -> them .requestMatchers(...).hasRole(...)
  *
  * MUC LUC (so dong - ten - tac dung)
- *   49  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
- *   52  field                           cac truong du lieu
+ *   57  hang so                         ten tham so, gioi han... (khong viet so ma trong code)
+ *   61  field                           cac truong du lieu
  *  ---- Ham public (controller / luong khac goi) ----
- *   55  securityFilterChain()           security filter chain
+ *   65  securityFilterChain()           security filter chain
  *  ---- Ham phu (private, chi dung trong file) ----
- *  116  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
- *  127  writeError()                    Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
+ *  131  jwtAuthenticationConverter()    Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER", nho vay viet duoc .hasRole("REPORTER") khi…
+ *  144  convertActiveUser()             Tai khoan da bi khoa thi tu choi token (401), con hoat dong thi doi token thanh nguoi dang dang nhap
+ *  153  writeError()                  Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler
  */
 @Configuration
 @RequiredArgsConstructor
@@ -48,8 +56,10 @@ public class SecurityConfig {
 
     private static final String NOT_LOGGED_IN_MESSAGE = "Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn.";
     private static final String FORBIDDEN_MESSAGE = "Bạn không có quyền thực hiện chức năng này.";
+    private static final String LOCKED_ACCOUNT_MESSAGE = "Tài khoản đã bị khoá.";
 
     private final ObjectMapper objectMapper;   // Spring Boot tao san, dung de doi ApiResponse -> JSON
+    private final AuthService authService;     // hoi tai khoan con hoat dong khong o moi request co token
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -92,6 +102,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/reader-imports/**").hasRole("ADMIN")
                         // Admin: xem / sua tham so nhap bai cua BF-01 (UC-13)
                         .requestMatchers("/api/system-parameters/**").hasRole("ADMIN")
+                        // Admin: xem / tao / khoa / mo khoa tai khoan. Chi khop dung "/api/users" va
+                        // "/api/users/{id}/lock|unlock" -> /api/users/me (ho so ca nhan) van cho moi vai tro.
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*/lock", "/api/users/*/unlock").hasRole("ADMIN")
                         // BF-01: chi Phong vien tao / sua / nop / rut bai, xac nhan dong tac gia (UC-03, 05, 10, 11, 12).
                         // GET de nguyen vi luong khac cung doc qua /api/articles (vd BF-03 appeal-eligibility).
                         .requestMatchers(HttpMethod.POST, "/api/articles/**").hasRole("REPORTER")
@@ -113,14 +128,25 @@ public class SecurityConfig {
 
     // Claim "role" trong token (vd "REPORTER") -> quyen "ROLE_REPORTER",
     // nho vay viet duoc .hasRole("REPORTER") khi can chan theo vai tro.
-    private JwtAuthenticationConverter jwtAuthenticationConverter() {
+    private Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter roleConverter = new JwtGrantedAuthoritiesConverter();
         roleConverter.setAuthoritiesClaimName(TokenService.ROLE_CLAIM);
         roleConverter.setAuthorityPrefix("ROLE_");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(roleConverter);
-        return converter;
+        // Truoc khi doi token thanh "nguoi dang dang nhap" thi kiem tai khoan con hoat dong khong
+        return jwt -> convertActiveUser(converter, jwt);
+    }
+
+    // Token con han nhung tai khoan da bi Admin khoa (hoac khong con) -> tu choi nhu chua dang nhap (401).
+    // LockedException la loi dang nhap cua Spring Security, tu dong di vao authenticationEntryPoint ben tren.
+    private AbstractAuthenticationToken convertActiveUser(JwtAuthenticationConverter converter, Jwt jwt) {
+        Integer userId = Integer.valueOf(jwt.getSubject());
+        if (!authService.isActiveUser(userId)) {
+            throw new LockedException(LOCKED_ACCOUNT_MESSAGE);
+        }
+        return converter.convert(jwt);
     }
 
     // Ghi loi ra response dang { success: false, message: "..." } giong GlobalExceptionHandler

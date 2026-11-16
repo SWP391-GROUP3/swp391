@@ -2,6 +2,7 @@ package com.swp391.kpi.exception;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,6 +75,35 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void emptyFieldBreakingTwoRulesAlwaysReportsRequiredMessage() throws Exception {
+        // username rong vi pham ca @NotBlank lan @Pattern -> luon lay cau "khong duoc de trong"
+        mockMvc.perform(post("/fake/validate-username")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.username").value("Tên đăng nhập không được để trống"));
+    }
+
+    @Test
+    void returns400WhenPathValueHasWrongType() throws Exception {
+        mockMvc.perform(get("/fake/items/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Tham số trên đường dẫn không hợp lệ."));
+    }
+
+    @Test
+    void returns400WhenBodyIsNotReadableJson() throws Exception {
+        mockMvc.perform(post("/fake/validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message")
+                        .value("Dữ liệu gửi lên không đọc được (sai định dạng JSON hoặc sai kiểu dữ liệu)."));
+    }
+
+    @Test
     void returns400WhenCalculatorRejectsInput() throws Exception {
         mockMvc.perform(get("/fake/illegal-argument"))
                 .andExpect(status().isBadRequest())
@@ -122,6 +153,25 @@ class GlobalExceptionHandlerTest {
         public String validate(@Valid @RequestBody FakeRequest request) {
             return "ok";
         }
+
+        @PostMapping("/validate-username")
+        public String validateUsername(@Valid @RequestBody FakeUsernameRequest request) {
+            return "ok";
+        }
+
+        @GetMapping("/items/{id}")
+        public String item(@PathVariable Integer id) {
+            return "ok";
+        }
+    }
+
+    // Request DTO gia: 1 o co 2 luat, de rong thi vi pham ca 2
+    @Getter
+    @Setter
+    public static class FakeUsernameRequest {
+        @NotBlank(message = "Tên đăng nhập không được để trống")
+        @Pattern(regexp = "^[a-z]+$", message = "Tên đăng nhập chỉ gồm chữ thường")
+        private String username;
     }
 
     // Request DTO gia de thu @Valid
