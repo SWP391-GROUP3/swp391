@@ -2,22 +2,27 @@
  * API cua luong royalty (BF-04). Goi qua goiApi(): tu gan token, tu bao loi tieng Viet.
  *
  * MUC LUC (so dong - ten - tac dung)
- *   29  getRoyaltyRates()               UC-55: tat ca phien ban don gia nhuan but (royalty_rates), moi nhat t… [GET /api/royalty-rates]
- *   37  createRoyaltyRate()             UC-55: them don gia moi [POST /api/royalty-rates]
- *   42  getMediaFactors()               UC-56: he so cua tung loai anh/video [GET /api/media-factors]
- *   47  updateMediaFactor()             UC-56: Admin sua he so 1 loai anh/video [PUT /api/media-factors/{id}]
- *   56  getRoyaltyPeriods()             UC-49: cac ky nhuan but, ky moi nhat truoc [GET /api/royalty-periods]
- *   66  getPendingGradings()            UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han ch… [GET /api/royalty-gradings/pending]
- *   75  previewRoyaltyGrading()         UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu [GET /api/royalty-gradings/preview?articleId={encodeURIComponentarticleId}]
- *   85  completeRoyaltyGrading()        UC-47 buoc 5: Thu ky bam Hoan tat -> luu phieu, anh/video, dong tien … [POST /api/royalty-gradings]
- *   95  getRoyaltyPeriodDetail()        UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNot… [GET /api/royalty-periods/{periodId}]
- *  100  closeRoyaltyPeriod()            UC-50: Thu ky chot ky OPEN -> CLOSED [POST /api/royalty-periods/{periodId}/close]
- *  105  returnRoyaltyPeriod()           UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do (… [POST /api/royalty-periods/{periodId}/return]
- *  110  lockRoyaltyPeriod()             UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho m… [POST /api/royalty-periods/{periodId}/lock]
- *  119  getRoyaltyPayments()            UC-54: phieu chi cua tung nguoi trong 1 ky (ky da khoa moi co phieu) [GET /api/royalty-payments?periodId={encodeURIComponentperiodId}]
- *  124  recordRoyaltyPayment()          UC-54: Ke toan ghi nhan da chi 1 phieu [POST /api/royalty-payments/{paymentId}/pay]
- *  135  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap, moi ky 1 dong, ky moi nhat… [GET /api/royalty-payments/me]
- *  144  getUnpaidRoyaltyTotal()         Chip vi o khung Phong vien: tong nhuan but CHUA NHAN
+ *   34  getRoyaltyRates()               UC-55: tat ca phien ban don gia nhuan but (royalty_rates), moi nhat t… [GET /api/royalty-rates]
+ *   42  createRoyaltyRate()             UC-55: them don gia moi [POST /api/royalty-rates]
+ *   47  getMediaFactors()               UC-56: he so cua tung loai anh/video [GET /api/media-factors]
+ *   52  updateMediaFactor()             UC-56: Admin sua he so 1 loai anh/video [PUT /api/media-factors/{id}]
+ *   61  getRoyaltyPeriods()             UC-49: cac ky nhuan but, ky moi nhat truoc [GET /api/royalty-periods]
+ *   71  getPendingGradings()            UC-46: bai da dang chua cham nhuan but, bai dang som nhat (gan han ch… [GET /api/royalty-gradings/pending]
+ *   80  previewRoyaltyGrading()         UC-47, 48: tinh truoc he so va tien cua 1 bai, CHUA luu [GET /api/royalty-gradings/preview?articleId={encodeURIComponentarticleId}]
+ *   90  completeRoyaltyGrading()        UC-47 buoc 5: Thu ky bam Hoan tat -> luu phieu, anh/video, dong tien … [POST /api/royalty-gradings]
+ *  100  getRoyaltyPeriodDetail()        UC-50: bang ke 1 ky. { id, periodYear, periodMonth, status, returnNot… [GET /api/royalty-periods/{periodId}]
+ *  105  closeRoyaltyPeriod()            UC-50: Thu ky chot ky OPEN -> CLOSED [POST /api/royalty-periods/{periodId}/close]
+ *  110  returnRoyaltyPeriod()           UC-52: Ke toan tra ky CLOSED ve OPEN cho Thu ky sua, bat buoc ly do (… [POST /api/royalty-periods/{periodId}/return]
+ *  115  lockRoyaltyPeriod()             UC-53: Ke toan khoa ky CLOSED -> LOCKED, server tao 1 phieu chi cho m… [POST /api/royalty-periods/{periodId}/lock]
+ *  124  getRoyaltyPayments()            UC-54: phieu chi cua tung nguoi trong 1 ky (ky da khoa moi co phieu) [GET /api/royalty-payments?periodId={encodeURIComponentperiodId}]
+ *  129  recordRoyaltyPayment()          UC-54: Ke toan ghi nhan da chi 1 phieu [POST /api/royalty-payments/{paymentId}/pay]
+ *  140  getMyRoyalties()                UC-57: nhuan but cua nguoi dang dang nhap, moi ky 1 dong, ky moi nhat… [GET /api/royalty-payments/me]
+ *  149  getUnpaidRoyaltyTotal()         Chip vi o khung Phong vien: tong nhuan but CHUA NHAN
+ *  169  getEvents()                     Su kien bao hoa: tat ca su kien, moi nhat truoc [GET /api/events]
+ *  178  createEvent()                   Thu ky tao su kien moi [POST /api/events]
+ *  183  updateEvent()                   Thu ky sua su kien [PUT /api/events/{id}]
+ *  188  setEventActive()                Thu ky bat / tat su kien [POST /api/events/{id}/activate|deactivate]
+ *  193  deleteEvent()                   Thu ky xoa su kien chua co bai gan vao [DELETE /api/events/{id}]
  */
 import { goiApi } from './goiApi.js'
 
@@ -154,4 +159,37 @@ export async function getUnpaidRoyaltyTotal() {
     }
   }
   return total
+}
+
+/**
+ * Quan ly su kien bao hoa (Thu ky): tat ca su kien, moi nhat truoc.
+ * Moi dong: { id, name, startDate: "2026-10-25", endDate, windowDays, articlesPerLevel,
+ *             exemptScore, active }.
+ */
+export async function getEvents() {
+  return goiApi('/api/events')
+}
+
+/**
+ * Thu ky tao su kien moi.
+ * @param {{ name: string, startDate: string, endDate: string, windowDays: number,
+ *           articlesPerLevel: number, exemptScore: number }} event ngay dang "2026-12-01"
+ */
+export async function createEvent(event) {
+  return goiApi('/api/events', { method: 'POST', body: event })
+}
+
+/** Thu ky sua su kien (cung 6 truong voi createEvent). Su kien da bat dau chi sua duoc ten va ngay ket thuc. */
+export async function updateEvent(id, event) {
+  return goiApi(`/api/events/${id}`, { method: 'PUT', body: event })
+}
+
+/** Thu ky bat (active = true) hoac tat (false) su kien. Tat thi PV khong chon duoc su kien nay nua. */
+export async function setEventActive(id, active) {
+  return goiApi(`/api/events/${id}/${active ? 'activate' : 'deactivate'}`, { method: 'POST' })
+}
+
+/** Thu ky xoa su kien tao nham. Su kien da co bai gan vao thi server tu choi (409), khi do chi tat duoc. */
+export async function deleteEvent(id) {
+  return goiApi(`/api/events/${id}`, { method: 'DELETE' })
 }

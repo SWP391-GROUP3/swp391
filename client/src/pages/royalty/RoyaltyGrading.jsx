@@ -129,9 +129,9 @@ export default function RoyaltyGrading() {
               <label className="royalty__field royalty__total-field">
                 Lý do chấm lại (bắt buộc)
                 <textarea className="royalty__input royalty__input--full royalty__textarea" rows={3}
-                          maxLength={RECALC_REASON_MAX} value={recalcReason} disabled={isSaving}
-                          onChange={(event) => setRecalcReason(event.target.value)}
-                          placeholder="Vd: Kế toán trả kỳ vì sai tỷ lệ đồng tác giả" />
+                          maxLength={RECALC_REASON_MAX} value={recalcReason}
+                          disabled={isSaving}
+                          onChange={(event) => setRecalcReason(event.target.value)} />
               </label>
             )}
 

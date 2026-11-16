@@ -96,11 +96,11 @@ export default function RoyaltyRates() {
           <label className="royalty__field">
             Lương cơ sở (đồng)
             <input
-              type="number" min="1" step="1" inputMode="numeric"
+              type="number" min="1" step="1"
+              inputMode="numeric"
               className="royalty__input"
               value={baseSalary}
               onChange={(event) => setBaseSalary(event.target.value)}
-              placeholder="vd 2500000"
               required
             />
           </label>
