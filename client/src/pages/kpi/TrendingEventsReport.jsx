@@ -4,6 +4,7 @@ import { formatNumber } from '../../utils/formatNumber.js'
 import { formatDate } from '../../utils/formatDate.js'
 import './TrendingEventsReport.css'
 
+
 /**
  * Man hinh Bao cao su kien xu huong & phat hien tang dot bien (UC-65: View Trending Events Report).
  * Danh cho Truong ban bien tap (Head of Editorial Department) theo doi luu luong doc gia
@@ -20,6 +21,25 @@ import './TrendingEventsReport.css'
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
  *  114  [Dang tai... / Lam moi]         taiDuLieuBaoCao() -> goi GET url
  */
+const NHAN_TRANG_THAI_SU_KIEN = {
+  NOT_STARTED: '○ Chưa bắt đầu',
+  ONGOING: '● Đang diễn ra',
+  ENDED: '○ Đã kết thúc',
+  DISABLED: '○ Đã tắt',
+}
+function layNgayHienTai() {
+  const homNay = new Date()
+  const thang = String(homNay.getMonth() + 1).padStart(2, '0')
+  const ngay = String(homNay.getDate()).padStart(2, '0')
+  return `${homNay.getFullYear()}-${thang}-${ngay}`
+}
+
+function layMaTrangThaiSuKien(item, homNay) {
+  if (!item.isActive) return 'DISABLED'
+  if (item.startDate > homNay) return 'NOT_STARTED'
+  if (item.endDate < homNay) return 'ENDED'
+  return 'ONGOING'
+}
 export default function TrendingEventsReport({ nguoiDung }) {
   const [ngayMoc, setNgayMoc] = useState('')
   const [tuKhoa, setTuKhoa] = useState('')
@@ -48,7 +68,7 @@ export default function TrendingEventsReport({ nguoiDung }) {
       setDangTai(false)
     }
   }
-
+  const homNay = layNgayHienTai()
   const items = duLieu?.items || []
   const danhSachLoc = items.filter((item) => {
     // Loc theo tu khoa
@@ -197,10 +217,12 @@ export default function TrendingEventsReport({ nguoiDung }) {
                     <span
                       style={{
                         fontSize: '11px',
-                        color: item.isActive ? 'var(--fm-tot, #1f6f1a)' : 'var(--fm-chu-nhat, #707070)',
+                        color: layMaTrangThaiSuKien(item, homNay) === 'ONGOING'
+                          ? 'var(--fm-tot, #1f6f1a)'
+                          : 'var(--fm-chu-nhat, #707070)',
                       }}
                     >
-                      {item.isActive ? '● Đang diễn ra' : '○ Đã đóng'}
+                      {NHAN_TRANG_THAI_SU_KIEN[layMaTrangThaiSuKien(item, homNay)] || 'Trạng thái không xác định'}
                     </span>
                   </td>
                   <td style={{ textAlign: 'center', fontWeight: '600' }}>
@@ -225,13 +247,12 @@ export default function TrendingEventsReport({ nguoiDung }) {
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <span
-                      className={`bc-xu-huong__badge ${
-                        item.statusLabel === 'TĂNG ĐỘT BIẾN'
-                          ? 'bc-xu-huong__badge--dot-bien'
-                          : item.statusLabel === 'BÌNH THƯỜNG'
+                      className={`bc-xu-huong__badge ${item.statusLabel === 'TĂNG ĐỘT BIẾN'
+                        ? 'bc-xu-huong__badge--dot-bien'
+                        : item.statusLabel === 'BÌNH THƯỜNG'
                           ? 'bc-xu-huong__badge--binh-thuong'
                           : 'bc-xu-huong__badge--chua-du'
-                      }`}
+                        }`}
                     >
                       {item.statusLabel}
                     </span>
