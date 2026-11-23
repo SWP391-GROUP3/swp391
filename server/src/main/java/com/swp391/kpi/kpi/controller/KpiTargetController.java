@@ -1,5 +1,6 @@
 package com.swp391.kpi.kpi.controller;
 
+import com.swp391.kpi.admin.dto.UserAccessResponse;
 import com.swp391.kpi.common.dto.ApiResponse;
 import com.swp391.kpi.kpi.dto.KpiBenchmarkConfigDto;
 import com.swp391.kpi.kpi.dto.KpiTargetCreateRequest;
@@ -77,6 +78,16 @@ public class KpiTargetController {
     ) {
         List<KpiTargetResponse> data = kpiTargetService.getTargetsByPeriod(year, month);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách chỉ tiêu KPI thành công", data));
+    }
+
+    /**
+     * Lấy danh sách phóng viên đang hoạt động để giao chỉ tiêu.
+     * GET /api/kpi-targets/reporters
+     */
+    @GetMapping("/reporters")
+    public ResponseEntity<ApiResponse<List<UserAccessResponse>>> getActiveReporters() {
+        List<UserAccessResponse> data = kpiTargetService.getActiveReporters();
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách phóng viên thành công", data));
     }
 
     /**
