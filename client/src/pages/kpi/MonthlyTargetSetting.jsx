@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import './MonthlyTargetSetting.css'
 import { namHienTai, thangHienTai } from './kyKpiMacDinh.js'
 import {
   layDinhMucChuan,
+  layDanhSachPhongVienHoatDong,
   layChiTieuTheoThang,
   taoChiTieu,
   capNhatChiTieu,
@@ -15,21 +17,25 @@ import {
  * MO TRANG NAY TAI: /kpi-targets
  *
  * MUC LUC (so dong - ten - tac dung)
- *   32  MonthlyTargetSetting()          xem tom tat dau file
- *   50    useEffect                     Tai dinh muc chuan khi mo trang
- *   56    useEffect                     Tai danh sach chi tieu theo thang
- *   60    taiDanhSachChiTieu()          tai danh sach chi tieu
- *   74    moModalThemMoi()              mo modal them moi
- *   84    moModalSua()                  mo modal sua
- *   95    apDungDinhMuc()               ap dung dinh muc
- *  100    xuLyLuuForm()                 xu ly luu form
- *  137    xuLyXoa()                     xu ly xoa
+ *   36  MonthlyTargetSetting()          component chinh
+ *   56    useEffect                     Goi API lay danh sach phong vien (1 lan)
+ *   67    useEffect                     Du phong: trich xuat tu bang KPI neu API chua co
+ *   78    useEffect                     Tai danh sach chi tieu theo thang
+ *   82    taiDanhSachChiTieu()          tai danh sach chi tieu
+ *   96    moModalThemMoi()              mo modal them moi
+ *  106    moModalSua()                  mo modal sua
+ *  117    capNhapTuKhoaPhongVien()      cap nhat tu khoa tim kiem phong vien
+ *  122    chonPhongVien()               chon phong vien tu danh sach
+ *  127    danhSachPhongVienLoc          danh sach phong vien da loc theo tu khoa
+ *  137    apDungDinhMuc()               ap dung dinh muc chuan
+ *  141    xuLyLuuForm()                 xu ly luu form
+ *  178    xuLyXoa()                     xu ly xoa
  *
  * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  158  [+ Giao chi tieu moi]           moModalThemMoi()
- *  196  [Tai lai]                       taiDanhSachChiTieu()
- *  243  [Sua]                           moModalSua()
- *  250  [Xoa]                           xuLyXoa()
+ *  232  [+ Giao chi tieu moi]           moModalThemMoi()
+ *  270  [Tai lai]                       taiDanhSachChiTieu()
+ *  321  [Sua]                           moModalSua()
+ *  328  [Xoa]                           xuLyXoa()
  */
 export default function MonthlyTargetSetting({ nguoiDung }) {
   const [nam, setNam] = useState(namHienTai())
@@ -47,6 +53,36 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
   const [formMinPublished, setFormMinPublished] = useState(6)
   const [formMinAvgScore, setFormMinAvgScore] = useState(65.0)
   const [dangLuu, setDangLuu] = useState(false)
+  const [danhSachPhongVien, setDanhSachPhongVien] = useState([])
+  const [tuKhoaPhongVien, setTuKhoaPhongVien] = useState('')
+  const [hienDanhSachPhongVien, setHienDanhSachPhongVien] = useState(false)
+
+  // Goi API lay danh sach phong vien ACTIVE 1 lan duy nhat khi mo trang
+  useEffect(() => {
+    layDanhSachPhongVienHoatDong()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setDanhSachPhongVien(data)
+        }
+      })
+      .catch((err) => console.error('Lỗi lấy danh sách phóng viên:', err))
+  }, [])
+
+  // Du phong: neu API /reporters chua co du lieu, trich xuat tu bang KPI da tai
+  useEffect(() => {
+    if (danhSachPhongVien.length > 0 || danhSach.length === 0) return
+    const map = new Map()
+    danhSach.forEach((item) => {
+      if (item.reporterId && !map.has(item.reporterId)) {
+        map.set(item.reporterId, {
+          id: item.reporterId,
+          fullName: item.reporterName || `Phóng viên #${item.reporterId}`,
+          sectionName: item.sectionName || '',
+        })
+      }
+    })
+    if (map.size > 0) setDanhSachPhongVien(Array.from(map.values()))
+  }, [danhSach, danhSachPhongVien.length])
 
   // Tải định mức chuẩn khi mở trang
   useEffect(() => {
@@ -77,6 +113,8 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
   function moModalThemMoi() {
     setDangSuaId(null)
     setFormReporterId('')
+    setTuKhoaPhongVien('')
+    setHienDanhSachPhongVien(false)
     setFormMinPublished(6)
     setFormMinAvgScore(65.0)
     setLoi('')
@@ -87,12 +125,37 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
   function moModalSua(item) {
     setDangSuaId(item.id)
     setFormReporterId(item.reporterId)
+    setTuKhoaPhongVien(item.reporterName ? `#${item.reporterId} — ${item.reporterName}` : `PV #${item.reporterId}`)
+    setHienDanhSachPhongVien(false)
     setFormMinPublished(item.minPublished)
     setFormMinAvgScore(item.minAvgScore)
     setLoi('')
     setThongBao('')
     setHienModal(true)
   }
+
+  function capNhapTuKhoaPhongVien(value) {
+    setTuKhoaPhongVien(value)
+    setHienDanhSachPhongVien(true)
+    setFormReporterId('')
+  }
+
+  function chonPhongVien(pv) {
+    setFormReporterId(pv.id)
+    setTuKhoaPhongVien(`#${pv.id} — ${pv.fullName}${pv.sectionName ? ` (Ban: ${pv.sectionName})` : ''}`)
+    setHienDanhSachPhongVien(false)
+  }
+
+  const danhSachPhongVienLoc = danhSachPhongVien.filter((pv) => {
+    const tuKhoa = tuKhoaPhongVien.toLowerCase().trim()
+    if (!tuKhoa) return true
+    const maId = String(pv.id)
+    const ten = (pv.fullName || '').toLowerCase()
+    const ban = (pv.sectionName || '').toLowerCase()
+    // Tach tung tu de ho tro gõ ket hop ca ID + ten (vd: "1 An", "An 7")
+    const cacTu = tuKhoa.split(/\s+/).filter((t) => t.length > 0)
+    return cacTu.every((t) => maId.includes(t) || ten.includes(t) || ban.includes(t))
+  })
 
   function apDungDinhMuc(dm) {
     setFormMinPublished(dm.defaultMinPublished)
@@ -106,6 +169,13 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
     setThongBao('')
 
     try {
+      // Neu them moi ma chua chon phong vien tu danh sach (chi gõ ten, khong bam chon)
+      if (!dangSuaId && !formReporterId) {
+        setLoi('Vui lòng chọn phóng viên từ danh sách gợi ý (bấm vào tên trong dropdown).')
+        setDangLuu(false)
+        return
+      }
+
       if (dangSuaId) {
         // Cập nhật chỉ tiêu (A2)
         await capNhatChiTieu(dangSuaId, {
@@ -165,7 +235,8 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
 
       {/* Thông báo kết quả */}
       {thongBao && <div className="thong-bao-thanh-cong">{thongBao}</div>}
-      {loi && <div className="thong-bao-loi">{loi}</div>}
+      {/* Chi hien loi o ngoai trang khi modal dong (vd: loi xoa) */}
+      {loi && !hienModal && <div className="thong-bao-loi">{loi}</div>}
 
       {/* Danh sách chỉ tiêu tháng (UC-59) */}
       <div className="the-khung">
@@ -301,18 +372,61 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
                 </div>
               </div>
 
-              {!dangSuaId && (
+              {!dangSuaId ? (
                 <div>
-                  <label className="nhan" htmlFor="reporterId">ID Phóng viên</label>
+                  <label className="nhan" htmlFor="tuKhoaPhongVien">
+                    Phóng viên (Tìm theo tên hoặc ID) <span style={{ color: 'var(--fm-do, #e11d48)' }}>*</span>
+                  </label>
+                  <div className="kpi-tim-phong-vien">
+                    <input
+                      id="tuKhoaPhongVien"
+                      className="o-nhap"
+                      type="text"
+                      autoComplete="off"
+                      placeholder="Gõ họ tên hoặc ID (vd: Nguyễn Văn An, 1, 7...)"
+                      value={tuKhoaPhongVien}
+                      onChange={(e) => capNhapTuKhoaPhongVien(e.target.value)}
+                      onFocus={() => setHienDanhSachPhongVien(true)}
+                      onBlur={() => setTimeout(() => setHienDanhSachPhongVien(false), 250)}
+                      required={!formReporterId}
+                    />
+
+                    {hienDanhSachPhongVien && (
+                      <div className="kpi-danh-sach-phong-vien">
+                        {danhSachPhongVienLoc.length === 0 ? (
+                          <div className="kpi-khong-tim-thay">
+                            Không tìm thấy phóng viên phù hợp
+                          </div>
+                        ) : (
+                          danhSachPhongVienLoc.map((pv) => (
+                            <button
+                              key={pv.id}
+                              type="button"
+                              className="kpi-muc-phong-vien"
+                              onMouseDown={() => chonPhongVien(pv)}
+                            >
+                              <strong>#{pv.id} — {pv.fullName}</strong>
+                              <span>{pv.sectionName ? `Ban: ${pv.sectionName}` : 'Chưa phân ban'}</span>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {formReporterId && (
+                    <div style={{ fontSize: '12.5px', color: 'var(--fm-chinh, #0284c7)', marginTop: '4px' }}>
+                      ✓ Đã chọn: <strong>{tuKhoaPhongVien}</strong>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <label className="nhan">Phóng viên</label>
                   <input
-                    id="reporterId"
                     className="o-nhap"
-                    type="number"
-                    min="1"
-                    required
-                    value={formReporterId}
-                    onChange={(e) => setFormReporterId(e.target.value)}
-                    placeholder="Nhập ID phóng viên (vd: 1, 2, 7...)"
+                    type="text"
+                    disabled
+                    value={tuKhoaPhongVien || `PV #${formReporterId}`}
                   />
                 </div>
               )}
@@ -344,6 +458,9 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
                   onChange={(e) => setFormMinAvgScore(e.target.value)}
                 />
               </div>
+
+              {/* Hien loi ben trong modal de nguoi dung thay ngay */}
+              {loi && <div className="thong-bao-loi">{loi}</div>}
 
               <div className="modal-footer">
                 <button

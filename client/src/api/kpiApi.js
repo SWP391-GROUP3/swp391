@@ -33,6 +33,13 @@ export async function capNhatDinhMucChuan(danhSach) {
 }
 
 /**
+ * Lấy danh sách phóng viên đang hoạt động (ACTIVE) để giao chỉ tiêu (UC-59).
+ */
+export async function layDanhSachPhongVienHoatDong() {
+  return goiApi('/api/kpi-targets/reporters')
+}
+
+/**
  * Lấy danh sách chỉ tiêu theo năm và tháng (UC-59).
  */
 export async function layChiTieuTheoThang(nam, thang) {
