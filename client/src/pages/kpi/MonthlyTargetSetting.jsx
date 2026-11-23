@@ -110,6 +110,11 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
     }
   }
 
+  function dongModal() {
+    setHienModal(false)
+    setLoi('')
+  }
+
   function moModalThemMoi() {
     setDangSuaId(null)
     setFormReporterId('')
@@ -348,7 +353,7 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
               <button
                 className="nut-dong"
                 type="button"
-                onClick={() => setHienModal(false)}
+                onClick={() => dongModal()}
               >
                 ✕
               </button>
@@ -467,7 +472,7 @@ export default function MonthlyTargetSetting({ nguoiDung }) {
                   className="nut-phu"
                   type="button"
                   disabled={dangLuu}
-                  onClick={() => setHienModal(false)}
+                  onClick={() => dongModal()}
                 >
                   Huỷ
                 </button>
