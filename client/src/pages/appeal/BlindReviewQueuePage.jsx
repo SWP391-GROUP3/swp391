@@ -19,12 +19,12 @@ import './ReviewWorkflow.css'
  *   39  link [# {phieu.id} · {phieu.title}]  mo trang {duongDan}{phieu.id} (khong co route)
  */
 
-export default function BlindReviewQueuePage() {
+export default function BlindReviewQueuePage({ chiChamMu = false }) { // chiChamMu: Truong ban chi co phieu cham mu, API cham cheo chi cho BTV
   const [duLieu, setDuLieu] = useState(null)
   const [loi, setLoi] = useState('')
   useEffect(() => {
     let conHienThi = true
-    Promise.all([layPhieuChamMu(), layPhieuChamCheo()])
+    Promise.all([layPhieuChamMu(), chiChamMu ? [] : layPhieuChamCheo()])
       .then(([chamMu, chamCheo]) => { if (conHienThi) setDuLieu({ chamMu, chamCheo }) })
       .catch((error) => { if (conHienThi) setLoi(error.message) })
     return () => { conHienThi = false }
@@ -33,7 +33,7 @@ export default function BlindReviewQueuePage() {
     <header className="bao-cao-qc__dau"><h1>Chấm lại &amp; chấm chéo</h1><p>Các phiếu được giao cho bạn. Phiếu đã nộp chỉ được xem lại.</p></header>
     {loi && <p role="alert" className="thong-bao-loi">{loi}</p>}
     {!duLieu && !loi && <p>Đang tải phiếu…</p>}
-    {duLieu && [['chamMu', 'Chấm lại mù', '/re-reviews/'], ['chamCheo', 'Chấm chéo phân tích', '/cross-review-tasks/']].map(([ten, nhan, duongDan]) =>
+    {duLieu && [['chamMu', 'Chấm lại mù', '/re-reviews/'], ['chamCheo', 'Chấm chéo phân tích', '/cross-review-tasks/']].filter(([ten]) => !(chiChamMu && ten === 'chamCheo')).map(([ten, nhan, duongDan]) =>
       <section key={ten} className="luong-qc__the"><h2>{nhan}</h2>
         {!duLieu[ten].length && <p>Chưa có phiếu được giao.</p>}
         <ul>{duLieu[ten].map((phieu) => <li key={phieu.id}><Link to={`${duongDan}${phieu.id}`}>#{phieu.id} · {phieu.title}</Link> · {phieu.submittedAt ? 'Đã nộp' : 'Chờ chấm'}</li>)}</ul>

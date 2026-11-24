@@ -40,6 +40,8 @@ const MENU_TRUONG_BAN = [
     cacMuc: [
       { path: '/appeals', nhan: 'Khiếu nại',                             // UC-38, 39, 37 (xac nhan S2), 43 (giao lai)
         icon: <><path d="M12 3v18M5 21h14" /><path d="M5 7h14" /><path d="M5 7l-3 7a3 3 0 0 0 6 0L5 7ZM19 7l-3 7a3 3 0 0 0 6 0l-3-7Z" /></> },
+      { path: '/re-reviews', nhan: 'Phiếu chấm mù của tôi',              // UC-36, 37: chi co khi het BTV, Truong ban tu cham
+        icon: <><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 9h6M9 13h6M9 17h3" /></> },
       { path: '/cross-reviews', nhan: 'Đợt chấm chéo',                   // UC-40
         icon: <><path d="M4 8h14l-3-3M20 16H6l3 3" /></> },
       { path: '/reviewers', nhan: 'Độ lệch & hồ sơ BTV',                 // UC-41, 42

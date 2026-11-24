@@ -77,7 +77,7 @@ public class ScoringAppealService {
     }
 
     public List<AppealReviewTaskResponse> getAssignedTasks(Integer reviewerId) {
-        users.requireActive(reviewerId, "EDITOR");
+        users.requireActive(reviewerId, "EDITOR", "HEAD_OF_DEPARTMENT");
         List<AppealReviewTaskResponse> result = new ArrayList<>();
         for (var attempt : attempts.findByReviewerIdAndAttemptTypeOrderByOpenedAtDesc(reviewerId, AttemptType.APPEAL)) {
             var version = articles.getVersion(attempt.getArticleId(), attempt.getVersionId());
@@ -88,7 +88,7 @@ public class ScoringAppealService {
 
     @Transactional
     public AppealBlindScorecardResponse getOwnedScorecard(Integer id, Integer reviewerId) {
-        users.requireActive(reviewerId, "EDITOR");
+        users.requireActive(reviewerId, "EDITOR", "HEAD_OF_DEPARTMENT");
         var locked = attempts.findLockedById(id).orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm."));
         entityManager.refresh(locked, LockModeType.PESSIMISTIC_WRITE);
         var attempt = getAttemptReference(id);
@@ -116,7 +116,7 @@ public class ScoringAppealService {
 
     @Transactional
     public AppealBlindScorecardResponse saveScorecard(Integer id, Integer reviewerId, AppealScorecardRequest request, boolean submit) { // [LUONG 3 - CHAM MU] buoc 6/7 service: dung chu phieu? doi chieu tieu chi -> server tinh tong -> ghi diem -> (nop) dong dau submittedAt
-        users.requireActive(reviewerId, "EDITOR");
+        users.requireActive(reviewerId, "EDITOR", "HEAD_OF_DEPARTMENT");
         var attempt = lockedDraft(id);
         if (!reviewerId.equals(attempt.getReviewerId()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không còn được giao phiếu chấm này.");
@@ -228,7 +228,7 @@ public class ScoringAppealService {
 
     @Transactional
     public ScoringAppealAttemptResponse requireOwnedDraft(Integer attemptId, Integer reviewerId) {
-        users.requireActive(reviewerId, "EDITOR");
+        users.requireActive(reviewerId, "EDITOR", "HEAD_OF_DEPARTMENT");
         var draft = lockedDraft(attemptId);
         if (!reviewerId.equals(draft.getReviewerId()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không còn được giao phiếu chấm này.");

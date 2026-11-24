@@ -24,7 +24,7 @@ import './AppealDetailPage.css'
  *  107  link [Xem nhat ky khieu nai]    mo trang /audit-logs?appealId={id} (AuditLogPage)
  */
 
-export default function AppealDetailPage() {
+export default function AppealDetailPage({ nguoiDung }) {
   const { id } = useParams()
   const location = useLocation()
   const [lanTai, setLanTai] = useState(0)
@@ -37,7 +37,8 @@ export default function AppealDetailPage() {
   const khieuNai = duLieu?.khieuNai
   const nguoiCham = duLieu?.nguoiCham || []
   const phieu = khieuNai?.currentAttempt
-  const coTheGiao = khieuNai && (khieuNai.status === 'SUBMITTED' || (khieuNai.status === 'IN_REVIEW' && phieu && !phieu.submittedAt))
+  const tuCham = nguoiCham.length > 0 && nguoiCham[0].reviewerId === nguoiDung?.id // het BTV moi ban: danh sach chi con Truong ban
+  const coTheGiao = khieuNai &&(khieuNai.status === 'SUBMITTED' || (khieuNai.status === 'IN_REVIEW' && phieu && !phieu.submittedAt))
 
   useEffect(() => {
     let conHienThi = true
@@ -55,8 +56,8 @@ export default function AppealDetailPage() {
     const reason = String(nhap.get('reason') || '').trim()
     const ungVien = nguoiCham.find((item) => item.reviewerId === reviewerId)
     const giaoLai = khieuNai.status === 'IN_REVIEW'
-    if (!ungVien || ((giaoLai || ungVien.crossDepartment) && !reason)) {
-      setThongBao({ id, loi: 'Chọn người hợp lệ và nhập lý do khi giao lại hoặc khác ban.', thanhCong: '' })
+    if (!ungVien || ((giaoLai || ungVien.crossDepartment || ungVien.reviewerId === nguoiDung?.id) && !reason)) {
+      setThongBao({ id, loi: 'Chọn người hợp lệ và nhập lý do khi giao lại, khác ban hoặc Trưởng ban tự chấm.', thanhCong: '' })
       return
     }
     if (!window.confirm(giaoLai ? 'Xác nhận giao lại? Nháp cũ được lưu trong nhật ký và xóa khỏi phiếu.' : 'Xác nhận phân công chấm mù?')) return
@@ -94,14 +95,15 @@ export default function AppealDetailPage() {
       {!coTheGiao && <p>Phân công hiện tại chỉ đọc. Mở so sánh để theo dõi kết quả, giao S2 nếu cần hoặc chốt điểm.</p>}
       <Link to={`/appeals/${id}/comparison`}>So sánh &amp; chốt điểm</Link>
       {coTheGiao && (nguoiCham.length ? <form key={khoa} className="chi-tiet-kn__form" onSubmit={luuPhanCong}>
-        <p>{nguoiCham[0].crossDepartment ? 'Không còn BTV hợp lệ cùng ban. Phân công khác ban bắt buộc có lý do.' : 'Ưu tiên các BTV hợp lệ cùng ban; người đã tham gia không được chọn lại.'}</p>
-        <label>Biên tập viên mới<select name="reviewerId" required defaultValue="" disabled={dangLuu}>
+        <p>{tuCham ? 'Không còn biên tập viên nào khác ở mọi ban. Bạn là người chấm duy nhất và phải nhập lý do. Phiếu này không còn mù hoàn toàn vì bạn đã thấy điểm gốc.'
+          : nguoiCham[0].crossDepartment ? 'Không còn BTV hợp lệ cùng ban. Phân công khác ban bắt buộc có lý do.' : 'Ưu tiên các BTV hợp lệ cùng ban; người đã tham gia không được chọn lại.'}</p>
+        <label>{tuCham ? 'Người chấm' : 'Biên tập viên mới'}<select name="reviewerId" required defaultValue="" disabled={dangLuu}>
           <option value="" disabled>Chọn người chấm</option>
-          {nguoiCham.map((item) => <option key={item.reviewerId} value={item.reviewerId}>{item.reviewerName} (#{item.reviewerId}) · {item.sectionName}</option>)}
+          {nguoiCham.map((item) => <option key={item.reviewerId} value={item.reviewerId}>{item.reviewerName} (#{item.reviewerId}) · {item.sectionName}{item.reviewerId === nguoiDung?.id ? ' · Trưởng ban tự chấm' : ''}</option>)}
         </select></label>
-        <label>Lý do {khieuNai.status === 'IN_REVIEW' || nguoiCham[0].crossDepartment ? '(bắt buộc)' : '(tùy chọn)'}
+        <label>Lý do {khieuNai.status === 'IN_REVIEW' || nguoiCham[0].crossDepartment || tuCham ? '(bắt buộc)' : '(tùy chọn)'}
           <textarea name="reason" maxLength={1000} rows={3} disabled={dangLuu}
-            required={khieuNai.status === 'IN_REVIEW' || nguoiCham[0].crossDepartment} /></label>
+            required={khieuNai.status === 'IN_REVIEW' || nguoiCham[0].crossDepartment || tuCham} /></label>
         <button disabled={dangLuu} type="submit">{dangLuu ? 'Đang lưu…' : khieuNai.status === 'SUBMITTED' ? 'Phân công' : 'Giao lại'}</button>
       </form> : <p>Không có biên tập viên đủ điều kiện. Chưa thay đổi phân công.</p>)}
       <Link to={`/audit-logs?appealId=${id}`}>Xem nhật ký khiếu nại</Link>

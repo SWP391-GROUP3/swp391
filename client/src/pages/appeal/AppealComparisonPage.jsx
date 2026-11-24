@@ -28,7 +28,7 @@ import './ReviewWorkflow.css'
 
 const TEN_LUAT = { USE_S1: 'Dùng điểm S1', MEDIAN_S0_S1_S2: 'Trung vị của S0, S1 và S2', AVERAGE_S0_S2: 'Trung bình S0 và S2', AVERAGE_S1_S2: 'Trung bình S1 và S2', USE_S2_TIE: 'Dùng S2 khi hai khoảng cách bằng nhau', KEEP_ORIGINAL: 'Giữ điểm gốc (lịch sử)', USE_RESCORE: 'Dùng điểm chấm lại (lịch sử)' }
 
-export default function AppealComparisonPage() {
+export default function AppealComparisonPage({ nguoiDung }) {
   const { id } = useParams()
   return <ComparisonContent key={id} id={id} />
 }
@@ -66,7 +66,7 @@ function ComparisonContent({ id }) {
     const reviewerId = Number(nhap.get('reviewerId'))
     const reason = String(nhap.get('reason') || '').trim()
     const nguoi = ketQua.ungVien.find((item) => item.reviewerId === reviewerId)
-    if (!nguoi || (nguoi.crossDepartment && !reason)) { setLoi('Chọn người hợp lệ và nhập lý do khi phân công khác ban.'); return }
+    if (!nguoi || ((nguoi.crossDepartment || nguoi.reviewerId === nguoiDung?.id) && !reason)) { setLoi('Chọn người hợp lệ và nhập lý do khi phân công khác ban hoặc Trưởng ban tự chấm.'); return }
     if (window.confirm('Phân công đợt chấm lại thứ hai và cuối cùng?'))
       xuLy(() => phanCongLanHai(id, reviewerId, reason), 'Đã phân công S2.') // [LUONG 4 - SO SANH & CHOT] nhanh S2: lech > T thi giao BTV thu 3 cham (buoc 2S, xem AppealManagementService.assignSecond)
   }
@@ -102,10 +102,10 @@ function ComparisonContent({ id }) {
           <p>Khoảng hiện tại: từ {Math.min(duLieu.original.totalScore, duLieu.first.totalScore)} đến {Math.max(duLieu.original.totalScore, duLieu.first.totalScore)}. Điểm cuối sẽ nằm trong khoảng này.</p>
           {ketQua.ungVien.length ? <form className="luong-qc__form" onSubmit={giaoLanHai}>
             <label>Người chấm S2<select name="reviewerId" required defaultValue="" disabled={dangLuu}><option value="" disabled>Chọn biên tập viên</option>
-              {ketQua.ungVien.map((item) => <option key={item.reviewerId} value={item.reviewerId}>{item.reviewerName} · {item.sectionName}{item.crossDepartment ? ' · Khác ban' : ''}</option>)}</select></label>
-            <label>Lý do phân công (bắt buộc khi khác ban)<textarea name="reason" maxLength={1000} rows={3} disabled={dangLuu} /></label>
+              {ketQua.ungVien.map((item) => <option key={item.reviewerId} value={item.reviewerId}>{item.reviewerName} · {item.sectionName}{item.crossDepartment ? ' · Khác ban' : ''}{item.reviewerId === nguoiDung?.id ? ' · Trưởng ban tự chấm' : ''}</option>)}</select></label>
+            <label>Lý do phân công (bắt buộc khi khác ban hoặc Trưởng ban tự chấm)<textarea name="reason" maxLength={1000} rows={3} disabled={dangLuu} /></label>
             <button disabled={dangLuu} type="submit">Phân công S2</button>
-          </form> : <p>Chưa có biên tập viên đủ điều kiện. Chưa thể chốt kết quả.</p>}
+          </form> : <p>Không còn biên tập viên nào đủ điều kiện (Trưởng ban đã chấm S1 thì không chấm S2). Chưa thể chốt kết quả, cần báo quản trị viên hoặc thêm biên tập viên.</p>}
         </section> : deXuat ? <section className="luong-qc__the"><h2>Đề xuất: {deXuat.effectiveScore}/100</h2>
           <p>{TEN_LUAT[deXuat.rule]}. Kết quả có thể tăng hoặc giảm so với S0.</p>
           <button disabled={dangLuu} onClick={xacNhan}>Xác nhận điểm hiệu lực</button>

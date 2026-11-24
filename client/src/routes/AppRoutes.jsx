@@ -261,8 +261,11 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               <Route path="/publishing" element={<PublishingQueue nguoiDung={nguoiDung} />} />
 
               <Route path="/appeals" element={<AppealManagementPage />} />
-              <Route path="/appeals/:id" element={<AppealDetailPage />} /> {/* [LUONG 2 - PHAN CONG] buoc 1/6 route: /appeals/:id -> AppealDetailPage */}
-              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage />} /> {/* [LUONG 4 - SO SANH & CHOT] buoc 1/7 route: /appeals/:id/comparison -> AppealComparisonPage */}
+              <Route path="/appeals/:id" element={<AppealDetailPage nguoiDung={nguoiDung} />} /> {/* [LUONG 2 - PHAN CONG] buoc 1/6 route: /appeals/:id -> AppealDetailPage */}
+              <Route path="/appeals/:id/comparison" element={<AppealComparisonPage nguoiDung={nguoiDung} />} /> {/* [LUONG 4 - SO SANH & CHOT] buoc 1/7 route: /appeals/:id/comparison -> AppealComparisonPage */}
+              {/* BF-03: het BTV o moi ban thi Truong ban tu cham mu (chi phieu cham mu, khong co cham cheo) */}
+              <Route path="/re-reviews" element={<BlindReviewQueuePage chiChamMu />} />
+              <Route path="/re-reviews/:id" element={<BlindReviewPage />} />
               <Route path="/cross-reviews" element={<CrossReviewBatchPage />} />
               <Route path="/cross-reviews/:id" element={<CrossReviewBatchDetailPage />} />
 

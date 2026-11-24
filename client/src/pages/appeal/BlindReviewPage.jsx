@@ -4,6 +4,7 @@ import { layChiTietChamMu, luuNhapChamMu, nopPhieuChamMu } from '../../api/appea
 import { layChiTietChamCheo, nopPhieuChamCheo } from '../../api/crossReviewApi.js'
 import { tinhTongTam, kiemTraPhieuCham } from './blindScorecard.js'
 import '../../styles/QualityReportPage.css'
+import '../../styles/Flow2.css'
 import './ReviewWorkflow.css'
 
 /**
@@ -87,23 +88,52 @@ function BlindReviewForm({ id, cheo }) {
     {thongBao && <p role="status">{thongBao}</p>}
     {!phieu && !loi && <p>Đang tải phiếu…</p>}
     {phieu && <>
-      <p>Phiên bản bài #{phieu.versionId} · Thể loại #{phieu.categoryId} · Bộ tiêu chí #{phieu.criteriaSetVersionId}</p>
+      {/* Bo cuc giong phieu cham goc cua BTV (flow2/ScoringSheet): bai ben trai, bang tieu chi + tong diem ben phai */}
       <div className="luong-qc__hai-cot">
-        <article className="luong-qc__the"><h2>{phieu.title}</h2><div className="luong-qc__noi-dung">{phieu.content}</div></article>
+        <article className="luong-qc__the">
+          <h2>{phieu.title}</h2>
+          <div className="bf02__nhat">Phiên bản bài #{phieu.versionId} · Thể loại #{phieu.categoryId} · Bộ tiêu chí #{phieu.criteriaSetVersionId}</div>
+          <div className="luong-qc__noi-dung" style={{ maxHeight: 480, overflowY: 'auto', marginTop: 12 }}>{phieu.content}</div>
+        </article>
         <form className="luong-qc__form" onSubmit={(e) => { e.preventDefault(); luuPhieu(true) }}>
           {daNop && <p role="status">Phiếu đã nộp, chỉ đọc. Tổng điểm: {phieu.totalScore}/100.</p>}
-          {(!cheo || !daNop) && cacDong.map((dong) => <fieldset key={dong.criterionId} className="luong-qc__tieu-chi" disabled={dangLuu || daNop}>
-            <legend>{dong.name} · {dong.weight}%</legend>
-            <label>Điểm (0–100)<input aria-label={`Điểm ${dong.name}`} type="number" min="0" max="100" step="0.01" value={dong.score}
-              onChange={(e) => doiDong(dong.criterionId, 'score', e.target.value)} /></label>
-            <label>Nhận xét {dong.score !== '' && Number(dong.score) < 50 ? '(bắt buộc dưới 50 điểm)' : ''}
-              <textarea rows={3} maxLength={1000} value={dong.comment} onChange={(e) => doiDong(dong.criterionId, 'comment', e.target.value)} /></label>
-          </fieldset>)}
+          {(!cheo || !daNop) && <div className="bf02__cuon">
+            <table className="bang-fm">
+              <thead><tr>
+                <th>Tiêu chí đánh giá</th>
+                <th style={{ width: 80, textAlign: 'center' }}>Trọng số</th>
+                <th style={{ width: 100, textAlign: 'center' }}>Điểm (0-100)</th>
+                <th>Nhận xét lý do</th>
+              </tr></thead>
+              <tbody>{cacDong.map((dong) => {
+                const duoi50 = dong.score !== '' && Number(dong.score) < 50
+                return <tr key={dong.criterionId}>
+                  <td><strong>{dong.name}</strong></td>
+                  <td style={{ textAlign: 'center' }}><span className="nhan-tt nhan-tt--thong-tin">{dong.weight}%</span></td>
+                  <td style={{ textAlign: 'center' }}>
+                    <input aria-label={`Điểm ${dong.name}`} type="number" min="0" max="100" step="0.01" value={dong.score}
+                      disabled={dangLuu || daNop} className="o-nhap-ngan bf02__o-nhap--so" style={{ width: 70, textAlign: 'center' }}
+                      onChange={(e) => doiDong(dong.criterionId, 'score', e.target.value)} />
+                  </td>
+                  <td>
+                    <input type="text" maxLength={1000} value={dong.comment} disabled={dangLuu || daNop} className="o-nhap-ngan"
+                      aria-label={`Nhận xét ${dong.name}`} placeholder={duoi50 ? 'Bắt buộc nhận xét (< 50đ)' : 'Nhận xét (không bắt buộc)...'}
+                      style={{ width: '100%', borderColor: duoi50 && !dong.comment.trim() ? 'var(--fm-loi)' : undefined }}
+                      onChange={(e) => doiDong(dong.criterionId, 'comment', e.target.value)} />
+                  </td>
+                </tr>
+              })}</tbody>
+            </table>
+          </div>}
+          <div className="bf02__tong-ket">
+            <div><span className="bf02__tong-nhan">Tổng điểm có trọng số:</span> <span className="bf02__nhat">(thang 100, BR-QC-05)</span></div>
+            <div className="bf02__tong-diem">{daNop ? Number(phieu.totalScore).toFixed(2) : (tinhTongTam(cacDong) ?? '--')} / 100.00</div>
+          </div>
           {!daNop && <>
-            <p>Tổng điểm tạm tính: <strong>{tinhTongTam(cacDong) ?? 'Chưa đủ điểm'}</strong>. Server kiểm tra lại khi lưu/nộp.</p>
-            <div className="luong-qc__thao-tac">
-              {!cheo && <button type="button" disabled={dangLuu} onClick={() => luuPhieu(false)}>Lưu nháp</button>}
-              <button type="submit" disabled={dangLuu}>{dangLuu ? 'Đang lưu…' : 'Nộp phiếu chấm'}</button>
+            <p className="bf02__nhat">Tổng điểm tạm tính, server kiểm tra lại khi lưu/nộp.</p>
+            <div className="luong-qc__thao-tac" style={{ justifyContent: 'flex-end' }}>
+              {!cheo && <button type="button" className="nut-nhe" disabled={dangLuu} onClick={() => luuPhieu(false)}>Lưu nháp</button>}
+              <button type="submit" className="nut-chinh-fm" disabled={dangLuu}>{dangLuu ? 'Đang lưu…' : 'Nộp phiếu chấm'}</button>
             </div>
           </>}
         </form>

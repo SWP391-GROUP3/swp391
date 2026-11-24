@@ -112,7 +112,7 @@ public class AppealManagementService {
 
     public List<AppealReviewerCandidateResponse> getCandidates(Integer id, Integer userId) {
         var appeal = scopedAppeal(id, userId, false);
-        return candidates(appeal);
+        return candidates(appeal, userId);
     }
 
     @Transactional
@@ -120,7 +120,7 @@ public class AppealManagementService {
         var appeal = scopedAppeal(id, userId, true);
         if (appeal.getStatus() != AppealStatus.SUBMITTED)
             throw new BusinessException("Khiếu nại không còn chờ phân công.");
-        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false);
+        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false, userId);
         var attempt = scoring.createDraft(id, appeal.getArticleId(), appeal.getScoringAttemptId(),
                 candidate.reviewerId(), candidate.crossDepartment());
         appeal.setStatus(AppealStatus.IN_REVIEW);
@@ -135,7 +135,7 @@ public class AppealManagementService {
     public AppealManagementResponse assignSecond(Integer id, AppealAssignRequest request, Integer userId) { // [LUONG 4 - SO SANH & CHOT] nhanh S2: chi giao khi S1 da nop va lech > T (requiresSecond)
         var appeal = scopedAppeal(id, userId, true);
         if (!requiresSecond(appeal)) throw new BusinessException("Khiếu nại chưa cần S2 hoặc đã được giao S2.");
-        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false);
+        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), false, userId);
         var attempt = scoring.createSecondDraft(id, appeal.getArticleId(), appeal.getScoringAttemptId(),
                 candidate.reviewerId(), candidate.crossDepartment());
         audit.log(userId, "ASSIGN", "appeals", id, null, assignmentJson(attempt, request.getReason()));
@@ -167,7 +167,7 @@ public class AppealManagementService {
             throw new BusinessException("Phân công đã thay đổi. Vui lòng tải lại khiếu nại.");
         if (old.submittedAt() != null)
             throw new BusinessException("Không thể đổi người chấm cho phiếu đã nộp.");
-        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), true);
+        var candidate = requireCandidate(appeal, request.getReviewerId(), request.getReason(), true, userId);
         var updated = scoring.reassignDraft(id, appeal.getArticleId(), old.id(), old.reviewerId(),
                 candidate.reviewerId(), candidate.crossDepartment(), request.getReason(), userId);
         notifications.notifyUser(old.reviewerId(), appeal.getArticleId(),
@@ -201,7 +201,7 @@ public class AppealManagementService {
         return current;
     }
 
-    private List<AppealReviewerCandidateResponse> candidates(Appeal appeal) { // [LUONG 2 - PHAN CONG] 5b: danh sach BTV hop le: loai nguoi da cham bai nay, uu tien cung ban
+    private List<AppealReviewerCandidateResponse> candidates(Appeal appeal, Integer headId) { // [LUONG 2 - PHAN CONG] 5b: danh sach BTV hop le: loai nguoi da cham bai nay, uu tien cung ban; het BTV moi ban thi Truong ban tu cham
         var current = currentAttempt(appeal);
         if (appeal.getStatus() == AppealStatus.RESOLVED
                 || (current != null && current.submittedAt() != null && !requiresSecond(appeal)))
@@ -215,7 +215,11 @@ public class AppealManagementService {
         Integer section = articles.getArticle(appeal.getArticleId()).sectionId();
         List<AppealReviewerCandidateResponse> same = new ArrayList<>();
         List<AppealReviewerCandidateResponse> other = new ArrayList<>();
+        AppealReviewerCandidateResponse selfHead = null;
         for (var editor : users.getUsers()) {
+            if ("ACTIVE".equals(editor.status()) && editor.id().equals(headId) && !excluded.contains(headId))
+                selfHead = new AppealReviewerCandidateResponse(editor.id(), editor.fullName(),
+                        editor.sectionId(), editor.sectionName(), false);
             if (!"ACTIVE".equals(editor.status()) || !"EDITOR".equals(editor.role())
                     || editor.sectionId() == null || excluded.contains(editor.id())) continue;
             boolean cross = !section.equals(editor.sectionId());
@@ -224,15 +228,17 @@ public class AppealManagementService {
             (cross ? other : same).add(candidate);
         }
         var result = same.isEmpty() ? other : same;
+        // Het BTV o moi ban: Truong ban (chua tung cham khieu nai nay) la nguoi cham duy nhat.
+        if (result.isEmpty() && selfHead != null) result.add(selfHead);
         result.sort(Comparator.comparing(AppealReviewerCandidateResponse::reviewerId));
         return result;
     }
 
-    private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign) { // [LUONG 2 - PHAN CONG] 5c: chon nguoi ngoai danh sach 5b thi bi tu choi; khac ban/giao lai bat buoc co ly do
-        for (var candidate : candidates(appeal)) {
+    private AppealReviewerCandidateResponse requireCandidate(Appeal appeal, Integer id, String reason, boolean reassign, Integer headId) { // [LUONG 2 - PHAN CONG] 5c: chon nguoi ngoai danh sach 5b thi bi tu choi; khac ban/giao lai/Truong ban tu cham bat buoc co ly do
+        for (var candidate : candidates(appeal, headId)) {
             if (!candidate.reviewerId().equals(id)) continue;
-            if ((candidate.crossDepartment() || reassign) && (reason == null || reason.isBlank()))
-                throw new BusinessException("Phải nhập lý do giao lại hoặc phân công khác ban.");
+            if ((candidate.crossDepartment() || reassign || candidate.reviewerId().equals(headId)) && (reason == null || reason.isBlank()))
+                throw new BusinessException("Phải nhập lý do giao lại, phân công khác ban hoặc Trưởng ban tự chấm.");
             return candidate;
         }
         throw new BusinessException("Biên tập viên không đủ điều kiện hoặc đã tham gia chấm bài này.");

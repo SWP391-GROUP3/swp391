@@ -136,6 +136,22 @@ class BF03AppealManagementIT {
                 .andExpect(status().isConflict());
     }
 
+    @Test void headReviewsHimselfOnlyWhenNoEditorIsLeftAndNeedsReason() throws Exception {
+        var f = fixture(1);
+        // Fixture rollback: danh dau moi BTV da tham gia khieu nai nay, nen khong con BTV hop le o ban nao.
+        jdbc.update("INSERT INTO audit_logs(actor_id,action_type,entity_type,entity_id,new_value) SELECT 5,'ASSIGN','appeals',?,CONCAT('{\"reviewerId\":',u.id,'}') FROM users u JOIN roles r ON r.id=u.role_id WHERE r.code='EDITOR'", f.appeal);
+        mvc.perform(get("/api/appeals/"+f.appeal+"/reviewer-candidates").header("Authorization", bearer(5)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.length()").value(1)).andExpect(jsonPath("$.data[0].reviewerId").value(5));
+        mvc.perform(post("/api/appeals/"+f.appeal+"/assign").header("Authorization", bearer(5))
+                .contentType("application/json").content("{\"reviewerId\":5}"))
+                .andExpect(status().isConflict());
+        var result = mvc.perform(post("/api/appeals/"+f.appeal+"/assign").header("Authorization", bearer(5))
+                .contentType("application/json").content("{\"reviewerId\":5,\"reason\":\"Không còn BTV nào khác\"}"))
+                .andExpect(status().isOk()).andReturn();
+        int attempt = json.readTree(result.getResponse().getContentAsString()).at("/data/currentAttempt/id").asInt();
+        mvc.perform(get("/api/appeal-reviews/"+attempt).header("Authorization", bearer(5))).andExpect(status().isOk());
+    }
+
     @Test
     @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     void notificationFailureRollsBackDraftStatusAuditAndNotification() {

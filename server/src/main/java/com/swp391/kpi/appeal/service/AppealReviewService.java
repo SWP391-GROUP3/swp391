@@ -84,7 +84,7 @@ public class AppealReviewService {
 
     @Transactional
     public AppealBlindScorecardResponse getCard(Integer attemptId, Integer userId) {
-        users.requireActive(userId, "EDITOR");
+        users.requireActive(userId, "EDITOR", "HEAD_OF_DEPARTMENT");
         var ref = scoring.getAttemptReference(attemptId);
         lockedAppeal(ref.appealId());
         return scoring.getOwnedScorecard(attemptId, userId);
@@ -92,7 +92,7 @@ public class AppealReviewService {
 
     @Transactional
     public AppealBlindScorecardResponse save(Integer attemptId, Integer userId, AppealScorecardRequest request, boolean submit) { // [LUONG 3 - CHAM MU] buoc 5/7 service: khoa khieu nai TRUOC khoa phieu, phai dang IN_REVIEW, goi saveScorecard, nop xong bao Truong ban
-        users.requireActive(userId, "EDITOR");
+        users.requireActive(userId, "EDITOR", "HEAD_OF_DEPARTMENT");
         deviations.lockWorkflow();
         var ref = scoring.getAttemptReference(attemptId);
         // Moi luong ghi deu khoa appeal truoc phieu, tranh deadlock voi giao lai/chot ket qua.
