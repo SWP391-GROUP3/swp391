@@ -87,4 +87,42 @@ public class AssignmentController {
         EditorWorkloadDTO workload = assignmentService.getEditorWorkload(editorId);
         return ResponseEntity.ok(ApiResponse.success("Lấy khối lượng công việc thành công", workload));
     }
+
+    /**
+     * Lấy danh sách các bài viết đang được phân công (ASSIGNED) trong ban của Trưởng ban.
+     */
+    @GetMapping("/assigned")
+    public ResponseEntity<ApiResponse<List<AssignmentResponse>>> getAssignedArticles(
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        List<AssignmentResponse> list = assignmentService.getAssignedArticles(currentUserId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách bài đã phân công thành công", list));
+    }
+
+    /**
+     * Trưởng ban đổi Biên tập viên khác chấm bài (Re-assign).
+     */
+    @PostMapping("/article/{articleId}/reassign")
+    public ResponseEntity<ApiResponse<AssignmentResponse>> reassignArticle(
+            @PathVariable Integer articleId,
+            @RequestBody AssignmentCreateRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        AssignmentResponse response = assignmentService.reassignArticle(articleId, request.getEditorId(), currentUserId);
+        return ResponseEntity.ok(ApiResponse.success("Đổi Biên tập viên thành công", response));
+    }
+
+    /**
+     * Trưởng ban thu hồi phân công bài viết (Unassign/Revoke).
+     */
+    @PostMapping("/article/{articleId}/revoke")
+    public ResponseEntity<ApiResponse<Void>> revokeAssignment(
+            @PathVariable Integer articleId,
+            @RequestBody(required = false) java.util.Map<String, String> body,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        String reason = body != null ? body.get("reason") : null;
+        assignmentService.revokeAssignment(articleId, currentUserId, reason);
+        return ResponseEntity.ok(ApiResponse.success("Thu hồi phân công bài viết thành công", null));
+    }
 }

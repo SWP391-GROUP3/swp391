@@ -344,4 +344,43 @@ class ScoreApprovalServiceTest {
         );
         verify(articleService, never()).publishArticle(any(), any());
     }
+
+    @Test
+    @DisplayName("Hủy duyệt xuất bản thành công khi bài đang PUBLISHED (UC-33 Alternative)")
+    void unpublish_Success() {
+        Article article = new Article();
+        article.setId(20);
+        article.setSectionId(1);
+        article.setStatus(ArticleStatus.PUBLISHED);
+
+        when(articleRepository.findById(20)).thenReturn(Optional.of(article));
+
+        ScoreApprovalDecisionRequest req = new ScoreApprovalDecisionRequest();
+        req.setReason("Cần chỉnh sửa lại nội dung");
+
+        PublishingResponse response = scoreApprovalService.unpublish(20, req, 2);
+
+        assertNotNull(response);
+        assertEquals(20, response.getArticleId());
+        assertEquals("SCORE_PUBLISHED", response.getStatus());
+        verify(articleService).unpublishArticle(20, 2, "Cần chỉnh sửa lại nội dung");
+    }
+
+    @Test
+    @DisplayName("Hủy duyệt xuất bản thất bại nếu bài chưa PUBLISHED")
+    void unpublish_WrongStatus_ThrowsException() {
+        Article article = new Article();
+        article.setId(20);
+        article.setSectionId(1);
+        article.setStatus(ArticleStatus.SCORE_PUBLISHED);
+
+        when(articleRepository.findById(20)).thenReturn(Optional.of(article));
+
+        BusinessException ex = assertThrows(BusinessException.class, () ->
+                scoreApprovalService.unpublish(20, null, 2)
+        );
+
+        assertTrue(ex.getMessage().contains("PUBLISHED"));
+        verify(articleService, never()).unpublishArticle(any(), any(), any());
+    }
 }

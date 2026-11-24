@@ -92,5 +92,29 @@ public class ScoreApprovalController {
         PublishingResponse response = scoreApprovalService.approvePublishing(articleId, headId);
         return ResponseEntity.ok(ApiResponse.success("Duyệt xuất bản bài viết thành công", response));
     }
+
+    /**
+     * Lay danh sach bai viet da xuat ban cua ban (UC-33).
+     */
+    @GetMapping("/published")
+    public ResponseEntity<ApiResponse<List<PublishingItemResponse>>> getPublishedArticles(
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        List<PublishingItemResponse> list = scoreApprovalService.getPublishedArticles(currentUserId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách bài viết đã xuất bản thành công", list));
+    }
+
+    /**
+     * Truong ban huy duyet xuat ban bai viet (UC-33).
+     */
+    @PostMapping("/article/{articleId}/unpublish")
+    public ResponseEntity<ApiResponse<PublishingResponse>> unpublish(
+            @PathVariable Integer articleId,
+            @RequestBody(required = false) ScoreApprovalDecisionRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer headId = Integer.valueOf(jwt.getSubject());
+        PublishingResponse response = scoreApprovalService.unpublish(articleId, request, headId);
+        return ResponseEntity.ok(ApiResponse.success("Hủy duyệt xuất bản bài viết thành công", response));
+    }
 }
 

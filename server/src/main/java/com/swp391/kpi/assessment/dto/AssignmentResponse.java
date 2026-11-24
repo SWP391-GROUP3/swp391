@@ -26,6 +26,8 @@ public class AssignmentResponse {
     private String articleStatus;
     private String categoryName;
     private Integer editorId;
+    private String editorName;
+    private String authorName;
     private Integer assignedBy;
     private LocalDateTime assignedAt;
     private Boolean wasSuggested;

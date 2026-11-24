@@ -300,6 +300,105 @@ public class ScoreApprovalService {
         );
     }
 
+    /**
+     * Lay danh sach cac bai viet da xuat ban cua ban Truong ban (UC-33).
+     * Chi lay cac bai co status = PUBLISHED.
+     */
+    @Transactional(readOnly = true)
+    public List<PublishingItemResponse> getPublishedArticles(Integer currentUserId) {
+        Integer sectionId = userReadService.requireActive(currentUserId, "HEAD_OF_DEPARTMENT").sectionId();
+        List<Article> articles = articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(
+                ArticleStatus.PUBLISHED, sectionId);
+
+        Map<Integer, String> genreMap = new HashMap<>();
+        for (GenreResponse g : genreService.getActiveGenres()) {
+            genreMap.put(g.getId(), g.getName());
+        }
+
+        List<PublishingItemResponse> result = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Article article : articles) {
+            ScoringAttempt attempt = findLatestAttempt(article.getId())
+                    .orElse(null);
+
+            if (attempt != null) {
+                String reviewerName = userRepository.findById(attempt.getReviewerId())
+                        .map(User::getFullName)
+                        .orElse("Biên tập viên #" + attempt.getReviewerId());
+
+                String authorName = userRepository.findById(article.getAuthorId())
+                        .map(User::getFullName)
+                        .orElse("Tác giả #" + article.getAuthorId());
+
+                String categoryName = genreMap.getOrDefault(article.getCategoryId(), "Chưa phân loại");
+
+                ScoreApproval approval = scoreApprovalRepository.findByScoringAttemptId(attempt.getId())
+                        .orElse(null);
+
+                LocalDateTime scoreApprovedAt = (approval != null && approval.getAnnouncedAt() != null)
+                        ? approval.getAnnouncedAt()
+                        : (approval != null ? approval.getDecidedAt() : null);
+
+                LocalDateTime appealDeadline = appealRuleConfigService.getAppealDeadline(scoreApprovedAt);
+                boolean appealOpen = appealDeadline != null && now.isBefore(appealDeadline);
+                long daysRemaining = 0;
+                if (appealOpen && scoreApprovedAt != null) {
+                    daysRemaining = ChronoUnit.DAYS.between(now, appealDeadline);
+                    if (daysRemaining < 0) {
+                        daysRemaining = 0;
+                    }
+                }
+
+                PublishingItemResponse item = new PublishingItemResponse(
+                        article.getId(),
+                        article.getTitle(),
+                        authorName,
+                        article.getCategoryId(),
+                        categoryName,
+                        appealEffectiveScoreService.getEffectiveScore(article.getId(), attempt.getTotalScore()),
+                        reviewerName,
+                        scoreApprovedAt,
+                        appealDeadline,
+                        appealOpen,
+                        (int) daysRemaining,
+                        article.getPublishedAt() != null ? article.getPublishedAt() : article.getUpdatedAt()
+                );
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Truong ban huy duyet xuat ban bai viet (UC-33 Alternative/Exception).
+     * Chuyen bai viet tu PUBLISHED ve SCORE_PUBLISHED, go published_at va approved_by.
+     */
+    @Transactional
+    public PublishingResponse unpublish(Integer articleId, ScoreApprovalDecisionRequest request, Integer headId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết với ID: " + articleId));
+        checkHeadOfSection(headId, article);
+
+        if (article.getStatus() != ArticleStatus.PUBLISHED) {
+            throw new BusinessException("Chỉ có thể hủy duyệt đăng các bài viết đang ở trạng thái ĐÃ XUẤT BẢN (PUBLISHED)");
+        }
+
+        String reason = (request != null && request.getReason() != null && !request.getReason().trim().isEmpty())
+                ? request.getReason().trim()
+                : "Trưởng ban hủy duyệt xuất bản bài viết";
+
+        articleService.unpublishArticle(articleId, headId, reason);
+
+        return new PublishingResponse(
+                articleId,
+                ArticleStatus.SCORE_PUBLISHED.name(),
+                null,
+                headId,
+                "Hủy duyệt xuất bản bài viết thành công"
+        );
+    }
+
     // M-A2: lan cham moi nhat cua BF-02 (INITIAL / RESCORE), bo qua lan cham APPEAL do BF-03 ghi
     private Optional<ScoringAttempt> findLatestAttempt(Integer articleId) {
         return scoringAttemptRepository.findTopByArticleIdAndAttemptTypeNotOrderByAttemptNoDesc(articleId, AttemptType.APPEAL);

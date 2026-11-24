@@ -52,4 +52,6 @@ public interface ScoringAttemptRepository extends JpaRepository<ScoringAttempt, 
 
     // Lấy lần chấm theo lượt phân công
     Optional<ScoringAttempt> findTopByAssignmentIdOrderByAttemptNoDesc(Integer assignmentId);
+    // Kiểm tra xem một phiên bản bộ tiêu chí đã từng được sử dụng để chấm bài chưa (BR-SC-02)
+    boolean existsByCriteriaSetVersionId(Integer criteriaSetVersionId);
 }

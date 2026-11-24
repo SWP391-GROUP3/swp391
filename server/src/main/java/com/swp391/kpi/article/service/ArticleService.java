@@ -89,10 +89,12 @@ public class ArticleService {
     // So dong toi da 1 trang, tranh client xin qua nhieu 1 lan
     private static final int MAX_PAGE_SIZE = 50;
 
-    // Ten hanh dong ghi vao article_status_logs.action khi rut bai
+    // Ten hanh dong khi rut bai
     private static final String ACTION_WITHDRAW = "WITHDRAW";
     // Ten hanh dong khi Truong ban duyet dang (giong database/data.sql)
     private static final String ACTION_PUBLISH = "PUBLISH";
+    // Ten hanh dong khi Truong ban huy duyet dang
+    private static final String ACTION_UNPUBLISH = "UNPUBLISH";
 
     private final ArticleRepository articleRepository;
     private final ArticleAuthorRepository articleAuthorRepository;
@@ -218,6 +220,22 @@ public class ArticleService {
         article.setPublishedAt(LocalDateTime.now());
         article.setApprovedBy(approverId);
         changeStatus(article, ArticleStatus.PUBLISHED, approverId, ACTION_PUBLISH, null);
+    }
+
+    /**
+     * Cho BF-02 (UC-33 huy duyet dang): bai PUBLISHED -> SCORE_PUBLISHED.
+     * Bat buoc dat published_at = null (CHECK ck_articles_published), approved_by = null.
+     */
+    @Transactional
+    public void unpublishArticle(Integer articleId, Integer approverId, String reason) {
+        Article article = findArticle(articleId);
+        if (article.getStatus() != ArticleStatus.PUBLISHED) {
+            throw new BusinessException("Chỉ có thể hủy duyệt đăng bài viết đang ở trạng thái Đã xuất bản (PUBLISHED).");
+        }
+        article.setPublishedAt(null);
+        article.setApprovedBy(null);
+        String note = (reason != null && !reason.trim().isEmpty()) ? reason.trim() : "Trưởng ban hủy duyệt xuất bản bài viết";
+        changeStatus(article, ArticleStatus.SCORE_PUBLISHED, approverId, ACTION_UNPUBLISH, note);
     }
 
     /**

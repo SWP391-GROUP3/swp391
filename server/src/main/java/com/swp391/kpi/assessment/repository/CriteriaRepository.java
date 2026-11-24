@@ -17,4 +17,7 @@ public interface CriteriaRepository extends JpaRepository<Criteria, Integer> {
 
     // Lấy danh sách tiêu chí thuộc về một version bộ tiêu chí sắp xếp theo sort_order
     List<Criteria> findByCriteriaSetVersionIdOrderBySortOrderAsc(Integer criteriaSetVersionId);
+
+    // Xóa tất cả các tiêu chí thuộc về một version bộ tiêu chí (dùng khi sửa/xóa bản DRAFT)
+    void deleteByCriteriaSetVersionId(Integer criteriaSetVersionId);
 }

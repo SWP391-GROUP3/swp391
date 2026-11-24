@@ -23,4 +23,7 @@ public interface ScoringAttemptDetailRepository extends JpaRepository<ScoringAtt
 
     // Lấy điểm của một tiêu chí cụ thể trong lần chấm
     Optional<ScoringAttemptDetail> findByScoringAttemptIdAndCriterionId(Integer scoringAttemptId, Integer criterionId);
+
+    // Xóa chi tiết điểm của một lần chấm
+    void deleteByScoringAttemptId(Integer scoringAttemptId);
 }

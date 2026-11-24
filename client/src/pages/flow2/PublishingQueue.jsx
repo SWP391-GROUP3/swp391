@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react'
-import { layDanhSachChoDuyetDang, duyetDangBaiViet } from '../../api/assessmentApi.js'
+import {
+  layDanhSachChoDuyetDang,
+  layDanhSachDaXuatBan,
+  duyetDangBaiViet,
+  huyDuyetDangBaiViet
+} from '../../api/assessmentApi.js'
 import { getArticleDetail } from '../../api/articleApi.js'
 import { formatDate } from '../../utils/formatDate.js'
 import './PublishingQueue.css'
@@ -7,29 +12,15 @@ import '../../styles/Flow2.css'
 
 /**
  * Man Truong ban duyet dang bai (UC-33): danh sach bai da cong bo diem cho dang, tim kiem, xem chi
- * tiet va duyet dang (PUBLISHED).
+ * tiet, duyet dang (PUBLISHED) va huy duyet xuat ban (Alternative/Exception).
  *
  * MO TRANG NAY TAI: /publishing
- *
- * MUC LUC (so dong - ten - tac dung)
- *   31  PublishingQueue()               publishing queue
- *   45    useEffect                     tai du lieu khi mo trang
- *   50    taiDanhSach()                 Bai SCORE_PUBLISHED cua ban minh, kem diem hieu luc va han khieu nai
- *   64    moModalKiemDuyet()            Mo hop kiem duyet: tai noi dung bai de doc truoc khi dang
- *   81    dongModal()                   Dong hop kiem duyet
- *   88    xuLyDuyetDang()               UC-33: duyet dang -> bai PUBLISHED, ghi ngay dang (BR-SC-11)
- *
- * NUT / LINK TREN MAN HINH (so dong - bam vao - ket qua)
- *  137  [Dang tai... / Lam moi]         taiDanhSach() Bai SCORE_PUBLISHED cua ban minh, kem diem hieu luc va han khieu nai -> goi GET /api/score-approvals/publishing
- *  247  [Kiem duyet & Dang]             moModalKiemDuyet() Mo hop kiem duyet: tai noi dung bai de doc truoc khi dang -> goi GET /api/articles/{articleId}
- *  266  [vung nen ngoai hop thoai]      dongModal() Dong hop kiem duyet -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
- *  273  []                              dongModal() Dong hop kiem duyet -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
- *  334  [Dong]                          dongModal() Dong hop kiem duyet -> tren trang: dong/xoa bai kiem duyet, dong/xoa chi tiet bai
- *  342  [Dang duyet xuat ban... / Duyet xuat ban]  xuLyDuyetDang() UC-33: duyet dang -> bai PUBLISHED, ghi ngay dang (BR-SC-11) -> goi POST /api/score-approvals/article/{articleId}/publish, GET /api/score-appro…
  */
 
 export default function PublishingQueue({ nguoiDung }) {
-  const [danhSach, setDanhSach] = useState([])
+  const [tabHienTai, setTabHienTai] = useState('CHO_DANG') // 'CHO_DANG' | 'DA_DANG'
+  const [danhSachChoDang, setDanhSachChoDang] = useState([])
+  const [danhSachDaDang, setDanhSachDaDang] = useState([])
   const [dangTai, setDangTai] = useState(false)
   const [thongBao, setThongBao] = useState('')
   const [loi, setLoi] = useState('')
@@ -42,19 +33,39 @@ export default function PublishingQueue({ nguoiDung }) {
   const [loiChiTiet, setLoiChiTiet] = useState('')
   const [dangXuLy, setDangXuLy] = useState(false)
 
+  // Modal hủy duyệt xuất bản
+  const [baiHuyDuyet, setBaiHuyDuyet] = useState(null)
+  const [lyDoHuy, setLyDoHuy] = useState('')
+  const [dangXuLyHuy, setDangXuLyHuy] = useState(false)
+
   useEffect(() => {
-    taiDanhSach()
+    taiDuLieu()
   }, [])
 
-  // Bai SCORE_PUBLISHED cua ban minh, kem diem hieu luc va han khieu nai
-  async function taiDanhSach() {
+  // Tải cả danh sách chờ xuất bản và đã xuất bản (dùng Promise.allSettled để không bị chặn lẫn nhau)
+  async function taiDuLieu() {
     setDangTai(true)
     setLoi('')
     try {
-      const data = await layDanhSachChoDuyetDang()
-      setDanhSach(data || [])
+      const [choDangRes, daDangRes] = await Promise.allSettled([
+        layDanhSachChoDuyetDang(),
+        layDanhSachDaXuatBan()
+      ])
+
+      if (choDangRes.status === 'fulfilled') {
+        setDanhSachChoDang(choDangRes.value || [])
+      } else {
+        setLoi(choDangRes.reason?.message || 'Không thể tải danh sách chờ duyệt xuất bản')
+      }
+
+      if (daDangRes.status === 'fulfilled') {
+        setDanhSachDaDang(daDangRes.value || [])
+      } else if (choDangRes.status === 'fulfilled') {
+        // Nếu chỉ lỗi danh sách đã xuất bản (vd backend cũ chưa nạp endpoint)
+        setLoi(daDangRes.reason?.message || 'Không thể tải danh sách đã xuất bản')
+      }
     } catch (err) {
-      setLoi(err.message || 'Không thể tải danh sách chờ duyệt xuất bản')
+      setLoi(err.message || 'Không thể tải danh sách xuất bản bài viết')
     } finally {
       setDangTai(false)
     }
@@ -70,14 +81,13 @@ export default function PublishingQueue({ nguoiDung }) {
       const chiTiet = await getArticleDetail(item.articleId)
       setChiTietBai(chiTiet)
     } catch (err) {
-      // M-A1: khong nuot loi - hien thong bao cua server (vd khong co quyen xem bai)
       setLoiChiTiet(err.message)
     } finally {
       setDangTaiChiTiet(false)
     }
   }
 
-  // Dong hop kiem duyet
+  // Dong hop kiem duyet (UC-33 A1: hoãn duyệt xuất bản)
   function dongModal() {
     if (dangXuLy) return
     setBaiKiemDuyet(null)
@@ -94,7 +104,7 @@ export default function PublishingQueue({ nguoiDung }) {
       setThongBao(`Duyệt xuất bản thành công bài viết: "${baiKiemDuyet.title}". Bài đã chuyển sang trạng thái ĐÃ XUẤT BẢN và bàn giao sang tính nhuận bút.`)
       setBaiKiemDuyet(null)
       setChiTietBai(null)
-      taiDanhSach()
+      taiDuLieu()
     } catch (err) {
       setLoi(err.message || 'Duyệt xuất bản bài viết thất bại')
     } finally {
@@ -102,8 +112,43 @@ export default function PublishingQueue({ nguoiDung }) {
     }
   }
 
+  // Mở modal hủy duyệt xuất bản
+  function moModalHuyDuyet(item) {
+    setBaiHuyDuyet(item)
+    setLyDoHuy('')
+    setLoi('')
+  }
+
+  // Đóng modal hủy duyệt xuất bản
+  function dongModalHuyDuyet() {
+    if (dangXuLyHuy) return
+    setBaiHuyDuyet(null)
+    setLyDoHuy('')
+  }
+
+  // UC-33 Alternative/Exception: Hủy duyệt xuất bản -> bai tro ve SCORE_PUBLISHED
+  async function xuLyHuyDuyet() {
+    if (!baiHuyDuyet) return
+    setDangXuLyHuy(true)
+    setLoi('')
+    try {
+      await huyDuyetDangBaiViet(baiHuyDuyet.articleId, lyDoHuy)
+      setThongBao(`Đã hủy duyệt xuất bản bài viết: "${baiHuyDuyet.title}". Bài viết đã quay về trạng thái Chờ duyệt xuất bản (SCORE_PUBLISHED).`)
+      setBaiHuyDuyet(null)
+      setLyDoHuy('')
+      taiDuLieu()
+    } catch (err) {
+      setLoi(err.message || 'Hủy duyệt xuất bản bài viết thất bại')
+    } finally {
+      setDangXuLyHuy(false)
+    }
+  }
+
+  // Lấy danh sách hiển thị theo tab
+  const danhSachHienTai = tabHienTai === 'CHO_DANG' ? danhSachChoDang : danhSachDaDang
+
   // Lọc theo từ khóa tìm kiếm
-  const danhSachLoc = danhSach.filter(item => {
+  const danhSachLoc = danhSachHienTai.filter(item => {
     if (!tuKhoa.trim()) return true
     const kw = tuKhoa.toLowerCase()
     return (
@@ -115,10 +160,11 @@ export default function PublishingQueue({ nguoiDung }) {
   })
 
   // Thống kê nhanh
-  const tongSoBai = danhSach.length
-  const soBaiTrongHanKhieuNai = danhSach.filter(item => item.isAppealWindowOpen).length
-  const diemTb = tongSoBai > 0
-    ? (danhSach.reduce((sum, item) => sum + Number(item.totalScore || 0), 0) / tongSoBai).toFixed(2)
+  const tongSoBaiChoDang = danhSachChoDang.length
+  const tongSoBaiDaDang = danhSachDaDang.length
+  const soBaiTrongHanKhieuNai = danhSachChoDang.filter(item => item.isAppealWindowOpen).length
+  const diemTb = danhSachChoDang.length > 0
+    ? (danhSachChoDang.reduce((sum, item) => sum + Number(item.totalScore || 0), 0) / danhSachChoDang.length).toFixed(2)
     : '0.00'
 
   return (
@@ -126,15 +172,15 @@ export default function PublishingQueue({ nguoiDung }) {
       <div className="duyet-dang__the">
         <div className="duyet-dang__dau">
           <div>
-            <h2 className="duyet-dang__tieu-de">Hàng chờ duyệt xuất bản bài viết</h2>
+            <h2 className="duyet-dang__tieu-de">Quản lý duyệt xuất bản bài viết</h2>
             <p className="duyet-dang__mo-ta">
-              Xem xét các bài viết đã hoàn thiện đánh giá chất lượng và công bố điểm để chính thức phát hành lên báo trực tuyến.
+              Xem xét các bài viết đã hoàn thiện đánh giá chất lượng để chính thức phát hành lên báo trực tuyến hoặc hủy duyệt xuất bản.
             </p>
           </div>
           <button
             type="button"
             className="duyet-dang__nut-lam-moi"
-            onClick={taiDanhSach}
+            onClick={taiDuLieu}
             disabled={dangTai}
           >
             {dangTai ? 'Đang tải...' : 'Làm mới'}
@@ -157,8 +203,13 @@ export default function PublishingQueue({ nguoiDung }) {
         <div className="duyet-dang__thong-ke">
           <div className="duyet-dang__thong-ke-the">
             <span className="duyet-dang__thong-ke-nhan">Chờ duyệt xuất bản</span>
-            <span className="duyet-dang__thong-ke-so">{tongSoBai}</span>
+            <span className="duyet-dang__thong-ke-so">{tongSoBaiChoDang}</span>
             <span className="duyet-dang__thong-ke-ghi-chu">Bài đã công bố điểm</span>
+          </div>
+          <div className="duyet-dang__thong-ke-the">
+            <span className="duyet-dang__thong-ke-nhan">Đã xuất bản trực tuyến</span>
+            <span className="duyet-dang__thong-ke-so" style={{ color: '#16a34a' }}>{tongSoBaiDaDang}</span>
+            <span className="duyet-dang__thong-ke-ghi-chu">Có thể hủy duyệt nếu cần</span>
           </div>
           <div className="duyet-dang__thong-ke-the">
             <span className="duyet-dang__thong-ke-nhan">Trong hạn khiếu nại (7 ngày)</span>
@@ -168,8 +219,26 @@ export default function PublishingQueue({ nguoiDung }) {
           <div className="duyet-dang__thong-ke-the">
             <span className="duyet-dang__thong-ke-nhan">Điểm chất lượng trung bình</span>
             <span className="duyet-dang__thong-ke-so" style={{ color: '#0284c7' }}>{diemTb}</span>
-            <span className="duyet-dang__thong-ke-ghi-chu">Thang điểm 100</span>
+            <span className="duyet-dang__thong-ke-ghi-chu">Hàng chờ duyệt</span>
           </div>
+        </div>
+
+        {/* Tabs chuyển đổi Chờ duyệt xuất bản / Đã xuất bản */}
+        <div className="duyet-dang__tabs">
+          <button
+            type="button"
+            className={`duyet-dang__tab-nut ${tabHienTai === 'CHO_DANG' ? 'duyet-dang__tab-nut--kich-hoat' : ''}`}
+            onClick={() => setTabHienTai('CHO_DANG')}
+          >
+            Chờ duyệt xuất bản ({tongSoBaiChoDang})
+          </button>
+          <button
+            type="button"
+            className={`duyet-dang__tab-nut ${tabHienTai === 'DA_DANG' ? 'duyet-dang__tab-nut--kich-hoat' : ''}`}
+            onClick={() => setTabHienTai('DA_DANG')}
+          >
+            Đã xuất bản ({tongSoBaiDaDang})
+          </button>
         </div>
 
         {/* Thanh tìm kiếm */}
@@ -185,10 +254,14 @@ export default function PublishingQueue({ nguoiDung }) {
 
         {/* Bảng danh sách bài */}
         {dangTai ? (
-          <div className="duyet-dang__trong">Đang tải danh sách bài chờ duyệt xuất bản...</div>
+          <div className="duyet-dang__trong">Đang tải danh sách bài viết...</div>
         ) : danhSachLoc.length === 0 ? (
           <div className="duyet-dang__trong">
-            {tuKhoa ? 'Không tìm thấy bài viết nào khớp với từ khóa tìm kiếm.' : 'Hiện không có bài viết nào chờ duyệt xuất bản.'}
+            {tuKhoa
+              ? 'Không tìm thấy bài viết nào khớp với từ khóa tìm kiếm.'
+              : tabHienTai === 'CHO_DANG'
+              ? 'Hiện không có bài viết nào chờ duyệt xuất bản.'
+              : 'Chưa có bài viết nào đã xuất bản trong ban của bạn.'}
           </div>
         ) : (
           <div className="duyet-dang__bang-bao">
@@ -200,8 +273,9 @@ export default function PublishingQueue({ nguoiDung }) {
                   <th>Tác giả & BTV</th>
                   <th>Thể loại</th>
                   <th>Điểm chất lượng</th>
-                  <th>Ngày công bố</th>
-                  <th>Cửa sổ khiếu nại</th>
+                  <th>{tabHienTai === 'CHO_DANG' ? 'Ngày công bố' : 'Ngày xuất bản'}</th>
+                  {tabHienTai === 'CHO_DANG' && <th>Cửa sổ khiếu nại</th>}
+                  {tabHienTai === 'DA_DANG' && <th>Trạng thái</th>}
                   <th style={{ textAlign: 'right' }}>Thao tác</th>
                 </tr>
               </thead>
@@ -229,29 +303,53 @@ export default function PublishingQueue({ nguoiDung }) {
                     <td>
                       {item.scoreApprovedAt ? formatDate(item.scoreApprovedAt) : '—'}
                     </td>
-                    <td>
-                      {item.isAppealWindowOpen ? (
-                        <span className="duyet-dang__huy-hieu duyet-dang__huy-hieu--khieu-nai-mo">
-                          Còn {item.daysRemaining} ngày
+                    {tabHienTai === 'CHO_DANG' && (
+                      <td>
+                        {item.isAppealWindowOpen ? (
+                          <span className="duyet-dang__huy-hieu duyet-dang__huy-hieu--khieu-nai-mo">
+                            Còn {item.daysRemaining} ngày
+                          </span>
+                        ) : (
+                          <span className="duyet-dang__huy-hieu duyet-dang__huy-hieu--het-han">
+                            Hết hạn khiếu nại
+                          </span>
+                        )}
+                      </td>
+                    )}
+                    {tabHienTai === 'DA_DANG' && (
+                      <td>
+                        <span className="duyet-dang__huy-hieu" style={{ background: '#dcfce7', color: '#15803d' }}>
+                          Đã xuất bản
                         </span>
-                      ) : (
-                        <span className="duyet-dang__huy-hieu duyet-dang__huy-hieu--het-han">
-                          Hết hạn khiếu nại
-                        </span>
-                      )}
-                    </td>
+                      </td>
+                    )}
                     <td style={{ textAlign: 'right' }}>
-                      <button
-                        type="button"
-                        className="duyet-dang__nut-kiem-duyet"
-                        onClick={() => moModalKiemDuyet(item)}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z" />
-                          <path d="m10 13 4-4" />
-                        </svg>
-                        Kiểm duyệt & Đăng
-                      </button>
+                      {tabHienTai === 'CHO_DANG' ? (
+                        <button
+                          type="button"
+                          className="duyet-dang__nut-kiem-duyet"
+                          onClick={() => moModalKiemDuyet(item)}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z" />
+                            <path d="m10 13 4-4" />
+                          </svg>
+                          Kiểm duyệt & Đăng
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="duyet-dang__nut-huy-dang"
+                          onClick={() => moModalHuyDuyet(item)}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                          </svg>
+                          Hủy duyệt đăng
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -334,7 +432,7 @@ export default function PublishingQueue({ nguoiDung }) {
                 onClick={dongModal}
                 disabled={dangXuLy}
               >
-                Đóng
+                Đóng (Hoãn duyệt)
               </button>
               <button
                 type="button"
@@ -351,6 +449,72 @@ export default function PublishingQueue({ nguoiDung }) {
                   <circle cx="12" cy="12" r="4" />
                 </svg>
                 {dangXuLy ? 'Đang duyệt xuất bản...' : 'Duyệt xuất bản'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal xác nhận Hủy duyệt xuất bản */}
+      {baiHuyDuyet && (
+        <div className="duyet-dang__modal-nen" onClick={dongModalHuyDuyet}>
+          <div className="duyet-dang__modal-hop" style={{ maxWidth: '550px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="duyet-dang__modal-dau">
+              <h3>Xác nhận hủy duyệt xuất bản</h3>
+              <button
+                type="button"
+                className="duyet-dang__nut-dong"
+                onClick={dongModalHuyDuyet}
+                disabled={dangXuLyHuy}
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="duyet-dang__modal-than">
+              <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--fm-chu)' }}>
+                Bạn có chắc chắn muốn hủy duyệt xuất bản bài viết sau không?
+              </p>
+              <div style={{ padding: '12px', background: 'var(--fm-nen)', borderRadius: '6px', marginBottom: '16px' }}>
+                <strong style={{ color: 'var(--fm-chu)', fontSize: '14px' }}>{baiHuyDuyet.title}</strong>
+                <div style={{ fontSize: '12px', color: 'var(--fm-chu-nhat)', marginTop: '4px' }}>
+                  Tác giả: {baiHuyDuyet.authorName} • Thể loại: {baiHuyDuyet.categoryName} • Điểm: {Number(baiHuyDuyet.totalScore).toFixed(2)}đ
+                </div>
+              </div>
+
+              <div className="duyet-dang__canh-bao" style={{ background: '#fef2f2', borderColor: '#fca5a5', color: '#991b1b' }}>
+                <strong>Lưu ý:</strong> Bài viết sẽ được thu hồi khỏi trạng thái ĐÃ XUẤT BẢN và quay trở về danh sách <strong>Chờ duyệt xuất bản (SCORE_PUBLISHED)</strong>. Ngày phát hành sẽ được gỡ bỏ cho đến khi có quyết định duyệt lại.
+              </div>
+
+              <label style={{ display: 'block', marginTop: '14px', fontSize: '13px', fontWeight: '500', color: 'var(--fm-chu)' }}>
+                Lý do hủy duyệt xuất bản (tùy chọn):
+                <textarea
+                  className="duyet-dang__o-nhap-ly-do"
+                  rows="3"
+                  placeholder="Nhập lý do thu hồi / hủy duyệt xuất bản bài viết này..."
+                  value={lyDoHuy}
+                  onChange={(e) => setLyDoHuy(e.target.value)}
+                  disabled={dangXuLyHuy}
+                />
+              </label>
+            </div>
+
+            <div className="duyet-dang__modal-duoi">
+              <button
+                type="button"
+                className="duyet-dang__nut-phu"
+                onClick={dongModalHuyDuyet}
+                disabled={dangXuLyHuy}
+              >
+                Quay lại
+              </button>
+              <button
+                type="button"
+                className="duyet-dang__nut-xac-nhan-huy"
+                onClick={xuLyHuyDuyet}
+                disabled={dangXuLyHuy}
+              >
+                {dangXuLyHuy ? 'Đang xử lý hủy...' : 'Xác nhận hủy duyệt'}
               </button>
             </div>
           </div>

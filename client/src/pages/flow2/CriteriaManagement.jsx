@@ -4,6 +4,8 @@ import {
   layBoTieuChiActive,
   layDanhSachBoTieuChi,
   taoBoTieuChiDraft,
+  suaBoTieuChiDraft,
+  xoaBoTieuChiDraft,
   kichHoatBoTieuChi
 } from '../../api/assessmentApi.js'
 import { getGenres } from '../../api/adminApi.js'
@@ -46,6 +48,7 @@ export default function CriteriaManagement({ nguoiDung }) {
   const [allVersions, setAllVersions] = useState([])
   const [previewVersion, setPreviewVersion] = useState(null)
   const [newlyCreatedVersion, setNewlyCreatedVersion] = useState(null)
+  const [editingVersion, setEditingVersion] = useState(null)
   const [autoActivateNew, setAutoActivateNew] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -53,9 +56,9 @@ export default function CriteriaManagement({ nguoiDung }) {
 
   // Form soạn phiên bản tiêu chí mới
   const [criteriaList, setCriteriaList] = useState([
-    { name: 'Tính thời sự & thông tin mới', description: 'Độ nhanh nhạy và tính độc quyền của tin tức', weight: 30, maxScore: 100, sortOrder: 1 },
-    { name: 'Độ chính xác & nguồn tin kiểm chứng', description: 'Có đối chiếu đa nguồn, không đưa tin sai sự thật', weight: 40, maxScore: 100, sortOrder: 2 },
-    { name: 'Văn phong & chuẩn mực đạo đức', description: 'Hành văn trong sáng, tuân thủ đạo đức báo chí', weight: 30, maxScore: 100, sortOrder: 3 }
+    { name: 'Tính thời sự & thông tin mới', weight: 30, maxScore: 100, sortOrder: 1 },
+    { name: 'Độ chính xác & nguồn tin kiểm chứng', weight: 40, maxScore: 100, sortOrder: 2 },
+    { name: 'Văn phong & chuẩn mực đạo đức', weight: 30, maxScore: 100, sortOrder: 3 }
   ])
 
   // Tính tổng trọng số
@@ -116,7 +119,7 @@ export default function CriteriaManagement({ nguoiDung }) {
   function handleAddCriterion() {
     setCriteriaList([
       ...criteriaList,
-      { name: '', description: '', weight: 0, maxScore: 100, sortOrder: criteriaList.length + 1 }
+      { name: '', weight: 0, maxScore: 100, sortOrder: criteriaList.length + 1 }
     ])
   }
 
@@ -136,7 +139,51 @@ export default function CriteriaManagement({ nguoiDung }) {
     setCriteriaList(updated)
   }
 
-  // UC-15, UC-16: kiem tong trong so 100% roi POST /api/criteria-sets; tick Kich hoat ngay thi server kich hoat luon
+  // Bắt đầu sửa trực tiếp bản DRAFT (UC-15 A1)
+  function handleStartEdit(v) {
+    setEditingVersion(v)
+    setError('')
+    setMessage('')
+    if (v.criteria && v.criteria.length > 0) {
+      setCriteriaList(v.criteria.map((c, idx) => ({
+        name: c.name || '',
+        weight: Number(c.weight) || 0,
+        maxScore: 100,
+        sortOrder: c.sortOrder || idx + 1
+      })))
+    }
+    const formEl = document.getElementById('form-soan-tieu-chi')
+    if (formEl) formEl.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Hủy sửa, quay lại form tạo mới
+  function handleCancelEdit() {
+    setEditingVersion(null)
+    setCriteriaList([
+      { name: 'Tính thời sự & thông tin mới', weight: 30, maxScore: 100, sortOrder: 1 },
+      { name: 'Độ chính xác & nguồn tin kiểm chứng', weight: 40, maxScore: 100, sortOrder: 2 },
+      { name: 'Văn phong & chuẩn mực đạo đức', weight: 30, maxScore: 100, sortOrder: 3 }
+    ])
+  }
+
+  // Xóa bản DRAFT thừa chưa kích hoạt (UC-15 A1)
+  async function handleDeleteVersion(versionId) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bản nháp bộ tiêu chí này không?')) return
+    setError('')
+    setMessage('')
+    try {
+      await xoaBoTieuChiDraft(versionId)
+      setMessage('Xóa bản nháp tiêu chí thành công!')
+      if (editingVersion && editingVersion.id === versionId) {
+        handleCancelEdit()
+      }
+      await loadCategoryData(categoryId)
+    } catch (err) {
+      setError('Lỗi khi xóa bản nháp: ' + err.message)
+    }
+  }
+
+  // UC-15, UC-16: kiem tong trong so 100% roi POST / PUT /api/criteria-sets; tick Kich hoat ngay thi server kich hoat luon
   async function handleCreateNewVersion(e) {
     e.preventDefault()
     setError('')
@@ -154,19 +201,24 @@ export default function CriteriaManagement({ nguoiDung }) {
         autoActivate: Boolean(autoActivateNew),
         criteria: criteriaList.map((c, idx) => ({
           name: c.name,
-          description: c.description,
           weight: Number(c.weight),
           maxScore: Number(c.maxScore) || 100,
           sortOrder: idx + 1
         }))
       }
 
-      const created = await taoBoTieuChiDraft(payload)
-      if (autoActivateNew || created.status === 'ACTIVE') {
-        setMessage(`Tạo và Kích hoạt thành công Phiên bản ${created.versionNo} (ACTIVE)!`)
+      if (editingVersion) {
+        const updated = await suaBoTieuChiDraft(editingVersion.id, payload)
+        setMessage(`Cập nhật thành công Phiên bản ${updated.versionNo} (DRAFT)!`)
+        handleCancelEdit()
       } else {
-        setMessage(`Tạo thành công Phiên bản ${created.versionNo} (Trạng thái: ${created.status})! Mã ID: ${created.id}`)
-        setNewlyCreatedVersion(created)
+        const created = await taoBoTieuChiDraft(payload)
+        if (autoActivateNew || created.status === 'ACTIVE') {
+          setMessage(`Tạo và Kích hoạt thành công Phiên bản ${created.versionNo} (ACTIVE)!`)
+        } else {
+          setMessage(`Tạo thành công Phiên bản ${created.versionNo} (Trạng thái: ${created.status})! Mã ID: ${created.id}`)
+          setNewlyCreatedVersion(created)
+        }
       }
       await loadCategoryData(categoryId)
     } catch (err) {
@@ -261,7 +313,6 @@ export default function CriteriaManagement({ nguoiDung }) {
                   <tr>
                     <th className="bf02__giua">STT</th>
                     <th>Tên tiêu chí</th>
-                    <th>Mô tả</th>
                     <th className="bf02__giua">Trọng số</th>
                   </tr>
                 </thead>
@@ -270,7 +321,6 @@ export default function CriteriaManagement({ nguoiDung }) {
                     <tr key={item.id || idx}>
                       <td className="bf02__giua">{idx + 1}</td>
                       <td className="bf02__dam">{item.name}</td>
-                      <td className="bf02__nhat">{item.description}</td>
                       <td className="bf02__giua bf02__trong-so">{item.weight}%</td>
                     </tr>
                   ))}
@@ -327,10 +377,18 @@ export default function CriteriaManagement({ nguoiDung }) {
                     </td>
                     <td className="bf02__giua">
                       {v.status === 'DRAFT' ? (
-                        <button type="button" onClick={() => handleActivate(v.id)} className="nut-chinh-fm">
-                          <Icon>{BT_DAU_TICH}</Icon>
-                          Kích hoạt (ACTIVE)
-                        </button>
+                        <div style={{ display: 'inline-flex', gap: 6 }}>
+                          <button type="button" onClick={() => handleActivate(v.id)} className="nut-chinh-fm" title="Kích hoạt áp dụng chính thức">
+                            <Icon>{BT_DAU_TICH}</Icon>
+                            Kích hoạt
+                          </button>
+                          <button type="button" onClick={() => handleStartEdit(v)} className="nut-nhe" title="Chỉnh sửa nội dung bản nháp">
+                            Sửa
+                          </button>
+                          <button type="button" onClick={() => handleDeleteVersion(v.id)} className="nut-thao-tac nut-xoa" title="Xóa bản nháp thừa này">
+                            <Icon>{BT_DAU_X}</Icon>
+                          </button>
+                        </div>
                       ) : (
                         <span className="bf02__nhat">
                           {v.status === 'ACTIVE' ? 'Đang áp dụng' : 'Đã thay thế'}
@@ -345,9 +403,19 @@ export default function CriteriaManagement({ nguoiDung }) {
         )}
       </div>
 
-      {/* Form tạo phiên bản mới - UC-15, BR-SC-02 */}
-      <form onSubmit={handleCreateNewVersion}>
-        <h4 className="bf02__tieu-de-nho"><Icon>{BT_THEM}</Icon>Tạo Phiên bản Bộ tiêu chí mới</h4>
+      {/* Form tạo / sửa phiên bản - UC-15, BR-SC-02 */}
+      <form id="form-soan-tieu-chi" onSubmit={handleCreateNewVersion}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <h4 className="bf02__tieu-de-nho" style={{ margin: 0 }}>
+            <Icon>{BT_THEM}</Icon>
+            {editingVersion ? `Chỉnh sửa Bản nháp Phiên bản ${editingVersion.versionNo}` : 'Tạo Phiên bản Bộ tiêu chí mới'}
+          </h4>
+          {editingVersion && (
+            <button type="button" onClick={handleCancelEdit} className="nut-nhe">
+              Hủy sửa (Tạo phiên bản mới)
+            </button>
+          )}
+        </div>
 
         <div className="bf02__cuon">
           <table className="bang-fm">
@@ -355,7 +423,6 @@ export default function CriteriaManagement({ nguoiDung }) {
               <tr>
                 <th className="bf02__giua">STT</th>
                 <th>Tên tiêu chí</th>
-                <th>Mô tả / Hướng dẫn</th>
                 <th className="bf02__giua">Trọng số (%)</th>
                 <th className="bf02__giua">Xóa</th>
               </tr>
@@ -372,16 +439,6 @@ export default function CriteriaManagement({ nguoiDung }) {
                       value={crit.name}
                       onChange={(e) => handleCriterionChange(idx, 'name', e.target.value)}
                       aria-label={'Tên tiêu chí ' + (idx + 1)}
-                      className="bf02__o-nhap"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      placeholder="Mô tả tiêu chuẩn đạt..."
-                      value={crit.description}
-                      onChange={(e) => handleCriterionChange(idx, 'description', e.target.value)}
-                      aria-label={'Mô tả tiêu chí ' + (idx + 1)}
                       className="bf02__o-nhap"
                     />
                   </td>
@@ -441,7 +498,7 @@ export default function CriteriaManagement({ nguoiDung }) {
         </div>
 
         <button type="submit" disabled={totalWeight !== 100} className="nut-chinh-fm">
-          Lưu Phiên bản Mới
+          {editingVersion ? 'Lưu thay đổi bản nháp' : 'Lưu Phiên bản Mới'}
         </button>
       </form>
     </div>
