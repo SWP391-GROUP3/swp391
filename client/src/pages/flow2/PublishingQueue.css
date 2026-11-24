@@ -424,3 +424,104 @@
   padding: 40px 20px;
   color: var(--fm-chu-nhat);
 }
+
+/* Tabs chuyển đổi Chờ xuất bản / Đã xuất bản */
+.duyet-dang__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--fm-vien);
+  padding-bottom: 12px;
+}
+
+.duyet-dang__tab-nut {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fm-chu-nhat);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.duyet-dang__tab-nut:hover {
+  background: var(--fm-nen);
+  color: var(--fm-chu);
+}
+
+.duyet-dang__tab-nut--kich-hoat {
+  background: var(--fm-nen);
+  color: #0284c7;
+  border-color: var(--fm-vien);
+  font-weight: 600;
+}
+
+/* Nút hủy duyệt đăng */
+.duyet-dang__nut-huy-dang {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #fca5a5;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+
+.duyet-dang__nut-huy-dang:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.duyet-dang__nut-huy-dang:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.duyet-dang__nut-xac-nhan-huy {
+  padding: 8px 18px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.duyet-dang__nut-xac-nhan-huy:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.duyet-dang__nut-xac-nhan-huy:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.duyet-dang__o-nhap-ly-do {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--fm-vien);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--fm-the);
+  color: var(--fm-chu);
+  margin-top: 10px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.duyet-dang__o-nhap-ly-do:focus {
+  outline: none;
+  border-color: var(--fm-chinh);
+}

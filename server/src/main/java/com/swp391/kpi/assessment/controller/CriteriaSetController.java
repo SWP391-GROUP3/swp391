@@ -75,4 +75,29 @@ public class CriteriaSetController {
         CriteriaSetVersionResponse data = criteriaSetService.activateVersion(versionId, currentUserId);
         return ResponseEntity.ok(ApiResponse.success("Kích hoạt phiên bản bộ tiêu chí thành công", data));
     }
+
+    /**
+     * Sửa trực tiếp một phiên bản DRAFT chưa dùng (UC-15 A1, BR-SC-02).
+     */
+    @PutMapping("/{versionId}")
+    public ResponseEntity<ApiResponse<CriteriaSetVersionResponse>> updateDraftVersion(
+            @PathVariable Integer versionId,
+            @Valid @RequestBody CriteriaSetVersionCreateRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        CriteriaSetVersionResponse data = criteriaSetService.updateDraftVersion(versionId, request, currentUserId);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật phiên bản bộ tiêu chí thành công", data));
+    }
+
+    /**
+     * Xóa một phiên bản DRAFT thừa chưa kích hoạt (UC-15 A1).
+     */
+    @DeleteMapping("/{versionId}")
+    public ResponseEntity<ApiResponse<Void>> deleteDraftVersion(
+            @PathVariable Integer versionId,
+            @AuthenticationPrincipal Jwt jwt) {
+        Integer currentUserId = Integer.valueOf(jwt.getSubject());
+        criteriaSetService.deleteDraftVersion(versionId, currentUserId);
+        return ResponseEntity.ok(ApiResponse.success("Xóa phiên bản bộ tiêu chí thành công", null));
+    }
 }

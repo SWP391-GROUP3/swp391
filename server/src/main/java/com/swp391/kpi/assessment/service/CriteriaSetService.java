@@ -38,11 +38,14 @@ public class CriteriaSetService {
 
     private final CriteriaSetVersionRepository criteriaSetVersionRepository;
     private final CriteriaRepository criteriaRepository;
+    private final com.swp391.kpi.assessment.repository.ScoringAttemptRepository scoringAttemptRepository;
 
     public CriteriaSetService(CriteriaSetVersionRepository criteriaSetVersionRepository,
-            CriteriaRepository criteriaRepository) {
+            CriteriaRepository criteriaRepository,
+            com.swp391.kpi.assessment.repository.ScoringAttemptRepository scoringAttemptRepository) {
         this.criteriaSetVersionRepository = criteriaSetVersionRepository;
         this.criteriaRepository = criteriaRepository;
+        this.scoringAttemptRepository = scoringAttemptRepository;
     }
 
     /**
@@ -160,6 +163,23 @@ public class CriteriaSetService {
             throw new BusinessException("Không thể kích hoạt lại phiên bản đã bị ngưng áp dụng (RETIRED)");
         }
 
+        // BR-SC-01: Kiểm tra lại các tiêu chí và tổng trọng số trước khi kích hoạt
+        List<Criteria> criteriaToCheck = criteriaRepository
+                .findByCriteriaSetVersionIdOrderBySortOrderAsc(versionToActivate.getId());
+        if (criteriaToCheck == null || criteriaToCheck.isEmpty()) {
+            throw new BusinessException("Bộ tiêu chí phải có ít nhất 1 tiêu chí thành phần trước khi kích hoạt");
+        }
+        BigDecimal checkWeight = BigDecimal.ZERO;
+        for (Criteria c : criteriaToCheck) {
+            if (c.getWeight() == null || c.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException("Mỗi tiêu chí phải có trọng số lớn hơn 0%");
+            }
+            checkWeight = checkWeight.add(c.getWeight());
+        }
+        if (checkWeight.compareTo(new BigDecimal("100.00")) != 0) {
+            throw new BusinessException("Tổng trọng số của bộ tiêu chí phải đúng 100.00% mới được kích hoạt (Hiện tại: " + checkWeight + "%)");
+        }
+
         // Chuyển phiên bản ACTIVE cũ thành RETIRED (nếu có)
         // Bắt buộc dùng saveAndFlush để ghi ngay trạng thái RETIRED xuống Database,
         // tránh vi phạm Unique Filtered Index 'uq_criteria_set_versions_active' khi
@@ -183,5 +203,80 @@ public class CriteriaSetService {
                 .findByCriteriaSetVersionIdOrderBySortOrderAsc(activated.getId());
 
         return CriteriaSetVersionResponse.from(activated, criteriaList);
+    }
+
+    /**
+     * Sửa trực tiếp một phiên bản DRAFT chưa từng dùng (UC-15 A1, BR-SC-02).
+     * Không tăng version_no, cập nhật đè danh sách tiêu chí.
+     */
+    @Transactional
+    public CriteriaSetVersionResponse updateDraftVersion(Integer versionId, CriteriaSetVersionCreateRequest request, Integer currentUserId) {
+        CriteriaSetVersion version = criteriaSetVersionRepository.findById(versionId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên bản bộ tiêu chí với ID: " + versionId));
+
+        if (version.getStatus() != CriteriaSetStatus.DRAFT) {
+            throw new BusinessException("Chỉ được chỉnh sửa trực tiếp các phiên bản đang ở trạng thái DRAFT (Bản nháp)");
+        }
+
+        if (scoringAttemptRepository.existsByCriteriaSetVersionId(versionId)) {
+            throw new BusinessException("Phiên bản này đã từng được sử dụng để chấm bài viết, không thể sửa đổi (BR-SC-02)");
+        }
+
+        List<CriteriaItemDTO> items = request.getCriteria();
+        if (items == null || items.size() < 2) {
+            throw new BusinessException("Bộ tiêu chí phải có ít nhất 2 tiêu chí thành phần");
+        }
+
+        BigDecimal totalWeight = BigDecimal.ZERO;
+        for (CriteriaItemDTO item : items) {
+            if (item.getWeight() == null || item.getWeight().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException("Mỗi tiêu chí phải có trọng số lớn hơn 0%");
+            }
+            totalWeight = totalWeight.add(item.getWeight());
+        }
+
+        if (totalWeight.compareTo(new BigDecimal("100.00")) != 0) {
+            throw new BusinessException("Tổng trọng số của tất cả các tiêu chí phải chính xác bằng 100.00%. Hiện tại: " + totalWeight + "%");
+        }
+
+        // Xóa tiêu chí cũ và thay bằng tiêu chí mới
+        criteriaRepository.deleteByCriteriaSetVersionId(versionId);
+
+        List<Criteria> savedCriteriaList = new ArrayList<>();
+        int defaultSort = 1;
+        for (CriteriaItemDTO item : items) {
+            Criteria c = new Criteria();
+            c.setCriteriaSetVersion(version);
+            c.setName(item.getName().trim());
+            c.setWeight(item.getWeight());
+            c.setSortOrder(item.getSortOrder() != null ? item.getSortOrder() : defaultSort++);
+            savedCriteriaList.add(criteriaRepository.save(c));
+        }
+
+        if (Boolean.TRUE.equals(request.getAutoActivate())) {
+            return activateVersion(version.getId(), currentUserId);
+        }
+
+        return CriteriaSetVersionResponse.from(version, savedCriteriaList);
+    }
+
+    /**
+     * Xóa một phiên bản DRAFT thừa chưa từng kích hoạt hay sử dụng (UC-15 A1).
+     */
+    @Transactional
+    public void deleteDraftVersion(Integer versionId, Integer currentUserId) {
+        CriteriaSetVersion version = criteriaSetVersionRepository.findById(versionId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy phiên bản bộ tiêu chí với ID: " + versionId));
+
+        if (version.getStatus() != CriteriaSetStatus.DRAFT) {
+            throw new BusinessException("Chỉ có thể xóa phiên bản đang ở trạng thái DRAFT (Bản nháp)");
+        }
+
+        if (scoringAttemptRepository.existsByCriteriaSetVersionId(versionId)) {
+            throw new BusinessException("Phiên bản này đã từng được sử dụng trong phiếu chấm, không thể xóa");
+        }
+
+        criteriaRepository.deleteByCriteriaSetVersionId(versionId);
+        criteriaSetVersionRepository.delete(version);
     }
 }

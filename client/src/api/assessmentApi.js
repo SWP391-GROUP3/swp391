@@ -40,6 +40,14 @@ export function taoBoTieuChiDraft(payload) {
   return goiApi('/api/criteria-sets', { method: 'POST', body: payload })
 }
 
+export function suaBoTieuChiDraft(versionId, payload) {
+  return goiApi(`/api/criteria-sets/${versionId}`, { method: 'PUT', body: payload })
+}
+
+export function xoaBoTieuChiDraft(versionId) {
+  return goiApi(`/api/criteria-sets/${versionId}`, { method: 'DELETE' })
+}
+
 export function kichHoatBoTieuChi(versionId) {
   return goiApi(`/api/criteria-sets/${versionId}/activate`, { method: 'PUT' })
 }
@@ -122,6 +130,27 @@ export function yeuCauChamLai(articleId, reason) {
   })
 }
 
+// Truong ban: Lay danh sach bai viet da phan cong (ASSIGNED) trong ban
+export function layDanhSachBaiDaGiaoBan() {
+  return goiApi('/api/assignments/assigned')
+}
+
+// Truong ban: Doi BTV khac cham bai (Re-assign)
+export function doiBienTapVien(articleId, editorId) {
+  return goiApi(`/api/assignments/article/${articleId}/reassign`, {
+    method: 'POST',
+    body: { editorId }
+  })
+}
+
+// Truong ban: Thu hoi phan cong bai viet (Unassign/Revoke)
+export function thuHoiPhanCong(articleId, reason) {
+  return goiApi(`/api/assignments/article/${articleId}/revoke`, {
+    method: 'POST',
+    body: { reason }
+  })
+}
+
 // Truong ban: Lay hang cho duyet xuat ban bai viet (UC-33)
 export function layDanhSachChoDuyetDang() {
   return goiApi('/api/score-approvals/publishing')
@@ -131,5 +160,18 @@ export function layDanhSachChoDuyetDang() {
 export function duyetDangBaiViet(articleId) {
   return goiApi(`/api/score-approvals/article/${articleId}/publish`, {
     method: 'POST'
+  })
+}
+
+// Truong ban: Lay danh sach bai viet da xuat ban cua ban (UC-33)
+export function layDanhSachDaXuatBan() {
+  return goiApi('/api/score-approvals/published')
+}
+
+// Truong ban: Huy duyet xuat ban bai viet (UC-33)
+export function huyDuyetDangBaiViet(articleId, reason) {
+  return goiApi(`/api/score-approvals/article/${articleId}/unpublish`, {
+    method: 'POST',
+    body: { reason }
   })
 }

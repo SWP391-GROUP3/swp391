@@ -29,4 +29,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Integer>
     // Đếm số bài viết mà một BTV đang phụ trách (chưa hoàn thành) để gợi ý BTV ít việc nhất (UC-19, BR-SC-04)
     @Query("SELECT COUNT(a) FROM Assignment a WHERE a.editorId = :editorId")
     long countAssignedArticlesByEditorId(@Param("editorId") Integer editorId);
+    // Xóa phân công theo mã bài viết (dùng khi thu hồi phân công)
+    void deleteByArticleId(Integer articleId);
 }

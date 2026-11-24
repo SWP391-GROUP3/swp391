@@ -17,6 +17,7 @@ import com.swp391.kpi.assessment.dto.PendingAssignmentResponse;
 import com.swp391.kpi.assessment.entity.Assignment;
 import com.swp391.kpi.assessment.entity.ScoringAttempt;
 import com.swp391.kpi.assessment.repository.AssignmentRepository;
+import com.swp391.kpi.assessment.repository.ScoringAttemptDetailRepository;
 import com.swp391.kpi.assessment.repository.ScoringAttemptRepository;
 import com.swp391.kpi.exception.BusinessException;
 import com.swp391.kpi.exception.NotFoundException;
@@ -56,6 +57,7 @@ public class AssignmentService {
     private final GenreRepository genreRepository;
     private final UserReadService userReadService;   // service luong admin: kiem tra vai tro, lay ban cua Truong ban
     private final ScoringAttemptRepository scoringAttemptRepository;
+    private final ScoringAttemptDetailRepository scoringAttemptDetailRepository;
 
     /**
      * Lấy danh sách bài viết SUBMITTED cho Trưởng ban phân công (UC-18).
@@ -211,6 +213,152 @@ public class AssignmentService {
     public EditorWorkloadDTO getEditorWorkload(Integer editorId) {
         long count = assignmentRepository.countAssignedArticlesByEditorId(editorId);
         return new EditorWorkloadDTO(editorId, count);
+    }
+
+    /**
+     * Lấy danh sách các bài viết đang được phân công (ASSIGNED) của ban mình (Trưởng ban).
+     */
+    @Transactional(readOnly = true)
+    public List<AssignmentResponse> getAssignedArticles(Integer currentUserId) {
+        UserAccessResponse head = userReadService.requireActive(currentUserId, "HEAD_OF_DEPARTMENT");
+        List<Article> articles = articleRepository.findByStatusAndSectionIdOrderByUpdatedAtDesc(
+                ArticleStatus.ASSIGNED, head.sectionId());
+
+        List<AssignmentResponse> result = new ArrayList<>();
+        for (Article art : articles) {
+            Optional<Assignment> opt = assignmentRepository.findByArticleId(art.getId());
+            if (opt.isPresent()) {
+                Assignment a = opt.get();
+                AssignmentResponse dto = AssignmentResponse.from(a);
+                dto.setArticleTitle(art.getTitle());
+                dto.setArticleStatus(art.getStatus().name());
+
+                String authorName = (art.getAuthorId() != null)
+                        ? userRepository.findById(art.getAuthorId()).map(User::getFullName).orElse("Tác giả #" + art.getAuthorId())
+                        : "Chưa rõ";
+                dto.setAuthorName(authorName);
+
+                Integer catId = art.getCategoryId() != null ? art.getCategoryId() : art.getDeclaredCategoryId();
+                if (catId != null) {
+                    genreRepository.findById(catId).ifPresent(g -> dto.setCategoryName(g.getName()));
+                }
+
+                String editorName = (a.getEditorId() != null)
+                        ? userRepository.findById(a.getEditorId()).map(User::getFullName).orElse("BTV #" + a.getEditorId())
+                        : "Chưa rõ";
+                dto.setEditorName(editorName);
+
+                Optional<ScoringAttempt> latestAttempt = scoringAttemptRepository
+                        .findTopByArticleIdOrderByAttemptNoDesc(art.getId());
+                if (latestAttempt.isPresent()) {
+                    ScoringAttempt att = latestAttempt.get();
+                    if (att.getSubmittedAt() != null) {
+                        dto.setScoringStatus("DA_CHAM");
+                    } else {
+                        dto.setScoringStatus("DANG_CHAM");
+                    }
+                } else {
+                    dto.setScoringStatus("CHUA_CHAM");
+                }
+
+                result.add(dto);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Trưởng ban đổi Biên tập viên khác chấm bài (Re-assign).
+     */
+    @Transactional
+    public AssignmentResponse reassignArticle(Integer articleId, Integer newEditorId, Integer currentUserId) {
+        UserAccessResponse head = userReadService.requireActive(currentUserId, "HEAD_OF_DEPARTMENT");
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết."));
+
+        if (!article.getSectionId().equals(head.sectionId())) {
+            throw new BusinessException("Bài viết không thuộc ban của bạn.");
+        }
+        if (article.getStatus() != ArticleStatus.ASSIGNED) {
+            throw new BusinessException("Chỉ có thể đổi người chấm cho bài viết đang ở trạng thái ĐÃ PHÂN CÔNG (ASSIGNED).");
+        }
+
+        checkEditorOfSection(newEditorId, head.sectionId());
+
+        Assignment assignment = assignmentRepository.findByArticleId(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy phân công của bài viết này."));
+
+        // Kiểm tra xem BTV cũ đã nộp phiếu chấm chưa
+        Optional<ScoringAttempt> latestAttempt = scoringAttemptRepository
+                .findTopByArticleIdOrderByAttemptNoDesc(articleId);
+        if (latestAttempt.isPresent() && latestAttempt.get().getSubmittedAt() != null) {
+            throw new BusinessException("Biên tập viên đã hoàn tất nộp phiếu chấm, không thể đổi người chấm ở bước này.");
+        }
+
+        // Nếu có lượt chấm dở của BTV cũ, chuyển người chấm sang BTV mới
+        if (latestAttempt.isPresent() && latestAttempt.get().getSubmittedAt() == null) {
+            ScoringAttempt att = latestAttempt.get();
+            att.setReviewerId(newEditorId);
+            scoringAttemptRepository.save(att);
+        }
+
+        assignment.setEditorId(newEditorId);
+        assignment.setAssignedBy(currentUserId);
+        assignment.setAssignedAt(LocalDateTime.now());
+        assignment.setWasSuggested(false);
+
+        Assignment saved = assignmentRepository.save(assignment);
+
+        articleService.updateArticleStatus(
+                articleId,
+                ArticleStatus.ASSIGNED,
+                currentUserId,
+                "REASSIGN",
+                "Trưởng ban đổi người chấm sang Biên tập viên #" + newEditorId
+        );
+
+        return AssignmentResponse.from(saved);
+    }
+
+    /**
+     * Trưởng ban thu hồi phân công bài viết (Unassign/Revoke), đưa bài về trạng thái SUBMITTED.
+     */
+    @Transactional
+    public void revokeAssignment(Integer articleId, Integer currentUserId, String reason) {
+        UserAccessResponse head = userReadService.requireActive(currentUserId, "HEAD_OF_DEPARTMENT");
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy bài viết."));
+
+        if (!article.getSectionId().equals(head.sectionId())) {
+            throw new BusinessException("Bài viết không thuộc ban của bạn.");
+        }
+        if (article.getStatus() != ArticleStatus.ASSIGNED) {
+            throw new BusinessException("Chỉ có thể thu hồi phân công bài viết đang ở trạng thái ĐÃ PHÂN CÔNG (ASSIGNED).");
+        }
+
+        Optional<ScoringAttempt> latestAttempt = scoringAttemptRepository
+                .findTopByArticleIdOrderByAttemptNoDesc(articleId);
+        if (latestAttempt.isPresent() && latestAttempt.get().getSubmittedAt() != null) {
+            throw new BusinessException("Biên tập viên đã nộp phiếu chấm, không thể thu hồi phân công.");
+        }
+
+        // Xóa lượt chấm dở dang nếu có
+        if (latestAttempt.isPresent() && latestAttempt.get().getSubmittedAt() == null) {
+            ScoringAttempt att = latestAttempt.get();
+            scoringAttemptDetailRepository.deleteByScoringAttemptId(att.getId());
+            scoringAttemptRepository.delete(att);
+        }
+
+        assignmentRepository.deleteByArticleId(articleId);
+
+        String note = (reason != null && !reason.trim().isEmpty()) ? reason.trim() : "Trưởng ban thu hồi phân công bài viết";
+        articleService.updateArticleStatus(
+                articleId,
+                ArticleStatus.SUBMITTED,
+                currentUserId,
+                "REVOKE_ASSIGNMENT",
+                note
+        );
     }
 
     // UC-20 E2: nguoi duoc giao phai la BTV dang ACTIVE cung ban voi Truong ban
