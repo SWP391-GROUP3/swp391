@@ -30,7 +30,7 @@ export default function BlindReviewQueuePage({ chiChamMu = false }) { // chiCham
     return () => { conHienThi = false }
   }, [])
   return <section className="bao-cao-qc luong-qc">
-    <header className="bao-cao-qc__dau"><h1>Chấm lại &amp; chấm chéo</h1><p>Các phiếu được giao cho bạn. Phiếu đã nộp chỉ được xem lại.</p></header>
+    <header className="bao-cao-qc__dau"><h1>{chiChamMu ? 'Chấm lại mù' : 'Chấm lại & chấm chéo'}</h1><p>Các phiếu được giao cho bạn. Phiếu đã nộp chỉ được xem lại.</p></header>
     {loi && <p role="alert" className="thong-bao-loi">{loi}</p>}
     {!duLieu && !loi && <p>Đang tải phiếu…</p>}
     {duLieu && [['chamMu', 'Chấm lại mù', '/re-reviews/'], ['chamCheo', 'Chấm chéo phân tích', '/cross-review-tasks/']].filter(([ten]) => !(chiChamMu && ten === 'chamCheo')).map(([ten, nhan, duongDan]) =>

@@ -243,7 +243,7 @@ export default function AppRoutes({ nguoiDung, onDangNhap, onDangXuat, onCapNhat
               {/* BF-02 (Duong): UC-21 Bài được giao & UC-22..28 Chấm điểm */}
               <Route path="/assigned-articles" element={<EditorTaskQueue nguoiDung={nguoiDung} />} />
               <Route path="/my-scorings" element={<MyScorings />} />
-              <Route path="/re-reviews" element={<BlindReviewQueuePage />} />
+              <Route path="/re-reviews" element={<BlindReviewQueuePage chiChamMu />} /> {/* dang an cham cheo o BTV: chi hien phieu cham mu */}
               <Route path="/re-reviews/:id" element={<BlindReviewPage />} /> {/* [LUONG 3 - CHAM MU] buoc 1/7 route: /re-reviews/:id -> BlindReviewPage */}
               <Route path="/cross-review-tasks/:id" element={<BlindReviewPage cheo />} />
               <Route path="/assigned-articles/:articleId" element={<ScoringSheet nguoiDung={nguoiDung} />} />
