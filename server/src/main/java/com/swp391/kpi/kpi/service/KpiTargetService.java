@@ -86,6 +86,14 @@ public class KpiTargetService {
         return KpiTargetResponse.from(target);
     }
 
+    /**
+     * Lấy danh sách phóng viên đang ACTIVE để màn hình KPI cho người dùng chọn.
+     */
+    @Transactional(readOnly = true)
+    public List<UserAccessResponse> getActiveReporters() {
+        return userReadService.getActiveUsersByRole("REPORTER");
+    }
+
     // Danh sách định mức chuẩn mẫu theo ngạch phóng viên (UC-58)
     private static final List<KpiBenchmarkConfigDto> BENCHMARK_LIST = new java.util.concurrent.CopyOnWriteArrayList<>(List.of(
             new KpiBenchmarkConfigDto("PROBATIONARY", "Phóng viên tập sự", 4, new BigDecimal("60.00")),
