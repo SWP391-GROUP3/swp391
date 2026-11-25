@@ -22,8 +22,7 @@ const MENU_THU_KY = [
         icon: <><circle cx="12" cy="12" r="8" /><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.4 0-2.5.8-2.5 2s1.1 1.6 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5V8M12 16v1.5" /></> },
       { path: '/royalty-periods', nhan: 'Kỳ nhuận bút',                  // UC-49, UC-50 (ky bi tra lai - UC-52 - cung xem o day)
         icon: <><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M4 10h16M9 3v4M15 3v4" /></> },
-      { path: '/royalty-events', nhan: 'Sự kiện bão hoà',                // tao / sua / bat-tat su kien (GBR-09)
-        icon: <><path d="M4 18h16M6 18V11M11 18V6M16 18v-4" /></> },
+      // [DANG AN] menu "Su kien bao hoa" (GBR-09, path /royalty-events, icon <path d="M4 18h16M6 18V11M11 18V6M16 18v-4" />): route van con, them lai muc nay de hien menu
     ],
   },
 ]
