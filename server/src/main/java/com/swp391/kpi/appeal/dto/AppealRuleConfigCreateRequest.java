@@ -36,5 +36,6 @@ public class AppealRuleConfigCreateRequest {
     private BigDecimal varianceThreshold;
 
     @NotNull(message = "Ngày hiệu lực không được để trống")
+    @jakarta.validation.constraints.FutureOrPresent(message = "Ngày hiệu lực phải từ hôm nay trở đi")
     private LocalDate effectiveFrom;
 }

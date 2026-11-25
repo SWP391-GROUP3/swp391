@@ -65,8 +65,8 @@ class AppealScoreCalculatorTest {
     }
 
     @Test void weightsArePercentAndTotalRoundsHalfUp() {
-        var items = List.of(item(1,"33.33","49.99","Giải thích"), item(2,"66.67","80",null));
-        assertEquals(n("70.00"), calculator.weightedTotal(items, true));
+        var items = List.of(item(1,"33.33","49","Giải thích"), item(2,"66.67","80",null));
+        assertEquals(n("69.67"), calculator.weightedTotal(items, true));
     }
 
     @Test void incompleteDraftIsAllowedButCannotBeSubmitted() {
@@ -76,8 +76,8 @@ class AppealScoreCalculatorTest {
     }
 
     @Test void lowScoreRequiresCommentOnlyWhenSubmitting() {
-        var items = List.of(item(1,"100","49.99"," "));
-        assertEquals(n("49.99"), calculator.weightedTotal(items, false));
+        var items = List.of(item(1,"100","49"," "));
+        assertEquals(n("49.00"), calculator.weightedTotal(items, false));
         assertThrows(BusinessException.class, () -> calculator.weightedTotal(items, true));
         assertEquals(n("50.00"), calculator.weightedTotal(List.of(item(1,"100","50",null)), true));
     }
@@ -88,7 +88,9 @@ class AppealScoreCalculatorTest {
                 List.of(item(1,"50","70",null),item(1,"50","80",null)),
                 List.of(item(1,"0","70",null),item(2,"100","80",null)),
                 List.of(item(1,"100","100.01",null)),
-                List.of(item(1,"100","70.001",null)))) {
+                List.of(item(1,"100","70.001",null)),
+                List.of(item(1,"100","70.5",null)),   // diem thap phan
+                List.of(item(1,"100","-1",null)))) {  // diem am
             assertThrows(BusinessException.class, () -> calculator.weightedTotal(items, true));
         }
         assertThrows(BusinessException.class, () -> calculator.weightedTotal(List.of(), true));

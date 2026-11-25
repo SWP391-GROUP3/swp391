@@ -64,10 +64,10 @@ export default function AppealRuleConfigPage() {
   }
 
   function handleOpenModal() {
-    // Mac dinh ngay mai
+    // Mac dinh ngay mai (gio may, khong dung toISOString vi no tinh theo UTC)
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    const dateStr = tomorrow.toISOString().split('T')[0]
+    const dateStr = tomorrow.toLocaleDateString('sv-SE')
 
     setForm({
       appealWindowDays: 7,
@@ -82,6 +82,11 @@ export default function AppealRuleConfigPage() {
   async function handleFormSubmit(e) {
     e.preventDefault()
     setFormError('')
+    // Chi cho ngay hieu luc tu hom nay tro di (server cung kiem lai)
+    if (form.effectiveFrom < homNay) {
+      setFormError('Ngày hiệu lực phải từ hôm nay trở đi')
+      return
+    }
     setSubmitting(true)
 
     try {
@@ -102,7 +107,7 @@ export default function AppealRuleConfigPage() {
     }
   }
 
-  const homNay = new Date().toISOString().split('T')[0]
+  const homNay = new Date().toLocaleDateString('sv-SE')
 
   return (
     <div className="cau-hinh-kn">
@@ -262,6 +267,7 @@ export default function AppealRuleConfigPage() {
                 id="ckn-ngay"
                 type="date"
                 className="o-nhap"
+                min={homNay}
                 value={form.effectiveFrom}
                 onChange={(e) => setForm({ ...form, effectiveFrom: e.target.value })}
                 required

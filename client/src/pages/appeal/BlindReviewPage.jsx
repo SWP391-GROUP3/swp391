@@ -111,7 +111,8 @@ function BlindReviewForm({ id, cheo }) {
                   <td><strong>{dong.name}</strong></td>
                   <td style={{ textAlign: 'center' }}><span className="nhan-tt nhan-tt--thong-tin">{dong.weight}%</span></td>
                   <td style={{ textAlign: 'center' }}>
-                    <input aria-label={`Điểm ${dong.name}`} type="number" min="0" max="100" step="0.01" value={dong.score}
+                    <input aria-label={`Điểm ${dong.name}`} type="number" min="0" max="100" step="1" inputMode="numeric" value={dong.score}
+                      onKeyDown={(e) => { if (['.', ',', '-', '+', 'e', 'E'].includes(e.key)) e.preventDefault() }} // chan go dau thap phan / dau am
                       disabled={dangLuu || daNop} className="o-nhap-ngan bf02__o-nhap--so" style={{ width: 70, textAlign: 'center' }}
                       onChange={(e) => doiDong(dong.criterionId, 'score', e.target.value)} />
                   </td>

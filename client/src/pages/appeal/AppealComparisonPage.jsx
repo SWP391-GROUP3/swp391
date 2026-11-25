@@ -30,10 +30,10 @@ const TEN_LUAT = { USE_S1: 'Dùng điểm S1', MEDIAN_S0_S1_S2: 'Trung vị củ
 
 export default function AppealComparisonPage({ nguoiDung }) {
   const { id } = useParams()
-  return <ComparisonContent key={id} id={id} />
+  return <ComparisonContent key={id} id={id} nguoiDung={nguoiDung} />
 }
 
-function ComparisonContent({ id }) {
+function ComparisonContent({ id, nguoiDung }) {
   const [lanTai, setLanTai] = useState(0)
   const [ketQua, setKetQua] = useState(null)
   const [loi, setLoi] = useState('')

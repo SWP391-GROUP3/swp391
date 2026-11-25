@@ -55,6 +55,8 @@ public class AppealScoreCalculator {
                 throw new BusinessException("Nhận xét không được vượt quá 1000 ký tự.");
             if (item.score() == null) { missing = true; continue; }
             requireScore(item.score());
+            if (item.score().stripTrailingZeros().scale() > 0) // diem tung tieu chi chi nhan so nguyen (tong diem van co the le)
+                throw new BusinessException("Điểm từng tiêu chí phải là số nguyên từ 0 đến 100 (không âm, không thập phân).");
             if (complete && item.score().compareTo(COMMENT_THRESHOLD) < 0
                     && (item.comment() == null || item.comment().isBlank()))
                 throw new BusinessException("Phải nhập nhận xét cho mọi tiêu chí có điểm dưới 50.");

@@ -1,4 +1,4 @@
--- noinspection SqlNoDataSourceInspectionForFile
+﻿-- noinspection SqlNoDataSourceInspectionForFile
 /* ==========================================================================
    SWP391 - Dữ liệu mẫu
    Chạy SAU schema.sql. Chỉ dùng để dev và demo.
